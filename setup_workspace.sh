@@ -78,6 +78,9 @@ function fix_robot_name() {
   # Place the package in the right path
   git mv src/main/java/team1403/robot/__replaceme__ \
          src/main/java/team1403/robot/${PACKAGE_NAME}
+  
+  git mv src/test/java/team1403/robot/__replaceme__ \
+         src/test/java/team1403/robot/${PACKAGE_NAME}
 
   echo "Created '${ROBOT_NAME}' in package team1403.robot.${PACAKGE_NAME}"
 }
