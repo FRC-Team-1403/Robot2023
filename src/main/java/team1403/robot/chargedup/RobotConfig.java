@@ -1,4 +1,4 @@
-package team1403.robot.__replaceme__;
+package team1403.robot.chargedup;
 
 /**
  * This class holds attributes for the robot configuration.

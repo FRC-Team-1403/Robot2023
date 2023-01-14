@@ -1,4 +1,4 @@
-package team1403.robot.__replaceme__;
+package team1403.robot.chargedup;
 
 import static edu.wpi.first.wpilibj.XboxController.Button;
 
@@ -16,8 +16,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.device.test.MappedDeviceFactory;
 import team1403.lib.subsystems.test.FakeBuiltinSubsystemParts;
-import team1403.robot.__replaceme__.examplerail.ExampleRailTest;
-import team1403.robot.__replaceme__.examplerail.SeekEndCommand;
+import team1403.robot.chargedup.examplerail.ExampleRailTest;
+import team1403.robot.chargedup.examplerail.SeekEndCommand;
 
 
 /**
