@@ -1,4 +1,4 @@
-package team1403.robot.__replaceme__;
+package team1403.robot.chargedup;
 
 import static edu.wpi.first.wpilibj.XboxController.Button;
 
@@ -13,9 +13,9 @@ import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarRobot;
 import team1403.lib.subsystems.BuiltinSubsystem;
 import team1403.lib.util.CougarLogger;
-import team1403.robot.__replaceme__.examplerail.ExampleRail;
-import team1403.robot.__replaceme__.examplerail.SeekCenterCommand;
-import team1403.robot.__replaceme__.examplerail.SeekEndCommand;
+import team1403.robot.chargedup.examplerail.ExampleRail;
+import team1403.robot.chargedup.examplerail.SeekCenterCommand;
+import team1403.robot.chargedup.examplerail.SeekEndCommand;
 
 /**
  * The heart of the robot.

@@ -54,13 +54,13 @@ function check_workspace_or_die() {
 # Change occurances of "__replaceme__" with this robot's name.
 # This includes the following locations:
 #    * README.md
-#    * Robot/build.gradle
-#    * Robot/src/java/main/team1403/__replaceme__
+#    * build.gradle
+#    * src/java/main/team1403/__replaceme__
 #
 # The skeleton classes will also be moved to the appropriate location
 # for the infered java package name.
 function fix_robot_name() {
-  if [[ ! -d Robot/src/main/java/team1403/robot/__replaceme__ ]]; then
+  if [[ ! -d src/main/java/team1403/robot/__replaceme__ ]]; then
     echo "This robot is already named. It is probably '$(head README.md)'"
     return
   fi
@@ -69,15 +69,18 @@ function fix_robot_name() {
   sed -i "s/__replaceme__/${ROBOT_NAME}/g" README.md
 
   # Replace our custom package reference to the 'Main' class in build.gradle.
-  sed -i "s/\.__replaceme__/\.${PACKAGE_NAME}/g" Robot/build.gradle  
+  sed -i "s/\.__replaceme__/\.${PACKAGE_NAME}/g" build.gradle  
 
   # Replace our custom package name in the Java code template.
-  find Robot/src -type f \
+  find src -type f \
                  -exec sed -i "s/\.__replaceme__/\.${PACKAGE_NAME}/g" {} \;
 
   # Place the package in the right path
-  git mv Robot/src/main/java/team1403/robot/__replaceme__ \
-         Robot/src/main/java/team1403/robot/${PACKAGE_NAME}
+  git mv src/main/java/team1403/robot/__replaceme__ \
+         src/main/java/team1403/robot/${PACKAGE_NAME}
+  
+  git mv src/test/java/team1403/robot/__replaceme__ \
+         src/test/java/team1403/robot/${PACKAGE_NAME}
 
   echo "Created '${ROBOT_NAME}' in package team1403.robot.${PACAKGE_NAME}"
 }

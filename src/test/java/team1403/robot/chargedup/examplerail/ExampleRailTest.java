@@ -1,4 +1,4 @@
-package team1403.robot.__replaceme__.examplerail;
+package team1403.robot.chargedup.examplerail;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -14,7 +14,7 @@ import team1403.lib.device.test.FakeMotorController;
 import team1403.lib.device.test.MappedDeviceFactory;
 import team1403.lib.device.virtual.ManualLimitSwitch;
 import team1403.lib.util.CougarLogger;
-import team1403.robot.__replaceme__.RobotConfig;
+import team1403.robot.chargedup.RobotConfig;
 
 
 /**

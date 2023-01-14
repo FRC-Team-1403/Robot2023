@@ -10,7 +10,7 @@ project.buildDir = "${project.rootDir}/build"
 // The name should be unique across all repositories so if we were
 // to fuse them together the name would not collide. You can add
 // the year as a suffix (e.g. cougar22)
-def ROBOT_MAIN_CLASS = "team1403.robot.__replaceme__.Main"
+def ROBOT_MAIN_CLASS = "team1403.robot.chargedup.Main"
 
 
 

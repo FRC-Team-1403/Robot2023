@@ -1,4 +1,4 @@
-package team1403.robot.__replaceme__.examplerail;
+package team1403.robot.chargedup.examplerail;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 

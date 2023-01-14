@@ -1,4 +1,4 @@
-package team1403.robot.__replaceme__.examplerail;
+package team1403.robot.chargedup.examplerail;
 
 import com.revrobotics.SparkMaxRelativeEncoder;
 
@@ -11,7 +11,7 @@ import team1403.lib.device.Encoder;
 import team1403.lib.device.LimitSwitch;
 import team1403.lib.device.MotorController;
 import team1403.lib.device.virtual.LimitSwitchImpl;
-import team1403.robot.__replaceme__.RobotConfig;
+import team1403.robot.chargedup.RobotConfig;
 
 /**
  * A placeholder subsystem for purposes of writing the skeleton RobotContainer.
