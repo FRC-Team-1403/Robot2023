@@ -1,0 +1,81 @@
+apply plugin: 'java'
+apply plugin: 'checkstyle'
+apply plugin: 'pmd'
+apply plugin: 'jacoco'
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+}
+
+checkstyle {
+    toolVersion = '10.3.1'
+    configFile = file("${project.rootDir}/buildSrc/checkstyle.xml")
+    reportsDir = file("${project.rootDir}/build/reports/${project.name}/checkstyle")
+    // Dont check test code
+    sourceSets = [project.sourceSets.main]
+}
+
+
+pmd {
+    toolVersion = '6.47.0'
+    ignoreFailures = true
+    ruleSets = []
+    ruleSetFiles = files("${project.rootDir}/buildSrc/pmd.xml")
+    reportsDir = file("${project.rootDir}/build/reports/${project.name}/pmd")
+}
+
+
+jacoco {
+    toolVersion = '0.8.8'
+}
+
+
+jacocoTestReport {
+    dependsOn test
+    afterEvaluate {
+      // The "excludes" in the jacoco still keeps the directories in the report.
+      // Remove those directories entirely.
+      // https://www.baeldung.com/jacoco-report-exclude#2-gradle-configuration
+      classDirectories.setFrom(files(classDirectories.files.collect {
+        fileTree(dir: it, exclude: [])
+      }))
+    }
+}
+
+
+compileJava {
+            options.compilerArgs << '-Xlint:unchecked'
+}
+
+test {
+    // This is needed to work with JUnit5
+    // Otherwise no tests are run.
+    useJUnitPlatform()
+
+    testLogging {
+      // Show code printf output to console
+      showStandardStreams = true
+
+      // Write test failure reasons to console
+      exceptionFormat "full"
+    }
+
+    systemProperties = [
+        'junit.jupiter.extensions.autodetection.enabled': 'true',
+        'java.util.logging.config.file': "${project.projectDir}/src/test/config/test.logging.properties"
+    ]
+
+    jacoco {
+        enabled = true
+	includes = []
+	excludes = []
+	output = JacocoTaskExtension.Output.FILE
+    }
+    finalizedBy jacocoTestReport
+}

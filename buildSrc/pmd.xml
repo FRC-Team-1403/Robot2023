@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<ruleset name="WPILibRuleset"
+  xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+
+  <description>PMD Ruleset for Team 1403</description>
+
+  <rule ref="category/java/bestpractices.xml">
+    <exclude name="JUnitAssertionsShouldIncludeMessage" />
+    <exclude name="JUnitTestContainsTooManyAsserts" />
+  </rule>
+
+  <rule ref="category/java/design.xml">
+    <exclude name="LawOfDemeter" />
+    <exclude name="LoosePackageCoupling" />
+  </rule>
+
+  <rule ref="category/java/documentation.xml">
+    <exclude name="UncommentedEmptyMethodBody" />
+  </rule>
+  <rule ref="category/java/documentation.xml/CommentSize">
+    <properties>
+        <!-- Intent here is to limit line length, not lines. -->
+        <property name="maxLines" value="120" />
+        <property name="maxLineLength" value="80" />
+    </properties>
+  </rule>
+  <rule ref="category/java/documentation.xml/CommentRequired">
+    <properties>
+        <property name="accessorCommentRequirement" value="Ignored" />
+        <property name="fieldCommentRequirement" value="Ignored" />
+        <property name="methodWithOverrideCommentRequirement" value="Ignored" />
+    </properties>
+  </rule>
+
+  <rule ref="category/java/errorprone.xml">
+    <exclude name="BeanMembersShouldSerialize" />
+  </rule>
+
+  <rule ref="category/java/multithreading.xml">
+  </rule>
+
+  <rule ref="category/java/performance.xml">
+    <exclude name="RedundantFieldInitializer" />
+  </rule>
+
+</ruleset>
