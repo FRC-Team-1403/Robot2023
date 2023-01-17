@@ -61,6 +61,16 @@ public class FakeEncoder extends BaseDevice implements Encoder {
     return m_ticksPerRevolution;
   }
 
+  @Override
+  public void setPositionTickConversionFactor(double conversionFactor) {
+    // TODO Auto-generated method stub
+  }
+
+  @Override
+  public void setVelocityTickConversionFactor(double conversionFactor) {
+    // TODO Auto-generated method stub
+  }
+
   private final double m_ticksPerRevolution;
   private double m_ticks;
   private double m_rpm;

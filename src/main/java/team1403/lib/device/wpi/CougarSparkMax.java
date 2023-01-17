@@ -108,6 +108,11 @@ public final class CougarSparkMax extends CANSparkMax
   }
 
   @Override
+  public final void setRampRate(double ramp) {
+    setClosedLoopRampRate(ramp);
+  }
+
+  @Override
   public boolean hasEmbeddedEncoder() {
     return m_encoder != null;
   }
@@ -163,6 +168,16 @@ public final class CougarSparkMax extends CANSparkMax
     @Override
     public final double getRpm() {
       return m_encoder.getVelocity();
+    }
+
+    @Override
+    public void setPositionTickConversionFactor(double conversionFactor) {
+      m_encoder.setPositionConversionFactor(conversionFactor); 
+    }
+
+    @Override
+    public void setVelocityTickConversionFactor(double conversionFactor) {
+      m_encoder.setVelocityConversionFactor(conversionFactor); 
     }
 
     private final String m_encoderName;

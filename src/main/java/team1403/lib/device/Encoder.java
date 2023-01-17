@@ -21,6 +21,20 @@ public interface Encoder extends Sensor {
   double getPositionTicks();
 
   /**
+   * Set conversion factor for position ticks.
+   *
+   * @param conversionFactor The conversion factor to be used with position.
+   */
+  void setPositionTickConversionFactor(double conversionFactor);
+
+  /**
+   * Set conversion factor for velocity ticks.
+   *
+   * @param conversionFactor The conversion factor to be used with velocity.
+   */
+  void setVelocityTickConversionFactor(double conversionFactor);
+
+  /**
    * Get the rate of rotation in RPM.
    *
    * @return rate of encoder rotation
