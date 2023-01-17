@@ -117,6 +117,11 @@ public class FakeMotorController
   }
 
   @Override
+  public void setRampRate(double rate) {
+    // TODO Auto-generated method stub 
+  }
+
+  @Override
   public Encoder getEmbeddedEncoder() {
     if (m_encoder != null) {
       return m_encoder;

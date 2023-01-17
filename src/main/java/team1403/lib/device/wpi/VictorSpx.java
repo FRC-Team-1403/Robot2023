@@ -57,6 +57,10 @@ public class VictorSpx extends WPI_VictorSPX
     setSpeed(speed);
   }
 
+  @Override
+  public void setRampRate(double rate) {
+    configClosedloopRamp(rate);
+  }
 
   @Override
   public final void setSpeed(double speed) {

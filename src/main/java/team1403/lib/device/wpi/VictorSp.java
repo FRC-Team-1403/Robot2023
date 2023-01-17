@@ -50,6 +50,10 @@ public class VictorSp extends VictorSP
     setSpeed(speed);
   }
 
+  @Override
+  public void setRampRate(double rate) {
+    // TODO
+  }
 
   @Override
   public final void setSpeed(double speed) {

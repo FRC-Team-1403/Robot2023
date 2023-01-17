@@ -69,6 +69,11 @@ public class TalonSrx extends WPI_TalonSRX
   }
 
   @Override
+  public void setRampRate(double rate) {
+    configClosedloopRamp(rate);
+  }
+
+  @Override
   public boolean hasEmbeddedEncoder() {
     return true;
   }
@@ -122,6 +127,17 @@ public class TalonSrx extends WPI_TalonSRX
     }
 
     private final String m_encoderName;
+
+    @Override
+    public void setPositionTickConversionFactor(double conversionFactor) {
+      // TODO 
+    }
+
+    @Override
+    public void setVelocityTickConversionFactor(double conversionFactor) {
+      // TODO Auto-generated method stub
+      
+    }
   }
 
   /**

@@ -56,6 +56,13 @@ public interface MotorController extends Actuator {
   boolean getInverted();
 
   /**
+   * Sets the ramp rate.
+   *
+   * @param rate Defines the seconds needed to reach a value.
+   */
+  void setRampRate(double rate);
+
+  /**
    * Force the motor to stop.
    *
    * <p>This is potentially different from setting the speed to 0 as an
