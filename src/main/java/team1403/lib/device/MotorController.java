@@ -30,7 +30,7 @@ public interface MotorController extends Actuator {
    *
    * @param voltage The desired voltage.
    */
-  void setVoltage(double voltage);
+  void setVoltageCompensation(double voltage);
 
   /**
    * Set the relative speed.
@@ -40,6 +40,13 @@ public interface MotorController extends Actuator {
    *              speed depends on the motor and battery level.
    */
   void setSpeed(double speed);
+
+  /**
+   * Set the output value of the motor in encoder ticks or an analog value.
+   *
+   * @param speed The setpoint value in encoder ticks/analog value.
+   */
+  void setPosition(double position);
 
   /**
    * Set whether the motor is inverted or not. Inverted motors run backward.
@@ -56,6 +63,11 @@ public interface MotorController extends Actuator {
   boolean getInverted();
 
   /**
+   * Set the gains for the motor.
+   */
+  void setGains(double p, double i, double d);
+
+  /**
    * Sets the ramp rate.
    *
    * @param rate Defines the seconds needed to reach a value.
@@ -69,6 +81,14 @@ public interface MotorController extends Actuator {
    * intentional stop may be treated differently within the motor.
    */
   void stopMotor();
+
+  /**
+   * Sets the current limit.
+   *
+   *@param limit The max current 
+   */
+  void setCurrentLimit(int limit);
+
 
   /**
    * Checks if the MotorController has an embedded encoder.

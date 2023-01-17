@@ -1,65 +1,60 @@
 package team1403.lib.device.wpi;
 
-import com.ctre.phoenix.motorcontrol.IMotorController;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.can.SlotConfiguration;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import team1403.lib.device.CurrentSensor;
 import team1403.lib.device.Encoder;
 import team1403.lib.device.MotorController;
+import team1403.lib.device.NoSuchDeviceError;
 import team1403.lib.util.CougarLogger;
 
-/**
- * Device implementation for a WPI_TalonSRX motor controller.
- */
-public class TalonSrx extends WPI_TalonSRX
-                      implements MotorController {
-  /**
-   * Constructor.
-   *
-   * @param name The name name for the device.
-   * @param channel The CAN channel the motor is on.
-   * @param logger The debug logger to use for the device.
-   */
-  public TalonSrx(String name, int channel, CougarLogger logger) {
-    super(channel);
+public class CougarTalonFx extends TalonFX implements MotorController {
+
+  private final EmbeddedEncoder m_encoder;
+  private final EmbeddedCurrentSensor m_currentSensor;
+  TalonFXControlMode controlMode;
+  String m_name;
+  CougarLogger m_logger;
+
+  public CougarTalonFx(String name, int deviceNumber, TalonFXControlMode controlMode, CougarLogger m_logger) {
+    super(deviceNumber);
+    this.controlMode = controlMode;
+    this.m_logger = m_logger;
     m_name = name;
-    m_logger = logger;
     m_encoder = new EmbeddedEncoder(name + ".Encoder");
     m_currentSensor = new EmbeddedCurrentSensor(name + ".CurrentSensor");
   }
 
-  /**
-   * Return the WPI_TalonSRX API so we can do something specific.
-   *
-   * @return The underlying {@code WPI_TalonSRX} instance.
-   */
-  public final WPI_TalonSRX getTalonSrxApi() {
-    return this;
-  }
-
   @Override
-  public final String getName() {
+  public String getName() {
     return m_name;
   }
 
-  /**
-   * Follow another TalonSrx motor.
-   *
-   * @param source Must be a com.ctre.phoenix.motorcontrol.IMotorController
-   *               (e.g. another TalonSrx or VictorSpx)
-   *
-   * @throws ClassCastException if motor is not compatible.
-   */
   @Override
   public void follow(MotorController source) {
     m_logger.tracef("follow %s <- %s", getName(), source.getName());
-    super.follow((IMotorController)source);  // Will throw an exception if source is not compatible.
+    super.follow((TalonFX) source);
+
   }
 
   @Override
-  public final void set(double speed) {
-    setSpeed(speed);
+  public void setSpeed(double speed) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void setPosition(double position) {
+    m_logger.tracef("setPosition %s %f", getName(), position);
+    set(controlMode, position);
+  }
+
+  @Override
+  public void stopMotor() {
+    m_logger.tracef(("stopMotor %s"), getName());
+    set(TalonFXControlMode.Velocity, 0);
   }
 
   @Override
@@ -69,14 +64,9 @@ public class TalonSrx extends WPI_TalonSRX
   }
 
   @Override
-  public final void setSpeed(double speed) {
-    m_logger.tracef("setSpeed %s %f", getName(), speed);
-    super.set(speed);
-  }
-
-  @Override
   public void setRampRate(double rate) {
-    configClosedloopRamp(rate);
+    super.configClosedloopRamp(rate);
+    
   }
 
   @Override
@@ -84,14 +74,27 @@ public class TalonSrx extends WPI_TalonSRX
     super.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, limit, 0, 0));
   }
 
+  @Override 
+  public void setGains(double p, double i, double d) {
+    SlotConfiguration config = new SlotConfiguration();
+    config.kP = p;
+    config.kD = d;
+    config.kI = i;
+    super.configureSlot(config, 0, getBaseID())
+  }
+
+
   @Override
   public boolean hasEmbeddedEncoder() {
-    return true;
+    return m_encoder != null;
   }
 
   @Override
   public Encoder getEmbeddedEncoder() {
-    return m_encoder;
+    if (hasEmbeddedEncoder()) {
+      return m_encoder;
+    }
+    throw new NoSuchDeviceError("No Encoder with " + m_name);
   }
 
   @Override
@@ -102,11 +105,6 @@ public class TalonSrx extends WPI_TalonSRX
   @Override
   public CurrentSensor getEmbeddedCurrentSensor() {
     return m_currentSensor;
-  }
-
-  @Override
-  public void setPosition(double position) {
-    throw new UnsupportedOperationException();
   }
 
   /**
@@ -146,7 +144,8 @@ public class TalonSrx extends WPI_TalonSRX
 
     @Override
     public void setPositionTickConversionFactor(double conversionFactor) {
-      // TODO 
+      // TODO Auto-generated method stub
+      
     }
 
     @Override
@@ -180,8 +179,4 @@ public class TalonSrx extends WPI_TalonSRX
     private final String m_sensorName;
   }
 
-  private final EmbeddedEncoder m_encoder;
-  private final EmbeddedCurrentSensor m_currentSensor;
-  private final CougarLogger m_logger;
-  private final String m_name;
 }

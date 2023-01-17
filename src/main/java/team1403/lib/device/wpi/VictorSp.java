@@ -52,7 +52,7 @@ public class VictorSp extends VictorSP
 
   @Override
   public void setRampRate(double rate) {
-    // TODO
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -62,9 +62,18 @@ public class VictorSp extends VictorSP
   }
 
   @Override
-  public void setVoltage(double voltage) {
-    m_logger.tracef("setVoltage %s %f", getName(), voltage);
-    super.setVoltage(voltage);
+  public final void setVoltageCompensation(double voltage) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void setPosition(double position) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void setCurrentLimit(int limit) {
+    throw new UnsupportedOperationException();
   }
 
   private final CougarLogger m_logger;

@@ -91,7 +91,7 @@ public class FakeMotorController
   }
 
   @Override
-  public void setVoltage(double voltage) {
+  public void setVoltageCompensation(double voltage) {
     m_voltage = voltage;
   }
 
@@ -145,4 +145,9 @@ public class FakeMotorController
   private final CougarLogger m_logger;
   private final Encoder m_encoder;
   private final CurrentSensor m_currentSensor;
+  @Override
+  public void setPosition(double position) {
+    // TODO Auto-generated method stub
+    
+  }
 }

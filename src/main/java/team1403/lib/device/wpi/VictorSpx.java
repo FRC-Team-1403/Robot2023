@@ -63,9 +63,24 @@ public class VictorSpx extends WPI_VictorSPX
   }
 
   @Override
+  public void setVoltageCompensation(double voltage) {
+    super.configVoltageCompSaturation(voltage);
+  }
+
+  @Override
   public final void setSpeed(double speed) {
     m_logger.tracef("setSpeed %s %f", getName(), speed);
     super.set(speed);
+  }
+
+  @Override
+  public void setPosition(double position) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void setCurrentLimit(int limit) {
+    throw new UnsupportedOperationException();
   }
 
   private final CougarLogger m_logger;
