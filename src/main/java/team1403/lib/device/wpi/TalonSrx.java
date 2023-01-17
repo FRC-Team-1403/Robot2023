@@ -3,6 +3,7 @@ package team1403.lib.device.wpi;
 import com.ctre.phoenix.motorcontrol.IMotorController;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.wpilibj.PneumaticHub;
 import team1403.lib.device.CurrentSensor;
 import team1403.lib.device.Encoder;
 import team1403.lib.device.MotorController;
