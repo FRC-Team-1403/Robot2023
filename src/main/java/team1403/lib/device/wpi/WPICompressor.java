@@ -1,5 +1,7 @@
 package team1403.lib.device.wpi;
 
+import javax.print.attribute.standard.Compression;
+
 import edu.wpi.first.wpilibj.Compressor;
 import team1403.lib.device.CougarCompressor;
 
@@ -32,6 +34,7 @@ public class WPICompressor implements CougarCompressor{
     @Override
     public void setPressure(int val) {
         //Set a constant for the pressure of the compressor.
+        this.m_Compressor.setPressure(val);
         
     }
 
@@ -47,32 +50,27 @@ public class WPICompressor implements CougarCompressor{
 
     @Override
     public void setClosedLoopControl(boolean value) {
-        // TODO Auto-generated method stub
-        
+        this.m_Compressor.setClosedLoopControl(value);
     }
 
     @Override
     public boolean getCompressorCurrentTooHighStickyFault() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.m_Compressor.getCompressorCurrentTooHighStickyFault();
     }
 
     @Override
     public boolean getCompressorShortedStickyFault() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.m_Compressor.getCompressorShortedStickyFault();
     }
 
     @Override
     public boolean getCompressorNotConnectedStickyFault() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.m_Compressor.getCompressorNotConnectedStickyFault();
     }
 
     @Override
     public void clearAllPCMStickyFaults() {
-        // TODO Auto-generated method stub
-        
+        this.m_Compressor.clearAllPCMStickyFaults();
     }
 
 
@@ -92,8 +90,7 @@ public class WPICompressor implements CougarCompressor{
 
     @Override
     public boolean getClosedLoopControl() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.m_Compressor.getClosedLoopControl();
     }
 
 
