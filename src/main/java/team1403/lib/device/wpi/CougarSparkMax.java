@@ -13,8 +13,12 @@ import team1403.lib.util.CougarLogger;
 /**
  * Device implementation for a base CANSparkMax motor controller.
  */
-public final class CougarSparkMax extends CANSparkMax
-    implements MotorController {
+public final class CougarSparkMax extends CANSparkMax implements MotorController {
+
+  private final EmbeddedEncoder m_encoder;
+  private final EmbeddedCurrentSensor m_currentSensor;
+  private final CougarLogger m_logger;
+  private final String m_name;
 
   /**
    * Method for creating brushless CANSparkMax.
@@ -92,11 +96,6 @@ public final class CougarSparkMax extends CANSparkMax
   }
 
   @Override
-  public final void set(double speed) {
-    setSpeed(speed);
-  }
-
-  @Override
   public final void setVoltageCompensation(double voltage) {
     m_logger.tracef("setVoltage %s %f", getName(), voltage);
     super.enableVoltageCompensation(voltage);
@@ -109,14 +108,50 @@ public final class CougarSparkMax extends CANSparkMax
   }
 
   @Override
+  public void setPosition(double position) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void setInverted(boolean isInverted) {
+    super.setInverted(isInverted);
+  }
+
+  @Override
+  public boolean getInverted() {
+    return super.getInverted();
+  }
+
+  @Override
+  public void setGains(double p, double i, double d) {
+    super.getPIDController().setP(p);
+    super.getPIDController().setI(i);
+    super.getPIDController().setD(d);
+  }
+
+  @Override
+  public void setIdleMode(CougarIdleMode mode) {
+    if (mode == CougarIdleMode.BRAKE) {
+      super.setIdleMode(IdleMode.kBrake);
+    } else {
+      super.setIdleMode(IdleMode.kCoast);
+    }
+  }
+
+  @Override
+  public final void setRampRate(double ramp) {
+    setClosedLoopRampRate(ramp);
+  }
+
+  @Override
   public final void stopMotor() {
     m_logger.tracef(("stopMotor %s"), getName());
     super.stopMotor();
   }
 
   @Override
-  public final void setRampRate(double ramp) {
-    setClosedLoopRampRate(ramp);
+  public void setCurrentLimit(int limit) {
+    super.setSmartCurrentLimit(limit);
   }
 
   @Override
@@ -142,16 +177,6 @@ public final class CougarSparkMax extends CANSparkMax
     return m_currentSensor;
   }
 
-  @Override
-  public void setPosition(double position) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void setCurrentLimit(int limit) {
-    super.setSmartCurrentLimit(limit);
-  }
-
   /**
    * Implements the interface to the embedded encoder.
    */
@@ -159,7 +184,7 @@ public final class CougarSparkMax extends CANSparkMax
   private class EmbeddedEncoder implements Encoder {
     /**
      * Constructor.
-     * 
+     *
      * @param name        The name of encoder
      * @param encoderType the type of encoder used
      */
@@ -205,8 +230,7 @@ public final class CougarSparkMax extends CANSparkMax
   /**
    * Implements the interface to the embedded current sensor.
    *
-   * <p>
-   * This is not a static class so instances share the
+   * <p>This is not a static class so instances share the
    * CougarSparkMax instance state.
    */
   private class EmbeddedCurrentSensor implements CurrentSensor {
@@ -229,9 +253,4 @@ public final class CougarSparkMax extends CANSparkMax
 
     private final String m_sensorName;
   }
-
-  private final EmbeddedEncoder m_encoder;
-  private final EmbeddedCurrentSensor m_currentSensor;
-  private final CougarLogger m_logger;
-  private final String m_name;
 }

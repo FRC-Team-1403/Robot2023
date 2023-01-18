@@ -9,8 +9,11 @@ import team1403.lib.util.CougarLogger;
 /**
  * Device implementation for a WPI_VictorSPX motor controller.
  */
-public class VictorSpx extends WPI_VictorSPX
-                       implements MotorController {
+public class VictorSpx extends WPI_VictorSPX implements MotorController {
+
+  private final CougarLogger m_logger;
+  private final String m_name;
+  
   /**
    * Constructor.
    *
@@ -53,16 +56,6 @@ public class VictorSpx extends WPI_VictorSPX
   }
 
   @Override
-  public final void set(double speed) {
-    setSpeed(speed);
-  }
-
-  @Override
-  public void setRampRate(double rate) {
-    configClosedloopRamp(rate);
-  }
-
-  @Override
   public void setVoltageCompensation(double voltage) {
     super.configVoltageCompSaturation(voltage);
   }
@@ -79,10 +72,37 @@ public class VictorSpx extends WPI_VictorSPX
   }
 
   @Override
-  public void setCurrentLimit(int limit) {
+  public void setInverted(boolean isInverted) {
+    super.setInverted(isInverted);
+  }
+
+  @Override
+  public boolean getInverted() {
+    return super.getInverted();
+  }
+
+  @Override 
+  public void setGains(double p, double i, double d) {
     throw new UnsupportedOperationException();
   }
 
-  private final CougarLogger m_logger;
-  private final String m_name;
+  @Override
+  public void setIdleMode(CougarIdleMode mode) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void setRampRate(double rate) {
+    configClosedloopRamp(rate);
+  }
+
+  @Override
+  public void stopMotor() {
+    super.stopMotor();
+  }
+
+  @Override
+  public void setCurrentLimit(int limit) {
+    throw new UnsupportedOperationException();
+  }
 }

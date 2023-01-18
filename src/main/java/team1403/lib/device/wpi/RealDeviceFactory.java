@@ -1,5 +1,6 @@
 package team1403.lib.device.wpi;
 
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.revrobotics.SparkMaxRelativeEncoder.Type;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -83,6 +84,11 @@ public class RealDeviceFactory implements DeviceFactory {
   public MotorController makeVictorSpx(
       String name, int channel, CougarLogger logger) {
     return new VictorSpx(name, channel, logger);
+  }
+
+  @Override
+  public MotorController makeCougarTalonFx(String name, int deviceNumber, TalonFXControlMode mode, CougarLogger logger) {
+    return new CougarTalonFx(name, deviceNumber, mode, logger);
   }
 
   /**

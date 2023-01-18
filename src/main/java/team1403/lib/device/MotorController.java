@@ -18,6 +18,21 @@ package team1403.lib.device;
  * {@code has} methods before requesting it to avoid the exception.
  */
 public interface MotorController extends Actuator {
+
+  /**
+   * Represents the neutral mode of the motor.
+   */
+  public enum CougarIdleMode {
+    /**
+     * Represents idle mode in brake mode.
+     */
+    BRAKE,
+    /**
+     * Represents idle mode in coast mode.
+     */
+    COAST
+  }
+
   /**
    * Configure this motor to follow another.
    *
@@ -44,7 +59,7 @@ public interface MotorController extends Actuator {
   /**
    * Set the output value of the motor in encoder ticks or an analog value.
    *
-   * @param speed The setpoint value in encoder ticks/analog value.
+   * @param position The setpoint value in encoder ticks/analog value.
    */
   void setPosition(double position);
 
@@ -68,6 +83,13 @@ public interface MotorController extends Actuator {
   void setGains(double p, double i, double d);
 
   /**
+   * Set the idle mode for the motor.
+   *
+   * @param mode the idle mode of the motor
+   */
+  void setIdleMode(CougarIdleMode mode);
+
+  /**
    * Sets the ramp rate.
    *
    * @param rate Defines the seconds needed to reach a value.
@@ -85,10 +107,9 @@ public interface MotorController extends Actuator {
   /**
    * Sets the current limit.
    *
-   *@param limit The max current 
+   * @param limit The max current
    */
   void setCurrentLimit(int limit);
-
 
   /**
    * Checks if the MotorController has an embedded encoder.
@@ -120,7 +141,7 @@ public interface MotorController extends Actuator {
   default Encoder getEmbeddedEncoder() {
     throw new NoSuchDeviceError(
         String.format("Device '%s' does not have an embedded encoder.",
-                      getName()));
+            getName()));
   }
 
   /**
@@ -153,6 +174,6 @@ public interface MotorController extends Actuator {
   default CurrentSensor getEmbeddedCurrentSensor() {
     throw new NoSuchDeviceError(
         String.format("Device '%s' does not have an embeded current sensor.",
-                      getName()));
+            getName()));
   }
 }

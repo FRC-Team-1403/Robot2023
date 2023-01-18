@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.revrobotics.SparkMaxRelativeEncoder;
 
 import edu.wpi.first.networktables.NetworkTable;
@@ -187,6 +188,12 @@ public class MappedDeviceFactory implements DeviceFactory {
   public MotorController makeVictorSpx(
       String name, int channel, CougarLogger logger) {
     m_calls.put(name, Arrays.asList(name, Integer.valueOf(channel), logger));
+    return (MotorController)takeDevice(name);
+  }
+
+  @Override
+  public MotorController makeCougarTalonFx(String name, int deviceNumber, TalonFXControlMode mode, CougarLogger logger) {
+    m_calls.put(name, Arrays.asList(name, deviceNumber, mode, logger));
     return (MotorController)takeDevice(name);
   }
 

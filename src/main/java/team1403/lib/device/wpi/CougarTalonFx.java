@@ -1,8 +1,8 @@
 package team1403.lib.device.wpi;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
-import com.ctre.phoenix.motorcontrol.can.SlotConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import team1403.lib.device.CurrentSensor;
@@ -11,6 +11,9 @@ import team1403.lib.device.MotorController;
 import team1403.lib.device.NoSuchDeviceError;
 import team1403.lib.util.CougarLogger;
 
+/**
+ * Device implementation for a base TalonFX motor controller.
+ */
 public class CougarTalonFx extends TalonFX implements MotorController {
 
   private final EmbeddedEncoder m_encoder;
@@ -19,13 +22,31 @@ public class CougarTalonFx extends TalonFX implements MotorController {
   String m_name;
   CougarLogger m_logger;
 
-  public CougarTalonFx(String name, int deviceNumber, TalonFXControlMode controlMode, CougarLogger m_logger) {
+  /**
+   * Constructor.
+   *
+   * @param name of the mptor
+   * @param deviceNumber the port the motor is plugged into
+   * @param controlMode the control mode of the motor
+   * @param logger The debug logger to use for the device.
+   */
+  public CougarTalonFx(String name, int deviceNumber, TalonFXControlMode controlMode, 
+        CougarLogger logger) {
     super(deviceNumber);
     this.controlMode = controlMode;
-    this.m_logger = m_logger;
+    this.m_logger = logger;
     m_name = name;
     m_encoder = new EmbeddedEncoder(name + ".Encoder");
     m_currentSensor = new EmbeddedCurrentSensor(name + ".CurrentSensor");
+  }
+
+  /**
+   * Return the TalonFX API so we can do something specific.
+   *
+   * @return The underlying {@code TalonFX} instance.
+   */
+  public final TalonFX geTalonFxApi() {
+    return this;
   }
 
   @Override
@@ -37,7 +58,12 @@ public class CougarTalonFx extends TalonFX implements MotorController {
   public void follow(MotorController source) {
     m_logger.tracef("follow %s <- %s", getName(), source.getName());
     super.follow((TalonFX) source);
+  }
 
+  @Override
+  public final void setVoltageCompensation(double voltage) {
+    m_logger.tracef("setVoltage %s %f", getName(), voltage);
+    super.configVoltageCompSaturation(voltage);
   }
 
   @Override
@@ -52,37 +78,46 @@ public class CougarTalonFx extends TalonFX implements MotorController {
   }
 
   @Override
+  public void setInverted(boolean isInverted) {
+    super.setInverted(isInverted);
+  }
+
+  @Override
+  public boolean getInverted() {
+    return super.getInverted();
+  }
+
+  @Override 
+  public void setGains(double p, double i, double d) {
+    super.config_kP(0, p);
+    super.config_kD(0, d);
+    super.config_kI(0, i);
+  }
+
+  @Override
+  public void setIdleMode(CougarIdleMode mode) {
+    if (mode == CougarIdleMode.BRAKE) {
+      super.setNeutralMode(NeutralMode.Brake);
+    } else {
+      super.setNeutralMode(NeutralMode.Coast);
+    }
+  }
+
+  @Override
+  public void setRampRate(double rate) {
+    super.configClosedloopRamp(rate);
+  }
+
+  @Override
   public void stopMotor() {
     m_logger.tracef(("stopMotor %s"), getName());
     set(TalonFXControlMode.Velocity, 0);
   }
 
   @Override
-  public final void setVoltageCompensation(double voltage) {
-    m_logger.tracef("setVoltage %s %f", getName(), voltage);
-    super.configVoltageCompSaturation(voltage);
-  }
-
-  @Override
-  public void setRampRate(double rate) {
-    super.configClosedloopRamp(rate);
-    
-  }
-
-  @Override
   public void setCurrentLimit(int limit) {
     super.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, limit, 0, 0));
   }
-
-  @Override 
-  public void setGains(double p, double i, double d) {
-    SlotConfiguration config = new SlotConfiguration();
-    config.kP = p;
-    config.kD = d;
-    config.kI = i;
-    super.configureSlot(config, 0, getBaseID())
-  }
-
 
   @Override
   public boolean hasEmbeddedEncoder() {

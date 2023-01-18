@@ -46,12 +46,7 @@ public class VictorSp extends VictorSP
   }
 
   @Override
-  public final void set(double speed) {
-    setSpeed(speed);
-  }
-
-  @Override
-  public void setRampRate(double rate) {
+  public final void setVoltageCompensation(double voltage) {
     throw new UnsupportedOperationException();
   }
 
@@ -60,15 +55,40 @@ public class VictorSp extends VictorSP
     m_logger.tracef("setSpeed %s %f", getName(), speed);
     super.set(speed);
   }
-
+  
   @Override
-  public final void setVoltageCompensation(double voltage) {
+  public void setPosition(double position) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public void setPosition(double position) {
+  public void setInverted(boolean isInverted) {
+    super.setInverted(isInverted);
+  }
+
+  @Override
+  public boolean getInverted() {
+    return super.getInverted();
+  }
+
+  @Override 
+  public void setGains(double p, double i, double d) {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void setIdleMode(CougarIdleMode mode) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void setRampRate(double rate) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void stopMotor() {
+    super.stopMotor();
   }
 
   @Override

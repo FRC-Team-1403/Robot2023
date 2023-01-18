@@ -1,6 +1,7 @@
 package team1403.lib.device.wpi;
 
 import com.ctre.phoenix.motorcontrol.IMotorController;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
@@ -58,11 +59,6 @@ public class TalonSrx extends WPI_TalonSRX
   }
 
   @Override
-  public final void set(double speed) {
-    setSpeed(speed);
-  }
-
-  @Override
   public final void setVoltageCompensation(double voltage) {
     m_logger.tracef("setVoltage %s %f", getName(), voltage);
     super.configVoltageCompSaturation(voltage);
@@ -75,8 +71,44 @@ public class TalonSrx extends WPI_TalonSRX
   }
 
   @Override
+  public void setPosition(double position) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void setInverted(boolean isInverted) {
+    super.setInverted(isInverted);
+  }
+
+  @Override
+  public boolean getInverted() {
+    return super.getInverted();
+  }
+
+  @Override 
+  public void setGains(double p, double i, double d) {
+    super.config_kP(0, p);
+    super.config_kD(0, d);
+    super.config_kI(0, i);
+  }
+
+  @Override
+  public void setIdleMode(CougarIdleMode mode) {
+    if (mode == CougarIdleMode.BRAKE) {
+      super.setNeutralMode(NeutralMode.Brake);
+    } else {
+      super.setNeutralMode(NeutralMode.Brake);
+    }
+  }
+
+  @Override
   public void setRampRate(double rate) {
     configClosedloopRamp(rate);
+  }
+
+  @Override
+  public void stopMotor() {
+    super.stopMotor();
   }
 
   @Override
@@ -102,11 +134,6 @@ public class TalonSrx extends WPI_TalonSRX
   @Override
   public CurrentSensor getEmbeddedCurrentSensor() {
     return m_currentSensor;
-  }
-
-  @Override
-  public void setPosition(double position) {
-    throw new UnsupportedOperationException();
   }
 
   /**
