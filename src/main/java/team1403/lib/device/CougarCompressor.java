@@ -1,86 +1,64 @@
 package team1403.lib.device;
 
-import edu.wpi.first.wpilibj.Compressor;;
-
+/**
+ *Interface for the compressor device. 
+*/
 public interface CougarCompressor extends Actuator {
 
-    /**
-     * Starts the Compressor.
-     * 
-     * @param type The type of mode.
-     */
-    void start(String type);
+  /**
+  * Enum contains different way to enable a compressor.
+  */
+  public enum Mode {
+    ANALOG,
+    DIGITAL,
+    HYBRID
+  }
 
-    /**
-     * Stops the Compressor.
-     */
-    void stop();
+  /**
+   * Starts the Compressor.
+   *
+   * @param type The type of mode.
+   *
+   */
+  void start(Mode type);
 
-    /**
-     * Gets the Pressure Switch Value.
-     *
-     * @return The pressure switch value
-     */
-    double getPressureSwitchValue();
+  /**
+   * Stops the Compressor.
+   */
+  void stop();
 
-    /**
-     * Sets the pressure value of the Compressor.
-     *
-     * @param val The new pressure value.
-     */
-    void setPressure(int val);
+  /**
+   * Gets the Pressure Switch Value.
+   *
+   * @return The pressure switch value
+   *
+   */
+  double getPressureSwitchValue();
 
-    /**
-     * Checks if the Compressor is enabled. 
-     *
-     * @return The status of the Compressor.
-     */
-    boolean isEnabled();
+  /**
+   * Sets the pressure value of the Compressor.
+   *
+   * @param maxVal The max pressure value.
+   *
+   *@param minVal The min pressure vakye
+   */
+  void setPressure(int maxVal, int minVal);
 
-    /**
-     * Returns the current flowing through the compressor motor.
-     * @return the current value
-     */
-    double getCurrent();
+  /**
+   * Checks if the Compressor is enabled. 
+   *
+   * @return The status of the Compressor.
+   *
+   */
+  boolean isEnabled();
 
-    /**
-     * Returns a boolean indicating whether the compressor is in closed-loop control mode.
-     *
-     * @return The boolean value corressponding to the Compressor's mode.
-     */
-    boolean getClosedLoopControl();
-
-    /**
-     * Sets the compressor to closed-loop control mode if value is true, or open-loop control mode if value is false.
-     *
-     * @param value The status of the loop control mode.
-     */
-    void setClosedLoopControl(boolean value);
-
-    /**
-     * returns a boolean indicating whether the compressor has detected a fault due to excessive current.
-     *
-     * @return The boolean indictating any fault in excessive current.
-     */
-    boolean getCompressorCurrentTooHighStickyFault();
-
-    /**
-     * returns a boolean indicating whether the compressor has detected a sticky fault due to a shorted motor.
-     * @return The boolean indictating any sticky fault due to a shorted motor.
-     */
-    boolean getCompressorShortedStickyFault();
-
-    /**
-     * Returns a boolean indicating whether the compressor has detected a sticky fault due to a disconnected motor.
-     *
-     * @return The boolean indictating any sticky fault due to a disconnected motor.
-     */
-    boolean getCompressorNotConnectedStickyFault();
-
-    /**
-     * Clears all the Sticky faults.
-     */
-    void clearAllPCMStickyFaults();
+  /**
+   * Returns the current flowing through the compressor motor.
+   *
+   * @return the current value
+   *
+   */
+  double getCurrent();
 
 
 
