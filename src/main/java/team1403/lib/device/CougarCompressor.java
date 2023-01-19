@@ -5,13 +5,19 @@ package team1403.lib.device;
 */
 public interface CougarCompressor extends Actuator {
 
+  enum Mode {
+    ANALOG,
+    DIGITAL,
+    HYBRID
+  }
+
   /**
    * Starts the Compressor.
    *
    * @param type The type of mode.
    *
    */
-  void start();
+  void start(Mode type);
 
   /**
    * Stops the Compressor.
@@ -24,7 +30,7 @@ public interface CougarCompressor extends Actuator {
    * @return The pressure switch value
    *
    */
-  int getPressureSwitchValue();
+  boolean getPressureSwitchValue();
 
   /**
    * Sets the pressure value of the Compressor.
@@ -33,7 +39,7 @@ public interface CougarCompressor extends Actuator {
    *
    *@param minVal The min pressure vakye
    */
-  int setPressure(int maxVal, int minVal);
+  void  setPressure(Double maxVal, Double minVal);
 
   /**
    * Checks if the Compressor is enabled. 

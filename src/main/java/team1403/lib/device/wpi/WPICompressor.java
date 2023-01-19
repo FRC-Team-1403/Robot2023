@@ -19,8 +19,8 @@ public class WpiCompressor extends Compressor implements CougarCompressor {
   }
 
   private final String m_name;
-  private boolean m_maxPressure;
-  private boolean m_minPressure;
+  private double m_maxPressure;
+  private double m_minPressure;
 
   /**
    * Constructor. 
@@ -29,8 +29,8 @@ public class WpiCompressor extends Compressor implements CougarCompressor {
    * @param type The mode of the WPI compressor.
    *
    */
-  public WpiCompressor(String name, m_Mode type) {
-    super(type);
+  public WpiCompressor(String name){ 
+    super(null);
     this.m_name = name;
   }
 
@@ -51,21 +51,22 @@ public class WpiCompressor extends Compressor implements CougarCompressor {
   }
 
   @Override
-  public void setPressure(Boolean maxVal, Boolean minVal) {
+  public void setPressure(Double maxVal, Double minVal) {
     //Set a constant for the pressure of the compressor.
     this.m_maxPressure = maxVal;
     this.m_minPressure = minVal;
+
 
   }
 
   @Override
   public boolean isEnabled() {
-    return this.m_compressor.isEnabled();
+    return this.isEnabled();
   }
 
   @Override
   public double getAmps() {
-    return this.m_compressor.getCurrent();
+    return this.getCurrent();
   }
 
   @Override
@@ -73,17 +74,18 @@ public class WpiCompressor extends Compressor implements CougarCompressor {
     // start the compressor
     switch (type) {
       case ANALOG:
-        this.m_compressor.enableAnalog(m_minPressure, m_maxPressure);
+        this.enableAnalog(m_minPressure, m_maxPressure);
         break;
       case HYBRID:
-        this.m_compressor.enableHybrid(m_minPressure, m_maxPressure);
+        this.enableHybrid(m_minPressure, m_maxPressure);
         break;
       case DIGITAL:
-        this.m_compressor.enableDigital();
+        this.enableDigital();
         break;
 
       default:
         break;
     }   
   }
+
 }
