@@ -1,7 +1,7 @@
 package team1403.lib.device.wpi;
 
 import edu.wpi.first.wpilibj.Compressor;
-
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import team1403.lib.device.CougarCompressor;
 
 /**
@@ -9,7 +9,8 @@ import team1403.lib.device.CougarCompressor;
 */
 public class WpiCompressor extends Compressor implements CougarCompressor {
 
-  /**
+
+/**
   * Enum contains different way to enable a compressor.
   */
   public enum m_Mode {
@@ -29,14 +30,14 @@ public class WpiCompressor extends Compressor implements CougarCompressor {
    * @param type The mode of the WPI compressor.
    *
    */
-  public WpiCompressor(String name){ 
-    super(null);
-    this.m_name = name;
+  public WpiCompressor(String name, PneumaticsModuleType type){ 
+    super(type);
+    m_name = name;
   }
 
   @Override
   public String getName() {
-    return this.m_name;
+    return m_name;
   }
 
   @Override
@@ -46,8 +47,8 @@ public class WpiCompressor extends Compressor implements CougarCompressor {
   }
 
   @Override
-  public boolean getPressureSwitchValue() {
-    return getPressureSwitchValue();
+  public boolean getPressureSwitchValueState() {
+    return this.getPressureSwitchValue();
   }
 
   @Override
@@ -55,12 +56,10 @@ public class WpiCompressor extends Compressor implements CougarCompressor {
     //Set a constant for the pressure of the compressor.
     this.m_maxPressure = maxVal;
     this.m_minPressure = minVal;
-
-
   }
 
   @Override
-  public boolean isEnabled() {
+  public boolean enabled() {
     return this.isEnabled();
   }
 
@@ -82,10 +81,6 @@ public class WpiCompressor extends Compressor implements CougarCompressor {
       case DIGITAL:
         this.enableDigital();
         break;
-
-      default:
-        break;
     }   
   }
-
 }

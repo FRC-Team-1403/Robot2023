@@ -15,7 +15,6 @@ public interface CougarCompressor extends Actuator {
    * Starts the Compressor.
    *
    * @param type The type of mode.
-   *
    */
   void start(Mode type);
 
@@ -25,12 +24,11 @@ public interface CougarCompressor extends Actuator {
   void stop();
 
   /**
-   * Gets the Pressure Switch Value.
+   * Returns the state of the pressure switch.
    *
-   * @return The pressure switch value
-   *
+   * @return True if pressure switch indicates that the system is not full, otherwise false.
    */
-  boolean getPressureSwitchValue();
+  boolean getPressureSwitchValueState();
 
   /**
    * Sets the pressure value of the Compressor.
@@ -45,15 +43,13 @@ public interface CougarCompressor extends Actuator {
    * Checks if the Compressor is enabled. 
    *
    * @return The status of the Compressor.
-   *
    */
-  boolean isEnabled();
+  boolean enabled();
 
   /**
    * Returns the current flowing through the compressor motor.
    *
-   * @return the current value
-   *
+   * @return the current value.
    */
   double getAmps();
 }
