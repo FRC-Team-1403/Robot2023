@@ -56,7 +56,7 @@ public class FakeCompressor implements CougarCompressor {
   }
 
   @Override
-  public double getCurrent() {
+  public double getAmps() {
     return this.m_current;
   }
 
@@ -66,5 +66,4 @@ public class FakeCompressor implements CougarCompressor {
     this.m_state = true;
 
   }
-
 }

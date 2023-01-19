@@ -7,33 +7,31 @@ import team1403.lib.device.CougarCompressor;
 /**
  *Class to make a real compressor device.
 */
-public class WpiCompressor implements CougarCompressor {
-
-  private final String m_name;
-  private final Compressor m_compressor;
-  private double m_maxPressure;
-  private double m_minPressure;
+public class WpiCompressor extends Compressor implements CougarCompressor {
 
   /**
-   * Enum contains different ways to enable to compressor.
-   */
-  public enum Type {
-    DIGITAL,
+  * Enum contains different way to enable a compressor.
+  */
+  public enum m_Mode {
     ANALOG,
+    DIGITAL,
     HYBRID
   }
+
+  private final String m_name;
+  private boolean m_maxPressure;
+  private boolean m_minPressure;
 
   /**
    * Constructor. 
    *
-   * @param name
-   *
-   * @param compressor
+   * @param name The name given to this device instance.
+   * @param type The mode of the WPI compressor.
    *
    */
-  public WpiCompressor(String name, Compressor compressor) {
+  public WpiCompressor(String name, m_Mode type) {
+    super(type);
     this.m_name = name;
-    this.m_compressor = compressor;
   }
 
   @Override
@@ -44,16 +42,16 @@ public class WpiCompressor implements CougarCompressor {
   @Override
   public void stop() {
     // disable the compressor 
-    this.m_compressor.disable();
+    disable();
   }
 
   @Override
-  public double getPressureSwitchValue() {
-    return this.m_compressor.getPressure();
+  public boolean getPressureSwitchValue() {
+    return getPressureSwitchValue();
   }
 
   @Override
-  public void setPressure(int maxVal, int minVal) {
+  public void setPressure(Boolean maxVal, Boolean minVal) {
     //Set a constant for the pressure of the compressor.
     this.m_maxPressure = maxVal;
     this.m_minPressure = minVal;
@@ -66,7 +64,7 @@ public class WpiCompressor implements CougarCompressor {
   }
 
   @Override
-  public double getCurrent() {
+  public double getAmps() {
     return this.m_compressor.getCurrent();
   }
 
