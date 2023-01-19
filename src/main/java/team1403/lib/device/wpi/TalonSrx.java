@@ -159,28 +159,27 @@ public class TalonSrx extends WPI_TalonSRX
 
     @Override
     public final double getPositionTicks() {
-      return getSelectedSensorPosition(1);
+      return getSelectedSensorPosition(1) * m_positionConversionFactor;
     }
 
     @Override
     public final double getRpm() {
-      final double unitsPer100ms = getSelectedSensorVelocity(1);
+      final double unitsPer100ms = getSelectedSensorVelocity(1) * m_velocityConversionFactor;
       final double unitsPerMinute = unitsPer100ms * 10 * 60;
-      return unitsPerMinute / 4096.0;
+      return unitsPerMinute;
     }
-
-    private final String m_encoderName;
 
     @Override
     public void setPositionTickConversionFactor(double conversionFactor) {
-      // TODO 
+      m_positionConversionFactor = conversionFactor;
     }
 
     @Override
     public void setVelocityTickConversionFactor(double conversionFactor) {
-      // TODO Auto-generated method stub
-      
+      m_velocityConversionFactor = conversionFactor;
     }
+
+    private final String m_encoderName;
   }
 
   /**
@@ -211,4 +210,7 @@ public class TalonSrx extends WPI_TalonSRX
   private final EmbeddedCurrentSensor m_currentSensor;
   private final CougarLogger m_logger;
   private final String m_name;
+
+  private double m_positionConversionFactor = 1;
+  private double m_velocityConversionFactor = 1;
 }

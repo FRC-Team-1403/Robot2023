@@ -192,7 +192,8 @@ public class MappedDeviceFactory implements DeviceFactory {
   }
 
   @Override
-  public MotorController makeCougarTalonFx(String name, int deviceNumber, TalonFXControlMode mode, CougarLogger logger) {
+  public MotorController makeCougarTalonFx(String name, int deviceNumber, 
+                                           TalonFXControlMode mode, CougarLogger logger) {
     m_calls.put(name, Arrays.asList(name, deviceNumber, mode, logger));
     return (MotorController)takeDevice(name);
   }
@@ -210,6 +211,14 @@ public class MappedDeviceFactory implements DeviceFactory {
     return (LimitSwitch)takeDevice(name);
   }
 
+  /**
+   * Creates a Limelight.
+   *
+   * @param name The name of the new device instance.
+   * @param table The table to acted upon.
+   *
+   * @return a new Limelight instance.
+   */
   public Limelight makeLimelight(String name, NetworkTable table) {
     m_calls.put(name, Arrays.asList(name, table));
     return (Limelight)takeDevice(name);

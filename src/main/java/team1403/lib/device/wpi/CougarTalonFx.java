@@ -15,13 +15,6 @@ import team1403.lib.util.CougarLogger;
  * Device implementation for a base TalonFX motor controller.
  */
 public class CougarTalonFx extends TalonFX implements MotorController {
-
-  private final EmbeddedEncoder m_encoder;
-  private final EmbeddedCurrentSensor m_currentSensor;
-  TalonFXControlMode controlMode;
-  String m_name;
-  CougarLogger m_logger;
-
   /**
    * Constructor.
    *
@@ -33,7 +26,7 @@ public class CougarTalonFx extends TalonFX implements MotorController {
   public CougarTalonFx(String name, int deviceNumber, TalonFXControlMode controlMode, 
         CougarLogger logger) {
     super(deviceNumber);
-    this.controlMode = controlMode;
+    this.m_controlMode = controlMode;
     this.m_logger = logger;
     m_name = name;
     m_encoder = new EmbeddedEncoder(name + ".Encoder");
@@ -74,11 +67,12 @@ public class CougarTalonFx extends TalonFX implements MotorController {
   @Override
   public void setPosition(double position) {
     m_logger.tracef("setPosition %s %f", getName(), position);
-    set(controlMode, position);
+    set(m_controlMode, position);
   }
 
   @Override
   public void setInverted(boolean isInverted) {
+    m_logger.tracef("setInverted %s %f", getName(), isInverted);
     super.setInverted(isInverted);
   }
 
@@ -165,28 +159,26 @@ public class CougarTalonFx extends TalonFX implements MotorController {
 
     @Override
     public final double getPositionTicks() {
-      return getSelectedSensorPosition(1);
+      return getSelectedSensorPosition(1) * m_positionConversionFactor;
     }
 
     @Override
     public final double getRpm() {
-      final double unitsPer100ms = getSelectedSensorVelocity(1);
+      final double unitsPer100ms = getSelectedSensorVelocity(1) * m_velocityConversionFactor;
       final double unitsPerMinute = unitsPer100ms * 10 * 60;
-      return unitsPerMinute / 4096.0;
+      return unitsPerMinute;
     }
 
     private final String m_encoderName;
 
     @Override
     public void setPositionTickConversionFactor(double conversionFactor) {
-      // TODO Auto-generated method stub
-      
+      m_positionConversionFactor = conversionFactor;
     }
 
     @Override
     public void setVelocityTickConversionFactor(double conversionFactor) {
-      // TODO Auto-generated method stub
-      
+      m_velocityConversionFactor = conversionFactor;
     }
   }
 
@@ -214,4 +206,12 @@ public class CougarTalonFx extends TalonFX implements MotorController {
     private final String m_sensorName;
   }
 
+  private final EmbeddedEncoder m_encoder;
+  private final EmbeddedCurrentSensor m_currentSensor;
+  private final TalonFXControlMode m_controlMode;
+  private final CougarLogger m_logger;
+  private final String m_name;
+
+  private double m_positionConversionFactor = 1;
+  private double m_velocityConversionFactor = 1;
 }

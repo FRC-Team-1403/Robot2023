@@ -9,11 +9,7 @@ import team1403.lib.util.CougarLogger;
 /**
  * Device implementation for a WPI_VictorSPX motor controller.
  */
-public class VictorSpx extends WPI_VictorSPX implements MotorController {
-
-  private final CougarLogger m_logger;
-  private final String m_name;
-  
+public class VictorSpx extends WPI_VictorSPX implements MotorController {  
   /**
    * Constructor.
    *
@@ -105,4 +101,7 @@ public class VictorSpx extends WPI_VictorSPX implements MotorController {
   public void setCurrentLimit(int limit) {
     throw new UnsupportedOperationException();
   }
+  
+  private final CougarLogger m_logger;
+  private final String m_name;
 }

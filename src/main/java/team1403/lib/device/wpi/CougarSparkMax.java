@@ -14,12 +14,6 @@ import team1403.lib.util.CougarLogger;
  * Device implementation for a base CANSparkMax motor controller.
  */
 public final class CougarSparkMax extends CANSparkMax implements MotorController {
-
-  private final EmbeddedEncoder m_encoder;
-  private final EmbeddedCurrentSensor m_currentSensor;
-  private final CougarLogger m_logger;
-  private final String m_name;
-
   /**
    * Method for creating brushless CANSparkMax.
    *
@@ -253,4 +247,9 @@ public final class CougarSparkMax extends CANSparkMax implements MotorController
 
     private final String m_sensorName;
   }
+
+  private final EmbeddedEncoder m_encoder;
+  private final EmbeddedCurrentSensor m_currentSensor;
+  private final CougarLogger m_logger;
+  private final String m_name;
 }
