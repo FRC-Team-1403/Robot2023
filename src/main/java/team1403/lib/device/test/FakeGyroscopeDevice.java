@@ -1,16 +1,14 @@
 package team1403.lib.device.test;
 
 import team1403.lib.device.GyroscopeDevice;
-import team1403.lib.util.Timer;
+
 
 /**
 * A fake gyroscope that will be at
-* / rotate at whatever angle it is told to be at.
+* rotate at whatever angle it is told to be at.
 */
-
 public class FakeGyroscopeDevice implements GyroscopeDevice {
 
-  private final Timer m_timer;  
   private double m_currAngle;
   private double m_currVelocity;
   private double m_angleOffset;
@@ -19,9 +17,17 @@ public class FakeGyroscopeDevice implements GyroscopeDevice {
   * Creates a fake gyroscope.
   * (either FPGA if in simulator or fake if in unit tests)
   */
-  public FakeGyroscopeDevice(Timer timer) {
-    this.m_timer = timer;
+  public FakeGyroscopeDevice() {
     this.reset();
+  }
+
+  /**
+  * Sets the current angle the gyroscope is at to the passed in value.
+  *
+  * @param angle the angle in degrees
+  */
+  public void setRawAngle(double angle) {
+    this.m_currAngle = angle;
   }
 
   @Override
@@ -31,7 +37,6 @@ public class FakeGyroscopeDevice implements GyroscopeDevice {
 
   @Override
   public void reset() {
-    this.m_timer.restart();
     this.m_currAngle = 0;
     this.m_currVelocity = 0;
   }
@@ -56,14 +61,6 @@ public class FakeGyroscopeDevice implements GyroscopeDevice {
     this.m_currVelocity = velocity;   
   }
 
-  /**
-  * Sets the current angle the gyroscope is at to the passed in value.
-  *
-  * @param angle the angle in degrees
-  */
-  public void setm_currAngle(double angle) {
-    this.m_currAngle = angle;
-  }
 
   private String m_name;
 
@@ -73,13 +70,13 @@ public class FakeGyroscopeDevice implements GyroscopeDevice {
   }
 
   @Override
-  public void set_angleOffset(double angleOffset) {
+  public void setAngleOffset(double angleOffset) {
     this.m_angleOffset = angleOffset;
     
   }
 
   @Override
-  public double get_angleOffset() {
+  public double getAngleOffset() {
     return m_angleOffset;
   }
 }

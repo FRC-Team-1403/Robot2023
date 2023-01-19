@@ -1,11 +1,9 @@
 package team1403.lib.device;
 
 /**
-* Interphase that represents a gyroscope.
+* Interface that represents a gyroscope.
 */
 public interface GyroscopeDevice extends Sensor {
-
-
 
   /**
   * resets gyro.
@@ -15,17 +13,14 @@ public interface GyroscopeDevice extends Sensor {
   /**
   * Gets the angle (in degrees) of the gyro.
   *
-  * @return the angle the gyroscope is at (relative to where it started)
+  * @return the angle the gyroscope is at (relative to where it was when last reset)
   */
   public abstract double getRawAngle();
 
   /**
-  * Returns the raw angle offsetted by some amount. 
-  * The offset is just a basic "add" to the angle,
-  * so it moves 0 to that point.
   *
-  * @return the angle offset by some amount
-*/
+  * @return the raw angle plus the configured offset
+  */
   public double getAngle();
 
   /**
@@ -36,16 +31,16 @@ public interface GyroscopeDevice extends Sensor {
   public abstract double getAngularVelocity();
 
   /**
-  * Sets the angle offset to the inputed value.
+  * Configures the offset angle set by getAngle.
   */
-  public void set_angleOffset(double angleOffset);
+  public void setAngleOffset(double angleOffset);
 
   /**
   * Gets the current angle offset.
   *
   * @return the current angle offset (in degrees)
   */
-  public double get_angleOffset();
+  public double getAngleOffset();
 
 }
 
