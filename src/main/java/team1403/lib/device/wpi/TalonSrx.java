@@ -72,21 +72,11 @@ public class TalonSrx extends WPI_TalonSRX
 
   @Override
   public void setPosition(double position) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void setInverted(boolean isInverted) {
-    super.setInverted(isInverted);
-  }
-
-  @Override
-  public boolean getInverted() {
-    return super.getInverted();
+    m_logger.errorf("setPosition is not supported %s %f", getName(), position);
   }
 
   @Override 
-  public void setGains(double p, double i, double d) {
+  public void setPidGains(double p, double i, double d) {
     super.config_kP(0, p);
     super.config_kD(0, d);
     super.config_kI(0, i);
@@ -107,12 +97,7 @@ public class TalonSrx extends WPI_TalonSRX
   }
 
   @Override
-  public void stopMotor() {
-    super.stopMotor();
-  }
-
-  @Override
-  public void setCurrentLimit(int limit) {
+  public void setAmpLimit(int limit) {
     super.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, limit, 0, 0));
   }
 
@@ -211,6 +196,6 @@ public class TalonSrx extends WPI_TalonSRX
   private final CougarLogger m_logger;
   private final String m_name;
 
-  private double m_positionConversionFactor = 1;
-  private double m_velocityConversionFactor = 1;
+  private double m_positionConversionFactor = 1.0;
+  private double m_velocityConversionFactor = 1.0;
 }

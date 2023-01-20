@@ -80,7 +80,7 @@ public interface MotorController extends Actuator {
   /**
    * Set the gains for the motor.
    */
-  void setGains(double p, double i, double d);
+  void setPidGains(double p, double i, double d);
 
   /**
    * Set the idle mode for the motor.
@@ -107,9 +107,9 @@ public interface MotorController extends Actuator {
   /**
    * Sets the current limit.
    *
-   * @param limit The max current
+   * @param limit The max current (amps)
    */
-  void setCurrentLimit(int limit);
+  void setAmpLimit(int limit);
 
   /**
    * Checks if the MotorController has an embedded encoder.

@@ -26,8 +26,8 @@ public class CougarTalonFx extends TalonFX implements MotorController {
   public CougarTalonFx(String name, int deviceNumber, TalonFXControlMode controlMode, 
         CougarLogger logger) {
     super(deviceNumber);
-    this.m_controlMode = controlMode;
-    this.m_logger = logger;
+    m_controlMode = controlMode;
+    m_logger = logger;
     m_name = name;
     m_encoder = new EmbeddedEncoder(name + ".Encoder");
     m_currentSensor = new EmbeddedCurrentSensor(name + ".CurrentSensor");
@@ -61,7 +61,8 @@ public class CougarTalonFx extends TalonFX implements MotorController {
 
   @Override
   public void setSpeed(double speed) {
-    throw new UnsupportedOperationException();
+    m_logger.tracef("SetSpeed %s %f", getName(), speed);
+    set(TalonFXControlMode.PercentOutput, speed);
   }
 
   @Override
@@ -76,13 +77,8 @@ public class CougarTalonFx extends TalonFX implements MotorController {
     super.setInverted(isInverted);
   }
 
-  @Override
-  public boolean getInverted() {
-    return super.getInverted();
-  }
-
   @Override 
-  public void setGains(double p, double i, double d) {
+  public void setPidGains(double p, double i, double d) {
     super.config_kP(0, p);
     super.config_kD(0, d);
     super.config_kI(0, i);
@@ -109,7 +105,7 @@ public class CougarTalonFx extends TalonFX implements MotorController {
   }
 
   @Override
-  public void setCurrentLimit(int limit) {
+  public void setAmpLimit(int limit) {
     super.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, limit, 0, 0));
   }
 
@@ -169,8 +165,6 @@ public class CougarTalonFx extends TalonFX implements MotorController {
       return unitsPerMinute;
     }
 
-    private final String m_encoderName;
-
     @Override
     public void setPositionTickConversionFactor(double conversionFactor) {
       m_positionConversionFactor = conversionFactor;
@@ -180,6 +174,8 @@ public class CougarTalonFx extends TalonFX implements MotorController {
     public void setVelocityTickConversionFactor(double conversionFactor) {
       m_velocityConversionFactor = conversionFactor;
     }
+
+    private final String m_encoderName;
   }
 
   /**

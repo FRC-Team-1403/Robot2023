@@ -103,7 +103,7 @@ public final class CougarSparkMax extends CANSparkMax implements MotorController
 
   @Override
   public void setPosition(double position) {
-    throw new UnsupportedOperationException();
+    m_logger.errorf("Setting position is not supported for this motor controller position: %d", position);
   }
 
   @Override
@@ -117,7 +117,7 @@ public final class CougarSparkMax extends CANSparkMax implements MotorController
   }
 
   @Override
-  public void setGains(double p, double i, double d) {
+  public void setPidGains(double p, double i, double d) {
     super.getPIDController().setP(p);
     super.getPIDController().setI(i);
     super.getPIDController().setD(d);
@@ -134,6 +134,7 @@ public final class CougarSparkMax extends CANSparkMax implements MotorController
 
   @Override
   public final void setRampRate(double ramp) {
+    m_logger.tracef("setRampRate %s %f", getName(), ramp);
     setClosedLoopRampRate(ramp);
   }
 
@@ -144,7 +145,7 @@ public final class CougarSparkMax extends CANSparkMax implements MotorController
   }
 
   @Override
-  public void setCurrentLimit(int limit) {
+  public void setAmpLimit(int limit) {
     super.setSmartCurrentLimit(limit);
   }
 

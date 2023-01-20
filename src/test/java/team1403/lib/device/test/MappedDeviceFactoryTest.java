@@ -47,7 +47,7 @@ class MappedDeviceFactoryTest {
     final var gotSwitch = factory.makeLimitSwitch(kLimitSwitchName, kLimitSwitchPort);
     assertSame(m_limitSwitch, gotSwitch);
 
-    final var gotTalon = factory.makeTalon(kTalonName, kTalonPort, m_deviceLogger);
+    final var gotTalon = factory.makeTalonSrx(kTalonName, kTalonPort, m_deviceLogger);
     assertSame(gotTalon, m_talon);
 
     final var gotVictor = factory.makeVictorSpx(kVictorName, kVictorPort, m_deviceLogger);

@@ -42,12 +42,12 @@ public class VictorSp extends VictorSP
    */
   @Override
   public void follow(MotorController source) {
-    m_logger.tracef("VictorSp cannot follow");
+    m_logger.errorf("Unsupported follow: %s source: %s", getName(), source.getName());
   }
 
   @Override
   public final void setVoltageCompensation(double voltage) {
-    throw new UnsupportedOperationException();
+    m_logger.errorf("Unsupported setVoltageCompensation %s %f", voltage);
   }
 
   @Override
@@ -58,42 +58,27 @@ public class VictorSp extends VictorSP
   
   @Override
   public void setPosition(double position) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void setInverted(boolean isInverted) {
-    super.setInverted(isInverted);
-  }
-
-  @Override
-  public boolean getInverted() {
-    return super.getInverted();
+    m_logger.errorf("Unsupported SetPosition %s %f", getName(), position);
   }
 
   @Override 
-  public void setGains(double p, double i, double d) {
-    throw new UnsupportedOperationException();
+  public void setPidGains(double p, double i, double d) {
+    m_logger.errorf("Unsupported setPidGains %s %f %f %f", getName(), p, i, d);
   }
 
   @Override
   public void setIdleMode(CougarIdleMode mode) {
-    throw new UnsupportedOperationException();
+    m_logger.errorf("Unsupported setIdleMode %s %s", getName(), mode.toString());
   }
 
   @Override
   public void setRampRate(double rate) {
-    throw new UnsupportedOperationException();
+    m_logger.errorf("Unsupported setRampRate %s %f", getName(), rate);
   }
 
   @Override
-  public void stopMotor() {
-    super.stopMotor();
-  }
-
-  @Override
-  public void setCurrentLimit(int limit) {
-    throw new UnsupportedOperationException();
+  public void setAmpLimit(int limit) {
+    m_logger.errorf("Unsupported setAmpLimit %s %d", getName(), limit);
   }
 
   private final CougarLogger m_logger;

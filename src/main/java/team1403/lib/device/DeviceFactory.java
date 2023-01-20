@@ -70,7 +70,7 @@ public interface DeviceFactory {
 	 *
 	 * @return a new MotorController for a TalonSRX.
 	 */
-	public MotorController makeTalon(
+	public MotorController makeTalonSrx(
 					String name, int channel, CougarLogger logger);
 
  /**

@@ -63,7 +63,7 @@ public class RealDeviceFactory implements DeviceFactory {
    * Returns a TalonSrx instance.
    */
   @Override
-  public MotorController makeTalon(
+  public MotorController makeTalonSrx(
       String name, int channel, CougarLogger logger) {
     return new TalonSrx(name, channel, logger);
   }

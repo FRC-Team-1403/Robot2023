@@ -67,39 +67,24 @@ public class VictorSpx extends WPI_VictorSPX implements MotorController {
     throw new UnsupportedOperationException();
   }
 
-  @Override
-  public void setInverted(boolean isInverted) {
-    super.setInverted(isInverted);
-  }
-
-  @Override
-  public boolean getInverted() {
-    return super.getInverted();
-  }
-
   @Override 
-  public void setGains(double p, double i, double d) {
-    throw new UnsupportedOperationException();
+  public void setPidGains(double p, double i, double d) {
+    m_logger.errorf("Unsupported setPidGains %s %f %f %f", getName(), p, i, d);
   }
 
   @Override
   public void setIdleMode(CougarIdleMode mode) {
-    throw new UnsupportedOperationException();
+    m_logger.errorf("Unsupported setIdleMode %s %s", getName(), mode.toString());
   }
 
   @Override
   public void setRampRate(double rate) {
     configClosedloopRamp(rate);
   }
-
+  
   @Override
-  public void stopMotor() {
-    super.stopMotor();
-  }
-
-  @Override
-  public void setCurrentLimit(int limit) {
-    throw new UnsupportedOperationException();
+  public void setAmpLimit(int limit) {
+    m_logger.errorf("Unsupported setAmpLimit %s %d", getName(), limit);
   }
   
   private final CougarLogger m_logger;

@@ -43,7 +43,7 @@ class SimpleDeviceTest {
      */
     public SeekMotorCommand(DeviceFactory factory) {
       m_switch = factory.makeLimitSwitch("MyLimitSwitch", kLimitSwitchPort);
-      m_motor = factory.makeTalon("MyMotorController", kMotorPort, m_logger);
+      m_motor = factory.makeTalonSrx("MyMotorController", kMotorPort, m_logger);
     }
 
     /**

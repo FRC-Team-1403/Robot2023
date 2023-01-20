@@ -41,7 +41,7 @@ public class ExampleRail extends CougarSubsystem {
           SparkMaxRelativeEncoder.Type.kQuadrature,
           logger);
     } else {
-      m_motor = factory.makeTalon("Rail.Motor", can.exampleRailMotor, logger);
+      m_motor = factory.makeTalonSrx("Rail.Motor", can.exampleRailMotor, logger);
     }
     m_motor.setInverted(m_railConfig.motorInverted);
     m_frontLimitSwitch

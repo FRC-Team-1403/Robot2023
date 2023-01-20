@@ -192,14 +192,14 @@ public class FakeMotorController extends BaseDevice implements MotorController {
   }
 
   @Override
-  public void setGains(double p, double i, double d) {
+  public void setPidGains(double p, double i, double d) {
     this.m_kp = p;
     this.m_ki = i;
     this.m_kd = d;
   }
 
   @Override
-  public void setCurrentLimit(int limit) {
+  public void setAmpLimit(int limit) {
     this.m_currentLimit = limit;
   }
 
@@ -221,7 +221,7 @@ public class FakeMotorController extends BaseDevice implements MotorController {
 
   private double m_speed = Double.NaN;
   private double m_voltage = Double.NaN;
-  private CougarIdleMode m_mode = null;
+  private CougarIdleMode m_mode = CougarIdleMode.COAST;
   private double m_rampRate = Double.NaN;
   private double m_kp = Double.NaN;
   private double m_ki = Double.NaN;

@@ -199,7 +199,7 @@ public class MappedDeviceFactory implements DeviceFactory {
   }
 
   @Override
-  public MotorController makeTalon(
+  public MotorController makeTalonSrx(
       String name, int channel, CougarLogger logger) {
     m_calls.put(name, Arrays.asList(name, Integer.valueOf(channel), logger));
     return (MotorController)takeDevice(name);
