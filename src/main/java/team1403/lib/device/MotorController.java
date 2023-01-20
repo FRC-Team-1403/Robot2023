@@ -90,7 +90,7 @@ public interface MotorController extends Actuator {
   void setIdleMode(CougarIdleMode mode);
 
   /**
-   * Sets the ramp rate.
+   * Sets how quickly the motor will increase/decrease speed. 
    *
    * @param rate Defines the seconds needed to reach a value.
    */
