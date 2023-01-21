@@ -1,5 +1,6 @@
 package team1403.lib.device.test;
 
+import team1403.lib.device.AdvancedMotorController;
 import team1403.lib.device.BaseDevice;
 import team1403.lib.device.CurrentSensor;
 import team1403.lib.device.Encoder;
@@ -10,7 +11,7 @@ import team1403.lib.util.CougarLogger;
  * A fake MotorController for testing.
  */
 @SuppressWarnings("PMD.DataClass")
-public class FakeMotorController extends BaseDevice implements MotorController {
+public class FakeMotorController extends BaseDevice implements AdvancedMotorController {
   /**
    * Constructor.
    *
@@ -146,11 +147,6 @@ public class FakeMotorController extends BaseDevice implements MotorController {
   }
 
   @Override
-  public void follow(MotorController source) {
-    m_follow = source;
-  }
-
-  @Override
   public void setVoltageCompensation(double voltage) {
     m_voltage = voltage;
   }
@@ -199,8 +195,8 @@ public class FakeMotorController extends BaseDevice implements MotorController {
   }
 
   @Override
-  public void setAmpLimit(int limit) {
-    this.m_currentLimit = limit;
+  public void setAmpLimit(double amps) {
+    this.m_currentLimit = amps;
   }
 
   @Override
@@ -208,7 +204,7 @@ public class FakeMotorController extends BaseDevice implements MotorController {
     if (m_encoder != null) {
       return m_encoder;
     }
-    return MotorController.super.getEmbeddedEncoder();
+    return AdvancedMotorController.super.getEmbeddedEncoder();
   }
 
   @Override
@@ -216,7 +212,12 @@ public class FakeMotorController extends BaseDevice implements MotorController {
     if (m_currentSensor != null) {
       return m_currentSensor;
     }
-    return MotorController.super.getEmbeddedCurrentSensor();
+    return AdvancedMotorController.super.getEmbeddedCurrentSensor();
+  }
+
+  @Override
+  public void follow(AdvancedMotorController source) {
+    m_follow = source;
   }
 
   private double m_speed = Double.NaN;
@@ -229,10 +230,9 @@ public class FakeMotorController extends BaseDevice implements MotorController {
   private double m_position = Double.NaN;
   private double m_currentLimit = Double.NaN;
   private int m_stopCalls;
-  private MotorController m_follow;
+  private AdvancedMotorController m_follow;
   private boolean m_inverted;
   private final CougarLogger m_logger;
   private final Encoder m_encoder;
   private final CurrentSensor m_currentSensor;
-
 }

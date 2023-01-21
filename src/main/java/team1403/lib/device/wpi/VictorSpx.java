@@ -3,13 +3,13 @@ package team1403.lib.device.wpi;
 import com.ctre.phoenix.motorcontrol.IMotorController;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
-import team1403.lib.device.MotorController;
+import team1403.lib.device.AdvancedMotorController;
 import team1403.lib.util.CougarLogger;
 
 /**
  * Device implementation for a WPI_VictorSPX motor controller.
  */
-public class VictorSpx extends WPI_VictorSPX implements MotorController {  
+public class VictorSpx extends WPI_VictorSPX implements AdvancedMotorController {  
   /**
    * Constructor.
    *
@@ -46,7 +46,7 @@ public class VictorSpx extends WPI_VictorSPX implements MotorController {
    * @throws ClassCastException if motor is not compatible.
    */
   @Override
-  public void follow(MotorController source) {
+  public void follow(AdvancedMotorController source) {
     m_logger.tracef("follow %s <- %s", getName(), source.getName());
     super.follow((IMotorController)source);  // Will throw an exception if source is not compatible.
   }
@@ -64,7 +64,7 @@ public class VictorSpx extends WPI_VictorSPX implements MotorController {
 
   @Override
   public void setPosition(double position) {
-    throw new UnsupportedOperationException();
+    m_logger.errorf("Unsupported setPosition %s %f", getName(), position);
   }
 
   @Override 
@@ -83,8 +83,8 @@ public class VictorSpx extends WPI_VictorSPX implements MotorController {
   }
   
   @Override
-  public void setAmpLimit(int limit) {
-    m_logger.errorf("Unsupported setAmpLimit %s %d", getName(), limit);
+  public void setAmpLimit(double amps) {
+    m_logger.errorf("Unsupported setAmpLimit %s %d", getName(), amps);
   }
   
   private final CougarLogger m_logger;

@@ -37,48 +37,10 @@ public class VictorSp extends VictorSP
     return m_name;
   }
 
-  /**
-   * Maybe create another motor controller class for something like this.
-   */
-  @Override
-  public void follow(MotorController source) {
-    m_logger.errorf("Unsupported follow: %s source: %s", getName(), source.getName());
-  }
-
-  @Override
-  public final void setVoltageCompensation(double voltage) {
-    m_logger.errorf("Unsupported setVoltageCompensation %s %f", voltage);
-  }
-
   @Override
   public final void setSpeed(double speed) {
     m_logger.tracef("setSpeed %s %f", getName(), speed);
     super.set(speed);
-  }
-  
-  @Override
-  public void setPosition(double position) {
-    m_logger.errorf("Unsupported SetPosition %s %f", getName(), position);
-  }
-
-  @Override 
-  public void setPidGains(double p, double i, double d) {
-    m_logger.errorf("Unsupported setPidGains %s %f %f %f", getName(), p, i, d);
-  }
-
-  @Override
-  public void setIdleMode(CougarIdleMode mode) {
-    m_logger.errorf("Unsupported setIdleMode %s %s", getName(), mode.toString());
-  }
-
-  @Override
-  public void setRampRate(double rate) {
-    m_logger.errorf("Unsupported setRampRate %s %f", getName(), rate);
-  }
-
-  @Override
-  public void setAmpLimit(int limit) {
-    m_logger.errorf("Unsupported setAmpLimit %s %d", getName(), limit);
   }
 
   private final CougarLogger m_logger;

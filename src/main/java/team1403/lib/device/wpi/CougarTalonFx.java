@@ -5,16 +5,16 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
+import team1403.lib.device.AdvancedMotorController;
 import team1403.lib.device.CurrentSensor;
 import team1403.lib.device.Encoder;
-import team1403.lib.device.MotorController;
 import team1403.lib.device.NoSuchDeviceError;
 import team1403.lib.util.CougarLogger;
 
 /**
  * Device implementation for a base TalonFX motor controller.
  */
-public class CougarTalonFx extends TalonFX implements MotorController {
+public class CougarTalonFx extends TalonFX implements AdvancedMotorController {
   /**
    * Constructor.
    *
@@ -23,10 +23,8 @@ public class CougarTalonFx extends TalonFX implements MotorController {
    * @param controlMode the control mode of the motor
    * @param logger The debug logger to use for the device.
    */
-  public CougarTalonFx(String name, int deviceNumber, TalonFXControlMode controlMode, 
-        CougarLogger logger) {
+  public CougarTalonFx(String name, int deviceNumber, CougarLogger logger) {
     super(deviceNumber);
-    m_controlMode = controlMode;
     m_logger = logger;
     m_name = name;
     m_encoder = new EmbeddedEncoder(name + ".Encoder");
@@ -48,7 +46,7 @@ public class CougarTalonFx extends TalonFX implements MotorController {
   }
 
   @Override
-  public void follow(MotorController source) {
+  public void follow(AdvancedMotorController source) {
     m_logger.tracef("follow %s <- %s", getName(), source.getName());
     super.follow((TalonFX) source);
   }
@@ -65,10 +63,11 @@ public class CougarTalonFx extends TalonFX implements MotorController {
     set(TalonFXControlMode.PercentOutput, speed);
   }
 
+  //TODO: units are unkown
   @Override
   public void setPosition(double position) {
     m_logger.tracef("setPosition %s %f", getName(), position);
-    set(m_controlMode, position);
+    set(TalonFXControlMode.Position, position);
   }
 
   @Override
@@ -100,13 +99,13 @@ public class CougarTalonFx extends TalonFX implements MotorController {
 
   @Override
   public void stopMotor() {
-    m_logger.tracef(("stopMotor %s"), getName());
+    m_logger.tracef("stopMotor %s", getName());
     set(TalonFXControlMode.Velocity, 0);
   }
 
   @Override
-  public void setAmpLimit(int limit) {
-    super.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, limit, 0, 0));
+  public void setAmpLimit(double amps) {
+    super.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, amps, 0, 0));
   }
 
   @Override
@@ -204,7 +203,6 @@ public class CougarTalonFx extends TalonFX implements MotorController {
 
   private final EmbeddedEncoder m_encoder;
   private final EmbeddedCurrentSensor m_currentSensor;
-  private final TalonFXControlMode m_controlMode;
   private final CougarLogger m_logger;
   private final String m_name;
 

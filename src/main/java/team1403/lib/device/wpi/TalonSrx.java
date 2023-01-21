@@ -5,16 +5,16 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import team1403.lib.device.AdvancedMotorController;
 import team1403.lib.device.CurrentSensor;
 import team1403.lib.device.Encoder;
-import team1403.lib.device.MotorController;
 import team1403.lib.util.CougarLogger;
 
 /**
  * Device implementation for a WPI_TalonSRX motor controller.
  */
 public class TalonSrx extends WPI_TalonSRX
-                      implements MotorController {
+                      implements AdvancedMotorController {
   /**
    * Constructor.
    *
@@ -53,7 +53,7 @@ public class TalonSrx extends WPI_TalonSRX
    * @throws ClassCastException if motor is not compatible.
    */
   @Override
-  public void follow(MotorController source) {
+  public void follow(AdvancedMotorController source) {
     m_logger.tracef("follow %s <- %s", getName(), source.getName());
     super.follow((IMotorController)source);  // Will throw an exception if source is not compatible.
   }
@@ -97,8 +97,8 @@ public class TalonSrx extends WPI_TalonSRX
   }
 
   @Override
-  public void setAmpLimit(int limit) {
-    super.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, limit, 0, 0));
+  public void setAmpLimit(double amps) {
+    super.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, amps, 0, 0));
   }
 
   @Override

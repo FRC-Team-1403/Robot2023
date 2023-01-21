@@ -4,16 +4,16 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxRelativeEncoder;
 
+import team1403.lib.device.AdvancedMotorController;
 import team1403.lib.device.CurrentSensor;
 import team1403.lib.device.Encoder;
-import team1403.lib.device.MotorController;
 import team1403.lib.device.NoSuchDeviceError;
 import team1403.lib.util.CougarLogger;
 
 /**
  * Device implementation for a base CANSparkMax motor controller.
  */
-public final class CougarSparkMax extends CANSparkMax implements MotorController {
+public final class CougarSparkMax extends CANSparkMax implements AdvancedMotorController {
   /**
    * Method for creating brushless CANSparkMax.
    *
@@ -84,7 +84,7 @@ public final class CougarSparkMax extends CANSparkMax implements MotorController
    * @throws ClassCastException if motor is not compatible.
    */
   @Override
-  public void follow(MotorController source) {
+  public void follow(AdvancedMotorController source) {
     m_logger.tracef("follow %s <- %s", getName(), source.getName());
     follow((CANSparkMax) source); // Will throw an exception if source is not compatible.
   }
@@ -103,7 +103,7 @@ public final class CougarSparkMax extends CANSparkMax implements MotorController
 
   @Override
   public void setPosition(double position) {
-    m_logger.errorf("Setting position is not supported for this motor controller position: %d", position);
+    m_logger.errorf("Unsupported setPosition %s %d", getName(), position);
   }
 
   @Override
@@ -145,8 +145,8 @@ public final class CougarSparkMax extends CANSparkMax implements MotorController
   }
 
   @Override
-  public void setAmpLimit(int limit) {
-    super.setSmartCurrentLimit(limit);
+  public void setAmpLimit(double amps) {
+    super.setSmartCurrentLimit((int)amps);
   }
 
   @Override

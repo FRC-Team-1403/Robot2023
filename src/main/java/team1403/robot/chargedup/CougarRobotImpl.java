@@ -70,9 +70,9 @@ public class CougarRobotImpl extends CougarRobot {
     SeekCenterCommand railCenter
         = new SeekCenterCommand(m_exampleRail, config.seekCenterTolerance);
 
-    new JoystickButton(xboxDriver, Button.kA.value).whenPressed(railForward);
-    new JoystickButton(xboxDriver, Button.kY.value).whenPressed(railBackward);
-    new JoystickButton(xboxDriver, Button.kX.value).whenPressed(railCenter);
+    new JoystickButton(xboxDriver, Button.kA.value).onTrue(railForward);
+    new JoystickButton(xboxDriver, Button.kY.value).onTrue(railBackward);
+    new JoystickButton(xboxDriver, Button.kX.value).onTrue(railCenter);
 
     // Only for the sake of running this without a controller as an example.
     SmartDashboard.putData(railForward);
