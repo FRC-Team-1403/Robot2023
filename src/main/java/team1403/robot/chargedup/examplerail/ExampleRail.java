@@ -6,10 +6,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarSubsystem;
+import team1403.lib.device.AdvancedMotorController;
 import team1403.lib.device.CurrentSensor;
 import team1403.lib.device.Encoder;
 import team1403.lib.device.LimitSwitch;
-import team1403.lib.device.MotorController;
 import team1403.lib.device.virtual.LimitSwitchImpl;
 import team1403.robot.chargedup.RobotConfig;
 
@@ -41,7 +41,7 @@ public class ExampleRail extends CougarSubsystem {
           SparkMaxRelativeEncoder.Type.kQuadrature,
           logger);
     } else {
-      m_motor = factory.makeTalon("Rail.Motor", can.exampleRailMotor, logger);
+      m_motor = factory.makeTalonSrx("Rail.Motor", can.exampleRailMotor, logger);
     }
     m_motor.setInverted(m_railConfig.motorInverted);
     m_frontLimitSwitch
@@ -216,7 +216,7 @@ public class ExampleRail extends CougarSubsystem {
   private double m_frontPositionTicks = Double.NaN;
   private double m_backPositionTicks = Double.NaN;
 
-  private final MotorController m_motor;
+  private final AdvancedMotorController m_motor;
   private final LimitSwitch m_frontLimitSwitch;
   private final LimitSwitch m_backLimitSwitch;
   private final Encoder m_encoder;

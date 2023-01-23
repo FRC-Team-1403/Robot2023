@@ -5,10 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.revrobotics.SparkMaxRelativeEncoder;
 
 import edu.wpi.first.networktables.NetworkTable;
 
+import team1403.lib.device.AdvancedMotorController;
 import team1403.lib.device.AnalogDevice;
 import team1403.lib.device.CougarAccelerometer;
 import team1403.lib.device.CougarDoubleSolenoid;
@@ -163,17 +165,17 @@ public class MappedDeviceFactory implements DeviceFactory {
   }
 
   @Override
-  public MotorController makeBrushlessCanSparkMax(
+  public AdvancedMotorController makeBrushlessCanSparkMax(
       String name, int channel, SparkMaxRelativeEncoder.Type encoderType, CougarLogger logger) {
     m_calls.put(name, Arrays.asList(name, Integer.valueOf(channel), encoderType, logger));
-    return (MotorController)takeDevice(name);
+    return (AdvancedMotorController)takeDevice(name);
   }
 
   @Override
-  public MotorController makeBrushedCanSparkMax(
+  public AdvancedMotorController makeBrushedCanSparkMax(
       String name, int channel, SparkMaxRelativeEncoder.Type encoderType, CougarLogger logger) {
     m_calls.put(name, Arrays.asList(name, Integer.valueOf(channel), encoderType, logger));
-    return (MotorController)takeDevice(name);
+    return (AdvancedMotorController)takeDevice(name);
   }
 
   @Override
@@ -184,17 +186,23 @@ public class MappedDeviceFactory implements DeviceFactory {
   }
 
   @Override
-  public MotorController makeVictorSpx(
+  public AdvancedMotorController makeVictorSpx(
       String name, int channel, CougarLogger logger) {
     m_calls.put(name, Arrays.asList(name, Integer.valueOf(channel), logger));
-    return (MotorController)takeDevice(name);
+    return (AdvancedMotorController)takeDevice(name);
   }
 
   @Override
-  public MotorController makeTalon(
+  public AdvancedMotorController makeCougarTalonFx(String name, int deviceNumber, CougarLogger logger) {
+    m_calls.put(name, Arrays.asList(name, deviceNumber, logger));
+    return (AdvancedMotorController)takeDevice(name);
+  }
+
+  @Override
+  public AdvancedMotorController makeTalonSrx(
       String name, int channel, CougarLogger logger) {
     m_calls.put(name, Arrays.asList(name, Integer.valueOf(channel), logger));
-    return (MotorController)takeDevice(name);
+    return (AdvancedMotorController)takeDevice(name);
   }
 
   @Override
@@ -203,6 +211,14 @@ public class MappedDeviceFactory implements DeviceFactory {
     return (LimitSwitch)takeDevice(name);
   }
 
+  /**
+   * Creates a Limelight.
+   *
+   * @param name The name of the new device instance.
+   * @param table The table to acted upon.
+   *
+   * @return a new Limelight instance.
+   */
   public Limelight makeLimelight(String name, NetworkTable table) {
     m_calls.put(name, Arrays.asList(name, table));
     return (Limelight)takeDevice(name);
