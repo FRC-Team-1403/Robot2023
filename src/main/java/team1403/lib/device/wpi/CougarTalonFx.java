@@ -18,9 +18,8 @@ public class CougarTalonFx extends TalonFX implements AdvancedMotorController {
   /**
    * Constructor.
    *
-   * @param name of the mptor
-   * @param deviceNumber the port the motor is plugged into
-   * @param controlMode the control mode of the motor
+   * @param name of the motor.
+   * @param deviceNumber the port the motor is plugged into.
    * @param logger The debug logger to use for the device.
    */
   public CougarTalonFx(String name, int deviceNumber, CougarLogger logger) {
