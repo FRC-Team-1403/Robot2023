@@ -17,12 +17,14 @@ import edu.wpi.first.math.util.Units;
  * any conflicts since these ports specify their config together.
  */
 public final class RobotConfig {
+
   /**
    * Configures the CAN bus. These are grouped together
    * rather than by subsystem to more easily detect conflict
    * and understand overall wiring.
    */
   public static class CanBus {
+
     /**
      * The can bus port for the rail motor if it is a TalonSRX.
      *
@@ -42,6 +44,7 @@ public final class RobotConfig {
    * Ports on the RoboRIO.
    */
   public static class RioPorts {
+
     /**
      * The rio port that the forward limit switch uses.
      */
@@ -57,6 +60,7 @@ public final class RobotConfig {
    * Config parameters for tuning the operator interface.
    */
   public static class OperatorConfig {
+
     /**
      * The joystick port for the driver's controller.
      */
@@ -77,6 +81,7 @@ public final class RobotConfig {
    *
    */
   public static class ExampleRail {
+    
     /**
      * True if the motor is inverted.
      */
