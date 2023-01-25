@@ -42,19 +42,22 @@ public class SwerveModule {
   private final String m_name;
 
   /**
-   * the method for running the swerve module.
+   * The method for running the swerve module.
    *
    */
   public SwerveModule(String name, int driveMotorPort, int steerMotorPort, 
       int canCoderPort, double offset, CougarLogger logger) {
+
     m_logger = logger;
     m_name = name;
+
     m_driveMotor = CougarSparkMax.makeBrushless("DriveMotor", driveMotorPort, 
       SparkMaxRelativeEncoder.Type.kHallSensor, logger);
     m_steerMotor = new CougarTalonFx("SteerMotor", steerMotorPort, logger);
     m_absoluteEncoder = new CANCoder(canCoderPort);
     m_driveRelativeEncoder = m_driveMotor.getEmbeddedEncoder();
     m_absoluteEncoderOffset = offset;
+
     configEncoders();
     configSteerMotor();
     configDriveMotor();
@@ -117,7 +120,7 @@ public class SwerveModule {
   /**
      * the angle for getting the steer angle.
      *
-     * @return returns a value.
+     * @return The motor angles in radians.
      *
      */
   public double getSteerAngle() {
@@ -133,7 +136,7 @@ public class SwerveModule {
   /**
    * Sets the contoller mode.
    *
-   * @param mode its the mode.
+   * @param mode its the mode for the controller.
    * 
    */
   public void setControllerMode(IdleMode mode) {
@@ -152,6 +155,8 @@ public class SwerveModule {
 
   /**
    * method for calculating angle errors.
+   *
+   * @return The steer angle after accounting for error.
    *
    */
   public double angleError(double targetAngle) {
@@ -283,7 +288,7 @@ public class SwerveModule {
    * @return drive motor value?.
    * 
    */
-  public CANSparkMax getM_driveMotor() {
+  public CANSparkMax getdriveMotor() {
     return m_driveMotor;
   }
 
