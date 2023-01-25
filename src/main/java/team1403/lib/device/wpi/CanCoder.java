@@ -16,9 +16,10 @@ public class CanCoder extends CANCoder implements Encoder {
   private final String m_name;
 
   /**
-   * Constructor.
+   * defines the name, port number, ticks per revolution.
    *
-   * @param name The name of the instance.
+   * @param name The name of the instance
+   *
    * @param ticksPerRevolution The ticks per revolution is fixed.
    */
   public CanCoder(String name, double ticksPerRevolution, int portNumber) {
