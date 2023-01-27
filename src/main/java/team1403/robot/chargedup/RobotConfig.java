@@ -1,5 +1,7 @@
 package team1403.robot.chargedup;
 
+import team1403.robot.chargedup.photonvision.PhotonVisionSubsystem;
+
 /**
  * This class holds attributes for the robot configuration.
  *
@@ -122,4 +124,6 @@ public final class RobotConfig {
    * Configuration for the ExampleRail subsystem.
    */
   public ExampleRail exampleRail = new ExampleRail();
+
+  public PhotonVisionSubsystem photonVision = new PhotonVisionSubsystem();
 }
