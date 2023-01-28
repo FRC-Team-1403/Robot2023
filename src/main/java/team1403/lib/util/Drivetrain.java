@@ -11,14 +11,20 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import team1403.lib.core.CougarLibInjectedParameters;
+import team1403.lib.core.CougarSubsystem;
 import team1403.lib.device.ModuleConstants;
 import team1403.lib.device.SwerveModule;
 import team1403.lib.util.NavXGyro;
+import team1403.robot.chargedup.RobotConfig;
 
-public class Drivetrain extends SubsystemBase {
+import java.lang.reflect.*;
+
+public class Drivetrain extends CougarSubsystem {
 
 	    /**
    * The maximum voltage that will be delivered to the drive motors.
@@ -28,33 +34,31 @@ public class Drivetrain extends SubsystemBase {
   public static double MAX_VOLTAGE = 5.0;
 
 	private final AHRS m_navx = new AHRS(SPI.Port.kMXP);
+	private SwerveModulePosition[] m_position = new SwerveModulePosition[4];
 	private final SwerveDriveOdometry m_odometer = new SwerveDriveOdometry(
 		ModuleConstants.kDriveKinematics,
-			getGyroscopeRotation());
-
+			getGyroscopeRotation(), m_position);
 	private final SwerveModule m_frontLeftModule;
 	private final SwerveModule m_frontRightModule;
 	private final SwerveModule m_backLeftModule;
 	private final SwerveModule m_backRightModule;
+	private final RobotConfig config;
 
 	private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 
-
-	private static Drivetrain instance = null;
-
-	private Drivetrain() {
-		m_backRightModule = new SwerveModule(ModuleConstants.BR_Drive_Id, ModuleConstants.BR_Steer_Id, ModuleConstants.BR_Steer_Id, ModuleConstants.BR_Encoder_Offset);
-		m_backLeftModule = new SwerveModule(ModuleConstants.BL_Drive_Id, ModuleConstants.BL_Steer_Id, ModuleConstants.BL_Steer_Id, ModuleConstants.BL_Encoder_Offset);
-		m_frontRightModule = new SwerveModule(ModuleConstants.FR_Drive_Id, ModuleConstants.FR_Steer_Id, ModuleConstants.FR_Steer_Id, ModuleConstants.FR_Encoder_Offset);
-        m_frontLeftModule = new SwerveModule(ModuleConstants.FL_Drive_Id, ModuleConstants.FL_Steer_Id, ModuleConstants.FL_Steer_Id, ModuleConstants.FL_Encoder_Offset);
+	public Drivetrain(CougarLibInjectedParameters injectedParameters, RobotConfig config) {
+		super("Drivetrain", injectedParameters);
+		this.config = config;
+		m_backRightModule = new SwerveModule("Back Right Module", ModuleConstants.BR_Drive_Id, ModuleConstants.BR_Steer_Id, ModuleConstants.BR_Steer_Id, ModuleConstants.BR_Encoder_Offset, getLogger(), config);
+		m_backLeftModule = new SwerveModule("Back Left Module", ModuleConstants.BL_Drive_Id, ModuleConstants.BL_Steer_Id, ModuleConstants.BL_Steer_Id, ModuleConstants.BL_Encoder_Offset, getLogger(), config);
+		m_frontRightModule = new SwerveModule("Front Right Module", ModuleConstants.FR_Drive_Id, ModuleConstants.FR_Steer_Id, ModuleConstants.FR_Steer_Id, ModuleConstants.FR_Encoder_Offset, getLogger(), config);
+        m_frontLeftModule = new SwerveModule("Front Left Module", ModuleConstants.FL_Drive_Id, ModuleConstants.FL_Steer_Id, ModuleConstants.FL_Steer_Id, ModuleConstants.FL_Encoder_Offset, getLogger(), config);
 		setRobotIdleMode(IdleMode.kCoast);
-	}
-
-	public static Drivetrain getInstance () {
-		if(instance == null) {
-			instance = new Drivetrain();
-		}
-		return instance;
+		
+		m_position[0] = m_backRightModule.getModulePosition();
+		m_position[1] = m_backLeftModule.getModulePosition();
+		m_position[2] = m_frontLeftModule.getModulePosition();
+		m_position[3] = m_frontRightModule.getModulePosition();
 	}
 
 	public void setRobotIdleMode(IdleMode mode) {
@@ -101,9 +105,18 @@ public class Drivetrain extends SubsystemBase {
 	 * Set the position of the drivetrain
 	 *
 	 * @param pose the position of the drivetrain to be set
+	 * @throws IllegalAccessException
+	 * @throws IllegalArgumentException
 	 */
-	public void setPose(Pose2d pose) {
-		m_odometer.setPoseMeters(pose);
+	public void setPose(Pose2d pose) throws IllegalArgumentException, IllegalAccessException {
+		Field[] fields = m_odometer.getClass().getFields();
+		for(Field field : fields)
+		{
+			if(field.getName() == "m_poseMeters")
+			{
+				field.set(m_odometer, pose);
+			}
+		}
 	}
 
 
@@ -113,7 +126,7 @@ public class Drivetrain extends SubsystemBase {
 	 * @param pose the current position of the drivetrain
 	 */
 	public void resetOdometry() {
-		m_odometer.resetPosition(getPose(), getGyroscopeRotation());
+		m_odometer.resetPosition(getGyroscopeRotation(), m_position, getPose());
 	}
 
 	public Rotation2d getGyroscopeRotation() {
@@ -154,7 +167,10 @@ public class Drivetrain extends SubsystemBase {
 	public void periodic() {
 		SwerveModuleState[] states = ModuleConstants.kDriveKinematics.toSwerveModuleStates(m_chassisSpeeds);
 		setModuleStates(states);
-		
+		m_position[0] = m_backRightModule.getModulePosition();
+		m_position[1] = m_backLeftModule.getModulePosition();
+		m_position[2] = m_frontLeftModule.getModulePosition();
+		m_position[3] = m_frontRightModule.getModulePosition();
 	}
 
 	public void stop() {

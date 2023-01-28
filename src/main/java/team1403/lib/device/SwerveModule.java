@@ -13,13 +13,19 @@ import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.SparkMaxRelativeEncoder;
 
 import team1403.lib.device.wpi.CougarSparkMax;
 import team1403.lib.device.wpi.CougarTalonFx;
 import team1403.lib.util.CougarLogger;
-import team1403.robot.chargedup.RobotConfig.ModuleConstants;
+import team1403.robot.chargedup.RobotConfig;
 
 /**
  * SwerveModule calling variables listed, and setting to values listed.
@@ -29,6 +35,7 @@ public class SwerveModule {
   private static final double ENCODER_RESET_MAX_ANGULAR_VELOCITY = Math.toRadians(0.5);
   private static final int STATUS_FRAME_GENERAL_PERIOD_MS = 250;
   private static final int CAN_TIMEOUT_MS = 250;
+
 
   private double m_absoluteEncoderResetIterations = 0;
 
@@ -40,16 +47,32 @@ public class SwerveModule {
   private final Encoder m_driveRelativeEncoder;
   private final CougarLogger m_logger;
   private final String m_name;
+  private final RobotConfig config;
+
+  private SwerveDriveKinematics kDriveKinematics;
+
 
   /**
    * The method for running the swerve module.
+   * @param RobotConfig
    *
    */
   public SwerveModule(String name, int driveMotorPort, int steerMotorPort, 
-      int canCoderPort, double offset, CougarLogger logger) {
+      int canCoderPort, double offset, CougarLogger logger, RobotConfig config) {
 
     m_logger = logger;
     m_name = name;
+    this.config = config;
+
+    kDriveKinematics = new SwerveDriveKinematics(
+      // Front left
+      new Translation2d(config.swerveConfig.trackWidth / 2.0, config.swerveConfig.wheelBase / 2.0),
+      // Front right
+      new Translation2d(config.swerveConfig.trackWidth / 2.0, -config.swerveConfig.wheelBase / 2.0),
+      // Back left
+      new Translation2d(-config.swerveConfig.trackWidth / 2.0, config.swerveConfig.wheelBase / 2.0),
+      // Back right
+      new Translation2d(-config.swerveConfig.trackWidth / 2.0, -config.swerveConfig.wheelBase / 2.0));
 
     m_driveMotor = CougarSparkMax.makeBrushless("DriveMotor", driveMotorPort, 
       SparkMaxRelativeEncoder.Type.kHallSensor, logger);
@@ -320,5 +343,12 @@ public class SwerveModule {
    */
   public Encoder getRelativeEncoder() {
     return m_driveRelativeEncoder;
+  }
+  
+  /**
+   * Returns the SwerveModulePosition
+   */
+  public SwerveModulePosition getModulePosition() {
+    return new SwerveModulePosition(m_driveRelativeEncoder.getPositionTicks(), new Rotation2d(getSteerAngle()));
   }
 }

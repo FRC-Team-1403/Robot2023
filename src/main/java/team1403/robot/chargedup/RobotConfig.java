@@ -16,14 +16,90 @@ import edu.wpi.first.math.util.Units;
  * to make it easier to see how the robot should be wired and see
  * any conflicts since these ports specify their config together.
  */
-public final class RobotConfig {
+public class RobotConfig {
 
+    /**
+   * Module constants.
+   * 
+   */
+  public class SwerveConfig {
+    public double wheelDiameterMeters = Units.inchesToMeters(4);
+    public double driveReduction = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
+    public double steerReduction = (15.0 / 32.0) * (10.0 / 60.0);
+
+    // Distance between right and left wheels
+    public double trackWidth = Units.inchesToMeters(21);
+    // Distance between front and back wheels
+    public double wheelBase = Units.inchesToMeters(25.5);
+
+    public double maxSpeed = 
+        5880.0 / 60.0 / driveReduction * wheelDiameterMeters * Math.PI;
+
+    public double maxAngularSpeed = 
+        maxSpeed / Math.hypot(trackWidth / 2.0, wheelBase / 2.0);
+
+    public double steerRelativeEncoderPositionConversionFactor = 
+        2.0 * Math.PI / 2048.0 * steerReduction;
+    public double steerRelativeEncoderVelocityConversionFactor = 
+        steerRelativeEncoderPositionConversionFactor * 10.0;
+
+    public int FL_Drive_Id = 1;
+    public int FL_Steer_Id = 2;
+    public int FL_Encoder_Id = 1;
+    public double FL_Encoder_Offset = -Math.toRadians(180.263671875);
+
+    public int FR_Drive_Id = 8;
+    public int FR_Steer_Id = 3;
+    public int FR_Encoder_Id = 3;
+    public double FR_Encoder_Offset = -Math.toRadians(267.1875);
+
+    public int BL_Drive_Id = 14;
+    public int BL_Steer_Id = 4;
+    public int BL_Encoder_Id = 2;
+    public double BL_Encoder_Offset = -Math.toRadians(268.2421875);
+
+    public int BR_Drive_Id = 2;
+    public int BR_Steer_Id = 1;
+    public int BR_Encoder_Id = 4;
+    public double BR_Encoder_Offset = -Math.toRadians(153.544921875);
+
+    public double kMaxSpeedMetersPerSecond = 
+        maxSpeed / 2;
+
+    public double kMaxAngularSpeedRadiansPerSecond = 
+        maxAngularSpeed / 5; // 10;
+
+    public static final double kMaxAccelerationMetersPerSecondSquared = 3; // orig 3
+    public static final double kMaxAngularAccelerationRadiansPerSecondSquared = 
+        Math.PI / 2; // 2 //Orig 4
+        
+    public static final double kPXController = 5;
+    public static final double kPYController = 5;
+
+    public TrapezoidProfile.Constraints kThetaControllerConstraints = //
+              new TrapezoidProfile.Constraints(
+                      kMaxAngularSpeedRadiansPerSecond,
+                      kMaxAngularAccelerationRadiansPerSecondSquared);
+    public static final double kGoToPointLinearP = 0;
+    public static final double kGoToPointLinearF = 0.5;
+    public static final double kGoToPointAngularP = 0;
+    public static final double kGoToPointAngularF = 0;
+
+    public static final double kPTranslationController = 320;
+    public static final double kDTranslationController = 30;
+    public static final double kPThetaController = 3;
+
+    public static final double maxTrajectoryOverrunSeconds = 3;
+    public static final double kMaxDistanceMetersError = 0.1;
+    public static final double kMaxAngleDegreesError = 5;
+  }
+  
   /**
    * Configures the CAN bus. These are grouped together
    * rather than by subsystem to more easily detect conflict
    * and understand overall wiring.
    */
-  public static class CanBus {
+  public class CanBus {
 
     /**
      * The can bus port for the rail motor if it is a TalonSRX.
@@ -43,7 +119,7 @@ public final class RobotConfig {
   /**
    * Ports on the RoboRIO.
    */
-  public static class RioPorts {
+  public class RioPorts {
 
     /**
      * The rio port that the forward limit switch uses.
@@ -59,7 +135,7 @@ public final class RobotConfig {
   /**
    * Config parameters for tuning the operator interface.
    */
-  public static class OperatorConfig {
+  public class OperatorConfig {
 
     /**
      * The joystick port for the driver's controller.
@@ -80,7 +156,7 @@ public final class RobotConfig {
    * configuration.
    *
    */
-  public static class ExampleRail {
+  public class ExampleRail {
     
     /**
      * True if the motor is inverted.
@@ -132,97 +208,8 @@ public final class RobotConfig {
    * Configuration for the ExampleRail subsystem.
    */
   public ExampleRail exampleRail = new ExampleRail();
-  
-  /**
-   * Module constants.
-   * 
-   */
-  public static class ModuleConstants {
-    public static final double kWheelDiameterMeters = Units.inchesToMeters(4);
-    public static final double driveReduction = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
-    public static final double steerReduction = (15.0 / 32.0) * (10.0 / 60.0);
 
-    // Distance between right and left wheels
-    public static final double kTrackWidth = Units.inchesToMeters(21);
-    // Distance between front and back wheels
-    public static final double kWheelBase = Units.inchesToMeters(25.5);
+  public SwerveConfig swerveConfig = new SwerveConfig();
 
-    public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
-              // Front left
-              new Translation2d(kTrackWidth / 2.0, kWheelBase / 2.0),
-              // Front right
-              new Translation2d(kTrackWidth / 2.0, -kWheelBase / 2.0),
-              // Back left
-              new Translation2d(-kTrackWidth / 2.0, kWheelBase / 2.0),
-              // Back right
-              new Translation2d(-kTrackWidth / 2.0, -kWheelBase / 2.0));
-
-    public static final double kMaxSpeed = 
-        5880.0 / 60.0 / driveReduction * kWheelDiameterMeters * Math.PI;
-
-    public static final double kMaxAngularSpeed = 
-        kMaxSpeed / Math.hypot(kTrackWidth / 2.0, kWheelBase / 2.0);
-
-    public static final double steerRelativeEncoderPositionConversionFactor = 
-        2.0 * Math.PI / 2048.0 * steerReduction;
-    public static final double steerRelativeEncoderVelocityConversionFactor = 
-        steerRelativeEncoderPositionConversionFactor * 10.0;
-
-    public static final int FL_Drive_Id = 1;
-    public static final int FL_Steer_Id = 2;
-    public static final int FL_Encoder_Id = 1;
-    public static final double FL_Encoder_Offset = -Math.toRadians(180.263671875);
-
-    public static final int FR_Drive_Id = 8;
-    public static final int FR_Steer_Id = 3;
-    public static final int FR_Encoder_Id = 3;
-    public static final double FR_Encoder_Offset = -Math.toRadians(267.1875);
-
-    public static final int BL_Drive_Id = 14;
-    public static final int BL_Steer_Id = 4;
-    public static final int BL_Encoder_Id = 2;
-    public static final double BL_Encoder_Offset = -Math.toRadians(268.2421875);
-
-    public static final int BR_Drive_Id = 2;
-    public static final int BR_Steer_Id = 1;
-    public static final int BR_Encoder_Id = 4;
-    public static final double BR_Encoder_Offset = -Math.toRadians(153.544921875);
-  }
-
-  /**
-   * Auto constants.
-   * 
-   */
-  public static final class AutoConstants {
-    public static final double kMaxSpeedMetersPerSecond = 
-        ModuleConstants.kMaxSpeed / 2;
-
-    public static final double kMaxAngularSpeedRadiansPerSecond = 
-        ModuleConstants.kMaxAngularSpeed / 5; // 10;
-
-    public static final double kMaxAccelerationMetersPerSecondSquared = 3; // orig 3
-    public static final double kMaxAngularAccelerationRadiansPerSecondSquared = 
-        Math.PI / 2; // 2 //Orig 4
-        
-    public static final double kPXController = 5;
-    public static final double kPYController = 5;
-
-    public static final TrapezoidProfile.Constraints kThetaControllerConstraints = //
-              new TrapezoidProfile.Constraints(
-                      kMaxAngularSpeedRadiansPerSecond,
-                      kMaxAngularAccelerationRadiansPerSecondSquared);
-    public static final double kGoToPointLinearP = 0;
-    public static final double kGoToPointLinearF = 0.5;
-    public static final double kGoToPointAngularP = 0;
-    public static final double kGoToPointAngularF = 0;
-
-    public static final double kPTranslationController = 320;
-    public static final double kDTranslationController = 30;
-    public static final double kPThetaController = 3;
-
-    public static final double maxTrajectoryOverrunSeconds = 3;
-    public static final double kMaxDistanceMetersError = 0.1;
-    public static final double kMaxAngleDegreesError = 5;
-  }
 
 }
