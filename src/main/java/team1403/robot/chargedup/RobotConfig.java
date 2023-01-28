@@ -23,50 +23,55 @@ public class RobotConfig {
    * 
    */
   public class SwerveConfig {
-    public double wheelDiameterMeters = Units.inchesToMeters(4);
-    public double driveReduction = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
-    public double steerReduction = (15.0 / 32.0) * (10.0 / 60.0);
+
+    public static final double kP = 0.5;
+    public static final double kI = 0.0;
+    public static final double kD = 5.0;
+
+    public final double kWheelDiameterMeters = Units.inchesToMeters(4);
+    public final double kDriveReduction = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
+    public final double kSteerReduction = (15.0 / 32.0) * (10.0 / 60.0);
 
     // Distance between right and left wheels
-    public double trackWidth = Units.inchesToMeters(21);
+    public final double kTrackWidth = Units.inchesToMeters(21);
     // Distance between front and back wheels
-    public double wheelBase = Units.inchesToMeters(25.5);
+    public final double kWheelBase = Units.inchesToMeters(25.5);
 
-    public double maxSpeed = 
-        5880.0 / 60.0 / driveReduction * wheelDiameterMeters * Math.PI;
+    // meters per second, it is the maximum speed we can go
+    public static final double kMaxSpeed = 10.0;
 
     public double maxAngularSpeed = 
-        maxSpeed / Math.hypot(trackWidth / 2.0, wheelBase / 2.0);
+        kMaxSpeed / Math.hypot(kTrackWidth / 2.0, kWheelBase / 2.0);
 
     public double steerRelativeEncoderPositionConversionFactor = 
-        2.0 * Math.PI / 2048.0 * steerReduction;
+        2.0 * Math.PI / 2048.0 * kSteerReduction;
     public double steerRelativeEncoderVelocityConversionFactor = 
         steerRelativeEncoderPositionConversionFactor * 10.0;
 
-    public int FL_Drive_Id = 1;
-    public int FL_Steer_Id = 2;
-    public int FL_Encoder_Id = 1;
-    public double FL_Encoder_Offset = -Math.toRadians(180.263671875);
+    public final int FLDriveID = 1;
+    public final int FLSteerID = 2;
+    public final int FLEncoderID = 1;
+    public final double FLEncoderOffset = -Math.toRadians(180.263671875);
 
-    public int FR_Drive_Id = 8;
-    public int FR_Steer_Id = 3;
-    public int FR_Encoder_Id = 3;
-    public double FR_Encoder_Offset = -Math.toRadians(267.1875);
+    public final int FRDriveID = 8;
+    public final int FRSteerID = 3;
+    public final int FREncoderID = 3;
+    public final double FREncoderOffset = -Math.toRadians(267.1875);
 
-    public int BL_Drive_Id = 14;
-    public int BL_Steer_Id = 4;
-    public int BL_Encoder_Id = 2;
-    public double BL_Encoder_Offset = -Math.toRadians(268.2421875);
+    public final int BLDriveID = 14;
+    public final int BLSteerID = 4;
+    public final int BLEncoderID = 2;
+    public final double BLEncoderOffset = -Math.toRadians(268.2421875);
 
-    public int BR_Drive_Id = 2;
-    public int BR_Steer_Id = 1;
-    public int BR_Encoder_Id = 4;
-    public double BR_Encoder_Offset = -Math.toRadians(153.544921875);
+    public final int BRDriveID = 2;
+    public final int BRSteerID = 1;
+    public final int BREncoderID = 4;
+    public final double BREncoderOffset = -Math.toRadians(153.544921875);
 
-    public double kMaxSpeedMetersPerSecond = 
-        maxSpeed / 2;
+    public final double kMaxSpeedMetersPerSecond = 
+        kMaxSpeed / 2;
 
-    public double kMaxAngularSpeedRadiansPerSecond = 
+    public final double kMaxAngularSpeedRadiansPerSecond = 
         maxAngularSpeed / 5; // 10;
 
     public static final double kMaxAccelerationMetersPerSecondSquared = 3; // orig 3
@@ -76,7 +81,7 @@ public class RobotConfig {
     public static final double kPXController = 5;
     public static final double kPYController = 5;
 
-    public TrapezoidProfile.Constraints kThetaControllerConstraints = //
+    public final TrapezoidProfile.Constraints kThetaControllerConstraints = //
               new TrapezoidProfile.Constraints(
                       kMaxAngularSpeedRadiansPerSecond,
                       kMaxAngularAccelerationRadiansPerSecondSquared);
@@ -89,9 +94,12 @@ public class RobotConfig {
     public static final double kDTranslationController = 30;
     public static final double kPThetaController = 3;
 
-    public static final double maxTrajectoryOverrunSeconds = 3;
+    public static final double kMaxTrajectoryOverrunSeconds = 3;
     public static final double kMaxDistanceMetersError = 0.1;
     public static final double kMaxAngleDegreesError = 5;
+
+    public static final double kVoltageSaturation = 12.0;
+    public static final double kCurrentLimit = 20.0;
   }
   
   /**
@@ -209,7 +217,8 @@ public class RobotConfig {
    */
   public ExampleRail exampleRail = new ExampleRail();
 
+  /**
+   * Configuration for the Swerve subsystem
+   */
   public SwerveConfig swerveConfig = new SwerveConfig();
-
-
 }

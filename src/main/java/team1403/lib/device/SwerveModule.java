@@ -47,7 +47,6 @@ public class SwerveModule {
   private final Encoder m_driveRelativeEncoder;
   private final CougarLogger m_logger;
   private final String m_name;
-  private final RobotConfig config;
 
   private SwerveDriveKinematics kDriveKinematics;
 
@@ -62,17 +61,16 @@ public class SwerveModule {
 
     m_logger = logger;
     m_name = name;
-    this.config = config;
 
     kDriveKinematics = new SwerveDriveKinematics(
       // Front left
-      new Translation2d(config.swerveConfig.trackWidth / 2.0, config.swerveConfig.wheelBase / 2.0),
+      new Translation2d(config.swerveConfig.kTrackWidth / 2.0, config.swerveConfig.kWheelBase / 2.0),
       // Front right
-      new Translation2d(config.swerveConfig.trackWidth / 2.0, -config.swerveConfig.wheelBase / 2.0),
+      new Translation2d(config.swerveConfig.kTrackWidth / 2.0, -config.swerveConfig.kWheelBase / 2.0),
       // Back left
-      new Translation2d(-config.swerveConfig.trackWidth / 2.0, config.swerveConfig.wheelBase / 2.0),
+      new Translation2d(-config.swerveConfig.kTrackWidth / 2.0, config.swerveConfig.kWheelBase / 2.0),
       // Back right
-      new Translation2d(-config.swerveConfig.trackWidth / 2.0, -config.swerveConfig.wheelBase / 2.0));
+      new Translation2d(-config.swerveConfig.kTrackWidth / 2.0, -config.swerveConfig.kWheelBase / 2.0));
 
     m_driveMotor = CougarSparkMax.makeBrushless("DriveMotor", driveMotorPort, 
       SparkMaxRelativeEncoder.Type.kHallSensor, logger);
@@ -99,17 +97,18 @@ public class SwerveModule {
     double drivePositionConversionFactor = 
         Math.PI * ModuleConstants.kWheelDiameterMeters * ModuleConstants.driveReduction;
     m_driveRelativeEncoder.setPositionTickConversionFactor(drivePositionConversionFactor);
+    // Set velocity in terms of seconds
     m_driveRelativeEncoder.setVelocityTickConversionFactor(drivePositionConversionFactor / 60.0);
 
   }
 
   private void configSteerMotor() {
     TalonFXConfiguration motorConfiguration = new TalonFXConfiguration();
-    motorConfiguration.slot0.kP = 0.5;
-    motorConfiguration.slot0.kI = 0;
-    motorConfiguration.slot0.kD = 5;
-    motorConfiguration.voltageCompSaturation = 12;
-    motorConfiguration.supplyCurrLimit.currentLimit = 20;
+    motorConfiguration.slot0.kP = RobotConfig.SwerveConfig.kP;
+    motorConfiguration.slot0.kI = RobotConfig.SwerveConfig.kI;
+    motorConfiguration.slot0.kD = RobotConfig.SwerveConfig.kD;
+    motorConfiguration.voltageCompSaturation = RobotConfig.SwerveConfig.kVoltageSaturation;
+    motorConfiguration.supplyCurrLimit.currentLimit = RobotConfig.SwerveConfig.kCurrentLimit;
     motorConfiguration.supplyCurrLimit.enable = true;
 
     m_steerMotor.configAllSettings(motorConfiguration, CAN_TIMEOUT_MS);
@@ -130,8 +129,8 @@ public class SwerveModule {
 
   private void configDriveMotor() {
     m_driveMotor.setInverted(true);
-    m_driveMotor.setVoltageCompensation(12); 
-    m_driveMotor.setAmpLimit(20.0);
+    m_driveMotor.setVoltageCompensation(RobotConfig.SwerveConfig.kVoltageSaturation); 
+    m_driveMotor.setAmpLimit(RobotConfig.SwerveConfig.kCurrentLimit);
     m_driveMotor.getCanSparkMaxApi().setPeriodicFramePeriod(
         CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 100);
     m_driveMotor.getCanSparkMaxApi().setPeriodicFramePeriod(
@@ -316,12 +315,12 @@ public class SwerveModule {
   }
 
   /**
-   * How much the steermotor moved.
+   * Returns the steer motor object.
    *
-   * @return the steermotor number.
+   * @return the steermotor object.
    * 
    */
-  public TalonFX getSteerMotorNumber() {
+  public TalonFX getSteerMotor() {
     return m_steerMotor;
   }
 
@@ -331,7 +330,7 @@ public class SwerveModule {
    * @return the CANCoder value.
    * 
    */
-  public CANCoder getCanCoder() {
+  public CANCoder getAbsoluteEncoder() {
     return m_absoluteEncoder;
   }
 
