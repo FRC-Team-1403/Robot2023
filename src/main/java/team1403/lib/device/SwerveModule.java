@@ -15,8 +15,6 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 
 import com.revrobotics.CANSparkMaxLowLevel;
@@ -48,29 +46,16 @@ public class SwerveModule {
   private final CougarLogger m_logger;
   private final String m_name;
 
-  private SwerveDriveKinematics kDriveKinematics;
-
-
   /**
    * The method for running the swerve module.
    * @param RobotConfig
    *
    */
   public SwerveModule(String name, int driveMotorPort, int steerMotorPort, 
-      int canCoderPort, double offset, CougarLogger logger, RobotConfig config) {
+      int canCoderPort, double offset, CougarLogger logger, RobotConfig.SwerveConfig config) {
 
     m_logger = logger;
     m_name = name;
-
-    kDriveKinematics = new SwerveDriveKinematics(
-      // Front left
-      new Translation2d(config.swerveConfig.kTrackWidth / 2.0, config.swerveConfig.kWheelBase / 2.0),
-      // Front right
-      new Translation2d(config.swerveConfig.kTrackWidth / 2.0, -config.swerveConfig.kWheelBase / 2.0),
-      // Back left
-      new Translation2d(-config.swerveConfig.kTrackWidth / 2.0, config.swerveConfig.kWheelBase / 2.0),
-      // Back right
-      new Translation2d(-config.swerveConfig.kTrackWidth / 2.0, -config.swerveConfig.kWheelBase / 2.0));
 
     m_driveMotor = CougarSparkMax.makeBrushless("DriveMotor", driveMotorPort, 
       SparkMaxRelativeEncoder.Type.kHallSensor, logger);
