@@ -18,26 +18,27 @@ public final class RobotConfig {
    * and understand overall wiring.
    */
   public static class CanBus {
-    /**
-     * The can bus port for the rail motor if it is a TalonSRX.
-     *
-     * <p>Should be -1 if exampleRailSparkMotor was set.
-     */
-    public int exampleRailMotor = 10;  // talon
+    
+    public int telescopicArmMotor = 1;
 
-    /**
-     * The can bus port for the rail motor if it is a SparkMax.
-     *
-     * <p>Should be -1 if exampleRailMotor was set.
-     */
-    public int exampleRailSparkMotor = -1;
+    public int leftAngledArmMotor = 2; 
+
+    public int rightAngledArmMotor = 3;
+
+    public int frontArmSwitch = 1;
+
+    public int backArmSwitch = 2;
   }
 
   /**
    * Ports on the RoboRIO.
    */
   public static class RioPorts {
-    /**
+    public static final int frontArmSwitch = 0;
+
+    public static final int backArmSwitch = 0;
+
+		/**
      * The rio port that the forward limit switch uses.
      */
     public int exampleRailForwardLimitSwitch = 1;
@@ -99,6 +100,16 @@ public final class RobotConfig {
     public long virtualBackLimitSwitchTicks = 2000;
   }
 
+  public static class Arm {
+    int kp = 0; //constant for Proportional
+    int ki = 0; //constant for Integral
+    int kd = 0; //constant for Derivative
+  }
+
+  public static class Switch {
+
+  }
+
   // These are the actual configuration attributes.
   // Each independent aspect of config has its own type
   // so they are scoped to where they are needed and relevant.
@@ -122,4 +133,9 @@ public final class RobotConfig {
    * Configuration for the ExampleRail subsystem.
    */
   public ExampleRail exampleRail = new ExampleRail();
+
+  /**
+   * Configuration for the Arm subsystem.
+   */
+  public Arm arm = new Arm();
 }
