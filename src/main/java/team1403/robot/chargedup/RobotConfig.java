@@ -25,6 +25,8 @@ public final class RobotConfig {
 
     public int rightAngledArmMotor = 3;
 
+    public int wristMotor = 4;
+
     public int frontArmSwitch = 1;
 
     public int backArmSwitch = 2;
@@ -38,7 +40,7 @@ public final class RobotConfig {
 
     public static final int backArmSwitch = 0;
 
-		/**
+    /**
      * The rio port that the forward limit switch uses.
      */
     public int exampleRailForwardLimitSwitch = 1;
@@ -100,12 +102,30 @@ public final class RobotConfig {
     public long virtualBackLimitSwitchTicks = 2000;
   }
 
+  /**
+   * class Arm, sets constant values for PID for Arm.java.
+   */
   public static class Arm {
-    int kp = 0; //constant for Proportional
-    int ki = 0; //constant for Integral
-    int kd = 0; //constant for Derivative
-  }
+    public int kP = 0; //constant for Proportional
+    public int kI = 0; //constant for Integral
+    public int kD = 0; //constant for Derivative
 
+    double wristAngle = 0;
+
+    public double kMaxArmRotation = 270;
+    public double kMinArmRotation = 0;
+    public double kMaxWristRotation = 90;
+    public double kMinWristRotation = 0;
+
+    public double kRobotHeight = 10;
+    public double kRobotWidth = 6;
+
+    public double kMaxAmperage = 0;
+  }
+  
+  /**
+   * class switch, to define type Switch for Limit switch.
+   */
   public static class Switch {
 
   }
