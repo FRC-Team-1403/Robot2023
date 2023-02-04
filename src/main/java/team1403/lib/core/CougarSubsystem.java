@@ -2,9 +2,11 @@ package team1403.lib.core;
 
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import team1403.lib.device.Device;
+import team1403.lib.device.wpi.WpiAnalogDevice;
 import team1403.lib.util.CougarLogger;
 
 /**

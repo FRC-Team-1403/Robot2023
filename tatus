@@ -1,0 +1,77 @@
+[1mdiff --git a/src/main/java/team1403/lib/core/CougarSubsystem.java b/src/main/java/team1403/lib/core/CougarSubsystem.java[m
+[1mindex 4569078..b8b88ff 100644[m
+[1m--- a/src/main/java/team1403/lib/core/CougarSubsystem.java[m
+[1m+++ b/src/main/java/team1403/lib/core/CougarSubsystem.java[m
+[36m@@ -2,9 +2,11 @@[m [mpackage team1403.lib.core;[m
+ [m
+ import edu.wpi.first.util.sendable.Sendable;[m
+ import edu.wpi.first.util.sendable.SendableRegistry;[m
+[32m+[m[32mimport edu.wpi.first.wpilibj.Encoder;[m
+ import edu.wpi.first.wpilibj2.command.SubsystemBase;[m
+ [m
+ import team1403.lib.device.Device;[m
+[32m+[m[32mimport team1403.lib.device.wpi.WpiAnalogDevice;[m
+ import team1403.lib.util.CougarLogger;[m
+ [m
+ /**[m
+[36m@@ -48,17 +50,17 @@[m [mpublic abstract class CougarSubsystem extends SubsystemBase {[m
+    *[m
+    * @param shortName The name of the device unique within the subsystem.[m
+    *[m
+[31m-   * @param device The device owned by the subsystem. If it is Sendable[m
+[32m+[m[32m   * @param photogate The device owned by the subsystem. If it is Sendable[m
+    *               then the SmartDashboard will be informed of it being[m
+    *               a child of the subsystem.[m
+    */[m
+[31m-  public void addDevice(String shortName, Device device) {[m
+[31m-    if (device instanceof Sendable) {[m
+[31m-      super.addChild(shortName, (Sendable)device);[m
+[32m+[m[32m  public void addDevice(String shortName, WpiAnalogDevice photogate) {[m
+[32m+[m[32m    if (photogate instanceof Sendable) {[m
+[32m+[m[32m      super.addChild(shortName, (Sendable)photogate);[m
+ [m
+       // Group this sendable (device) with the subsystem.[m
+       // Otherwise it will lump into the "Ungrouped" group.[m
+[31m-      SendableRegistry.setName((Sendable)device, getName(), shortName);[m
+[32m+[m[32m      SendableRegistry.setName((Sendable)photogate, getName(), shortName);[m
+     }[m
+   }[m
+ [m
+[1mdiff --git a/src/main/java/team1403/robot/chargedup/ExperimentalSubsystem.java b/src/main/java/team1403/robot/chargedup/ExperimentalSubsystem.java[m
+[1mindex e1247fd..eb1539c 100644[m
+[1m--- a/src/main/java/team1403/robot/chargedup/ExperimentalSubsystem.java[m
+[1m+++ b/src/main/java/team1403/robot/chargedup/ExperimentalSubsystem.java[m
+[36m@@ -1,5 +1,8 @@[m
+ package team1403.robot.chargedup;[m
+ [m
+[32m+[m[32mimport com.revrobotics.AbsoluteEncoder;[m
+[32m+[m
+[32m+[m[32mimport edu.wpi.first.wpilibj.Encoder;[m
+ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;[m
+ import team1403.lib.core.CougarLibInjectedParameters;[m
+ import team1403.lib.core.CougarSubsystem;[m
+[36m@@ -7,16 +10,23 @@[m [mimport team1403.lib.device.wpi.WpiAnalogDevice;[m
+ [m
+ public class ExperimentalSubsystem extends CougarSubsystem{[m
+     private final WpiAnalogDevice photogate;[m
+[32m+[m[32m    private final Encoder throughBore;[m
+     public ExperimentalSubsystem(String name, CougarLibInjectedParameters injectedParameters) {[m
+         super(name, injectedParameters);[m
+         photogate = new WpiAnalogDevice("photogate", 0);[m
+[32m+[m[32m        throughBore = new Encoder(1, 2);[m
+[32m+[m
+ [m
+         addDevice("photogate", photogate);[m
+[32m+[m[32m        addChild("throughBore", throughBore);[m
+     }[m
+ [m
+     @Override[m
+     public void periodic() {[m
+[31m-        SmartDashboard.getNumber("photogateValues", photogate.getAnalogValue());[m
+[32m+[m[32m        SmartDashboard.putNumber("photogateValues", photogate.getAnalogValue());[m
+[32m+[m
+[32m+[m[32m        SmartDashboard.putNumber("encoderValue", throughBore.get());[m
+[32m+[m[32m        SmartDashboard.putBoolean("encoderValue", throughBore.getDirection());[m
+     }[m
+ [m
+ }[m

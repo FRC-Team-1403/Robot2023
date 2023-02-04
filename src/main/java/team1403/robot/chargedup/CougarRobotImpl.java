@@ -35,6 +35,8 @@ public class CougarRobotImpl extends CougarRobot {
 
     m_builtins = new BuiltinSubsystem(parameters, logger);
 
+    m_experimentalSubsystem = new ExperimentalSubsystem("ExperimentalSubsystem", parameters);
+
     var scheduler = CommandScheduler.getInstance();
     scheduler.registerSubsystem(m_builtins);
 
@@ -68,4 +70,5 @@ public class CougarRobotImpl extends CougarRobot {
   } */
 
   private final BuiltinSubsystem m_builtins;
+  private final ExperimentalSubsystem m_experimentalSubsystem;
 }
