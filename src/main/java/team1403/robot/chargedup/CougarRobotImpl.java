@@ -1,13 +1,8 @@
 package team1403.robot.chargedup;
 
-import static edu.wpi.first.wpilibj.XboxController.Button;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarRobot;
@@ -33,59 +28,26 @@ public class CougarRobotImpl extends CougarRobot {
    * @param parameters Standard framework injected parameters.
    * @param config Our robot's custom configuration values.
    */
-  public CougarRobotImpl(CougarLibInjectedParameters parameters,
-                         RobotConfig config) {
+  public CougarRobotImpl(CougarLibInjectedParameters parameters) {
     super(parameters);
     var logger = CougarLogger.getChildLogger(
         parameters.getRobotLogger(), "BuiltinDevices");
 
-    // m_exampleRail = new ExampleRail(parameters, config);
+    m_builtins = new BuiltinSubsystem(parameters, logger);
 
     var scheduler = CommandScheduler.getInstance();
-    // scheduler.registerSubsystem(m_exampleRail);
+    scheduler.registerSubsystem(m_builtins);
 
-    // m_autoCommand = new SeekEndCommand(m_exampleRail,
-    //                                    SeekEndCommand.Position.FRONT);
-
-    configureOperatorInterface(config.operator);
+    configureOperatorInterface();
   }
 
   /**
    * Configures the operator commands and their bindings.
    */
-  private void configureOperatorInterface(
-      RobotConfig.OperatorConfig config) {
-    XboxController xboxDriver = getJoystick("Driver", config.pilotPort);
+  private void configureOperatorInterface() {
+    XboxController xboxDriver = getJoystick("Driver", RobotConfig.OperatorConfig.pilotPort);
 
-    // SeekEndCommand railForward
-    //     = new SeekEndCommand(m_exampleRail, SeekEndCommand.Position.FRONT);
-    // SeekEndCommand railBackward
-    //     = new SeekEndCommand(m_exampleRail, SeekEndCommand.Position.BACK);
-    // SeekCenterCommand railCenter
-    //     = new SeekCenterCommand(m_exampleRail, config.seekCenterTolerance);
-
-    // new JoystickButton(xboxDriver, Button.kA.value).whenPressed(railForward);
-    // new JoystickButton(xboxDriver, Button.kY.value).whenPressed(railBackward);
-    // new JoystickButton(xboxDriver, Button.kX.value).whenPressed(railCenter);
-
-    // // Only for the sake of running this without a controller as an example.
-    // SmartDashboard.putData(railForward);
-    // SmartDashboard.putData(railCenter);
-    // SmartDashboard.putData(railBackward);
   }
-
-  /**
-   * Provides the command used for autonomous.
-   *
-   * <p>This is special because it does not have a trigger.
-   * This function allows the Robot to get it when it enters AUTONOMOUS mode.
-   *
-   * @return the command to run in autonomous
-   */
-  // @Override
-  // public Command getAutonomousCommand() {
-  //   return m_autoCommand;
-  // }
 
   /**
    * Get controller and silence warnings if not found.
@@ -103,5 +65,6 @@ public class CougarRobotImpl extends CougarRobot {
     }
     return new XboxController(port);
   }
-  // private final Command m_autoCommand;
+
+  private final BuiltinSubsystem m_builtins;
 }
