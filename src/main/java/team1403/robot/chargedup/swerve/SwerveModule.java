@@ -161,7 +161,7 @@ public class SwerveModule implements Device {
   }
 
   /**
-   * Sets the Ramp Rate.
+   * Sets the ramp rate.
    *
    * @param rate speed in seconds motor will take to ramp to speed
    */
@@ -308,7 +308,7 @@ public class SwerveModule implements Device {
    */
   public void set(double driveMetersPerSecond, double steerAngle) {
 
-    // Set driveMotor according to voltage
+    // Set driveMotor according to percentage output
     this.m_driveMotor.set(convertDriveMetersPerSecond(driveMetersPerSecond, steerAngle));
 
     // Set steerMotor according to position of encoder
@@ -330,19 +330,19 @@ public class SwerveModule implements Device {
   }
 
   /**
-   * intializes the drive motor.
+   * Returns the drive motor object associated with the module.
    *
-   * @return drive motor value?.
+   * @return the drive motor object.
    * 
    */
-  public CANSparkMax getdriveMotor() {
+  public CANSparkMax getDriveMotor() {
     return m_driveMotor;
   }
 
   /**
-   * Returns the steer motor object.
+   * Returns the steer motor object associated with the module.
    *
-   * @return the steermotor object.
+   * @return the steer motor object.
    * 
    */
   public TalonFX getSteerMotor() {
@@ -350,9 +350,9 @@ public class SwerveModule implements Device {
   }
 
   /**
-   * Gets CANCoder value.
+   * Returns the CANCoder object associated with the module.
    *
-   * @return the CANCoder value.
+   * @return the CANCoder object.
    * 
    */
   public CANCoder getAbsoluteEncoder() {
@@ -360,17 +360,20 @@ public class SwerveModule implements Device {
   }
 
   /**
-   * Gets the value from the relative encoder.
+   * Returns the relative encoder for the drive motor.
    *
-   * @return relative encoder value.
+   * @return relative encoder value from drive motor.
    *
    */
-  public Encoder getRelativeEncoder() {
+  public Encoder getDriveRelativeEncoder() {
     return m_driveRelativeEncoder;
   }
 
   /**
-   * Returns the SwerveModulePosition.
+   * Returns the SwerveModulePosition of this particular module.
+   * 
+   * @return the SwerveModulePosition, which represents the distance travelled
+   * and the angle of the module.
    */
   public SwerveModulePosition getModulePosition() {
     return new SwerveModulePosition(m_driveRelativeEncoder.getPositionTicks(), 
