@@ -44,31 +44,32 @@ public class SwerveModule implements Actuator {
   private final double m_absoluteEncoderOffset;
   private final Encoder m_driveRelativeEncoder;
   private final CougarLogger m_logger;
-  private final RobotConfig m_config = new RobotConfig();
   private final String m_name;
 
   /**
-   * Swerve Module represents a singular swerve module for a 
-   * swerve drive train. 
+   * Swerve Module represents a singular swerve module for a
+   * swerve drive train.
    * 
-   * <p>Each swerve module consists of a drive motor,
-   * changing the velocity of the wheel, and a steer motor, changing 
-   * the angle of the actual wheel inside of the module. 
+   * <p>
+   * Each swerve module consists of a drive motor,
+   * changing the velocity of the wheel, and a steer motor, changing
+   * the angle of the actual wheel inside of the module.
    * 
-   * <p>The swerve module also features 
-   * an absolute encoder to ensure the angle of 
+   * <p>
+   * The swerve module also features
+   * an absolute encoder to ensure the angle of
    * the module is always known, regardless if the bot is turned off
    * or not.
    *
    */
-  public SwerveModule(String name, int driveMotorPort, int steerMotorPort, 
+  public SwerveModule(String name, int driveMotorPort, int steerMotorPort,
       int canCoderPort, double offset, CougarLogger logger) {
 
     m_logger = logger;
     m_name = name;
 
-    m_driveMotor = CougarSparkMax.makeBrushless("DriveMotor", driveMotorPort, 
-      SparkMaxRelativeEncoder.Type.kHallSensor, logger);
+    m_driveMotor = CougarSparkMax.makeBrushless("DriveMotor", driveMotorPort,
+        SparkMaxRelativeEncoder.Type.kHallSensor, logger);
     m_steerMotor = new CougarTalonFx("SteerMotor", steerMotorPort, logger);
     m_absoluteEncoder = new CANCoder(canCoderPort);
     m_driveRelativeEncoder = m_driveMotor.getEmbeddedEncoder();
@@ -79,7 +80,6 @@ public class SwerveModule implements Actuator {
     initDriveMotor();
   }
 
-  
   @Override
   public String getName() {
     return m_name;
@@ -95,8 +95,7 @@ public class SwerveModule implements Actuator {
     m_absoluteEncoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 10, 250);
 
     // Config drive relative encoder
-    double drivePositionConversionFactor = 
-        Math.PI * m_config.swerveConfig.kWheelDiameterMeters * SwerveConfig.kDriveReduction;
+    double drivePositionConversionFactor = Math.PI * SwerveConfig.kWheelDiameterMeters * SwerveConfig.kDriveReduction;
     m_driveRelativeEncoder.setPositionTickConversionFactor(drivePositionConversionFactor);
     // Set velocity in terms of seconds
     m_driveRelativeEncoder.setVelocityTickConversionFactor(drivePositionConversionFactor / 60.0);
@@ -120,17 +119,17 @@ public class SwerveModule implements Actuator {
     m_steerMotor.setInverted(TalonFXInvertType.CounterClockwise);
     m_steerMotor.setNeutralMode(NeutralMode.Brake);
     m_steerMotor.setSelectedSensorPosition(
-                getAbsoluteAngle() / m_config.swerveConfig.kSteerRelativeEncoderPositionConversionFactor,
-                0, CAN_TIMEOUT_MS);
+        getAbsoluteAngle() / SwerveConfig.kSteerRelativeEncoderPositionConversionFactor,
+        0, CAN_TIMEOUT_MS);
     m_steerMotor.setStatusFramePeriod(
-                StatusFrameEnhanced.Status_1_General,
-                STATUS_FRAME_GENERAL_PERIOD_MS,
-                CAN_TIMEOUT_MS);
+        StatusFrameEnhanced.Status_1_General,
+        STATUS_FRAME_GENERAL_PERIOD_MS,
+        CAN_TIMEOUT_MS);
   }
 
   private void initDriveMotor() {
     m_driveMotor.setInverted(true);
-    m_driveMotor.setVoltageCompensation(RobotConfig.SwerveConfig.kVoltageSaturation); 
+    m_driveMotor.setVoltageCompensation(RobotConfig.SwerveConfig.kVoltageSaturation);
     m_driveMotor.setAmpLimit(RobotConfig.SwerveConfig.kCurrentLimit);
     m_driveMotor.getCanSparkMaxApi().setPeriodicFramePeriod(
         CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 100);
@@ -147,7 +146,7 @@ public class SwerveModule implements Actuator {
    */
   public double getSteerAngle() {
     double motorAngleRadians = m_steerMotor.getSelectedSensorPosition()
-        * m_config.swerveConfig.kSteerRelativeEncoderPositionConversionFactor;
+        * SwerveConfig.kSteerRelativeEncoderPositionConversionFactor;
     motorAngleRadians %= 2.0 * Math.PI;
     if (motorAngleRadians < 0) {
       motorAngleRadians += 2.0 * Math.PI;
@@ -248,13 +247,12 @@ public class SwerveModule implements Actuator {
     // end up getting a good reading. If we reset periodically this won't matter
     // anymore.
     if (m_steerMotor.getSelectedSensorVelocity()
-         * m_config.swerveConfig.kSteerRelativeEncoderVelocityConversionFactor 
-            < ENCODER_RESET_MAX_ANGULAR_VELOCITY) {
+        * SwerveConfig.kSteerRelativeEncoderVelocityConversionFactor < ENCODER_RESET_MAX_ANGULAR_VELOCITY) {
       if (++m_absoluteEncoderResetIterations >= ENCODER_RESET_ITERATIONS) {
         m_absoluteEncoderResetIterations = 0;
         double absoluteAngle = getAbsoluteAngle();
-        m_steerMotor.setSelectedSensorPosition(getAbsoluteAngle() 
-                    / m_config.swerveConfig.kSteerRelativeEncoderPositionConversionFactor);
+        m_steerMotor.setSelectedSensorPosition(getAbsoluteAngle()
+            / SwerveConfig.kSteerRelativeEncoderPositionConversionFactor);
         currentAngleRadians = absoluteAngle;
       }
     } else {
@@ -266,26 +264,25 @@ public class SwerveModule implements Actuator {
       currentAngleRadiansMod += 2.0 * Math.PI;
     }
 
-    // The reference angle has the range [0, 2pi) 
+    // The reference angle has the range [0, 2pi)
     // but the Falcon's encoder can go above that
-    double adjustedReferenceAngleRadians = 
-        referenceAngleRadians + currentAngleRadians - currentAngleRadiansMod;
+    double adjustedReferenceAngleRadians = referenceAngleRadians + currentAngleRadians - currentAngleRadiansMod;
     if (referenceAngleRadians - currentAngleRadiansMod > Math.PI) {
       adjustedReferenceAngleRadians -= 2.0 * Math.PI;
     } else if (referenceAngleRadians - currentAngleRadiansMod < -Math.PI) {
       adjustedReferenceAngleRadians += 2.0 * Math.PI;
     }
 
-    // The position that the motor should turn to 
+    // The position that the motor should turn to
     // when taking into account the ticks of the motor
-    return adjustedReferenceAngleRadians / 
-      m_config.swerveConfig.kSteerRelativeEncoderPositionConversionFactor;
+    return adjustedReferenceAngleRadians /
+        SwerveConfig.kSteerRelativeEncoderPositionConversionFactor;
   }
 
   /**
    * Converts the drive votlage to be inverted or not
    *
-   * @param steerAngle the current steer angle.
+   * @param steerAngle   the current steer angle.
    * @param driveVoltage the current drive voltage
    */
   public double convertDriveMetersPerSecond(double driveMetersPerSecond, double steerAngle) {
@@ -311,14 +308,14 @@ public class SwerveModule implements Actuator {
    *
    * @param driveMetersPerSecond driving meters per second.
    *
-   * @param steerAngle steering angle.
+   * @param steerAngle           steering angle.
    *
    */
   public void set(double driveMetersPerSecond, double steerAngle) {
 
     // Set driveMotor according to voltage
     this.m_driveMotor.set(convertDriveMetersPerSecond(driveMetersPerSecond, steerAngle));
-    
+
     // Set steerMotor according to position of encoder
     this.m_steerMotor.set(TalonFXControlMode.Position, convertSteerAngle(steerAngle));
   }
@@ -376,7 +373,7 @@ public class SwerveModule implements Actuator {
   public Encoder getRelativeEncoder() {
     return m_driveRelativeEncoder;
   }
-  
+
   /**
    * Returns the SwerveModulePosition
    */
