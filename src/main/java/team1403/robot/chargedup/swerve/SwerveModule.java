@@ -1,4 +1,4 @@
-package team1403.lib.device;
+package team1403.robot.chargedup.swerve;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
@@ -19,6 +19,8 @@ import com.revrobotics.SparkMaxRelativeEncoder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 
+import team1403.lib.device.Device;
+import team1403.lib.device.Encoder;
 import team1403.lib.device.wpi.CougarSparkMax;
 import team1403.lib.device.wpi.CougarTalonFx;
 import team1403.lib.util.CougarLogger;
@@ -26,14 +28,10 @@ import team1403.robot.chargedup.RobotConfig;
 import team1403.robot.chargedup.RobotConfig.SwerveConfig;
 
 /**
- * SwerveModule calling variables listed, and setting to values listed.
+ * Represents a swerve module. Consists of a drive motor, steer motor, 
+ * and their respective relative encoders. Also consists of a absolute encoder to track steer angle.
  */
 public class SwerveModule implements Device {
-  private static final int ENCODER_RESET_ITERATIONS = 500;
-  private static final double ENCODER_RESET_MAX_ANGULAR_VELOCITY = Math.toRadians(0.5);
-  private static final int STATUS_FRAME_GENERAL_PERIOD_MS = 250;
-  private static final int CAN_TIMEOUT_MS = 250;
-
   private double m_absoluteEncoderResetIterations = 0;
 
   private final CougarSparkMax m_driveMotor;
@@ -88,7 +86,7 @@ public class SwerveModule implements Device {
     config.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
     config.magnetOffsetDegrees = Math.toDegrees(this.m_absoluteEncoderOffset);
     config.sensorDirection = false;
-    m_absoluteEncoder.configAllSettings(config, CAN_TIMEOUT_MS);
+    m_absoluteEncoder.configAllSettings(config, SwerveConfig.kCanTimeoutMs);
     m_absoluteEncoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 10, 250);
 
     // Config drive relative encoder
@@ -109,20 +107,20 @@ public class SwerveModule implements Device {
     motorConfiguration.supplyCurrLimit.currentLimit = RobotConfig.SwerveConfig.kCurrentLimit;
     motorConfiguration.supplyCurrLimit.enable = true;
 
-    m_steerMotor.configAllSettings(motorConfiguration, CAN_TIMEOUT_MS);
+    m_steerMotor.configAllSettings(motorConfiguration, SwerveConfig.kCanTimeoutMs);
     m_steerMotor.enableVoltageCompensation(true);
     m_steerMotor.configSelectedFeedbackSensor(
-        TalonFXFeedbackDevice.IntegratedSensor, 0, CAN_TIMEOUT_MS);
+        TalonFXFeedbackDevice.IntegratedSensor, 0, SwerveConfig.kCanTimeoutMs);
     m_steerMotor.setSensorPhase(true);
     m_steerMotor.setInverted(TalonFXInvertType.CounterClockwise);
     m_steerMotor.setNeutralMode(NeutralMode.Brake);
     m_steerMotor.setSelectedSensorPosition(
         getAbsoluteAngle() / SwerveConfig.kSteerRelativeEncoderPositionConversionFactor,
-        0, CAN_TIMEOUT_MS);
+        0, SwerveConfig.kCanTimeoutMs);
     m_steerMotor.setStatusFramePeriod(
         StatusFrameEnhanced.Status_1_General,
-        STATUS_FRAME_GENERAL_PERIOD_MS,
-        CAN_TIMEOUT_MS);
+        SwerveConfig.kStatusFrameGeneralPeriodMs,
+        SwerveConfig.kCanTimeoutMs);
   }
 
   private void initDriveMotor() {
@@ -189,27 +187,25 @@ public class SwerveModule implements Device {
   }
 
   /**
-   * method for calculating angle errors.
+   * Returns difference (targetAngle - getSteerAngle()) normalized in range -pi .. pi
    *
    * @param targetAngle the angle to be moved to
    * @return The steer angle after accounting for error.
    */
   public double normalizeAngleError(double targetAngle) {
-
-    double normalizedAngleError = targetAngle;
-
     // Angle is inbetween 0 to 2pi
-    normalizedAngleError = normalizeAngle(normalizedAngleError);
+    double normalizedAngleError = normalizeAngle(targetAngle);
 
     double difference = normalizedAngleError - getSteerAngle();
     // Change the target angle so the difference is in the range [-pi, pi) instead
     // of [0, 2pi)
     if (difference >= Math.PI) {
-      normalizedAngleError -= 2.0 * Math.PI;
+      return difference - 2 * Math.PI;
     } else if (difference < -Math.PI) {
-      normalizedAngleError += 2.0 * Math.PI;
+      return difference - 2 * Math.PI;
+    } else {
+      return difference;
     }
-    return normalizedAngleError - getSteerAngle();
   }
 
   /**
@@ -246,8 +242,10 @@ public class SwerveModule implements Device {
     // anymore.
     if (m_steerMotor.getSelectedSensorVelocity()
         * SwerveConfig.kSteerRelativeEncoderVelocityConversionFactor 
-            < ENCODER_RESET_MAX_ANGULAR_VELOCITY) {
-      if (++m_absoluteEncoderResetIterations >= ENCODER_RESET_ITERATIONS) {
+            < SwerveConfig.kEncoderResetMaxAngularVelocity) {
+      if (++m_absoluteEncoderResetIterations >= SwerveConfig.kEncoderResetIterations) {
+        m_logger.tracef("Resetting steer relative encoder. Reset iteration %d", 
+            m_absoluteEncoderResetIterations);
         m_absoluteEncoderResetIterations = 0;
         double absoluteAngle = getAbsoluteAngle();
         m_steerMotor.setSelectedSensorPosition(getAbsoluteAngle()
@@ -258,10 +256,7 @@ public class SwerveModule implements Device {
       m_absoluteEncoderResetIterations = 0;
     }
 
-    double currentAngleRadiansMod = currentAngleRadians % (2.0 * Math.PI);
-    if (currentAngleRadiansMod < 0.0) {
-      currentAngleRadiansMod += 2.0 * Math.PI;
-    }
+    double currentAngleRadiansMod = normalizeAngle(currentAngleRadians);
 
     // The reference angle has the range [0, 2pi)
     // but the Falcon's encoder can go above that
