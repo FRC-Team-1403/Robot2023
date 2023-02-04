@@ -6,7 +6,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarRobot;
+import team1403.lib.subsystems.BuiltinSubsystem;
 import team1403.lib.util.CougarLogger;
+import team1403.robot.chargedup.photonvision.PhotonVisionSubsystem;
 
 /**
  * The heart of the robot.
@@ -34,6 +36,8 @@ public class CougarRobotImpl extends CougarRobot {
         parameters.getRobotLogger(), "BuiltinDevices");
 
     m_builtins = new BuiltinSubsystem(parameters, logger);
+
+    m_visionSubsystem = new PhotonVisionSubsystem();
 
     var scheduler = CommandScheduler.getInstance();
     scheduler.registerSubsystem(m_builtins);
@@ -67,4 +71,7 @@ public class CougarRobotImpl extends CougarRobot {
   }
 
   private final BuiltinSubsystem m_builtins;
+  // private final Command m_autoCommand;
+
+  private final PhotonVisionSubsystem m_visionSubsystem;
 }

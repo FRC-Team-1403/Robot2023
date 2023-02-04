@@ -19,6 +19,5 @@ import java.util.Optional;
 
 
 public class PhotonVision extends SubsystemBase{
-
- 
+    
 }
