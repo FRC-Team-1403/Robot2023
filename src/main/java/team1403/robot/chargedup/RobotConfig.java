@@ -1,5 +1,7 @@
 package team1403.robot.chargedup;
 
+import team1403.lib.util.Dimension;
+
 /**
  * This class holds attributes for the robot configuration.
  *
@@ -116,11 +118,24 @@ public final class RobotConfig {
     public double kMinArmRotation = 0;
     public double kMaxWristRotation = 90;
     public double kMinWristRotation = 0;
+    public double kMinArmExtension = 5;
+    public double kMaxArmExtension = 15;
 
-    public double kRobotHeight = 10;
-    public double kRobotWidth = 6;
+    public Dimension robotDimensions = new Dimension(0, 0, 0);
+
+    public Dimension wristDimensions = new Dimension(0, 0, 0);
 
     public double kMaxAmperage = 0;
+
+    public double kMaxArmLengthOffset = 0;
+    public double kAngleToMeters = 0;
+
+    /**
+     * This is the angular threshold to determine at what
+     * point the maximum extenstion of the arm should be
+     * limited by the arm hitting the ground
+     */
+    public double kMaxGroundArmLengthThreshold = 0;
   }
   
   /**

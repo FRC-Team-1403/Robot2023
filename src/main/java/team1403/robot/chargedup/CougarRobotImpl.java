@@ -1,11 +1,15 @@
 package team1403.robot.chargedup;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarRobot;
 import team1403.lib.subsystems.BuiltinSubsystem;
 import team1403.lib.util.CougarLogger;
+import team1403.robot.chargedup.armSubsystem.Arm;
+import team1403.robot.chargedup.armSubsystem.ArmCommands;
 
 /**
  * The heart of the robot.
@@ -34,6 +38,7 @@ public class CougarRobotImpl extends CougarRobot {
         parameters.getRobotLogger(), "BuiltinDevices");
 
     m_builtins = new BuiltinSubsystem(parameters, logger);
+    m_arm = new Arm(parameters, config);
 
     var scheduler = CommandScheduler.getInstance();
     scheduler.registerSubsystem(m_builtins);
@@ -46,9 +51,18 @@ public class CougarRobotImpl extends CougarRobot {
    */
   private void configureOperatorInterface(
       RobotConfig.OperatorConfig config) {
-    // XboxController xboxDriver = getJoystick("Driver", config.pilotPort);
+    XboxController xboxOperator = getJoystick("Operator", config.pilotPort);
+
+    ArmCommands armCommand = new ArmCommands(m_arm, xboxOperator.getLeftY(), xboxOperator.getRightY(), xboxOperator.getRightTriggerAxis(), xboxOperator.getLeftTriggerAxis());
 
   }
+
+  private void configureDriverInterface(
+    RobotConfig.DriverConfig config) {
+      XboxController xboxDriver = getJoystick("Driver", config.pilotPort);
+
+      ArmCommands armCommand = new ArmCommands(m_arm, xboxDriver.getLeftY(), xboxDriver.getRightY(), xboxDriver.getRightTriggerAxis(), xboxDriver.getLeftTriggerAxis());
+    }
 
   /**
    * Get controller and silence warnings if not found.
@@ -58,14 +72,15 @@ public class CougarRobotImpl extends CougarRobot {
    *
    * @return controller for port, though might not be temporarily disconnected.
    */
-  /* private XboxController getJoystick(String role, int port) {
+  private XboxController getJoystick(String role, int port) {
     if (!DriverStation.isJoystickConnected(port)) {
       DriverStation.silenceJoystickConnectionWarning(true);
       CougarLogger.getAlwaysOn().warningf("No controller found on port %d for '%s'",
                                           port, role);
     }
     return new XboxController(port);
-  } */
+  }
 
   private final BuiltinSubsystem m_builtins;
+  private final Arm m_arm;
 }
