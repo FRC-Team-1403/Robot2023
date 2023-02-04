@@ -3,8 +3,6 @@ package team1403.robot.chargedup.armSubsystem;
 
 import java.util.function.DoubleSupplier;
 
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MoveAction;
-
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import team1403.robot.chargedup.RobotConfig;
@@ -27,7 +25,7 @@ public class ArmCommands extends CommandBase {
   private double m_armExtension;
 
   /**
-   * defines spinny, as m_arm.
+   * Defines spinny, as m_arm.
    * sets xBoxControllerInput to controller
    */
   public ArmCommands(Arm spinny, DoubleSupplier m_armAngle, DoubleSupplier m_wristAngle,

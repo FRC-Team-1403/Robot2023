@@ -123,7 +123,6 @@ public class Arm extends CougarSubsystem {
    * @return
    * 
    */
-
   public double normalizeArmAngle(double angle) {
     if(angle > m_armConfig.kMaxArmRotation) {
       angle = m_armConfig.kMaxArmRotation;
@@ -133,8 +132,9 @@ public class Arm extends CougarSubsystem {
 
     return angle;
   }
+
   /**
-   * Helper function for m_desiredArmExtension
+   * Helper function for m_desiredArmExtension.
    * 
    * @param angle
    * @return
@@ -143,13 +143,20 @@ public class Arm extends CougarSubsystem {
     desiredArmAngle = 270 - desiredArmAngle;
     double max = 0;
 
+    /*
+     * Limit for the desired arm angle, if over the limit, then
+     * sets max equal to the limit, otherwise 
+     * sets the max = to whatever the desired arm angle is
+     */
     if(desiredArmAngle < m_armConfig.kMaxGroundArmLengthThreshold) {
       max = maxGroundArmLength(desiredArmAngle, desiredRelativeWristAngle);
     } else {
       max = m_armConfig.kMaxArmExtension;
     }
 
-
+    /*
+     * Checks length against max.
+     */
     if(length > max) {
       length = max;
     } else if (length < 0) {
@@ -159,6 +166,12 @@ public class Arm extends CougarSubsystem {
     return length;
   }
 
+/**
+ * Checks current angle against max angle, if it is over the max,
+ * then sets it eequal to the max.
+ * Checks current angle against min angle, if it is over the min,
+ * then sets it eequal to the min.
+ */
 public double normalizeWristAngle(double angle) {
     if(angle > m_armConfig.kMaxWristRotation) {
       angle = m_armConfig.kMaxWristRotation;
@@ -180,7 +193,7 @@ public double normalizeWristAngle(double angle) {
   }
 
 
-  /*
+  /**
    * Move the arm to an angle between 0 and 360 degrees where 0 is positive x axis and 90 is positive y axis
    * @param angle you want the arm move to 
    * @return the speed returned by the PID controller.
@@ -196,12 +209,16 @@ public double normalizeWristAngle(double angle) {
     return m_pidWristRotation.calculate(getWristRotation(), angle);
   }
   
+  /*
+   * Calculates the PID for the arm length
+   */
   public double setArmExtension(double angle) {
     return m_pidArmLength.calculate(getArmExtension(), angle);
   }
 
-  //Getters for motor positions
-
+  /**
+   * Getters for motor positions.
+   */
   public double getArmRotation() {
     return m_leftAngledMotor.getEmbeddedEncoder().getPositionTicks() * kArmConversionFactor;
   }
@@ -215,8 +232,9 @@ public double normalizeWristAngle(double angle) {
             * kArmLengthConversionFactor) * m_armConfig.kAngleToMeters;
   }
 
-  //Setters for motor speeds
-     
+  /**
+   * Setters for motor speeds.
+   */
   public void setArmExtensionMotorSpeed(double speed) {
     m_telescopicMotor.setSpeed(speed);
   }
@@ -229,14 +247,18 @@ public double normalizeWristAngle(double angle) {
     m_wristAngleMotor.setSpeed(speed);
   }
 
+  /**
+   * Stops all motors for arm.
+   */
   public void setStopArm(double speed) {
     m_telescopicMotor.setSpeed(0);
     m_leftAngledMotor.setSpeed(0);
     m_wristAngleMotor.setSpeed(0);
   }
      
-  //Getters
-
+  /**
+   * Getters for limit switches.
+   */
   public boolean isFrontSwitchActive() {
     return m_frontLimitSwitch.isTriggered();
   }
@@ -245,28 +267,32 @@ public double normalizeWristAngle(double angle) {
     return m_backLimitSwitch.isTriggered();
   }
 
+  /**
+   * Getter for m_armConfig.
+   */
   public RobotConfig.Arm getArmConfig() {
     return m_armConfig;
   }
-     
+
+  /**
+   * Getter for current amps.
+   */
   public double getCurrentAmps() {
     return m_leftAngledMotor.getEmbeddedCurrentSensor().getAmps();
   }
 
+  /**
+   * Getter for limiting the arm angle.
+   */
   private boolean isArmAngleWithinBounds() {
     return getArmRotation() <= m_armConfig.kMaxArmRotation && getArmRotation() >= m_armConfig.kMinArmRotation;
   }
 
   @Override
   public void periodic() {
-    
-    
     setArmRotation(m_desiredArmAngle);
     setWristRotation(m_desiredWristAngle);
     setArmExtension(m_desiredArmExtension);
-
-
-    //TODO, add constraints for angles
 
     if(isFrontSwitchActive() || isBackSwitchActive() || !isArmAngleWithinBounds() || getCurrentAmps() <= m_armConfig.kMaxAmperage) {
       setArmExtensionMotorSpeed(0);

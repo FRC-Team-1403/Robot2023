@@ -3,7 +3,6 @@ package team1403.robot.chargedup;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarRobot;
 import team1403.lib.subsystems.BuiltinSubsystem;
@@ -34,11 +33,13 @@ public class CougarRobotImpl extends CougarRobot {
   public CougarRobotImpl(CougarLibInjectedParameters parameters,
                          RobotConfig config) {
     super(parameters);
+    m_config = config;
+
     var logger = CougarLogger.getChildLogger(
         parameters.getRobotLogger(), "BuiltinDevices");
 
     m_builtins = new BuiltinSubsystem(parameters, logger);
-    m_arm = new Arm(parameters, config);
+    m_arm = new Arm(parameters, m_config);
 
     var scheduler = CommandScheduler.getInstance();
     scheduler.registerSubsystem(m_builtins);
@@ -53,17 +54,14 @@ public class CougarRobotImpl extends CougarRobot {
       RobotConfig.OperatorConfig config) {
     XboxController xboxOperator = getJoystick("Operator", config.pilotPort);
 
-    ArmCommands armCommand = new ArmCommands(m_arm, xboxOperator.getLeftY(), xboxOperator.getRightY(), xboxOperator.getRightTriggerAxis(), xboxOperator.getLeftTriggerAxis());
-
+    ArmCommands armCommand = new ArmCommands(m_arm, 
+    () -> xboxOperator.getLeftY(), 
+    () -> xboxOperator.getRightY(), 
+    () -> xboxOperator.getRightTriggerAxis(), 
+    () -> xboxOperator.getLeftTriggerAxis(),
+    m_config);
   }
-
-  private void configureDriverInterface(
-    RobotConfig.DriverConfig config) {
-      XboxController xboxDriver = getJoystick("Driver", config.pilotPort);
-
-      ArmCommands armCommand = new ArmCommands(m_arm, xboxDriver.getLeftY(), xboxDriver.getRightY(), xboxDriver.getRightTriggerAxis(), xboxDriver.getLeftTriggerAxis());
-    }
-
+  
   /**
    * Get controller and silence warnings if not found.
    *
@@ -83,4 +81,5 @@ public class CougarRobotImpl extends CougarRobot {
 
   private final BuiltinSubsystem m_builtins;
   private final Arm m_arm;
+  private final RobotConfig m_config;
 }
