@@ -1,5 +1,7 @@
 package team1403.robot.chargedup;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import team1403.lib.core.CougarLibInjectedParameters;
@@ -27,8 +29,7 @@ public class CougarRobotImpl extends CougarRobot {
    * @param parameters Standard framework injected parameters.
    * @param config Our robot's custom configuration values.
    */
-  public CougarRobotImpl(CougarLibInjectedParameters parameters,
-                         RobotConfig config) {
+  public CougarRobotImpl(CougarLibInjectedParameters parameters) {
     super(parameters);
     var logger = CougarLogger.getChildLogger(
         parameters.getRobotLogger(), "BuiltinDevices");
@@ -38,15 +39,14 @@ public class CougarRobotImpl extends CougarRobot {
     var scheduler = CommandScheduler.getInstance();
     scheduler.registerSubsystem(m_builtins);
 
-    configureOperatorInterface(config.operator);
+    configureOperatorInterface();
   }
 
   /**
    * Configures the operator commands and their bindings.
    */
-  private void configureOperatorInterface(
-      RobotConfig.OperatorConfig config) {
-    // XboxController xboxDriver = getJoystick("Driver", config.pilotPort);
+  private void configureOperatorInterface() {
+    XboxController xboxDriver = getJoystick("Driver", RobotConfig.OperatorConfig.pilotPort);
 
   }
 
@@ -58,14 +58,14 @@ public class CougarRobotImpl extends CougarRobot {
    *
    * @return controller for port, though might not be temporarily disconnected.
    */
-  /* private XboxController getJoystick(String role, int port) {
+  private XboxController getJoystick(String role, int port) {
     if (!DriverStation.isJoystickConnected(port)) {
       DriverStation.silenceJoystickConnectionWarning(true);
       CougarLogger.getAlwaysOn().warningf("No controller found on port %d for '%s'",
                                           port, role);
     }
     return new XboxController(port);
-  } */
+  }
 
   private final BuiltinSubsystem m_builtins;
 }
