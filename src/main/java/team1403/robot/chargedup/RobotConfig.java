@@ -18,12 +18,15 @@ import edu.wpi.first.math.util.Units;
  */
 public class RobotConfig {
 
-    /**
+  /**
    * Module constants.
    * 
    */
   public class SwerveConfig {
+    public static final double driveReduction = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
+    public static final double steerReduction = (15.0 / 32.0) * (10.0 / 60.0);
 
+    // Constants for swerve module PID regarding rotation
     public static final double kP = 0.5;
     public static final double kI = 0.0;
     public static final double kD = 5.0;
@@ -37,51 +40,64 @@ public class RobotConfig {
     // Distance between front and back wheels
     public final double kWheelBase = Units.inchesToMeters(25.5);
 
-    // meters per second, it is the maximum speed we can go
-    public static final double kMaxSpeed = 10.0;
+    public final SwerveDriveKinematics kDriveKinematics 
+      = new SwerveDriveKinematics(
+        // Front left
+        new Translation2d(kTrackWidth / 2.0, kWheelBase / 2.0),
+        // Front right
+        new Translation2d(kTrackWidth / 2.0, -kWheelBase / 2.0),
+        // Back left
+        new Translation2d(-kTrackWidth / 2.0, kWheelBase / 2.0),
+        // Back right
+        new Translation2d(-kTrackWidth / 2.0, -kWheelBase / 2.0));
 
-    public double maxAngularSpeed = 
-        kMaxSpeed / Math.hypot(kTrackWidth / 2.0, kWheelBase / 2.0);
+    // meters per second, it is the maximum speed we can go
+    public static final double kMaxSpeed = 6.0;
+
+    // Therotical max angular speed
+    public static final double maxAngularSpeed = 
+        14.301625486188971;
 
     public double steerRelativeEncoderPositionConversionFactor = 
         2.0 * Math.PI / 2048.0 * kSteerReduction;
+        
     public double steerRelativeEncoderVelocityConversionFactor = 
         steerRelativeEncoderPositionConversionFactor * 10.0;
 
-    public final int FLDriveID = 1;
-    public final int FLSteerID = 2;
-    public final int FLEncoderID = 1;
-    public final double FLEncoderOffset = -Math.toRadians(180.263671875);
-
-    public final int FRDriveID = 8;
-    public final int FRSteerID = 3;
-    public final int FREncoderID = 3;
-    public final double FREncoderOffset = -Math.toRadians(267.1875);
-
-    public final int BLDriveID = 14;
-    public final int BLSteerID = 4;
-    public final int BLEncoderID = 2;
-    public final double BLEncoderOffset = -Math.toRadians(268.2421875);
-
-    public final int BRDriveID = 2;
-    public final int BRSteerID = 1;
-    public final int BREncoderID = 4;
-    public final double BREncoderOffset = -Math.toRadians(153.544921875);
+    public static final int frontLeftDriveId = 1;
+    public static final int frontLeftSteerId = 2;
+    public static final int frontLeftEncoderId = 1;
+    public final double frontLeftEncoderOffset = -Math.toRadians(180.263671875);
+  
+    public static final int frontRightDriveId = 8;
+    public static final int frontRightSteerId = 3;
+    public static final int frontRightEncoderId = 3;
+    public final double frontRightEncoderOffset = -Math.toRadians(267.1875);
+  
+    public static final int backLeftDriveId = 14;
+    public static final int backLeftSteerId = 4;
+    public static final int backLeftEncoderId = 2;
+    public final double backLeftEncoderOffset = -Math.toRadians(268.2421875);
+  
+    public static final int backRightDriveId = 2;
+    public static final int backRightSteerId = 1;
+    public static final int backRightEncoderId = 4;
+    public final double backRightEncoderOffset = -Math.toRadians(153.544921875);
 
     public final double kMaxSpeedMetersPerSecond = 
         kMaxSpeed / 2;
 
     public final double kMaxAngularSpeedRadiansPerSecond = 
-        maxAngularSpeed / 5; // 10;
+        maxAngularSpeed / 5;
 
-    public static final double kMaxAccelerationMetersPerSecondSquared = 3; // orig 3
+    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
     public static final double kMaxAngularAccelerationRadiansPerSecondSquared = 
-        Math.PI / 2; // 2 //Orig 4
+        Math.PI / 2;
         
     public static final double kPXController = 5;
     public static final double kPYController = 5;
 
-    public final TrapezoidProfile.Constraints kThetaControllerConstraints = //
+    public final TrapezoidProfile.Constraints kThetaControllerConstraints =
               new TrapezoidProfile.Constraints(
                       kMaxAngularSpeedRadiansPerSecond,
                       kMaxAngularAccelerationRadiansPerSecondSquared);
@@ -90,16 +106,16 @@ public class RobotConfig {
     public static final double kGoToPointAngularP = 0;
     public static final double kGoToPointAngularF = 0;
 
-    public static final double kPTranslationController = 320;
-    public static final double kDTranslationController = 30;
-    public static final double kPThetaController = 3;
-
     public static final double kMaxTrajectoryOverrunSeconds = 3;
     public static final double kMaxDistanceMetersError = 0.1;
     public static final double kMaxAngleDegreesError = 5;
 
     public static final double kVoltageSaturation = 12.0;
     public static final double kCurrentLimit = 20.0;
+  }
+
+  public class AutoSwerveConstants {
+    
   }
   
   /**
