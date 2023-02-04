@@ -13,12 +13,11 @@ import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMaxLowLevel;
+import com.revrobotics.SparkMaxRelativeEncoder;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-
-import com.revrobotics.CANSparkMaxLowLevel;
-import com.revrobotics.SparkMaxRelativeEncoder;
 
 import team1403.lib.device.wpi.CougarSparkMax;
 import team1403.lib.device.wpi.CougarTalonFx;
@@ -29,7 +28,7 @@ import team1403.robot.chargedup.RobotConfig.SwerveConfig;
 /**
  * SwerveModule calling variables listed, and setting to values listed.
  */
-public class SwerveModule implements Actuator {
+public class SwerveModule implements Device {
   private static final int ENCODER_RESET_ITERATIONS = 500;
   private static final double ENCODER_RESET_MAX_ANGULAR_VELOCITY = Math.toRadians(0.5);
   private static final int STATUS_FRAME_GENERAL_PERIOD_MS = 250;
@@ -50,13 +49,11 @@ public class SwerveModule implements Actuator {
    * Swerve Module represents a singular swerve module for a
    * swerve drive train.
    * 
-   * <p>
-   * Each swerve module consists of a drive motor,
+   * <p>Each swerve module consists of a drive motor,
    * changing the velocity of the wheel, and a steer motor, changing
    * the angle of the actual wheel inside of the module.
    * 
-   * <p>
-   * The swerve module also features
+   * <p>The swerve module also features
    * an absolute encoder to ensure the angle of
    * the module is always known, regardless if the bot is turned off
    * or not.
@@ -95,7 +92,8 @@ public class SwerveModule implements Actuator {
     m_absoluteEncoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 10, 250);
 
     // Config drive relative encoder
-    double drivePositionConversionFactor = Math.PI * SwerveConfig.kWheelDiameterMeters * SwerveConfig.kDriveReduction;
+    double drivePositionConversionFactor = Math.PI * SwerveConfig.kWheelDiameterMeters 
+          * SwerveConfig.kDriveReduction;
     m_driveRelativeEncoder.setPositionTickConversionFactor(drivePositionConversionFactor);
     // Set velocity in terms of seconds
     m_driveRelativeEncoder.setVelocityTickConversionFactor(drivePositionConversionFactor / 60.0);
@@ -175,8 +173,8 @@ public class SwerveModule implements Actuator {
   }
 
   /**
-   * Normalizes angle value to be inbetween values 0 to 2pi
-   * 
+   * Normalizes angle value to be inbetween values 0 to 2pi.
+   *
    * @param angle angle to be normalized
    * @return angle value between 0 to 2pi
    */
@@ -191,9 +189,9 @@ public class SwerveModule implements Actuator {
   }
 
   /**
-   * method for calculating angle errors
+   * method for calculating angle errors.
    *
-   * @param normalizedAngleError the angle to be moved to
+   * @param targetAngle the angle to be moved to
    * @return The steer angle after accounting for error.
    */
   public double normalizeAngleError(double targetAngle) {
@@ -247,7 +245,8 @@ public class SwerveModule implements Actuator {
     // end up getting a good reading. If we reset periodically this won't matter
     // anymore.
     if (m_steerMotor.getSelectedSensorVelocity()
-        * SwerveConfig.kSteerRelativeEncoderVelocityConversionFactor < ENCODER_RESET_MAX_ANGULAR_VELOCITY) {
+        * SwerveConfig.kSteerRelativeEncoderVelocityConversionFactor 
+            < ENCODER_RESET_MAX_ANGULAR_VELOCITY) {
       if (++m_absoluteEncoderResetIterations >= ENCODER_RESET_ITERATIONS) {
         m_absoluteEncoderResetIterations = 0;
         double absoluteAngle = getAbsoluteAngle();
@@ -266,7 +265,8 @@ public class SwerveModule implements Actuator {
 
     // The reference angle has the range [0, 2pi)
     // but the Falcon's encoder can go above that
-    double adjustedReferenceAngleRadians = referenceAngleRadians + currentAngleRadians - currentAngleRadiansMod;
+    double adjustedReferenceAngleRadians = referenceAngleRadians 
+        + currentAngleRadians - currentAngleRadiansMod;
     if (referenceAngleRadians - currentAngleRadiansMod > Math.PI) {
       adjustedReferenceAngleRadians -= 2.0 * Math.PI;
     } else if (referenceAngleRadians - currentAngleRadiansMod < -Math.PI) {
@@ -275,15 +275,15 @@ public class SwerveModule implements Actuator {
 
     // The position that the motor should turn to
     // when taking into account the ticks of the motor
-    return adjustedReferenceAngleRadians /
-        SwerveConfig.kSteerRelativeEncoderPositionConversionFactor;
+    return adjustedReferenceAngleRadians 
+      / SwerveConfig.kSteerRelativeEncoderPositionConversionFactor;
   }
 
   /**
-   * Converts the drive votlage to be inverted or not
+   * Converts the drive votlage to be inverted or not.
    *
-   * @param steerAngle   the current steer angle.
-   * @param driveVoltage the current drive voltage
+   * @param steerAngle          the current steer angle.
+   * @param driveMetersPerSecond the current drive voltage
    */
   public double convertDriveMetersPerSecond(double driveMetersPerSecond, double steerAngle) {
 
@@ -375,9 +375,10 @@ public class SwerveModule implements Actuator {
   }
 
   /**
-   * Returns the SwerveModulePosition
+   * Returns the SwerveModulePosition.
    */
   public SwerveModulePosition getModulePosition() {
-    return new SwerveModulePosition(m_driveRelativeEncoder.getPositionTicks(), new Rotation2d(getSteerAngle()));
+    return new SwerveModulePosition(m_driveRelativeEncoder.getPositionTicks(), 
+          new Rotation2d(getSteerAngle()));
   }
 }
