@@ -96,7 +96,7 @@ public class SwerveModule implements Actuator {
 
     // Config drive relative encoder
     double drivePositionConversionFactor = 
-        Math.PI * m_config.swerveConfig.kWheelDiameterMeters * SwerveConfig.driveReduction;
+        Math.PI * m_config.swerveConfig.kWheelDiameterMeters * SwerveConfig.kDriveReduction;
     m_driveRelativeEncoder.setPositionTickConversionFactor(drivePositionConversionFactor);
     // Set velocity in terms of seconds
     m_driveRelativeEncoder.setVelocityTickConversionFactor(drivePositionConversionFactor / 60.0);
@@ -105,9 +105,9 @@ public class SwerveModule implements Actuator {
 
   private void initSteerMotor() {
     TalonFXConfiguration motorConfiguration = new TalonFXConfiguration();
-    motorConfiguration.slot0.kP = RobotConfig.SwerveConfig.kP;
-    motorConfiguration.slot0.kI = RobotConfig.SwerveConfig.kI;
-    motorConfiguration.slot0.kD = RobotConfig.SwerveConfig.kD;
+    motorConfiguration.slot0.kP = RobotConfig.SwerveConfig.kPTurning;
+    motorConfiguration.slot0.kI = RobotConfig.SwerveConfig.kITurning;
+    motorConfiguration.slot0.kD = RobotConfig.SwerveConfig.kDTurning;
     motorConfiguration.voltageCompSaturation = RobotConfig.SwerveConfig.kVoltageSaturation;
     motorConfiguration.supplyCurrLimit.currentLimit = RobotConfig.SwerveConfig.kCurrentLimit;
     motorConfiguration.supplyCurrLimit.enable = true;
@@ -120,7 +120,7 @@ public class SwerveModule implements Actuator {
     m_steerMotor.setInverted(TalonFXInvertType.CounterClockwise);
     m_steerMotor.setNeutralMode(NeutralMode.Brake);
     m_steerMotor.setSelectedSensorPosition(
-                getAbsoluteAngle() / m_config.swerveConfig.steerRelativeEncoderPositionConversionFactor,
+                getAbsoluteAngle() / m_config.swerveConfig.kSteerRelativeEncoderPositionConversionFactor,
                 0, CAN_TIMEOUT_MS);
     m_steerMotor.setStatusFramePeriod(
                 StatusFrameEnhanced.Status_1_General,
@@ -147,7 +147,7 @@ public class SwerveModule implements Actuator {
    */
   public double getSteerAngle() {
     double motorAngleRadians = m_steerMotor.getSelectedSensorPosition()
-        * m_config.swerveConfig.steerRelativeEncoderPositionConversionFactor;
+        * m_config.swerveConfig.kSteerRelativeEncoderPositionConversionFactor;
     motorAngleRadians %= 2.0 * Math.PI;
     if (motorAngleRadians < 0) {
       motorAngleRadians += 2.0 * Math.PI;
@@ -248,13 +248,13 @@ public class SwerveModule implements Actuator {
     // end up getting a good reading. If we reset periodically this won't matter
     // anymore.
     if (m_steerMotor.getSelectedSensorVelocity()
-         * m_config.swerveConfig.steerRelativeEncoderVelocityConversionFactor 
+         * m_config.swerveConfig.kSteerRelativeEncoderVelocityConversionFactor 
             < ENCODER_RESET_MAX_ANGULAR_VELOCITY) {
       if (++m_absoluteEncoderResetIterations >= ENCODER_RESET_ITERATIONS) {
         m_absoluteEncoderResetIterations = 0;
         double absoluteAngle = getAbsoluteAngle();
         m_steerMotor.setSelectedSensorPosition(getAbsoluteAngle() 
-                    / m_config.swerveConfig.steerRelativeEncoderPositionConversionFactor);
+                    / m_config.swerveConfig.kSteerRelativeEncoderPositionConversionFactor);
         currentAngleRadians = absoluteAngle;
       }
     } else {
@@ -279,7 +279,7 @@ public class SwerveModule implements Actuator {
     // The position that the motor should turn to 
     // when taking into account the ticks of the motor
     return adjustedReferenceAngleRadians / 
-      m_config.swerveConfig.steerRelativeEncoderPositionConversionFactor;
+      m_config.swerveConfig.kSteerRelativeEncoderPositionConversionFactor;
   }
 
   /**
