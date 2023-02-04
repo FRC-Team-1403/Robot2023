@@ -16,9 +16,7 @@ import team1403.robot.chargedup.RobotConfig.CanBus;
 import team1403.robot.chargedup.RobotConfig.RioPorts;
 
 /**
- * Arm subsytem with motors and PID control.
- * Order of operations for Arm Subsystem Angles
- * Arm angle, arm extension, and then wrist angle
+ * Arm subsytem with mo`tors and PID control.
  */
 public class Arm extends CougarSubsystem {
   private final RobotConfig.Arm m_armConfig;
@@ -31,11 +29,6 @@ public class Arm extends CougarSubsystem {
   private final PIDController m_pidArmRotation;
   private final PIDController m_pidWristRotation;
   private final PIDController m_pidArmLength;
-  public double m_desiredArmAngle;
-  public double m_desiredWristAngle;
-  public double m_desiredArmExtension;
-  
-  
 
   // TODO find conversion factor
   private static final double kArmConversionFactor = 1;
@@ -78,115 +71,15 @@ public class Arm extends CougarSubsystem {
     m_pidArmRotation = new PIDController(0, 0, 0);
     m_pidWristRotation = new PIDController(0, 0, 0);
     m_pidArmLength = new PIDController(0, 0, 0);
-
-    m_desiredArmAngle = getArmRotation();
-    m_desiredWristAngle = getWristRotation();
-    m_desiredArmExtension = getArmExtension();
   }
-
-  /**
-   * This method is the maximum the wrist can veritcally rotate. It can use currentWristAngle,
-   * because it is only converting from 
-   * 
-   * @param armAngle
-   * @return
-   */
-  private double absoluteWristAngle(double desiredWristAngle, double desiredArmAngle, double currentWristAngle) {
-    return currentWristAngle - (desiredArmAngle - 180) - 180 + desiredWristAngle;
-  }  
-  
-  /*
-   * Calculates the space the wrist takes up vertically
-   */
-  private double wristVerticleOccupation(double relativeWristAngle) {
-    return Math.sin(relativeWristAngle - 180) * m_armConfig.wristDimensions.getLength();
-  }
-
-  /*
-   * Calculates the theoretical arm length of the arm.
-   */
-  private double theoreticalArmLength(double absoluteArmAngle) {
-    return m_armConfig.robotDimensions.getLength() / Math.cos(270 - absoluteArmAngle);
-  }
-  
-  /*
-   * This method calculates the maximum arm length the arm can go to without damaging the robot
-   */
-  public double maxGroundArmLength(double absoluteArmAngle, double relativeWristAngle) {
-    return theoreticalArmLength(absoluteArmAngle) - wristVerticleOccupation(relativeWristAngle) - m_armConfig.kMaxArmLengthOffset;
-  }
-
-  /**
-   * Helper function for m_desiredArmAngle
-   * 
-   * @param angle
-   * @return
-   * 
-   */
-
-  public double normalizeArmAngle(double angle) {
-    if(angle > m_armConfig.kMaxArmRotation) {
-      angle = m_armConfig.kMaxArmRotation;
-    } else  if(angle < m_armConfig.kMinArmRotation) {
-      angle = m_armConfig.kMinArmRotation;
-    }
-
-    return angle;
-  }
-  /**
-   * Helper function for m_desiredArmExtension
-   * 
-   * @param angle
-   * @return
-   */
-  public double normalizeArmExtension(double length, double desiredArmAngle, double desiredRelativeWristAngle) {
-    desiredArmAngle = 270 - desiredArmAngle;
-    double max = 0;
-
-    if(desiredArmAngle < m_armConfig.kMaxGroundArmLengthThreshold) {
-      max = maxGroundArmLength(desiredArmAngle, desiredRelativeWristAngle);
-    } else {
-      max = m_armConfig.kMaxArmExtension;
-    }
-
-
-    if(length > max) {
-      length = max;
-    } else if (length < 0) {
-      length = 0;
-    }
-
-    return length;
-  }
-
-public double normalizeWristAngle(double angle) {
-    if(angle > m_armConfig.kMaxWristRotation) {
-      angle = m_armConfig.kMaxWristRotation;
-    } else  if(angle < m_armConfig.kMinWristRotation) {
-      angle = m_armConfig.kMinWristRotation;
-    }
-
-    return angle;
-  }
-
-  /*
-   * This method is being called inside Periodic, and sets up the variables to be changed to the setpoints.
-   */
-  public void moveArm(double armAngle, double armExtension, double wristAngle) {
-    m_desiredArmAngle = normalizeArmAngle(armAngle);
-    m_desiredArmExtension = normalizeArmExtension(armExtension, m_desiredArmAngle, wristAngle);
-    m_desiredWristAngle = absoluteWristAngle(wristAngle, m_desiredArmAngle, getWristRotation());
-    m_desiredWristAngle = normalizeWristAngle(wristAngle);
-  }
-
 
   /*
    * Move the arm to an angle between 0 and 360 degrees where 0 is positive x axis and 90 is positive y axis
    * @param angle you want the arm move to 
    * @return the speed returned by the PID controller.
    */
-  public void setArmRotation(double angle) {
-    m_leftAngledMotor.setSpeed(m_pidArmRotation.calculate(getArmRotation(), angle));
+  public double setArmRotation(double angle) {
+    return m_pidArmRotation.calculate(getArmRotation(), angle);
   }
 
   /*
@@ -211,8 +104,8 @@ public double normalizeWristAngle(double angle) {
   }
 
   public double getArmExtension() {
-    return (m_telescopicMotor.getEmbeddedEncoder().getPositionTicks()
-            * kArmLengthConversionFactor) * m_armConfig.kAngleToMeters;
+    return m_telescopicMotor.getEmbeddedEncoder().getPositionTicks()
+            * kArmLengthConversionFactor;
   }
 
   //Setters for motor speeds
@@ -259,19 +152,10 @@ public double normalizeWristAngle(double angle) {
 
   @Override
   public void periodic() {
-    
-    
-    setArmRotation(m_desiredArmAngle);
-    setWristRotation(m_desiredWristAngle);
-    setArmExtension(m_desiredArmExtension);
-
-
-    //TODO, add constraints for angles
-
-    if(isFrontSwitchActive() || isBackSwitchActive() || !isArmAngleWithinBounds() || getCurrentAmps() <= m_armConfig.kMaxAmperage) {
-      setArmExtensionMotorSpeed(0);
-      setArmAngleMotorSpeed(0);
-      setWristMotorSpeed(0);
-    }
+      if(isFrontSwitchActive() || isBackSwitchActive() || !isArmAngleWithinBounds() || getCurrentAmps() <= m_armConfig.kMaxAmperage) {
+        setArmExtensionMotorSpeed(0);
+        setArmAngleMotorSpeed(0);
+        setWristMotorSpeed(0);
+      }
   }
 }

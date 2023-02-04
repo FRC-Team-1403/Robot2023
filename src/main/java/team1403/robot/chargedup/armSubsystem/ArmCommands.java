@@ -48,7 +48,10 @@ public class ArmCommands extends CommandBase {
     m_armExtension += m_armExtensionIncreaseSupplier.getAsDouble() * m_armConfig.kMaxArmExtension;
     m_armExtension += m_armExtensionDecreaseSupplier.getAsDouble() * m_armConfig.kMaxArmExtension;
     m_wristAngle += m_wristAngleSupplier.getAsDouble() * 360;
-    m_arm.moveArm(m_armAngle, m_armExtension, m_wristAngle);
+    // m_arm.moveArm(m_armAngle, m_armExtension, m_wristAngle);
+    m_arm.setArmExtension(m_armExtension);
+    m_arm.setWristRotation(m_wristAngle);
+    m_arm.setArmRotation(m_armAngle);
   }
 
 }
