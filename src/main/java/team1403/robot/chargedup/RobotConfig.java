@@ -24,16 +24,16 @@ public class RobotConfig {
    */
   public static class SwerveConfig {
     // Constants for swerve module PID regarding rotation
-    public final double kPTurning = 0.5;
-    public final double kITurning = 0.0;
-    public final double kDTurning = 5.0;
+    public static final double kPTurning = 0.5;
+    public static final double kITurning = 0.0;
+    public static final double kDTurning = 5.0;
 
     // Distance between right and left wheels
-    public final double kTrackWidth = Units.inchesToMeters(21);
+    public static final double kTrackWidth = Units.inchesToMeters(21);
     // Distance between front and back wheels
-    public final double kWheelBase = Units.inchesToMeters(25.5);
+    public static final double kWheelBase = Units.inchesToMeters(25.5);
 
-    public final SwerveDriveKinematics kDriveKinematics 
+    public static final SwerveDriveKinematics kDriveKinematics 
       = new SwerveDriveKinematics(
         // Front left
         new Translation2d(kTrackWidth / 2.0, kWheelBase / 2.0),
@@ -44,50 +44,50 @@ public class RobotConfig {
         // Back right
         new Translation2d(-kTrackWidth / 2.0, -kWheelBase / 2.0));
 
-    public final int frontLeftDriveId = 1;
-    public final int frontLeftSteerId = 2;
-    public final int frontLeftEncoderId = 1;
-    public final double frontLeftEncoderOffset = -Math.toRadians(180.263671875);
+    public static final int frontLeftDriveId = 1;
+    public static final int frontLeftSteerId = 2;
+    public static final int frontLeftEncoderId = 1;
+    public static final double frontLeftEncoderOffset = -Math.toRadians(180.263671875);
   
-    public final int frontRightDriveId = 8;
-    public final int frontRightSteerId = 3;
-    public final int frontRightEncoderId = 3;
-    public final double frontRightEncoderOffset = -Math.toRadians(267.1875);
+    public static final int frontRightDriveId = 8;
+    public static final int frontRightSteerId = 3;
+    public static final int frontRightEncoderId = 3;
+    public static final double frontRightEncoderOffset = -Math.toRadians(267.1875);
   
-    public final int backLeftDriveId = 14;
-    public final int backLeftSteerId = 4;
-    public final int backLeftEncoderId = 2;
-    public final double backLeftEncoderOffset = -Math.toRadians(268.2421875);
+    public static final int backLeftDriveId = 14;
+    public static final int backLeftSteerId = 4;
+    public static final int backLeftEncoderId = 2;
+    public static final double backLeftEncoderOffset = -Math.toRadians(268.2421875);
   
-    public final int backRightDriveId = 2;
-    public final int backRightSteerId = 1;
-    public final int backRightEncoderId = 4;
-    public final double backRightEncoderOffset = -Math.toRadians(153.544921875);
+    public static final int backRightDriveId = 2;
+    public static final int backRightSteerId = 1;
+    public static final int backRightEncoderId = 4;
+    public static final double backRightEncoderOffset = -Math.toRadians(153.544921875);
 
-    public final double kDriveReduction = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
-    public final double kSteerReduction = (15.0 / 32.0) * (10.0 / 60.0);
+    public static final double kDriveReduction = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
+    public static final double kSteerReduction = (15.0 / 32.0) * (10.0 / 60.0);
 
-    public double kSteerRelativeEncoderPositionConversionFactor = 
+    public static final double kSteerRelativeEncoderPositionConversionFactor = 
         2.0 * Math.PI / 2048.0 * kSteerReduction;
         
-    public double kSteerRelativeEncoderVelocityConversionFactor = 
+    public static final double kSteerRelativeEncoderVelocityConversionFactor = 
         kSteerRelativeEncoderPositionConversionFactor * 10.0;
 
-    public final double kWheelDiameterMeters = Units.inchesToMeters(4);
+    public static final double kWheelDiameterMeters = Units.inchesToMeters(4);
 
-    public final double kMaxSpeed = 6.0;
+    public static final double kMaxSpeed = 6.0;
 
-    public final double maxAngularSpeed = 
+    public static final double maxAngularSpeed = 
         14.301625486188971;
 
-    public final double kVoltageSaturation = 12.0;
-    public final double kCurrentLimit = 20.0;
+    public static final double kVoltageSaturation = 12.0;
+    public static final double kCurrentLimit = 20.0;
 
-    public final double kMaxAccelerationMetersPerSecondSquared = 3;
-    public final double kMaxAngularAccelerationRadiansPerSecondSquared = 
+    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+    public static final  double kMaxAngularAccelerationRadiansPerSecondSquared = 
         Math.PI / 2;
 
-    public final TrapezoidProfile.Constraints kThetaControllerConstraints =
+    public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
               new TrapezoidProfile.Constraints(
                       maxAngularSpeed,
                       kMaxAngularAccelerationRadiansPerSecondSquared);
