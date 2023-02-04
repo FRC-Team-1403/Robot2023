@@ -30,8 +30,7 @@ public class CougarRobotImpl extends CougarRobot {
    * @param parameters Standard framework injected parameters.
    * @param config Our robot's custom configuration values.
    */
-  public CougarRobotImpl(CougarLibInjectedParameters parameters,
-                         RobotConfig config) {
+  public CougarRobotImpl(CougarLibInjectedParameters parameters) {
     super(parameters);
     m_config = config;
 
@@ -44,7 +43,7 @@ public class CougarRobotImpl extends CougarRobot {
     var scheduler = CommandScheduler.getInstance();
     scheduler.registerSubsystem(m_builtins);
 
-    configureOperatorInterface(config.operator);
+    configureOperatorInterface();
   }
 
   /**
@@ -52,7 +51,7 @@ public class CougarRobotImpl extends CougarRobot {
    */
   private void configureOperatorInterface(
       RobotConfig.OperatorConfig config) {
-    XboxController xboxOperator = getJoystick("Operator", config.pilotPort);
+    XboxController xboxOperator = getJoystick("Operator", RobotConfig.OperatorConfig.pilotPort);
 
     ArmCommands armCommand = new ArmCommands(m_arm, 
     () -> xboxOperator.getLeftY(), 

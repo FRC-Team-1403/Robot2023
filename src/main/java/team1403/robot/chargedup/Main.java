@@ -32,7 +32,7 @@ public final class Main {
     Function<CougarLibInjectedParameters, CougarRobotImpl> cougarFactory =
         (CougarLibInjectedParameters params) -> {
           RobotConfig config = new RobotConfig();
-          return new CougarRobotImpl(params, config);
+          return new CougarRobotImpl(params);
         };
 
     RobotBase.startRobot(
