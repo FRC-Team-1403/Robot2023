@@ -4,6 +4,7 @@ import com.revrobotics.SparkMaxRelativeEncoder.Type;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 
+import team1403.lib.device.AdvancedMotorController;
 import team1403.lib.device.AnalogDevice;
 import team1403.lib.device.CougarAccelerometer;
 import team1403.lib.device.CougarDoubleSolenoid;
@@ -45,7 +46,7 @@ public class RealDeviceFactory implements DeviceFactory {
    * Returns a Brushless CanSparkMax instance.
    */
   @Override
-  public MotorController makeBrushlessCanSparkMax(
+  public AdvancedMotorController makeBrushlessCanSparkMax(
       String name, int channel, Type encoderType, CougarLogger logger) {
     return CougarSparkMax.makeBrushless(name, channel, encoderType, logger);
   }
@@ -54,7 +55,7 @@ public class RealDeviceFactory implements DeviceFactory {
    * Returns a Brushed CanSparkMax instance.
    */
   @Override
-  public MotorController makeBrushedCanSparkMax(
+  public AdvancedMotorController makeBrushedCanSparkMax(
       String name, int channel, Type encoderType, CougarLogger logger) {
     return CougarSparkMax.makeBrushed(name, channel, encoderType, logger);
   }
@@ -63,7 +64,7 @@ public class RealDeviceFactory implements DeviceFactory {
    * Returns a TalonSrx instance.
    */
   @Override
-  public MotorController makeTalon(
+  public AdvancedMotorController makeTalonSrx(
       String name, int channel, CougarLogger logger) {
     return new TalonSrx(name, channel, logger);
   }
@@ -81,9 +82,15 @@ public class RealDeviceFactory implements DeviceFactory {
    * Returns a VictorSpx instance.
    */
   @Override
-  public MotorController makeVictorSpx(
+  public AdvancedMotorController makeVictorSpx(
       String name, int channel, CougarLogger logger) {
     return new VictorSpx(name, channel, logger);
+  }
+
+  @Override
+  public AdvancedMotorController makeCougarTalonFx(String name, int deviceNumber,
+      CougarLogger logger) {
+    return new CougarTalonFx(name, deviceNumber, logger);
   }
 
   /**
