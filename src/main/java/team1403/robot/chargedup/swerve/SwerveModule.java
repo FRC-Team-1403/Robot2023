@@ -177,7 +177,7 @@ public class SwerveModule implements Device {
    * @param angle angle to be normalized
    * @return angle value between 0 to 2pi
    */
-  public double normalizeAngle(double angle) {
+  private double normalizeAngle(double angle) {
     double normalizedAngle = angle;
 
     normalizedAngle %= (2.0 * Math.PI);
@@ -193,7 +193,7 @@ public class SwerveModule implements Device {
    * @param targetAngle the angle to be moved to
    * @return The steer angle after accounting for error.
    */
-  public double normalizeAngleError(double targetAngle) {
+  private double normalizeAngleError(double targetAngle) {
     // Angle is inbetween 0 to 2pi
     double normalizedAngleError = normalizeAngle(targetAngle);
 
@@ -214,7 +214,7 @@ public class SwerveModule implements Device {
    *
    * @param steerAngle the current steer angle.
    */
-  public double convertSteerAngle(double steerAngle) {
+  private double convertSteerAngle(double steerAngle) {
 
     double newSteerAngle = steerAngle;
 
@@ -281,7 +281,7 @@ public class SwerveModule implements Device {
    * @param steerAngle          the current steer angle.
    * @param driveMetersPerSecond the current drive voltage
    */
-  public double convertDriveMetersPerSecond(double driveMetersPerSecond, double steerAngle) {
+  private double convertDriveMetersPerSecond(double driveMetersPerSecond, double steerAngle) {
 
     double convertedDriveMetersPerSecond = driveMetersPerSecond;
 
