@@ -31,7 +31,8 @@ public final class Main {
     // This is going to create our CougarRobotImpl when called.
     Function<CougarLibInjectedParameters, CougarRobotImpl> cougarFactory =
         (CougarLibInjectedParameters params) -> {
-          return new CougarRobotImpl(params);
+          RobotConfig config = new RobotConfig();
+          return new CougarRobotImpl(params, config);
         };
 
     RobotBase.startRobot(

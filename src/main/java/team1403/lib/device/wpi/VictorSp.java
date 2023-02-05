@@ -37,10 +37,30 @@ public class VictorSp extends VictorSP
     return m_name;
   }
 
+  /**
+   * Maybe create another motor controller class for something like this.
+   */
+  @Override
+  public void follow(MotorController source) {
+    m_logger.tracef("VictorSp cannot follow");
+  }
+
+  @Override
+  public final void set(double speed) {
+    setSpeed(speed);
+  }
+
+
   @Override
   public final void setSpeed(double speed) {
     m_logger.tracef("setSpeed %s %f", getName(), speed);
     super.set(speed);
+  }
+
+  @Override
+  public void setVoltage(double voltage) {
+    m_logger.tracef("setVoltage %s %f", getName(), voltage);
+    super.setVoltage(voltage);
   }
 
   private final CougarLogger m_logger;

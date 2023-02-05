@@ -1,20 +1,18 @@
 package team1403.lib.device.wpi;
 
 import com.ctre.phoenix.motorcontrol.IMotorController;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-import team1403.lib.device.AdvancedMotorController;
 import team1403.lib.device.CurrentSensor;
 import team1403.lib.device.Encoder;
+import team1403.lib.device.MotorController;
 import team1403.lib.util.CougarLogger;
 
 /**
  * Device implementation for a WPI_TalonSRX motor controller.
  */
 public class TalonSrx extends WPI_TalonSRX
-                      implements AdvancedMotorController {
+                      implements MotorController {
   /**
    * Constructor.
    *
@@ -53,52 +51,21 @@ public class TalonSrx extends WPI_TalonSRX
    * @throws ClassCastException if motor is not compatible.
    */
   @Override
-  public void follow(AdvancedMotorController source) {
+  public void follow(MotorController source) {
     m_logger.tracef("follow %s <- %s", getName(), source.getName());
     super.follow((IMotorController)source);  // Will throw an exception if source is not compatible.
   }
 
   @Override
-  public final void setVoltageCompensation(double voltage) {
-    m_logger.tracef("setVoltage %s %f", getName(), voltage);
-    super.configVoltageCompSaturation(voltage);
+  public final void set(double speed) {
+    setSpeed(speed);
   }
+
 
   @Override
   public final void setSpeed(double speed) {
     m_logger.tracef("setSpeed %s %f", getName(), speed);
     super.set(speed);
-  }
-
-  @Override
-  public void setPosition(double position) {
-    m_logger.errorf("setPosition is not supported %s %f", getName(), position);
-  }
-
-  @Override 
-  public void setPidGains(double p, double i, double d) {
-    super.config_kP(0, p);
-    super.config_kD(0, d);
-    super.config_kI(0, i);
-  }
-
-  @Override
-  public void setIdleMode(CougarIdleMode mode) {
-    if (mode == CougarIdleMode.BRAKE) {
-      super.setNeutralMode(NeutralMode.Brake);
-    } else {
-      super.setNeutralMode(NeutralMode.Brake);
-    }
-  }
-
-  @Override
-  public void setRampRate(double rate) {
-    configClosedloopRamp(rate);
-  }
-
-  @Override
-  public void setAmpLimit(double amps) {
-    super.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, amps, 0, 0));
   }
 
   @Override
@@ -144,24 +111,14 @@ public class TalonSrx extends WPI_TalonSRX
 
     @Override
     public final double getPositionTicks() {
-      return getSelectedSensorPosition(1) * m_positionConversionFactor;
+      return getSelectedSensorPosition(1);
     }
 
     @Override
     public final double getRpm() {
-      final double unitsPer100ms = getSelectedSensorVelocity(1) * m_velocityConversionFactor;
+      final double unitsPer100ms = getSelectedSensorVelocity(1);
       final double unitsPerMinute = unitsPer100ms * 10 * 60;
-      return unitsPerMinute;
-    }
-
-    @Override
-    public void setPositionTickConversionFactor(double conversionFactor) {
-      m_positionConversionFactor = conversionFactor;
-    }
-
-    @Override
-    public void setVelocityTickConversionFactor(double conversionFactor) {
-      m_velocityConversionFactor = conversionFactor;
+      return unitsPerMinute / 4096.0;
     }
 
     private final String m_encoderName;
@@ -195,7 +152,4 @@ public class TalonSrx extends WPI_TalonSRX
   private final EmbeddedCurrentSensor m_currentSensor;
   private final CougarLogger m_logger;
   private final String m_name;
-
-  private double m_positionConversionFactor = 1.0;
-  private double m_velocityConversionFactor = 1.0;
 }

@@ -3,13 +3,14 @@ package team1403.lib.device.wpi;
 import com.ctre.phoenix.motorcontrol.IMotorController;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
-import team1403.lib.device.AdvancedMotorController;
+import team1403.lib.device.MotorController;
 import team1403.lib.util.CougarLogger;
 
 /**
  * Device implementation for a WPI_VictorSPX motor controller.
  */
-public class VictorSpx extends WPI_VictorSPX implements AdvancedMotorController {  
+public class VictorSpx extends WPI_VictorSPX
+                       implements MotorController {
   /**
    * Constructor.
    *
@@ -46,15 +47,16 @@ public class VictorSpx extends WPI_VictorSPX implements AdvancedMotorController 
    * @throws ClassCastException if motor is not compatible.
    */
   @Override
-  public void follow(AdvancedMotorController source) {
+  public void follow(MotorController source) {
     m_logger.tracef("follow %s <- %s", getName(), source.getName());
     super.follow((IMotorController)source);  // Will throw an exception if source is not compatible.
   }
 
   @Override
-  public void setVoltageCompensation(double voltage) {
-    super.configVoltageCompSaturation(voltage);
+  public final void set(double speed) {
+    setSpeed(speed);
   }
+
 
   @Override
   public final void setSpeed(double speed) {
@@ -62,31 +64,6 @@ public class VictorSpx extends WPI_VictorSPX implements AdvancedMotorController 
     super.set(speed);
   }
 
-  @Override
-  public void setPosition(double position) {
-    m_logger.errorf("Unsupported setPosition %s %f", getName(), position);
-  }
-
-  @Override 
-  public void setPidGains(double p, double i, double d) {
-    m_logger.errorf("Unsupported setPidGains %s %f %f %f", getName(), p, i, d);
-  }
-
-  @Override
-  public void setIdleMode(CougarIdleMode mode) {
-    m_logger.errorf("Unsupported setIdleMode %s %s", getName(), mode.toString());
-  }
-
-  @Override
-  public void setRampRate(double rate) {
-    configClosedloopRamp(rate);
-  }
-  
-  @Override
-  public void setAmpLimit(double amps) {
-    m_logger.errorf("Unsupported setAmpLimit %s %d", getName(), amps);
-  }
-  
   private final CougarLogger m_logger;
   private final String m_name;
 }
