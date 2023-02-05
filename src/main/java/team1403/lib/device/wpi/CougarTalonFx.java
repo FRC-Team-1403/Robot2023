@@ -173,6 +173,11 @@ public class CougarTalonFx extends TalonFX implements AdvancedMotorController {
       m_velocityConversionFactor = conversionFactor;
     }
 
+    @Override
+    public double getVelocityTicks() {
+      return getSelectedSensorVelocity() * m_velocityConversionFactor;
+    }
+
     private final String m_encoderName;
   }
 
