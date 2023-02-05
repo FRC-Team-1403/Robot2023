@@ -7,7 +7,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -16,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import team1403.lib.device.GyroscopeDevice;
 import team1403.lib.device.wpi.NavxAhrs;
 import team1403.lib.util.CougarLogger;
+import team1403.lib.util.SwerveDriveOdometry;
 import team1403.robot.chargedup.RobotConfig.CanBus;
 import team1403.robot.chargedup.RobotConfig.SwerveConfig;
 
@@ -144,6 +144,10 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public Pose2d getPose() {
     return m_odometer.getPoseMeters();
+  }
+
+  public void setPose(Pose2d pose) {
+    m_odometer.setPoseMeters(pose);
   }
 
   /**

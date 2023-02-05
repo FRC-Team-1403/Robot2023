@@ -1,7 +1,13 @@
 package team1403.robot.chargedup;
 
+import java.util.List;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -10,7 +16,10 @@ import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarRobot;
 import team1403.lib.subsystems.BuiltinSubsystem;
 import team1403.lib.util.CougarLogger;
+import team1403.robot.chargedup.cse.CougarScriptObject;
+import team1403.robot.chargedup.cse.CougarScriptReader;
 import team1403.robot.chargedup.swerve.SwerveCommand;
+import team1403.robot.chargedup.swerve.SwerveDrivePath;
 import team1403.robot.chargedup.swerve.SwerveSubsystem;
 
 /**
@@ -45,8 +54,15 @@ public class CougarRobotImpl extends CougarRobot {
 
     configureOperatorInterface();
     configureDriverInterface();
+    registerAutoCommands();
 
   }
+
+  @Override
+  public Command getAutonomousCommand() {
+    return m_reader.importScript("IPrayForMySanity.json");
+    
+  } 
 
   /**
    * Configures the operator commands and their bindings.
@@ -61,6 +77,10 @@ public class CougarRobotImpl extends CougarRobot {
   private void configureDriverInterface() {
     XboxController xboxDriver = getJoystick("Driver", RobotConfig.DriverConfig.pilotPort);
 
+    // The controls are for field-oriented driving:
+    // Left stick Y axis -> forward and backwards movement
+    // Left stick X axis -> left and right movement
+    // Right stick X axis -> rotation
     new SwerveCommand(
         m_swerveSubsystem,
         () -> -deadband(xboxDriver.getLeftY(), 0.05),
@@ -73,6 +93,36 @@ public class CougarRobotImpl extends CougarRobot {
 
     new Trigger(() -> xboxDriver.getLeftBumper()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.decreaseSpeed(0.2)));
+  }
+
+  /**
+   * Use this to pass the autonomous command to the main {@link Robot} class.
+   *
+   * @return the command to run in autonomous
+   */
+  private void registerAutoCommands() {
+    m_reader = new CougarScriptReader((Pose2d startPose) -> {
+      double feetToMeters = 0.30478512648;
+
+      Translation2d flippedXandY = new Translation2d(
+          startPose.getY() * feetToMeters, startPose.getX() * feetToMeters);
+
+      Rotation2d theta = new Rotation2d(
+          startPose.getRotation().getDegrees());
+
+      Pose2d transformedStartPose;
+
+      transformedStartPose = new Pose2d(flippedXandY, theta);
+      m_swerveSubsystem.setPose(transformedStartPose);
+    });
+
+    m_reader.registerCommand("SwerveDrivePath", (CougarScriptObject p) -> {
+      List<Translation2d> wayPoints = p.getPointList("Waypoints");
+      return new SwerveDrivePath(m_swerveSubsystem,
+          p.getDouble("StartAngle"),
+          p.getDouble("EndAngle"),
+          wayPoints);
+    });
   }
 
   /**
@@ -114,4 +164,5 @@ public class CougarRobotImpl extends CougarRobot {
 
   private final BuiltinSubsystem m_builtins;
   private final SwerveSubsystem m_swerveSubsystem;
+  private CougarScriptReader m_reader;
 }
