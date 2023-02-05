@@ -32,6 +32,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
   private PIDController m_driftCorrectionPid = new PIDController(0.33, 0, 0);
   private double m_desiredHeading = 0;
+  private double m_speedLimiter = 0.6;
 
   private final CougarLogger m_logger;
 
@@ -71,6 +72,29 @@ public class SwerveSubsystem extends SubsystemBase {
     setRobotIdleMode(IdleMode.kBrake);
   }
 
+  /**
+   * Increases the speed limiter by amt. The speed limiter will not exceed 1.
+   *
+   * @param amt the amount to increase the speed by
+   */
+  public void increaseSpeed(double amt) {
+    m_speedLimiter = Math.min(1, m_speedLimiter + amt);
+  }
+
+  /**
+   * Decreases the speed limiter by amt. The speed limiter will not go below 0.
+   *
+   * @param amt the amount to decrease the speed by
+   */
+  public void decreaseSpeed(double amt) {
+    m_speedLimiter = Math.max(0, m_speedLimiter - amt);
+  }
+
+  /**
+   * Gets the 4 swerve module positions.
+   *
+   * @return an array of swerve module positions
+   */
   public SwerveModulePosition[] getModulePositions() {
     return new SwerveModulePosition[] {
         m_modules[0].getPosition(),
@@ -154,8 +178,8 @@ public class SwerveSubsystem extends SubsystemBase {
     SwerveDriveKinematics.desaturateWheelSpeeds(states, SwerveConfig.kMaxSpeed);
 
     for (int i = 0; i < m_modules.length; i++) {
-      m_modules[i].set(states[i].speedMetersPerSecond
-          / SwerveConfig.kMaxSpeed, states[i].angle.getRadians());
+      m_modules[i].set((states[i].speedMetersPerSecond
+          / SwerveConfig.kMaxSpeed) * m_speedLimiter, states[i].angle.getRadians());
     }
   }
 
