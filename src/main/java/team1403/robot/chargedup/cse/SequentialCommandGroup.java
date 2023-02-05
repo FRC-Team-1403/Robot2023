@@ -22,9 +22,10 @@ public class SequentialCommandGroup extends CommandBase {
   /**
    * Constructor.
    */
-  public SequentialCommandGroup(Pose2d startPose, Consumer<Pose2d> onStart, Command... c_iter) {
+  public SequentialCommandGroup(Pose2d startPose, Consumer<Pose2d> onStart, 
+      Command... commandIter) {
     this.commandsToRun = new ArrayList<>();
-    for (Command i : c_iter) {
+    for (Command i : commandIter) {
       this.commandsToRun.add(i);
     }
     this.m_maxIndex = this.commandsToRun.size();
@@ -33,8 +34,8 @@ public class SequentialCommandGroup extends CommandBase {
     this.m_onStart = onStart;
   }
 
-  public SequentialCommandGroup(Command... c_iter) {
-    this(null, null, c_iter);
+  public SequentialCommandGroup(Command... commandIter) {
+    this(null, null, commandIter);
   }
 
   public void setM_startPose(Pose2d pose) {
@@ -45,7 +46,10 @@ public class SequentialCommandGroup extends CommandBase {
     this.commandsToRun.add(command);
     this.m_maxIndex++;
   }
-
+  
+  /**
+   * Resets the index of the list of commands to run.
+   */
   public void reset() {
     this.m_currIndex = 0;
     this.m_toRun = this.commandsToRun.get(this.m_currIndex);
