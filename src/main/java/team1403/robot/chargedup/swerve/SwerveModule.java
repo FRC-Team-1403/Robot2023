@@ -374,7 +374,7 @@ public class SwerveModule implements Device {
    * Returns the SwerveModulePosition of this particular module.
    *
    * @return the SwerveModulePosition, which represents the distance 
-   * travelled and the angle of the module.
+   *         travelled and the angle of the module.
    */
   public SwerveModulePosition getModulePosition() {
     return new SwerveModulePosition(m_driveRelativeEncoder.getPositionTicks(), 
