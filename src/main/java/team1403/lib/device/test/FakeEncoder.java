@@ -71,9 +71,15 @@ public class FakeEncoder extends BaseDevice implements Encoder {
     m_velocityConversionFactor = conversionFactor;
   }
 
+  @Override
+  public void setPosition(double position) {
+    m_ticks = position;
+  }
+
   private final double m_ticksPerRevolution;
   private double m_positionConversionFactor = 1.0;
   private double m_velocityConversionFactor = 1.0;
   private double m_ticks;
   private double m_rpm;
+  
 }

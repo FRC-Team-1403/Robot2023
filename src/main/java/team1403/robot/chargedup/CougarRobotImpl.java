@@ -3,12 +3,13 @@ package team1403.robot.chargedup;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarRobot;
 import team1403.lib.subsystems.BuiltinSubsystem;
 import team1403.lib.util.CougarLogger;
-import team1403.robot.chargedup.armSubsystem.Arm;
-import team1403.robot.chargedup.armSubsystem.ArmCommands;
+import team1403.robot.chargedup.arm.Arm;
+import team1403.robot.chargedup.arm.ArmCommands;
 
 /**
  * The heart of the robot.
@@ -28,17 +29,15 @@ public class CougarRobotImpl extends CougarRobot {
    * Constructor.
    *
    * @param parameters Standard framework injected parameters.
-   * @param config Our robot's custom configuration values.
    */
   public CougarRobotImpl(CougarLibInjectedParameters parameters) {
     super(parameters);
-    m_config = config;
 
     var logger = CougarLogger.getChildLogger(
         parameters.getRobotLogger(), "BuiltinDevices");
 
     m_builtins = new BuiltinSubsystem(parameters, logger);
-    m_arm = new Arm(parameters, m_config);
+    m_arm = new Arm(parameters);
 
     var scheduler = CommandScheduler.getInstance();
     scheduler.registerSubsystem(m_builtins);
@@ -49,18 +48,16 @@ public class CougarRobotImpl extends CougarRobot {
   /**
    * Configures the operator commands and their bindings.
    */
-  private void configureOperatorInterface(
-      RobotConfig.OperatorConfig config) {
+  private void configureOperatorInterface() {
     XboxController xboxOperator = getJoystick("Operator", RobotConfig.OperatorConfig.pilotPort);
 
-    ArmCommands armCommand = new ArmCommands(m_arm, 
-    () -> xboxOperator.getLeftY(), 
-    () -> xboxOperator.getRightY(), 
-    () -> xboxOperator.getRightTriggerAxis(), 
-    () -> xboxOperator.getLeftTriggerAxis(),
-    m_config);
+    m_arm.setDefaultCommand(new ArmCommands(m_arm,
+        () -> xboxOperator.getLeftY(),
+        () -> xboxOperator.getRightY(),
+        () -> xboxOperator.getRightTriggerAxis(),
+        () -> xboxOperator.getLeftTriggerAxis()));
   }
-  
+
   /**
    * Get controller and silence warnings if not found.
    *
@@ -73,12 +70,11 @@ public class CougarRobotImpl extends CougarRobot {
     if (!DriverStation.isJoystickConnected(port)) {
       DriverStation.silenceJoystickConnectionWarning(true);
       CougarLogger.getAlwaysOn().warningf("No controller found on port %d for '%s'",
-                                          port, role);
+          port, role);
     }
     return new XboxController(port);
   }
 
   private final BuiltinSubsystem m_builtins;
   private final Arm m_arm;
-  private final RobotConfig m_config;
 }

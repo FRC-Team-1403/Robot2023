@@ -40,4 +40,9 @@ public interface Encoder extends Sensor {
    * @return rate of encoder rotation
    */
   double getRpm();
+
+  /**
+   * Sets the position offset of the encoder.
+   */
+  public void setPosition(double position);
 }

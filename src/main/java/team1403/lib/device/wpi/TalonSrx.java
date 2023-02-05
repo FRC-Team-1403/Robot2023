@@ -164,7 +164,14 @@ public class TalonSrx extends WPI_TalonSRX
       m_velocityConversionFactor = conversionFactor;
     }
 
+    @Override
+    public void setPosition(double position) {
+      setSelectedSensorPosition(position);
+    }
+
     private final String m_encoderName;
+
+    
   }
 
   /**
