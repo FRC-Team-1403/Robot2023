@@ -21,6 +21,7 @@ public interface GyroscopeDevice extends Sensor {
   public abstract double getRawAngle();
 
   /**
+   * Returns the angle of the gyroscope + the offset.
    *
    * @return the raw angle plus the configured offset
    */
@@ -51,18 +52,19 @@ public interface GyroscopeDevice extends Sensor {
    * the gyro for use by wpilib which treats gyros backwards.
    * Gyros are normally clockwise positive. Wpilib wants
    * counter-clockwise positive.
-   * 
+   *
    * @return the clamped angle in degrees
    */
-  default public double getHeading()  {
+  public default double getHeading() {
     return Math.IEEEremainder(-getAngle(), 360);
- }
+  }
 
   /**
    * Convenience method to return the heading as a Rotation2d object.
+   *
    * @return the heading
    */
-  default public Rotation2d getRotation2d() {
+  public default Rotation2d getRotation2d() {
     return Rotation2d.fromDegrees(getHeading());
   }
 }
