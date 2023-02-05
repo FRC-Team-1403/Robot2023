@@ -60,8 +60,7 @@ public class CougarRobotImpl extends CougarRobot {
 
   @Override
   public Command getAutonomousCommand() {
-    return m_reader.importScript("IPrayForMySanity.json");
-    
+    return m_reader.importScript("TestAuto.json");
   } 
 
   /**
