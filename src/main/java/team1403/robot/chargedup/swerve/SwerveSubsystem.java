@@ -11,8 +11,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import team1403.lib.core.CougarLibInjectedParameters;
+import team1403.lib.core.CougarSubsystem;
 import team1403.lib.device.GyroscopeDevice;
 import team1403.lib.device.wpi.NavxAhrs;
 import team1403.lib.util.CougarLogger;
@@ -23,7 +23,7 @@ import team1403.robot.chargedup.RobotConfig.SwerveConfig;
  * The drivetrain of the robot. Consists of for swerve modules and the
  * gyroscope.
  */
-public class SwerveSubsystem extends SubsystemBase {
+public class SwerveSubsystem extends CougarSubsystem {
   private final GyroscopeDevice m_navx2;
   private final SwerveModule[] m_modules;
 
@@ -34,17 +34,16 @@ public class SwerveSubsystem extends SubsystemBase {
   private double m_desiredHeading = 0;
   private double m_speedLimiter = 0.6;
 
-  private final CougarLogger m_logger;
-
   /**
    * Creates a new {@link SwerveSubsystem}. Instantiates the 4 {@link SwerveModule}s, 
    * the {@link SwerveDriveOdometry}, and the {@link NavxAhrs}. 
    * Also sets drivetrain ramp rate, and idle mode to default values.
    *
-   * @param logger the {@link CougarLogger} used in this subsystem
+   * @param CougarLibInjectedParameters the {@link CougarLibInjectedParameters} used to construct this subsystem
    */
-  public SwerveSubsystem(CougarLogger logger) {
-    this.m_logger = logger;
+  public SwerveSubsystem(CougarLibInjectedParameters parameters) {
+    super("Swerve Subsystem", parameters);
+    CougarLogger logger = getLogger();
     m_modules = new SwerveModule[] {
         new SwerveModule("Back Right Module",
             CanBus.backRightDriveId, CanBus.backRightSteerId,
@@ -78,6 +77,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * @param amt the amount to increase the speed by
    */
   public void increaseSpeed(double amt) {
+    tracef("increasedSpeed %f", amt);
     m_speedLimiter = Math.min(1, m_speedLimiter + amt);
   }
 
@@ -87,6 +87,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * @param amt the amount to decrease the speed by
    */
   public void decreaseSpeed(double amt) {
+    tracef("decreasedSpeed %f", amt);
     m_speedLimiter = Math.max(0, m_speedLimiter - amt);
   }
 
@@ -110,6 +111,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * @param rate the ramp rate
    */
   public void setRobotRampRate(double rate) {
+    tracef("setRobotRampRate %f", rate);
     for (SwerveModule module : m_modules) {
       module.setRampRate(rate);
     }
@@ -121,6 +123,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * @param mode the IdleMode of the robot
    */
   public void setRobotIdleMode(IdleMode mode) {
+    tracef("setRobotIdleMode %s", mode.name());
     for (SwerveModule module : m_modules) {
       module.setControllerMode(mode);
     }
@@ -132,6 +135,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * 'forwards' direction.
    */
   public void zeroGyroscope() {
+    tracef("zeroGyroscope %f", getGyroscopeRotation());
     m_navx2.reset();
     m_desiredHeading = 0;
     resetOdometry();
@@ -150,6 +154,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * Reset the position of the drivetrain odometry.
    */
   public void resetOdometry() {
+    tracef("resetOdometry");
     m_odometer.resetPosition(getGyroscopeRotation(), getModulePositions(), getPose());
   }
 
@@ -180,6 +185,11 @@ public class SwerveSubsystem extends SubsystemBase {
     // Prevent wheels from going back to 0 degrees as the default state.
     if (states[0].speedMetersPerSecond < 0.001) {
       for (int i = 0; i < m_modules.length; i++) {
+        tracef("ModuleState of %s. Speed: %f, Angle: %f", 
+            m_modules[i].getName(), 
+            states[i].speedMetersPerSecond, 
+            states[i].angle.getRadians());
+        
         m_modules[i].set(0, m_modules[i].getSteerAngle());
       }
       return;
@@ -188,6 +198,11 @@ public class SwerveSubsystem extends SubsystemBase {
     SwerveDriveKinematics.desaturateWheelSpeeds(states, SwerveConfig.kMaxSpeed);
 
     for (int i = 0; i < m_modules.length; i++) {
+      tracef("ModuleState of %s. Speed: %f, Angle: %f", 
+            m_modules[i].getName(), 
+            states[i].speedMetersPerSecond, 
+            states[i].angle.getRadians());
+
       m_modules[i].set((states[i].speedMetersPerSecond
           / SwerveConfig.kMaxSpeed) * m_speedLimiter, states[i].angle.getRadians());
     }
@@ -207,6 +222,8 @@ public class SwerveSubsystem extends SubsystemBase {
       if (Math.abs(calc) >= 0.55) {
         m_chassisSpeeds.omegaRadiansPerSecond += calc;
       }
+      tracef("driftCorrection %f, corrected omegaRadiansPerSecond %f", 
+            calc, m_chassisSpeeds.omegaRadiansPerSecond);
     }
   }
 
@@ -214,6 +231,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * Stops the drivetrain.
    */
   public void stop() {
+    tracef("stop");
     m_chassisSpeeds = new ChassisSpeeds();
   }
 
