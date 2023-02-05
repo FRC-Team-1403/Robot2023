@@ -38,7 +38,7 @@ public class CougarRobotImpl extends CougarRobot {
         parameters.getRobotLogger(), "BuiltinDevices");
 
     m_builtins = new BuiltinSubsystem(parameters, logger);
-    m_swerveSubsystem = new SwerveSubsystem(logger);
+    m_swerveSubsystem = new SwerveSubsystem(parameters);
 
     var scheduler = CommandScheduler.getInstance();
     scheduler.registerSubsystem(m_builtins);
