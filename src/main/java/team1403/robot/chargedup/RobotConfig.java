@@ -19,18 +19,20 @@ import edu.wpi.first.math.util.Units;
 public class RobotConfig {
 
   /**
-   * Swerve Constants .
+   * Swerve Constants.
    * 
    */
   public static class SwerveConfig {
-    // Constants for swerve module PID regarding rotation
+    public static final int kEncoderResetIterations = 500;
+    public static final double kEncoderResetMaxAngularVelocity = Math.toRadians(0.5);
+    public static final int kStatusFrameGeneralPeriodMs = 250;
+    public static final int kCanTimeoutMs = 250;
+
     public static final double kPTurning = 0.5;
     public static final double kITurning = 0.0;
     public static final double kDTurning = 5.0;
 
-    // Distance between right and left wheels
     public static final double kTrackWidth = Units.inchesToMeters(21);
-    // Distance between front and back wheels
     public static final double kWheelBase = Units.inchesToMeters(25.5);
 
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
@@ -143,42 +145,5 @@ public class RobotConfig {
      * Encoder ticks from center still considered close enough to be at center.
      */
     public static final double seekCenterTolerance = 10.0;
-  }
-
-  /**
-   * exampleRail subsystem configuration.
-   *
-   * <p>Encapsulates the parameters controlling the rail subsystem behavior.
-   * The device wiring parameters are specified with their respective bus's
-   * configuration.
-   *
-   */
-  public class ExampleRail {
-
-    /**
-     * True if the motor is inverted.
-     */
-    public static final boolean motorInverted = false;
-
-    /**
-     * The default motor speed for commands.
-     */
-    public static final double motorSpeed = 0.75;
-
-    /**
-     * The minimum motor speed to move.
-     *
-     * <p>Anything less will be considered stopping.
-     */
-    public static final double minSpeed = 0.01;
-
-    /**
-     * Assumed length of rail in encoder ticks.
-     *
-     * <p>This is used if we have no exampleRailReverseLimitSwitch.
-     * In that case we will use a virtual one that will trigger when
-     * the encoder is this far from the front switch.
-     */
-    public static final long virtualBackLimitSwitchTicks = 2000;
   }
 }
