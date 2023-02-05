@@ -164,6 +164,11 @@ public class TalonSrx extends WPI_TalonSRX
       m_velocityConversionFactor = conversionFactor;
     }
 
+    @Override
+    public double getVelocityTicks() {
+      return getSelectedSensorVelocity() * m_velocityConversionFactor;
+    }
+
     private final String m_encoderName;
   }
 

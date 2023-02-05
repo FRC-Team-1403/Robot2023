@@ -218,6 +218,11 @@ public final class CougarSparkMax extends CANSparkMax implements AdvancedMotorCo
       m_encoder.setVelocityConversionFactor(conversionFactor);
     }
 
+    @Override
+    public double getVelocityTicks() {
+      return m_encoder.getVelocity();
+    }
+
     private final String m_encoderName;
     private final RelativeEncoder m_encoder;
   }

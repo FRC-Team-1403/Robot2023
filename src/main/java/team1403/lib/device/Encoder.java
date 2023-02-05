@@ -40,4 +40,14 @@ public interface Encoder extends Sensor {
    * @return rate of encoder rotation
    */
   double getRpm();
+
+  /**
+   * Get the velocity of the motor. 
+   * This returns the native units of 'RPM' by default, 
+   * and can be changed by a scale factor using setVelocityConversionFactor().
+   *
+   * @return Number the RPM of the motor
+   */
+  double getVelocityTicks();
+
 }
