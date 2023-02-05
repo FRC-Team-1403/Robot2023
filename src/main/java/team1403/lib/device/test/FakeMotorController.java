@@ -1,39 +1,37 @@
 package team1403.lib.device.test;
 
+import team1403.lib.device.AdvancedMotorController;
 import team1403.lib.device.BaseDevice;
 import team1403.lib.device.CurrentSensor;
 import team1403.lib.device.Encoder;
 import team1403.lib.device.MotorController;
 import team1403.lib.util.CougarLogger;
 
-
 /**
  * A fake MotorController for testing.
  */
 @SuppressWarnings("PMD.DataClass")
-public class FakeMotorController
-       extends BaseDevice
-       implements MotorController {
+public class FakeMotorController extends BaseDevice implements AdvancedMotorController {
   /**
    * Constructor.
    *
-   * @param name The name for this instance.
+   * @param name   The name for this instance.
    * @param logger The logger to use for this instance.
    */
   public FakeMotorController(String name, CougarLogger logger) {
-    this(name, logger, (Encoder)null, (CurrentSensor)null);
+    this(name, logger, (Encoder) null, (CurrentSensor) null);
   }
 
   /**
    * Full Constructor.
    *
-   * @param name The name for this instance.
-   * @param logger The logger to use for this instance.
+   * @param name    The name for this instance.
+   * @param logger  The logger to use for this instance.
    * @param encoder The embedded encoder or null if none.
    * @param current The embedded current sensor or null if none.
    */
   public FakeMotorController(String name, CougarLogger logger,
-                             Encoder encoder, CurrentSensor current) {
+      Encoder encoder, CurrentSensor current) {
     super(name);
     m_logger = logger;
     m_encoder = encoder;
@@ -68,7 +66,7 @@ public class FakeMotorController
   }
 
   /**
-   * Returns last last voltage to {@link #setVoltage}.
+   * Returns last voltage to {@link #setVoltage}.
    *
    * @return NaN if setVoltage not yet called.
    */
@@ -77,7 +75,7 @@ public class FakeMotorController
   }
 
   /**
-   * Returns last last speed to {@link #setSpeed}.
+   * Returns last speed to {@link #setSpeed}.
    *
    * @return NaN if setSpeed not yet called.
    */
@@ -85,13 +83,71 @@ public class FakeMotorController
     return m_speed;
   }
 
-  @Override
-  public void follow(MotorController source) {
-    m_follow = source;
+  /**
+   * Returns the last mode to {@link #setMode}.
+   *
+   * @return null if setMode not yet called.
+   */
+  public CougarIdleMode getMode() {
+    return m_mode;
+  }
+
+  /**
+   * Returns the last ramp rate to {@link #setRampRate}.
+   *
+   * @return NaN if setRampRate not yet called.
+   */
+  public double getRampRate() {
+    return m_rampRate;
+  }
+
+  /**
+   * Returns the last p to {@link #setGains}.
+   *
+   * @return NaN if setGains not yet called.
+   */
+  public double getkP() {
+    return m_kp;
+  }
+
+  /**
+   * Returns the last i to {@link #setGains}.
+   *
+   * @return NaN if setGains not yet called.
+   */
+  public double getkI() {
+    return m_ki;
+  }
+
+  /**
+   * Returns the last D to {@link #setGains}.
+   *
+   * @return NaN if setGains not yet called.
+   */
+  public double getkD() {
+    return m_kd;
+  }
+
+  /**
+   * Returns the last position to {@link #setPosition}.
+   *
+   * @return NaN if setPosition not yet called.
+   */
+  public double getPosition() {
+    return m_position;
+  }
+
+  /**
+   * Returns the last current limit to {@link #setCurrentLimit}.
+   *
+   * @return NaN if setCurrentLimit not yet called.
+   */
+  public double getCurrentLimit() {
+    return m_currentLimit;
   }
 
   @Override
-  public void setVoltage(double voltage) {
+  public void setVoltageCompensation(double voltage) {
     m_voltage = voltage;
   }
 
@@ -117,11 +173,38 @@ public class FakeMotorController
   }
 
   @Override
+  public void setRampRate(double rate) {
+    this.m_rampRate = rate;
+  }
+
+  @Override
+  public void setIdleMode(CougarIdleMode mode) {
+    this.m_mode = mode;
+  }
+
+  @Override
+  public void setPosition(double position) {
+    this.m_position = position;
+  }
+
+  @Override
+  public void setPidGains(double p, double i, double d) {
+    this.m_kp = p;
+    this.m_ki = i;
+    this.m_kd = d;
+  }
+
+  @Override
+  public void setAmpLimit(double amps) {
+    this.m_currentLimit = amps;
+  }
+
+  @Override
   public Encoder getEmbeddedEncoder() {
     if (m_encoder != null) {
       return m_encoder;
     }
-    return MotorController.super.getEmbeddedEncoder();
+    return AdvancedMotorController.super.getEmbeddedEncoder();
   }
 
   @Override
@@ -129,13 +212,25 @@ public class FakeMotorController
     if (m_currentSensor != null) {
       return m_currentSensor;
     }
-    return MotorController.super.getEmbeddedCurrentSensor();
+    return AdvancedMotorController.super.getEmbeddedCurrentSensor();
+  }
+
+  @Override
+  public void follow(AdvancedMotorController source) {
+    m_follow = source;
   }
 
   private double m_speed = Double.NaN;
   private double m_voltage = Double.NaN;
+  private CougarIdleMode m_mode = CougarIdleMode.COAST;
+  private double m_rampRate = Double.NaN;
+  private double m_kp = Double.NaN;
+  private double m_ki = Double.NaN;
+  private double m_kd = Double.NaN;
+  private double m_position = Double.NaN;
+  private double m_currentLimit = Double.NaN;
   private int m_stopCalls;
-  private MotorController m_follow;
+  private AdvancedMotorController m_follow;
   private boolean m_inverted;
   private final CougarLogger m_logger;
   private final Encoder m_encoder;
