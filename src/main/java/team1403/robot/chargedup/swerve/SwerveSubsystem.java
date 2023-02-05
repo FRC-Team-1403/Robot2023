@@ -71,7 +71,7 @@ public class SwerveSubsystem extends SubsystemBase {
     setRobotIdleMode(IdleMode.kBrake);
   }
 
-  private SwerveModulePosition[] getModulePositions() {
+  public SwerveModulePosition[] getModulePositions() {
     return new SwerveModulePosition[] {
         m_modules[0].getPosition(),
         m_modules[1].getPosition(),
@@ -159,13 +159,11 @@ public class SwerveSubsystem extends SubsystemBase {
     }
   }
 
-  @Override
-  public void periodic() {
-    SmartDashboard.putNumber("Gyro Reading", getGyroscopeRotation().getDegrees());
-    m_odometer.update(getGyroscopeRotation(), getModulePositions());
-    SmartDashboard.putString("Odometry", m_odometer.getPoseMeters().toString());
-
-    // Drift correction code
+  /**
+   * Adds rotational velocity to the chassis speed to compensate for 
+   * unwanted changes in gyroscope heading.
+   */
+  private void driftCorrection() {
     double translationalVelocity = Math.abs(m_modules[0].getDriveVelocity());
     if (Math.abs(m_navx2.getAngularVelocity()) > 0.2) {
       m_desiredHeading = getGyroscopeRotation().getDegrees();
@@ -176,14 +174,26 @@ public class SwerveSubsystem extends SubsystemBase {
         m_chassisSpeeds.omegaRadiansPerSecond += calc;
       }
     }
+  }
+
+  /**
+   * Stops the drivetrain.
+   */
+  public void stop() {
+    m_chassisSpeeds = new ChassisSpeeds();
+  }
+
+  @Override
+  public void periodic() {
+    SmartDashboard.putNumber("Gyro Reading", getGyroscopeRotation().getDegrees());
+    m_odometer.update(getGyroscopeRotation(), getModulePositions());
+    SmartDashboard.putString("Odometry", m_odometer.getPoseMeters().toString());
+
+    driftCorrection();
 
     SwerveModuleState[] states = SwerveConfig.kDriveKinematics
         .toSwerveModuleStates(m_chassisSpeeds);
 
     setModuleStates(states);
-  }
-
-  public void stop() {
-    m_chassisSpeeds = new ChassisSpeeds();
   }
 }
