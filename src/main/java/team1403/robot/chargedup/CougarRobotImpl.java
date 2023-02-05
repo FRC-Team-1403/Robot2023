@@ -38,7 +38,7 @@ public class CougarRobotImpl extends CougarRobot {
         parameters.getRobotLogger(), "BuiltinDevices");
 
     m_builtins = new BuiltinSubsystem(parameters, logger);
-    m_swerveSubsystem = new SwerveSubsystem(logger);
+    m_swerveSubsystem = new SwerveSubsystem(parameters);
 
     var scheduler = CommandScheduler.getInstance();
     scheduler.registerSubsystem(m_builtins);
@@ -61,12 +61,15 @@ public class CougarRobotImpl extends CougarRobot {
   private void configureDriverInterface() {
     XboxController xboxDriver = getJoystick("Driver", RobotConfig.DriverConfig.pilotPort);
 
-    new SwerveCommand(
+    // Setting default command of swerve subsystem
+     m_swerveSubsystem.setDefaultCommand(new SwerveCommand(
         m_swerveSubsystem,
         () -> -deadband(xboxDriver.getLeftY(), 0.05),
         () -> -deadband(xboxDriver.getLeftX(), 0.05),
         () -> -deadband(xboxDriver.getRightX(), 0.05),
-        () -> xboxDriver.getYButtonReleased());
+        () -> xboxDriver.getYButtonReleased())
+      );
+
 
     new Trigger(() -> xboxDriver.getRightBumper()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.increaseSpeed(0.2)));
