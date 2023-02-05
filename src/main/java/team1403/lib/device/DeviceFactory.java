@@ -142,4 +142,14 @@ public interface DeviceFactory {
    * @return a new AnalogDevice for a WPILib AnalogDevice.
    */
   public AnalogDevice makeAnalogDevice(String name, int channel);
+
+  /**
+   * Creates an Gyroscope Device.
+   *
+   * @param name The name of the new device instance.
+   *
+   * @return a new GyroscopeDevice for a NavxAhrs device.
+   */
+  public GyroscopeDevice makeGyroscopeDevice(String name);
 }
+
