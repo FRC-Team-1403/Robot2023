@@ -14,6 +14,7 @@ import team1403.lib.device.CougarAccelerometer;
 import team1403.lib.device.CougarDoubleSolenoid;
 import team1403.lib.device.Device;
 import team1403.lib.device.DeviceFactory;
+import team1403.lib.device.GyroscopeDevice;
 import team1403.lib.device.LimitSwitch;
 import team1403.lib.device.MotorController;
 import team1403.lib.device.NoSuchDeviceError;
@@ -221,6 +222,12 @@ public class MappedDeviceFactory implements DeviceFactory {
   public AnalogDevice makeAnalogDevice(String name, int channel) {
     m_calls.put(name, Arrays.asList(name, Integer.valueOf(channel)));
     return (AnalogDevice)takeDevice(name);
+  }
+
+  @Override
+  public GyroscopeDevice makeGyroscopeDevice(String name) {
+    m_calls.put(name, Arrays.asList(name));
+    return (GyroscopeDevice) takeDevice(name);
   }
   
   private final Map<String, Device> m_deviceMap = new HashMap<>();

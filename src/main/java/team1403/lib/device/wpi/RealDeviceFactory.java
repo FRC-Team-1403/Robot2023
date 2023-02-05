@@ -8,6 +8,7 @@ import team1403.lib.device.AnalogDevice;
 import team1403.lib.device.CougarAccelerometer;
 import team1403.lib.device.CougarDoubleSolenoid;
 import team1403.lib.device.DeviceFactory;
+import team1403.lib.device.GyroscopeDevice;
 import team1403.lib.device.LimitSwitch;
 import team1403.lib.device.MotorController;
 import team1403.lib.device.PowerDistributor;
@@ -116,5 +117,10 @@ public class RealDeviceFactory implements DeviceFactory {
   @Override
   public AnalogDevice makeAnalogDevice(String name, int channel) {
     return new WpiAnalogDevice(name, channel);
+  }
+
+  @Override
+  public GyroscopeDevice makeGyroscopeDevice(String name) {
+    return new NavxAhrs(name);
   }
 }
