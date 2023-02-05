@@ -1,10 +1,11 @@
 package team1403.robot.chargedup;
 
-import team1403.lib.util.Dimension;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+
+import team1403.lib.util.Dimension;
 
 /**
  * This class holds attributes for the robot configuration.
@@ -150,6 +151,11 @@ public class RobotConfig {
    * Config parameters for tuning the operator interface.
    */
   public class OperatorConfig {
+
+    public static final int dPadUp = 0;
+    public static final int dPadRight = 1;
+    public static final int dPadDown = 2;
+    public static final int dPadLeft = 3;
 
     /**
      * The joystick port for the driver's controller.

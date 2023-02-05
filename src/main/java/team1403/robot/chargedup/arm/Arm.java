@@ -139,7 +139,7 @@ public class Arm extends CougarSubsystem {
    * @param relativeWristAngle wrist angle relative to itself
    * @return the max arm length without hitting ground
    */
-  public double maxGroundArmLength(double absoluteArmAngle, double relativeWristAngle) {
+  private double maxGroundArmLength(double absoluteArmAngle, double relativeWristAngle) {
     return theoreticalArmLength(absoluteArmAngle) - wristVerticleOccupation(relativeWristAngle)
       - RobotConfig.Arm.kMaxArmLengthOffset;
   }
@@ -151,7 +151,7 @@ public class Arm extends CougarSubsystem {
    * @return current angle of arm
    * 
    */
-  public double normalizeArmAngle(double angle) {
+  private double limitArmAngle(double angle) {
     if (angle > RobotConfig.Arm.kMaxArmRotation) {
       angle = RobotConfig.Arm.kMaxArmRotation;
     } else  if (angle < RobotConfig.Arm.kMinArmRotation) {
@@ -172,7 +172,7 @@ public class Arm extends CougarSubsystem {
    * @param desiredRelativeWristAngle desired wrist angle, relative to itself
    * @return current length of arm
    */
-  public double normalizeArmExtension(double length, double desiredArmAngle,
+  private double limitArmExtension(double length, double desiredArmAngle,
       double desiredRelativeWristAngle) {
     desiredArmAngle = 270 - desiredArmAngle;
     double max = 0;
@@ -208,7 +208,7 @@ public class Arm extends CougarSubsystem {
    * 
    * @return angle
    */
-  public double normalizeWristAngle(double angle) {
+  private double limitWristAngle(double angle) {
     if (angle > RobotConfig.Arm.kMaxWristRotation) {
       angle = RobotConfig.Arm.kMaxWristRotation;
     } else  if (angle < RobotConfig.Arm.kMinWristRotation) {
@@ -216,6 +216,23 @@ public class Arm extends CougarSubsystem {
     }
 
     return angle;
+  }
+
+  /**
+   * This method is being called inside the periodic method, and sets up the
+   * desired angles and extentions to be changed to the setpoints.
+   *
+   * @param armAngle current arm angle
+   * @param armExtension current arm extension
+   * @param wristAngle current wrist angle
+   * @param speed current wheel speed, between -1 and 1 inclusive
+   */
+  public void moveArm(double armAngle, double armExtension, double wristAngle, double speed) {
+    m_desiredArmAngle = limitArmAngle(armAngle);
+    m_desiredArmExtension = limitArmExtension(armExtension, m_desiredArmAngle, wristAngle);
+    m_desiredWristAngle = absoluteWristAngle(wristAngle, m_desiredArmAngle, getWristAngle());
+    m_desiredWristAngle = limitWristAngle(wristAngle);
+    m_wheelSpeed = speed;
   }
 
   /**
@@ -228,24 +245,7 @@ public class Arm extends CougarSubsystem {
   }
 
   /**
-   * This method is being called inside the periodic method, and sets up the
-   * desired angles and extentions to be changed to the setpoints.
-   *
-   * @param armAngle current arm angle
-   * @param armExtension current arm extension
-   * @param wristAngle current wrist angle
-   * @param speed current wheel speed, constricted of -1 or 1
-   */
-  public void moveArm(double armAngle, double armExtension, double wristAngle, double speed) {
-    m_desiredArmAngle = normalizeArmAngle(armAngle);
-    m_desiredArmExtension = normalizeArmExtension(armExtension, m_desiredArmAngle, wristAngle);
-    m_desiredWristAngle = absoluteWristAngle(wristAngle, m_desiredArmAngle, getWristAngle());
-    m_desiredWristAngle = normalizeWristAngle(wristAngle);
-    m_wheelSpeed = speed;
-  }
-
-  /**
-   * Move the arm to an angle between 0 and 360 degrees where 0 is positive x axis
+   * Move the arm to the desired angle where 0 is positive x axis
    * and 90 is positive y axis.
    *
    * @param angle you want the arm move to
@@ -255,7 +255,7 @@ public class Arm extends CougarSubsystem {
   }
 
   /**
-   * Move the wrist to an angle between 0 and 360 degrees where 0 is positive x axis
+   * Move the wrist to the desired angle where 0 is positive x axis
    * and 90 is positive y axis.
    *
    * @param angle you want the wrist move to 
@@ -345,7 +345,7 @@ public class Arm extends CougarSubsystem {
   /**
    * Stops all motors for arm, as well as intake.
    */
-  public void setStopArm() {
+  public void stopArm() {
     m_telescopicMotor.setSpeed(0);
     m_leftAngledMotor.setSpeed(0);
     m_wristAngleMotor.setSpeed(0);
@@ -382,11 +382,31 @@ public class Arm extends CougarSubsystem {
   /**
    * Getter for limiting the arm angle.
    *
-   * @return limit for angle
+   * @return limit for arm angle
    */
   private boolean isArmAngleWithinBounds() {
     return getArmAngle() <= RobotConfig.Arm.kMaxArmRotation && getArmAngle()
       >= RobotConfig.Arm.kMinArmRotation;
+  }
+
+  /**
+   * Getter for limiting the arm extension.
+   * 
+   * @return limit for arm extension
+   */
+  private boolean isArmExtensionWithinBounds() {
+    return getArmExtension() <= RobotConfig.Arm.kMaxArmExtension && getArmExtension()
+      >= RobotConfig.Arm.kMinArmExtension;
+  }
+
+  /**
+   * Getter for limiting the wrist angle.
+   * 
+   * @return limit for wrist angle
+   */
+  private boolean isWristAngleWithinBounds() {
+    return getWristAngle() <= RobotConfig.Arm.kMaxWristRotation && getWristAngle()
+      >= RobotConfig.Arm.kMinWristRotation;
   }
 
   @Override
@@ -398,9 +418,15 @@ public class Arm extends CougarSubsystem {
     
     if (isFrontSwitchActive() || isBackSwitchActive() || !isArmAngleWithinBounds()
         || getCurrentAmps() <= RobotConfig.Arm.kMaxAmperage) {
-      setArmExtensionMotorSpeed(0);
       setArmAngleMotorSpeed(0);
+    }
+
+    if (isWristAngleWithinBounds()) {
       setWristMotorSpeed(0);
+    }
+
+    if (isArmExtensionWithinBounds()) {
+      setArmExtensionMotorSpeed(0);
     }
   }
 }

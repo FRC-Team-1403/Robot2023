@@ -25,18 +25,25 @@ public class ArmCommands extends CommandBase {
   private double m_armExtension;
 
   /**
-   * Defines spinny, as m_arm.
-   * sets xBoxControllerInput to controller
+   * Defines the constructor for ArmCommands,
+   * sets the instant class level vaiables,
+   * to new variables.
+   *
+   * @param arm the Armsubsystem
+   * @param armAngle function that determines arm angle, -1 to 1
+   * @param wristAngle function that determines wrist angle, -1 to 1
+   * @param armExtensionIncrease function that determines the increase of arm extension, 0 to 1
+   * @param armExtensionDecrease function that determines the decrease of arm extension, 0 to 1
    */
-  public ArmCommands(Arm spinny, DoubleSupplier armAngle, DoubleSupplier wristAngle,
+  public ArmCommands(Arm arm, DoubleSupplier armAngle, DoubleSupplier wristAngle,
       DoubleSupplier armExtensionIncrease, DoubleSupplier armExtensionDecrease) {
-    this.m_arm = spinny;
+    this.m_arm = arm;
     this.m_armAngleSupplier = armAngle;
     this.m_wristAngleSupplier = wristAngle;
     this.m_armExtensionIncreaseSupplier = armExtensionIncrease;
     this.m_armExtensionDecreaseSupplier = armExtensionDecrease;
 
-    addRequirements(spinny); // "Locks the subsystem to the command"
+    addRequirements(arm);
   }
 
   @Override
@@ -44,7 +51,7 @@ public class ArmCommands extends CommandBase {
     m_armAngle += m_armAngleSupplier.getAsDouble() * 360;
     m_armExtension += m_armExtensionIncreaseSupplier.getAsDouble()
       * RobotConfig.Arm.kMaxArmExtension;
-    m_armExtension += m_armExtensionDecreaseSupplier.getAsDouble()
+    m_armExtension -= m_armExtensionDecreaseSupplier.getAsDouble()
       * RobotConfig.Arm.kMaxArmExtension;
     m_wristAngle += m_wristAngleSupplier.getAsDouble() * 360;
 
