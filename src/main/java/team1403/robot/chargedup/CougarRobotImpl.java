@@ -52,11 +52,11 @@ public class CougarRobotImpl extends CougarRobot {
    * Configures the operator commands and their bindings.
    */
   private void configureOperatorInterface() {
-    XboxController xboxOperator = getJoystick("Driver", RobotConfig.OperatorConfig.pilotPort);
+    XboxController xboxOperator = getJoystick("Operator", RobotConfig.OperatorConfig.pilotPort);
   }
 
   /**
-   * Configures the operator commands and their bindings.
+   * Configures the driver commands and their bindings.
    */
   private void configureDriverInterface() {
     XboxController xboxDriver = getJoystick("Driver", RobotConfig.DriverConfig.pilotPort);

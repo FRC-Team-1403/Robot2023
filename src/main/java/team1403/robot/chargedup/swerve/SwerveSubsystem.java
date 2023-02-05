@@ -153,10 +153,20 @@ public class SwerveSubsystem extends SubsystemBase {
     m_odometer.resetPosition(getGyroscopeRotation(), getModulePositions(), getPose());
   }
 
+  /**
+   * Gets the heading of the gyroscope.
+   *
+   * @return a Rotation2d object that contains the gyroscope's heading
+   */
   public Rotation2d getGyroscopeRotation() {
     return m_navx2.getRotation2d();
   }
 
+  /**
+   * Moves the drivetrain at the given chassis speeds.
+   *
+   * @param chassisSpeeds the speed to move at
+   */
   public void drive(ChassisSpeeds chassisSpeeds) {
     m_chassisSpeeds = chassisSpeeds;
   }
