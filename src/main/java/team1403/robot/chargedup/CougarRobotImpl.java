@@ -13,6 +13,8 @@ import team1403.lib.util.CougarLogger;
 import team1403.robot.chargedup.RobotConfig.OperatorConfig;
 import team1403.robot.chargedup.arm.Arm;
 import team1403.robot.chargedup.arm.ArmCommands;
+import team1403.robot.chargedup.swerve.SwerveCommand;
+import team1403.robot.chargedup.swerve.SwerveSubsystem;
 
 /**
  * The heart of the robot.
@@ -41,11 +43,14 @@ public class CougarRobotImpl extends CougarRobot {
 
     m_builtins = new BuiltinSubsystem(parameters, logger);
     m_arm = new Arm(parameters);
+    m_swerveSubsystem = new SwerveSubsystem(parameters);
 
     var scheduler = CommandScheduler.getInstance();
     scheduler.registerSubsystem(m_builtins);
 
     configureOperatorInterface();
+    configureDriverInterface();
+
   }
 
   /**
@@ -61,6 +66,49 @@ public class CougarRobotImpl extends CougarRobot {
       manualOperatorMode(xboxOperator);
     } else {
       autoOperatorMode(xboxOperator);
+  }
+}
+
+  /**
+   * Configures the driver commands and their bindings.
+   */
+  private void configureDriverInterface() {
+    XboxController xboxDriver = getJoystick("Driver", RobotConfig.DriverConfig.pilotPort);
+
+    // Setting default command of swerve subsystem
+     m_swerveSubsystem.setDefaultCommand(new SwerveCommand(
+        m_swerveSubsystem,
+        () -> -deadband(xboxDriver.getLeftY(), 0.05),
+        () -> -deadband(xboxDriver.getLeftX(), 0.05),
+        () -> -deadband(xboxDriver.getRightX(), 0.05),
+        () -> xboxDriver.getYButtonReleased())
+      );
+
+
+    new Trigger(() -> xboxDriver.getRightBumper()).onFalse(
+        new InstantCommand(() -> m_swerveSubsystem.increaseSpeed(0.2)));
+
+    new Trigger(() -> xboxDriver.getLeftBumper()).onFalse(
+        new InstantCommand(() -> m_swerveSubsystem.decreaseSpeed(0.2)));
+  }
+
+  /**
+   * Applies a deadband to the given value.
+   *
+   * @param value the value to apply a deadband to
+   * @param deadband the deadband to apply to the value
+   * @return 0 if the value is < deadband,
+   *         or value if value > deadband
+   */
+  private double deadband(double value, double deadband) {
+    if (Math.abs(value) > deadband) {
+      if (value > 0.0) {
+        return (value - deadband) / (1.0 - deadband);
+      } else {
+        return (value + deadband) / (1.0 - deadband);
+      }
+    } else {
+      return 0.0;
     }
   }
 
@@ -133,4 +181,5 @@ public class CougarRobotImpl extends CougarRobot {
   private final BuiltinSubsystem m_builtins;
   private final Arm m_arm;
   private boolean m_armOperatorManual = true;
+  private final SwerveSubsystem m_swerveSubsystem;
 }

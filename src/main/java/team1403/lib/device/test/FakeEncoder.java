@@ -3,7 +3,6 @@ package team1403.lib.device.test;
 import team1403.lib.device.BaseDevice;
 import team1403.lib.device.Encoder;
 
-
 /**
  * Implements a fake encoder.
  */
@@ -11,7 +10,7 @@ public class FakeEncoder extends BaseDevice implements Encoder {
   /**
    * Constructor.
    *
-   * @param name The name of the instance.
+   * @param name               The name of the instance.
    * @param ticksPerRevolution The fake's ticks per revolution is fixed.
    */
   public FakeEncoder(String name, double ticksPerRevolution) {
@@ -65,8 +64,6 @@ public class FakeEncoder extends BaseDevice implements Encoder {
   public void setPositionTickConversionFactor(double conversionFactor) {
     m_positionConversionFactor = conversionFactor;
   }
-  
-  
 
   public void setVelocityTickConversionFactor(double conversionFactor) {
     m_velocityConversionFactor = conversionFactor;
@@ -75,6 +72,10 @@ public class FakeEncoder extends BaseDevice implements Encoder {
   @Override
   public void setPosition(double position) {
     m_ticks = position;
+  }
+  
+  public double getVelocityTicks() {
+    return m_rpm * m_velocityConversionFactor;
   }
 
   private final double m_ticksPerRevolution;

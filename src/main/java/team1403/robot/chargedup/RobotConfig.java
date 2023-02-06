@@ -65,7 +65,7 @@ public class RobotConfig {
 
     public static final double kMaxSpeed = 6.0;
 
-    public static final double maxAngularSpeed = 14.301625486188971;
+    public static final double kMaxAngularSpeed = 14.301625486188971;
 
     public static final double kVoltageSaturation = 12.0;
     public static final double kCurrentLimit = 20.0;
@@ -74,7 +74,7 @@ public class RobotConfig {
     public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI / 2;
 
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = 
-        new TrapezoidProfile.Constraints(maxAngularSpeed, 
+        new TrapezoidProfile.Constraints(kMaxAngularSpeed, 
         kMaxAngularAccelerationRadiansPerSecondSquared);
   }
 
@@ -156,6 +156,22 @@ public class RobotConfig {
     public static final int dPadRight = 1;
     public static final int dPadDown = 2;
     public static final int dPadLeft = 3;
+
+    /**
+     * The joystick port for the operator's controller.
+     */
+    public static final int pilotPort = 1;
+
+    /**
+     * Encoder ticks from center still considered close enough to be at center.
+     */
+    public static final double seekCenterTolerance = 10.0;
+  }
+
+  /**
+   * Config parameters for tuning the operator interface.
+   */
+  public class DriverConfig {
 
     /**
      * The joystick port for the driver's controller.

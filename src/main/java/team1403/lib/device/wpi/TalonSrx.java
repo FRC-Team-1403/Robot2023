@@ -168,6 +168,10 @@ public class TalonSrx extends WPI_TalonSRX
     public void setPosition(double position) {
       setSelectedSensorPosition(position);
     }
+    
+    public double getVelocityTicks() {
+      return getSelectedSensorVelocity() * m_velocityConversionFactor;
+    }
 
     private final String m_encoderName;
 

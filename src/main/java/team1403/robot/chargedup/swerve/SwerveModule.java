@@ -18,6 +18,7 @@ import com.revrobotics.SparkMaxRelativeEncoder;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 import team1403.lib.device.Device;
 import team1403.lib.device.Encoder;
@@ -176,7 +177,7 @@ public class SwerveModule implements Device {
    * @param angle angle to be normalized
    * @return angle value between 0 to 2pi
    */
-  public double normalizeAngle(double angle) {
+  private double normalizeAngle(double angle) {
     double normalizedAngle = angle;
 
     normalizedAngle %= (2.0 * Math.PI);
@@ -192,7 +193,7 @@ public class SwerveModule implements Device {
    * @param targetAngle the angle to be moved to
    * @return The steer angle after accounting for error.
    */
-  public double normalizeAngleError(double targetAngle) {
+  private double normalizeAngleError(double targetAngle) {
     // Angle is inbetween 0 to 2pi
     double normalizedAngleError = normalizeAngle(targetAngle);
 
@@ -213,7 +214,7 @@ public class SwerveModule implements Device {
    *
    * @param steerAngle the current steer angle.
    */
-  public double convertSteerAngle(double steerAngle) {
+  private double convertSteerAngle(double steerAngle) {
 
     double newSteerAngle = steerAngle;
 
@@ -280,7 +281,7 @@ public class SwerveModule implements Device {
    * @param steerAngle          the current steer angle.
    * @param driveMetersPerSecond the current drive voltage
    */
-  public double convertDriveMetersPerSecond(double driveMetersPerSecond, double steerAngle) {
+  private double convertDriveMetersPerSecond(double driveMetersPerSecond, double steerAngle) {
 
     double convertedDriveMetersPerSecond = driveMetersPerSecond;
 
@@ -371,12 +372,42 @@ public class SwerveModule implements Device {
 
   /**
    * Returns the SwerveModulePosition of this particular module.
-   * 
-   * @return the SwerveModulePosition, which represents the distance travelled
-   * and the angle of the module.
+   *
+   * @return the SwerveModulePosition, which represents the distance 
+   *         travelled and the angle of the module.
    */
   public SwerveModulePosition getModulePosition() {
     return new SwerveModulePosition(m_driveRelativeEncoder.getPositionTicks(), 
           new Rotation2d(getSteerAngle()));
+  }
+  
+  /**
+   * Returns the current velocity of the drive motor.
+   *
+   * @return the current velocity of the drive motor
+   */
+  public double getDriveVelocity() {
+    return m_driveRelativeEncoder.getVelocityTicks();
+  }
+
+  /**
+   * Returns the current state of the swerve module as defined by 
+   * the relative encoders of the drive and steer motors.
+   *
+   * @return the current state of the swerve module
+   */
+  public SwerveModuleState getState() {
+    return new SwerveModuleState(getDriveVelocity(), new Rotation2d(getSteerAngle()));
+  }
+
+  /**
+   * Returns the current position of the swerve module as defined by 
+   * the relative encoders of the drive and steer motors.
+   *
+   * @return the current position of the swerve module
+   */
+  public SwerveModulePosition getPosition() {
+    return new SwerveModulePosition(m_driveMotor.getEncoder().getPosition(), 
+        new Rotation2d(getSteerAngle()));
   }
 }

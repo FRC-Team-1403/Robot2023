@@ -45,4 +45,14 @@ public interface Encoder extends Sensor {
    * Sets the position offset of the encoder.
    */
   public void setPosition(double position);
+  
+  /**
+   * Get the velocity of the motor. 
+   * This returns the native units of 'RPM' by default, 
+   * and can be changed by a scale factor using setVelocityConversionFactor().
+   *
+   * @return Number the RPM of the motor
+   */
+  double getVelocityTicks();
+
 }
