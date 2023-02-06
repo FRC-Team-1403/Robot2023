@@ -5,6 +5,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
+import team1403.lib.util.Dimension;
+
 /**
  * This class holds attributes for the robot configuration.
  *
@@ -81,7 +83,21 @@ public class RobotConfig {
    * rather than by subsystem to more easily detect conflict
    * and understand overall wiring.
    */
-  public class CanBus {
+  public static class CanBus {
+
+    public static final int wheelIntakeMotor = 1;
+    
+    public static final int telescopicArmMotor = 1;
+
+    public static final int leftAngledArmMotor = 2; 
+
+    public static final int rightAngledArmMotor = 3;
+
+    public static final int wristMotor = 4;
+
+    public static final int frontArmSwitch = 1;
+
+    public static final int backArmSwitch = 2;
 
     /**
      * The can bus port for the rail motor if it is a TalonSRX.
@@ -136,6 +152,11 @@ public class RobotConfig {
    */
   public class OperatorConfig {
 
+    public static final int dPadUp = 0;
+    public static final int dPadRight = 1;
+    public static final int dPadDown = 2;
+    public static final int dPadLeft = 3;
+
     /**
      * The joystick port for the operator's controller.
      */
@@ -161,5 +182,44 @@ public class RobotConfig {
      * Encoder ticks from center still considered close enough to be at center.
      */
     public static final double seekCenterTolerance = 10.0;
+  }
+
+  /**
+   * class Arm, sets constant values for PID for Arm.java.
+   */
+  public static class Arm {
+    public static final int kP = 0; //constant for Proportional
+    public static final int kI = 0; //constant for Integral
+    public static final int kD = 0; //constant for Derivative
+
+    public static final double kArmConversionFactor = 1;
+    public static final double kWristConversionFactor = 2;
+    public static final double kArmLengthConversionFactor = 3;
+    public static final double kWheelIntakeConversionFactor = 4;
+
+    double wristAngle = 0;
+
+    public static final double kMaxArmRotation = 270;
+    public static final double kMinArmRotation = 0;
+    public static final double kMaxWristRotation = 90;
+    public static final double kMinWristRotation = 0;
+    public static final double kMinArmExtension = 5;
+    public static final double kMaxArmExtension = 15;
+
+    public static final Dimension robotDimensions = new Dimension(0, 0, 0);
+
+    public static final Dimension wristDimensions = new Dimension(0, 0, 0);
+
+    public static final double kMaxAmperage = 0;
+
+    public static final double kMaxArmLengthOffset = 0;
+    public static final double kAngleToMeters = 0;
+
+    /**
+     * This is the angular threshold to determine at what
+     * point the maximum extenstion of the arm should be
+     * limited by the arm hitting the ground.
+     */
+    public static final double kMaxGroundArmLengthThreshold = 0;
   }
 }

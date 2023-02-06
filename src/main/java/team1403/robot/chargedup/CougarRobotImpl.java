@@ -10,6 +10,9 @@ import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarRobot;
 import team1403.lib.subsystems.BuiltinSubsystem;
 import team1403.lib.util.CougarLogger;
+import team1403.robot.chargedup.RobotConfig.OperatorConfig;
+import team1403.robot.chargedup.arm.Arm;
+import team1403.robot.chargedup.arm.ArmCommands;
 import team1403.robot.chargedup.swerve.SwerveCommand;
 import team1403.robot.chargedup.swerve.SwerveSubsystem;
 
@@ -34,10 +37,12 @@ public class CougarRobotImpl extends CougarRobot {
    */
   public CougarRobotImpl(CougarLibInjectedParameters parameters) {
     super(parameters);
+
     var logger = CougarLogger.getChildLogger(
         parameters.getRobotLogger(), "BuiltinDevices");
 
     m_builtins = new BuiltinSubsystem(parameters, logger);
+    m_arm = new Arm(parameters);
     m_swerveSubsystem = new SwerveSubsystem(parameters);
 
     var scheduler = CommandScheduler.getInstance();
@@ -52,8 +57,17 @@ public class CougarRobotImpl extends CougarRobot {
    * Configures the operator commands and their bindings.
    */
   private void configureOperatorInterface() {
-    XboxController xboxOperator = getJoystick("Operator", RobotConfig.OperatorConfig.pilotPort);
+    XboxController xboxOperator = getJoystick("Operator", OperatorConfig.pilotPort);
+
+    new Trigger(() -> xboxOperator.getYButton()).onFalse(
+        new InstantCommand(() -> switchOperatorMode()));
+    
+    if (m_armOperatorManual) {
+      manualOperatorMode(xboxOperator);
+    } else {
+      autoOperatorMode(xboxOperator);
   }
+}
 
   /**
    * Configures the driver commands and their bindings.
@@ -115,6 +129,57 @@ public class CougarRobotImpl extends CougarRobot {
     return new XboxController(port);
   }
 
+  //TODO, figure out actual setpoint values
+  
+  /**
+   * This is the auto mode for operator.
+   * Has 5 setpoints, which will each set the arm
+   * in different positions
+   * A Button -> Ground
+   * B Button -> Shelf
+   * Dpad down Button -> Tuck
+   * DPad Up -> High
+   * DPad Right -> Mid
+   *
+   * @param xboxOperator defines which controller is being used
+   */
+  public void autoOperatorMode(XboxController xboxOperator) {
+    new Trigger(() -> xboxOperator.getAButton()).onFalse(
+      new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+    new Trigger(() -> xboxOperator.getBButton()).onFalse(
+        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadDown)).onFalse(
+        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadUp)).onFalse(
+      new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadRight)).onFalse(
+        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  }
+
+  /**
+   * This is the manual mode for operator.
+   * Minutely control arm with joysticks
+   * 
+   * @param xboxOperator defines which controller is being used
+   */
+  private void manualOperatorMode(XboxController xboxOperator) {
+    m_arm.setDefaultCommand(new ArmCommands(m_arm,
+        () -> xboxOperator.getLeftY(),
+        () -> xboxOperator.getRightY(),
+        () -> xboxOperator.getRightTriggerAxis(),
+        () -> xboxOperator.getLeftTriggerAxis()));
+
+  }
+
+  /**
+   * Switches the operator mode.
+   */
+  public void switchOperatorMode() {
+    m_armOperatorManual = !m_armOperatorManual;
+  }
+
   private final BuiltinSubsystem m_builtins;
+  private final Arm m_arm;
+  private boolean m_armOperatorManual = true;
   private final SwerveSubsystem m_swerveSubsystem;
 }
