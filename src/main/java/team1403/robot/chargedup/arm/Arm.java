@@ -414,16 +414,19 @@ public class Arm extends CougarSubsystem {
     if (isFrontSwitchActive() || isBackSwitchActive() || !isArmAngleWithinBounds()
         || getCurrentAmps() <= RobotConfig.Arm.kMaxAmperage) {
       setArmAngleMotorSpeed(0);
+      return;
     }
 
     if (isWristAngleWithinBounds()) {
       setWristMotorSpeed(0);
+      return;
     }
 
     if (isArmExtensionWithinBounds()) {
       setArmExtensionMotorSpeed(0);
+      return;
     }
-    
+
     setArmAngle(m_desiredArmAngle);
     setWristAngle(m_desiredWristAngle);
     setArmExtension(m_desiredArmExtension);
