@@ -36,8 +36,8 @@ public class SwerveCommand extends CommandBase {
                                DoubleSupplier rotationSupplier,
                                BooleanSupplier fieldRelativeSupplier) {
     this.m_drivetrainSubsystem = drivetrain;
-    this.m_verticalTranslationSupplier = horizontalTranslationSupplier;
-    this.m_horizontalTranslationSupplier = verticalTranslationSupplier;
+    this.m_verticalTranslationSupplier = verticalTranslationSupplier;
+    this.m_horizontalTranslationSupplier = horizontalTranslationSupplier;
     this.m_rotationSupplier = rotationSupplier;
     this.m_fieldRelativeSupplier = fieldRelativeSupplier;
     m_isFieldRelative = true;
@@ -46,7 +46,6 @@ public class SwerveCommand extends CommandBase {
 
   @Override
   public void execute() {
-    SmartDashboard.putNumber("Axis", m_horizontalTranslationSupplier.getAsDouble());
     if (m_fieldRelativeSupplier.getAsBoolean()) {
       m_isFieldRelative = !m_isFieldRelative;
     }
@@ -66,6 +65,5 @@ public class SwerveCommand extends CommandBase {
               m_horizontalTranslationSupplier.getAsDouble() * SwerveConfig.kMaxSpeed,
               m_rotationSupplier.getAsDouble() * SwerveConfig.kMaxAngularSpeed));
     }
-
   }
 }
