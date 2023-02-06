@@ -19,6 +19,15 @@ import team1403.lib.util.Dimension;
  * any conflicts since these ports specify their config together.
  */
 public class RobotConfig {
+  /**
+   * Variables to used by all subsystems.
+   */
+  public static final Dimension robotDimensions = new Dimension(0, 0, 0);
+
+  public static double kRobotHeight = 32;
+  public static double kHeightFromGround = 33.72326;
+  public static double kGroundToTopOfFrame = 1.72326;
+  public static double kPhysicalArmMaxExtension = 60.218;
 
   /**
    * Swerve Constants.
@@ -206,7 +215,7 @@ public class RobotConfig {
     public static final double kMinArmExtension = 5;
     public static final double kMaxArmExtension = 15;
 
-    public static final Dimension robotDimensions = new Dimension(0, 0, 0);
+    
 
     public static final Dimension wristDimensions = new Dimension(0, 0, 0);
 
