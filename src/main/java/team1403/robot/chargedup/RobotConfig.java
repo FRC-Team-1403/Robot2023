@@ -193,22 +193,6 @@ public class RobotConfig {
   }
 
   /**
-   * Config parameters for tuning the operator interface.
-   */
-  public class DriverConfig {
-
-    /**
-     * The joystick port for the driver's controller.
-     */
-    public static final int pilotPort = 1;
-
-    /**
-     * Encoder ticks from center still considered close enough to be at center.
-     */
-    public static final double seekCenterTolerance = 10.0;
-  }
-
-  /**
    * class Arm, sets constant values for PID for Arm.java.
    */
   public static class Arm {
