@@ -1,7 +1,8 @@
 package team1403.lib.util;
 
 /**
- * Sets the methods for .
+ * Class to store dimensions of an object.
+ * Stores 3d dimensions, the 3rd dimension can be null.
  */
 public class Dimension {
   private final double m_length;
@@ -33,15 +34,15 @@ public class Dimension {
     this.m_depth = depth;
   }
 
-  public double getM_length() {
+  public double getLength() {
     return m_length;
   }
 
-  public double getM_width() {
+  public double getWidth() {
     return m_width;
   }
 
-  public double getM_depth() {
+  public double getDepth() {
     return m_depth;
   }
 

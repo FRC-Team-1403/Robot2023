@@ -119,7 +119,7 @@ public class Arm extends CougarSubsystem {
    * @return space wrist takes up vertically
    */
   private double wristVerticleOccupation(double relativeWristAngle) {
-    return Math.sin(relativeWristAngle - 180) * RobotConfig.Arm.wristDimensions.getM_length();
+    return Math.sin(relativeWristAngle - 180) * RobotConfig.Arm.wristDimensions.getLength();
   }
 
   /**
@@ -129,7 +129,7 @@ public class Arm extends CougarSubsystem {
    * @return the theoretical arm length
    */
   private double theoreticalArmLength(double absoluteArmAngle) {
-    return RobotConfig.Arm.robotDimensions.getM_length() / Math.cos(270 - absoluteArmAngle);
+    return RobotConfig.Arm.robotDimensions.getLength() / Math.cos(270 - absoluteArmAngle);
   }
   
   /**
@@ -411,11 +411,6 @@ public class Arm extends CougarSubsystem {
 
   @Override
   public void periodic() {
-    setArmAngle(m_desiredArmAngle);
-    setWristAngle(m_desiredWristAngle);
-    setArmExtension(m_desiredArmExtension);
-    setWheelSpeed(m_wheelSpeed);
-    
     if (isFrontSwitchActive() || isBackSwitchActive() || !isArmAngleWithinBounds()
         || getCurrentAmps() <= RobotConfig.Arm.kMaxAmperage) {
       setArmAngleMotorSpeed(0);
@@ -428,5 +423,10 @@ public class Arm extends CougarSubsystem {
     if (isArmExtensionWithinBounds()) {
       setArmExtensionMotorSpeed(0);
     }
+    
+    setArmAngle(m_desiredArmAngle);
+    setWristAngle(m_desiredWristAngle);
+    setArmExtension(m_desiredArmExtension);
+    setWheelSpeed(m_wheelSpeed);
   }
 }
