@@ -66,8 +66,8 @@ public class CougarRobotImpl extends CougarRobot {
       manualOperatorMode(xboxOperator);
     } else {
       autoOperatorMode(xboxOperator);
+    }
   }
-}
 
   /**
    * Configures the driver commands and their bindings.
@@ -76,13 +76,13 @@ public class CougarRobotImpl extends CougarRobot {
     XboxController xboxDriver = getJoystick("Driver", RobotConfig.DriverConfig.pilotPort);
 
     // Setting default command of swerve subsystem
-     m_swerveSubsystem.setDefaultCommand(new SwerveCommand(
+    m_swerveSubsystem.setDefaultCommand(new SwerveCommand(
         m_swerveSubsystem,
         () -> -deadband(xboxDriver.getLeftY(), 0.05),
         () -> -deadband(xboxDriver.getLeftX(), 0.05),
         () -> -deadband(xboxDriver.getRightX(), 0.05),
         () -> xboxDriver.getYButtonReleased())
-      );
+    );
 
 
     new Trigger(() -> xboxDriver.getRightBumper()).onFalse(

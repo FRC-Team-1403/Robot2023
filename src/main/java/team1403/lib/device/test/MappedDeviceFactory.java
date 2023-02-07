@@ -193,11 +193,11 @@ public class MappedDeviceFactory implements DeviceFactory {
   }
 
   @Override
-canCoder
+
   public AdvancedMotorController makeCougarTalonFx(String name,
       int deviceNumber, CougarLogger logger) {
 
-main
+
     m_calls.put(name, Arrays.asList(name, deviceNumber, logger));
     return (AdvancedMotorController)takeDevice(name);
   }

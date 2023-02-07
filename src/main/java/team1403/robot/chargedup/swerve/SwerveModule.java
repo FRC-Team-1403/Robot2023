@@ -30,7 +30,8 @@ import team1403.robot.chargedup.RobotConfig.SwerveConfig;
 
 /**
  * Represents a swerve module. Consists of a drive motor, steer motor, 
- * and their respective relative encoders. Also consists of a absolute encoder to track steer angle.
+ * and their respective relative encoders.
+ * Also consists of a absolute encoder to track steer angle.
  */
 public class SwerveModule implements Device {
   private double m_absoluteEncoderResetIterations = 0;
@@ -188,7 +189,8 @@ public class SwerveModule implements Device {
   }
 
   /**
-   * Returns difference (targetAngle - getSteerAngle()) normalized in range -pi .. pi
+   * Returns difference (targetAngle - getSteerAngle())
+    normalized in range -pi .. pi
    *
    * @param targetAngle the angle to be moved to
    * @return The steer angle after accounting for error.

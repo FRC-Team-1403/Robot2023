@@ -57,4 +57,14 @@ public class CanCoder extends CANCoder implements Encoder {
   public String getName() {
     return m_name;
   }
+
+  @Override
+  public double getVelocityTicks() {
+    return getVelocity();
+  }
+
+  @Override
+  public void setPositionOffset(double position) {
+    setPosition(position);
+  }
 }

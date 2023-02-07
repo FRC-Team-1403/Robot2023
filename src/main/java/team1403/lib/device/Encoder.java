@@ -44,7 +44,7 @@ public interface Encoder extends Sensor {
   /**
    * Sets the position offset of the encoder.
    */
-  public void setPosition(double position);
+  public void setPositionOffset(double position);
   
   /**
    * Get the velocity of the motor. 
