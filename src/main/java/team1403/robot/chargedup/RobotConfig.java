@@ -63,9 +63,10 @@ public class RobotConfig {
 
     public static final double kWheelDiameterMeters = Units.inchesToMeters(4);
 
-    public static final double kMaxSpeed = 6.0;
+    public static final double kMaxSpeed = 14.5;
 
-    public static final double kMaxAngularSpeed = 14.301625486188971;
+    public static final double kMaxAngularSpeed = (kMaxSpeed /
+    Math.hypot(kTrackWidth / 2.0, kWheelBase / 2.0) );
 
     public static final double kVoltageSaturation = 12.0;
     public static final double kCurrentLimit = 20.0;
@@ -85,33 +86,14 @@ public class RobotConfig {
    */
   public static class CanBus {
 
-    public static final int wheelIntakeMotor = 1;
-    
-    public static final int telescopicArmMotor = 1;
-
-    public static final int leftAngledArmMotor = 2; 
-
-    public static final int rightAngledArmMotor = 3;
-
-    public static final int wristMotor = 4;
-
-    public static final int frontArmSwitch = 1;
-
-    public static final int backArmSwitch = 2;
-
-    /**
-     * The can bus port for the rail motor if it is a TalonSRX.
-     *
-     * <p>Should be -1 if exampleRailSparkMotor was set.
-     */
-    public static final int exampleRailMotor = 10; // talon
-
-    /**
-     * The can bus port for the rail motor if it is a SparkMax.
-     *
-     * <p>Should be -1 if exampleRailMotor was set.
-     */
-    public static final int exampleRailSparkMotor = -1;
+    //Arm Ports
+    public static final int wheelIntakeMotor = 3;
+    public static final int telescopicArmMotor = 4;
+    public static final int leftAngledArmMotor = 5; 
+    public static final int rightAngledArmMotor = 6;
+    public static final int wristMotor = 7;
+    public static final int frontArmSwitch = 9;
+    public static final int backArmSwitch = 10;
 
     // Swerve CanBus ids
     public static final int frontLeftDriveId = 1;

@@ -174,6 +174,9 @@ public class SwerveSubsystem extends CougarSubsystem {
    */
   public void drive(ChassisSpeeds chassisSpeeds) {
     m_chassisSpeeds = chassisSpeeds;
+    SmartDashboard.putNumber("chassisSpeeds X", m_chassisSpeeds.vxMetersPerSecond);
+    SmartDashboard.putNumber("chassisSpeeds Y", m_chassisSpeeds.vyMetersPerSecond);
+    SmartDashboard.putNumber("chassisSpeeds Omega", m_chassisSpeeds.omegaRadiansPerSecond);
   }
 
   /**
@@ -183,25 +186,26 @@ public class SwerveSubsystem extends CougarSubsystem {
    */
   public void setModuleStates(SwerveModuleState[] states) {
     // Prevent wheels from going back to 0 degrees as the default state.
-    if (states[0].speedMetersPerSecond < 0.001) {
-      for (int i = 0; i < m_modules.length; i++) {
-        tracef("ModuleState of %s. Speed: %f, Angle: %f", 
-            m_modules[i].getName(), 
-            states[i].speedMetersPerSecond, 
-            states[i].angle.getRadians());
+    // if (states[0].speedMetersPerSecond < 0.001) {
+    //   for (int i = 0; i < m_modules.length; i++) {
+    //     // tracef("ModuleState of %s. Speed: %f, Angle: %f", 
+    //     //     m_modules[i].getName(), 
+    //     //     states[i].speedMetersPerSecond, 
+    //     //     states[i].angle.getRadians());
         
-        m_modules[i].set(0, m_modules[i].getSteerAngle());
-      }
-      return;
-    }
+    //     m_modules[i].set(0, m_modules[i].getSteerAngle());
+    //   }
+    //   return;
+    // }
 
     SwerveDriveKinematics.desaturateWheelSpeeds(states, SwerveConfig.kMaxSpeed);
 
+
     for (int i = 0; i < m_modules.length; i++) {
-      tracef("ModuleState of %s. Speed: %f, Angle: %f", 
-            m_modules[i].getName(), 
-            states[i].speedMetersPerSecond, 
-            states[i].angle.getRadians());
+      // tracef("ModuleState of %s. Speed: %f, Angle: %f", 
+      //       m_modules[i].getName(), 
+      //       states[i].speedMetersPerSecond, 
+      //       states[i].angle.getRadians());
 
       m_modules[i].set((states[i].speedMetersPerSecond
           / SwerveConfig.kMaxSpeed) * m_speedLimiter, states[i].angle.getRadians());
@@ -241,7 +245,7 @@ public class SwerveSubsystem extends CougarSubsystem {
     m_odometer.update(getGyroscopeRotation(), getModulePositions());
     SmartDashboard.putString("Odometry", m_odometer.getPoseMeters().toString());
 
-    driftCorrection();
+    // driftCorrection();
 
     SwerveModuleState[] states = SwerveConfig.kDriveKinematics
         .toSwerveModuleStates(m_chassisSpeeds);
