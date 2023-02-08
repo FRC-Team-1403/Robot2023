@@ -25,10 +25,13 @@ public class SwerveCommand extends CommandBase {
    * Creates the swerve command.
    *
    * @param drivetrain the instance of the {@link SwerveSubsystem}
-   * @param horizontalTranslationSupplier supplies the horizontal speed of the drivetrain
-   * @param verticalTranslationSupplier supplies the the vertical speed of the drivetrain
+   * @param horizontalTranslationSupplier
+    supplies the horizontal speed of the drivetrain
+   * @param verticalTranslationSupplier
+    supplies the the vertical speed of the drivetrain
    * @param rotationSupplier supplies the rotational speed of the drivetrain
-   * @param fieldRelativeSupplier supplies the boolean value to enable field relative mode
+   * @param fieldRelativeSupplier supplies the
+    boolean value to enable field relative mode
    */
   public SwerveCommand(SwerveSubsystem drivetrain,
                                DoubleSupplier horizontalTranslationSupplier,

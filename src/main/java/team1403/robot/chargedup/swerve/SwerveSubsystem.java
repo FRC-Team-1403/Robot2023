@@ -33,16 +33,19 @@ public class SwerveSubsystem extends CougarSubsystem {
   private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds();
   private final SwerveDriveOdometry m_odometer;
 
-  private PIDController m_driftCorrectionPid = new PIDController(0.33, 0, 0);
+  private final PIDController m_driftCorrectionPid = new PIDController(0.33, 0, 0);
   private double m_desiredHeading = 0;
   private double m_speedLimiter = 0.6;
 
   /**
-   * Creates a new {@link SwerveSubsystem}. Instantiates the 4 {@link SwerveModule}s, 
+   * Creates a new {@link SwerveSubsystem}.
+    Instantiates the 4 {@link SwerveModule}s, 
    * the {@link SwerveDriveOdometry}, and the {@link NavxAhrs}. 
-   * Also sets drivetrain ramp rate, and idle mode to default values.
+   * Also sets drivetrain ramp rate,
+    and idle mode to default values.
    *
-   * @param CougarLibInjectedParameters the {@link CougarLibInjectedParameters} used to construct this subsystem
+   * @param parameters the {@link CougarLibInjectedParameters}
+   used to construct this subsystem
    */
   public SwerveSubsystem(CougarLibInjectedParameters parameters) {
     super("Swerve Subsystem", parameters);

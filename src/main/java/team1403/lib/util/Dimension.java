@@ -5,9 +5,9 @@ package team1403.lib.util;
  * Stores 3d dimensions, the 3rd dimension can be null.
  */
 public class Dimension {
-  private final double m_length;
+  private final double m_height;
   private final double m_width;
-  private final double m_depth;
+  private final double m_length;
 
   /**
    * Dimensions for arm.
@@ -16,9 +16,9 @@ public class Dimension {
    * @param width width of arm
    */
   public Dimension(double height, double width) {
-    this.m_length = height;
+    this.m_height = height;
     this.m_width = width;
-    this.m_depth = 0;
+    this.m_length = 0;
   }
 
   /**
@@ -26,24 +26,24 @@ public class Dimension {
    *
    * @param height height of arm
    * @param width width of arm
-   * @param depth depth of arm
+   * @param length length of arm
    */
-  public Dimension(double height, double width, double depth) {
-    this.m_length = height;
+  public Dimension(double height, double width, double length) {
+    this.m_height = height;
     this.m_width = width;
-    this.m_depth = depth;
+    this.m_length = length;
   }
 
-  public double getLength() {
-    return m_length;
+  public double getHeight(double armHeight) {
+    return m_height;
   }
 
   public double getWidth() {
     return m_width;
   }
 
-  public double getDepth() {
-    return m_depth;
+  public double getLenth() {
+    return m_length;
   }
 
 }

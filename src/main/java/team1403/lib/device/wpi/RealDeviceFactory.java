@@ -88,8 +88,10 @@ public class RealDeviceFactory implements DeviceFactory {
   }
 
   @Override
-  public AdvancedMotorController makeCougarTalonFx(String name, int deviceNumber,
-      CougarLogger logger) {
+
+  public AdvancedMotorController makeCougarTalonFx(String name,
+      int deviceNumber, CougarLogger logger) {
+
     return new CougarTalonFx(name, deviceNumber, logger);
   }
 

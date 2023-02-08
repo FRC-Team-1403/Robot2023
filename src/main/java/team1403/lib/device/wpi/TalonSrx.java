@@ -165,10 +165,11 @@ public class TalonSrx extends WPI_TalonSRX
     }
 
     @Override
-    public void setPosition(double position) {
+    public void setPositionOffset(double position) {
       setSelectedSensorPosition(position);
     }
     
+    @Override
     public double getVelocityTicks() {
       return getSelectedSensorVelocity() * m_velocityConversionFactor;
     }
