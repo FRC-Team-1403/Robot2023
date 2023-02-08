@@ -65,15 +65,17 @@ public class FakeEncoder extends BaseDevice implements Encoder {
     m_positionConversionFactor = conversionFactor;
   }
 
+  @Override
   public void setVelocityTickConversionFactor(double conversionFactor) {
     m_velocityConversionFactor = conversionFactor;
   }
 
   @Override
-  public void setPosition(double position) {
+  public void setPositionOffset(double position) {
     m_ticks = position;
   }
   
+  @Override
   public double getVelocityTicks() {
     return m_rpm * m_velocityConversionFactor;
   }
