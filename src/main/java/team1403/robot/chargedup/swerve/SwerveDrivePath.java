@@ -34,7 +34,7 @@ public class SwerveDrivePath extends CommandBase {
   private SwerveControllerCommand m_swerveControllerCommand;
 
   /**
-   * Constructs the the path to drive.
+   * Constructs the path to drive.
    *
    * @param drivetrain the instance of the drivetrain subsystem
    * @param startAngle the starting angle of the robot
