@@ -70,7 +70,7 @@ public class FakeEncoder extends BaseDevice implements Encoder {
   }
 
   @Override
-  public void setPosition(double position) {
+  public void setPositionOffset(double position) {
     m_ticks = position;
   }
   

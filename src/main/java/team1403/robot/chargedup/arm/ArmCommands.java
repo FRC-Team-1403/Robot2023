@@ -6,8 +6,6 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-import team1403.robot.chargedup.RobotConfig;
-
 /**
  * class ArmCommands is the where the commands for Arm.java is located
  */

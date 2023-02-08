@@ -19,6 +19,10 @@ import team1403.lib.util.Dimension;
  * any conflicts since these ports specify their config together.
  */
 public class RobotConfig {
+
+  public static double alpha_1 = 0;
+  public static double alpha_2 = 0;
+
   /**
    * Variables to used by all subsystems.
    */
@@ -28,6 +32,7 @@ public class RobotConfig {
   public static double kHeightFromGround = 33.72326;
   public static double kGroundToTopOfFrame = 1.72326;
   public static double kPhysicalArmMaxExtension = 60.218;
+  public static double kFrameHeight = 2;
 
   /**
    * Swerve Constants.
@@ -205,8 +210,6 @@ public class RobotConfig {
     public static final double kWristConversionFactor = 2;
     public static final double kArmLengthConversionFactor = 3;
     public static final double kWheelIntakeConversionFactor = 4;
-
-    double wristAngle = 0;
 
     public static final double kMaxArmRotation = 270;
     public static final double kMinArmRotation = 0;

@@ -165,7 +165,7 @@ public class TalonSrx extends WPI_TalonSRX
     }
 
     @Override
-    public void setPosition(double position) {
+    public void setPositionOffset(double position) {
       setSelectedSensorPosition(position);
     }
     
