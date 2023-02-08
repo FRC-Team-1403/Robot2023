@@ -73,13 +73,13 @@ public class Arm extends CougarSubsystem {
 
     m_rightArmAngleMotor.follow((AdvancedMotorController) m_leftArmAngleMotor);
 
-    m_telescopicMotor.getEmbeddedEncoder().setPositionTickConversionFactor(
+    m_telescopicMotor.getEmbeddedEncoder().setPositionConversionFactor(
         RobotConfig.Arm.kArmLengthConversionFactor * RobotConfig.Arm.kAngleToMeters);
 
-    m_leftArmAngleMotor.getEmbeddedEncoder().setPositionTickConversionFactor(
+    m_leftArmAngleMotor.getEmbeddedEncoder().setPositionConversionFactor(
         RobotConfig.Arm.kArmConversionFactor);
     
-    m_wristAngleMotor.getEmbeddedEncoder().setPositionTickConversionFactor(
+    m_wristAngleMotor.getEmbeddedEncoder().setPositionConversionFactor(
         RobotConfig.Arm.kWristConversionFactor);
 
     m_pidArmAngle = new PIDController(0, 0, 0);
@@ -118,12 +118,12 @@ public class Arm extends CougarSubsystem {
   }
 
   /**
-   * Will return the absolute wrist angle from current angle
+   * Will return the absolute wrist angle from current angle.
    *
-   * @param desiredWristAngle desired wrist angle
-   * @param desiredArmAngle desired arm angle
-   * @param currentWristAngle current wrist angle
-   * @return absolute wrist angle
+   * @param desiredWristAngle desired wrist angle.
+   * @param desiredArmAngle desired arm angle.
+   * @param currentWristAngle current wrist angle.
+   * @return absolute wrist angle.
    */
   public double absoluteWristAngle(double desiredWristAngle, double desiredArmAngle,
       double currentWristAngle) {
@@ -197,9 +197,12 @@ public class Arm extends CougarSubsystem {
   public double limitArmExtension(double angle, double length) {
     double max = 0;
 
-    if (angle > 0 && angle < RobotConfig.Arm.angleHittingRobot){
-      max = maxGroundArmLength(getArmAngle(), getWristAngle(), RobotConfig.kRobotHeight - RobotConfig.kFrameHeight);
-    } else if (angle > RobotConfig.Arm.angleHittingRobot && angle < RobotConfig.Arm.angleHittingGround) {
+    if (angle > 0 && angle < RobotConfig.Arm.angleHittingRobot) {
+      max = maxGroundArmLength(getArmAngle(), getWristAngle(), 
+          RobotConfig.kRobotHeight - RobotConfig.kFrameHeight);
+
+    } else if (angle > RobotConfig.Arm.angleHittingRobot && angle 
+                            < RobotConfig.Arm.angleHittingGround) {
       max = maxGroundArmLength(getArmAngle(), getWristAngle(), RobotConfig.kHeightFromGround);
     } else {
       max = RobotConfig.Arm.kPhysicalArmMaxExtension;
@@ -300,7 +303,7 @@ public class Arm extends CougarSubsystem {
    * @return position of arm angle motor
    */
   public double getArmAngle() {
-    return m_leftArmAngleMotor.getEmbeddedEncoder().getPositionTicks();
+    return m_leftArmAngleMotor.getEmbeddedEncoder().getPositionValue();
   }
 
   /**
@@ -309,7 +312,7 @@ public class Arm extends CougarSubsystem {
    * @return position of wrist angle motor
    */
   public double getWristAngle() {
-    return m_wristAngleMotor.getEmbeddedEncoder().getPositionTicks();
+    return m_wristAngleMotor.getEmbeddedEncoder().getPositionValue();
   }
 
   /**
@@ -318,7 +321,7 @@ public class Arm extends CougarSubsystem {
    * @return position of arm extension motor
    */
   public double getArmExtension() {
-    return (m_telescopicMotor.getEmbeddedEncoder().getPositionTicks());
+    return (m_telescopicMotor.getEmbeddedEncoder().getPositionValue());
   }
 
   /**
