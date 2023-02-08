@@ -94,9 +94,9 @@ public class SwerveModule implements Device {
     // Config drive relative encoder
     double drivePositionConversionFactor = Math.PI * SwerveConfig.kWheelDiameterMeters 
           * SwerveConfig.kDriveReduction;
-    m_driveRelativeEncoder.setPositionTickConversionFactor(drivePositionConversionFactor);
+    m_driveRelativeEncoder.setPositionConversionFactor(drivePositionConversionFactor);
     // Set velocity in terms of seconds
-    m_driveRelativeEncoder.setVelocityTickConversionFactor(drivePositionConversionFactor / 60.0);
+    m_driveRelativeEncoder.setVelocityConversionFactor(drivePositionConversionFactor / 60.0);
 
   }
 
@@ -379,7 +379,7 @@ public class SwerveModule implements Device {
    *         travelled and the angle of the module.
    */
   public SwerveModulePosition getModulePosition() {
-    return new SwerveModulePosition(m_driveRelativeEncoder.getPositionTicks(), 
+    return new SwerveModulePosition(m_driveRelativeEncoder.getPositionValue(), 
           new Rotation2d(getSteerAngle()));
   }
   
@@ -389,7 +389,7 @@ public class SwerveModule implements Device {
    * @return the current velocity of the drive motor
    */
   public double getDriveVelocity() {
-    return m_driveRelativeEncoder.getVelocityTicks();
+    return m_driveRelativeEncoder.getVelocityValue();
   }
 
   /**

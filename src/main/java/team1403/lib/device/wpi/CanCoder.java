@@ -29,12 +29,12 @@ public class CanCoder extends CANCoder implements Encoder {
   }
 
   @Override
-  public double getPositionTicks() {
+  public double getPositionValue() {
     return super.getPosition() * m_positionConversionFactor;
   }
 
   @Override
-  public double getRpm() {
+  public double getVelocityValue() {
     return super.getVelocity() * m_velocityConversionFactor;
   }
 
@@ -44,23 +44,18 @@ public class CanCoder extends CANCoder implements Encoder {
   }
 
   @Override
-  public void setPositionTickConversionFactor(double conversionFactor) {
+  public void setPositionConversionFactor(double conversionFactor) {
     m_positionConversionFactor = conversionFactor;
   }
 
   @Override
-  public void setVelocityTickConversionFactor(double conversionFactor) {
+  public void setVelocityConversionFactor(double conversionFactor) {
     m_velocityConversionFactor = conversionFactor;
   }
 
   @Override
   public String getName() {
     return m_name;
-  }
-
-  @Override
-  public double getVelocityTicks() {
-    return getVelocity();
   }
 
   @Override
