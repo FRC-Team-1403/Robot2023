@@ -144,14 +144,12 @@ public class TalonSrx extends WPI_TalonSRX
 
     @Override
     public final double getPositionValue() {
-      return getSelectedSensorPosition(1) * m_positionConversionFactor;
+      return getSelectedSensorPosition() * m_positionConversionFactor;
     }
 
     @Override
     public final double getVelocityValue() {
-      final double unitsPer100ms = getSelectedSensorVelocity(1) * m_velocityConversionFactor;
-      final double unitsPerMinute = unitsPer100ms * 10 * 60;
-      return unitsPerMinute;
+      return getSelectedSensorVelocity() * m_velocityConversionFactor;
     }
 
     @Override
