@@ -143,12 +143,12 @@ public class TalonSrx extends WPI_TalonSRX
     }
 
     @Override
-    public final double getPositionTicks() {
+    public final double getPositionValue() {
       return getSelectedSensorPosition(1) * m_positionConversionFactor;
     }
 
     @Override
-    public final double getRpm() {
+    public final double getVelocityValue() {
       final double unitsPer100ms = getSelectedSensorVelocity(1) * m_velocityConversionFactor;
       final double unitsPerMinute = unitsPer100ms * 10 * 60;
       return unitsPerMinute;
@@ -167,11 +167,6 @@ public class TalonSrx extends WPI_TalonSRX
     @Override
     public void setPositionOffset(double position) {
       setSelectedSensorPosition(position);
-    }
-    
-    @Override
-    public double getVelocityTicks() {
-      return getSelectedSensorVelocity() * m_velocityConversionFactor;
     }
 
     private final String m_encoderName;

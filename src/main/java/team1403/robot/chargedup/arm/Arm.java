@@ -286,7 +286,7 @@ public class Arm extends CougarSubsystem {
    * @return position of arm angle motor
    */
   public double getArmAngle() {
-    return m_leftAngledMotor.getEmbeddedEncoder().getPositionTicks()
+    return m_leftAngledMotor.getEmbeddedEncoder().getPositionValue()
       * RobotConfig.Arm.kArmConversionFactor;
   }
 
@@ -296,7 +296,7 @@ public class Arm extends CougarSubsystem {
    * @return position of wrist angle motor
    */
   public double getWristAngle() {
-    return m_wristAngleMotor.getEmbeddedEncoder().getPositionTicks()
+    return m_wristAngleMotor.getEmbeddedEncoder().getPositionValue()
       * RobotConfig.Arm.kWristConversionFactor;
   }
 
@@ -306,7 +306,7 @@ public class Arm extends CougarSubsystem {
    * @return position of arm extension motor
    */
   public double getArmExtension() {
-    return (m_telescopicMotor.getEmbeddedEncoder().getPositionTicks()
+    return (m_telescopicMotor.getEmbeddedEncoder().getPositionValue()
             * RobotConfig.Arm.kArmLengthConversionFactor) * RobotConfig.Arm.kAngleToMeters;
   }
 

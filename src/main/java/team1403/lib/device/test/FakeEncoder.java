@@ -19,12 +19,12 @@ public class FakeEncoder extends BaseDevice implements Encoder {
   }
 
   /**
-   * Sets the current RPM to return.
+   * Sets the current velocity to return.
    *
-   * @param rpm The revolutions per minute.
+   * @param velocity The revolutions per minute.
    */
-  public void setRpm(double rpm) {
-    m_rpm = rpm;
+  public void setVelocity(double velocity) {
+    m_velocity = velocity;
   }
 
   /**
@@ -46,13 +46,13 @@ public class FakeEncoder extends BaseDevice implements Encoder {
   }
 
   @Override
-  public double getPositionTicks() {
+  public double getPositionValue() {
     return m_ticks * m_positionConversionFactor;
   }
 
   @Override
-  public double getRpm() {
-    return m_rpm;
+  public double getVelocityValue() {
+    return m_velocity;
   }
 
   @Override
@@ -74,16 +74,11 @@ public class FakeEncoder extends BaseDevice implements Encoder {
   public void setPositionOffset(double position) {
     m_ticks = position;
   }
-  
-  @Override
-  public double getVelocityTicks() {
-    return m_rpm * m_velocityConversionFactor;
-  }
 
   private final double m_ticksPerRevolution;
   private double m_velocityConversionFactor = 1.0;
   private double m_positionConversionFactor = 1.0;
   private double m_ticks;
-  private double m_rpm;
+  private double m_velocity;
   
 }

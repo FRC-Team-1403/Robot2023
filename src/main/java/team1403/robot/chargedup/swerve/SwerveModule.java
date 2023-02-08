@@ -379,7 +379,7 @@ public class SwerveModule implements Device {
    *         travelled and the angle of the module.
    */
   public SwerveModulePosition getModulePosition() {
-    return new SwerveModulePosition(m_driveRelativeEncoder.getPositionTicks(), 
+    return new SwerveModulePosition(m_driveRelativeEncoder.getPositionValue(), 
           new Rotation2d(getSteerAngle()));
   }
   
@@ -389,7 +389,7 @@ public class SwerveModule implements Device {
    * @return the current velocity of the drive motor
    */
   public double getDriveVelocity() {
-    return m_driveRelativeEncoder.getVelocityTicks();
+    return m_driveRelativeEncoder.getVelocityValue();
   }
 
   /**

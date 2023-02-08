@@ -199,12 +199,12 @@ public final class CougarSparkMax extends CANSparkMax implements AdvancedMotorCo
     }
 
     @Override
-    public final double getPositionTicks() {
+    public final double getPositionValue() {
       return m_encoder.getPosition();
     }
 
     @Override
-    public final double getRpm() {
+    public final double getVelocityValue() {
       return m_encoder.getVelocity();
     }
 
@@ -223,11 +223,6 @@ public final class CougarSparkMax extends CANSparkMax implements AdvancedMotorCo
       m_encoder.setPosition(position);
     }
     
-    @Override
-    public double getVelocityTicks() {
-      return m_encoder.getVelocity();
-    }
-
     private final String m_encoderName;
     private final RelativeEncoder m_encoder;
     

@@ -18,7 +18,7 @@ public interface Encoder extends Sensor {
    *
    * @see ticksPerRevolution
    */
-  double getPositionTicks();
+  double getPositionValue();
 
   /**
    * Set conversion factor for position ticks.
@@ -35,24 +35,14 @@ public interface Encoder extends Sensor {
   void setVelocityTickConversionFactor(double conversionFactor);
 
   /**
-   * Get the rate of rotation in RPM.
+   * Get the rate of rotation.
    *
    * @return rate of encoder rotation
    */
-  double getRpm();
+  double getVelocityValue();
 
   /**
    * Sets the position offset of the encoder.
    */
-  public void setPositionOffset(double position);
-  
-  /**
-   * Get the velocity of the motor. 
-   * This returns the native units of 'RPM' by default, 
-   * and can be changed by a scale factor using setVelocityConversionFactor().
-   *
-   * @return Number the RPM of the motor
-   */
-  double getVelocityTicks();
-
+  void setPositionOffset(double position);
 }
