@@ -20,9 +20,9 @@ public class ArmCommands extends CommandBase {
 
   private final Arm m_arm;
 
-  private double m_armAngle;
-  private double m_wristAngle;
-  private double m_armExtension;
+  private Double m_armAngle;
+  private Double m_wristAngle;
+  private Double m_armExtension;
 
   /**
    * Defines the constructor for ArmCommands,
@@ -51,10 +51,13 @@ public class ArmCommands extends CommandBase {
   @Override
   public void execute() {
     m_armAngle += m_armAngleSupplier.getAsDouble() * 360;
+
     m_armExtension += m_armExtensionIncreaseSupplier.getAsDouble()
       * RobotConfig.Arm.kMaxArmExtension;
+
     m_armExtension -= m_armExtensionDecreaseSupplier.getAsDouble()
       * RobotConfig.Arm.kMaxArmExtension;
+    
     m_wristAngle += m_wristAngleSupplier.getAsDouble() * 360;
 
     m_arm.moveArm(m_armAngle, m_armExtension, m_wristAngle,
