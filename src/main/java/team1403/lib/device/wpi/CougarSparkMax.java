@@ -209,12 +209,12 @@ public final class CougarSparkMax extends CANSparkMax implements AdvancedMotorCo
     }
 
     @Override
-    public void setPositionTickConversionFactor(double conversionFactor) {
+    public void setPositionConversionFactor(double conversionFactor) {
       m_encoder.setPositionConversionFactor(conversionFactor);
     }
 
     @Override
-    public void setVelocityTickConversionFactor(double conversionFactor) {
+    public void setVelocityConversionFactor(double conversionFactor) {
       m_encoder.setVelocityConversionFactor(conversionFactor);
     }
 

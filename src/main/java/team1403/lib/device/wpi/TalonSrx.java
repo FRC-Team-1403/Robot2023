@@ -155,12 +155,12 @@ public class TalonSrx extends WPI_TalonSRX
     }
 
     @Override
-    public void setPositionTickConversionFactor(double conversionFactor) {
+    public void setPositionConversionFactor(double conversionFactor) {
       m_positionConversionFactor = conversionFactor;
     }
 
     @Override
-    public void setVelocityTickConversionFactor(double conversionFactor) {
+    public void setVelocityConversionFactor(double conversionFactor) {
       m_velocityConversionFactor = conversionFactor;
     }
 

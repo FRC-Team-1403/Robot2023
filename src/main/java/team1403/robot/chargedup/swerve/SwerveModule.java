@@ -94,9 +94,9 @@ public class SwerveModule implements Device {
     // Config drive relative encoder
     double drivePositionConversionFactor = Math.PI * SwerveConfig.kWheelDiameterMeters 
           * SwerveConfig.kDriveReduction;
-    m_driveRelativeEncoder.setPositionTickConversionFactor(drivePositionConversionFactor);
+    m_driveRelativeEncoder.setPositionConversionFactor(drivePositionConversionFactor);
     // Set velocity in terms of seconds
-    m_driveRelativeEncoder.setVelocityTickConversionFactor(drivePositionConversionFactor / 60.0);
+    m_driveRelativeEncoder.setVelocityConversionFactor(drivePositionConversionFactor / 60.0);
 
   }
 
