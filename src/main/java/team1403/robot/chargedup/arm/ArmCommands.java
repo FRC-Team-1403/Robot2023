@@ -6,6 +6,8 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
+import team1403.robot.chargedup.RobotConfig;
+
 /**
  * class ArmCommands is the where the commands for Arm.java is located
  */
@@ -48,9 +50,11 @@ public class ArmCommands extends CommandBase {
   public void execute() {
     m_armAngle += m_armAngleSupplier.getAsDouble() * 360;
 
-    m_armExtension += m_armExtensionIncreaseSupplier.getAsDouble();
+    m_armExtension += m_armExtensionIncreaseSupplier.getAsDouble()
+      * RobotConfig.Arm.kMaxArmExtension;
 
-    m_armExtension -= m_armExtensionDecreaseSupplier.getAsDouble();
+    m_armExtension -= m_armExtensionDecreaseSupplier.getAsDouble()
+      * RobotConfig.Arm.kMinArmExtension;
     
     m_wristAngle += m_wristAngleSupplier.getAsDouble() * 360;
 

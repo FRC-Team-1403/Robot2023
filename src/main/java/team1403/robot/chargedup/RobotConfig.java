@@ -20,19 +20,10 @@ import team1403.lib.util.Dimension;
  */
 public class RobotConfig {
 
-  public static double alpha_1 = 0;
-  public static double alpha_2 = 0;
-
   /**
    * Variables to used by all subsystems.
    */
   public static final Dimension robotDimensions = new Dimension(0, 0, 0);
-
-  public static double kRobotHeight = 32;
-  public static double kHeightFromGround = 33.72326;
-  public static double kGroundToTopOfFrame = 1.72326;
-  public static double kPhysicalArmMaxExtension = 60.218;
-  public static double kFrameHeight = 2;
 
   /**
    * Swerve Constants.
@@ -202,6 +193,16 @@ public class RobotConfig {
    * class Arm, sets constant values for PID for Arm.java.
    */
   public static class Arm {
+
+    public static double angleHittingRobot = 0;
+    public static double angleHittingGround = 0;
+
+    public static double kRobotHeight = 32;
+    public static double kHeightFromGround = 33.72326;
+    public static double kGroundToTopOfFrame = 1.72326;
+    public static double kPhysicalArmMaxExtension = 60.218;
+    public static double kFrameHeight = 2;
+
     public static final int kP = 0; //constant for Proportional
     public static final int kI = 0; //constant for Integral
     public static final int kD = 0; //constant for Derivative
