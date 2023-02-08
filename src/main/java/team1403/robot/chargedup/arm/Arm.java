@@ -105,11 +105,17 @@ public class Arm extends CougarSubsystem {
     return m_absoluteEncoder; 
   }
 
-  /**
-   * Getter method for relative encoder, sets the absolute encoder to relative encoder.
-   */
+
   public void resetArmAngleEncoder() {   
-    m_leftArmAngleMotor.getEmbeddedEncoder().setPositionOffset(
+    m_leftArmAngleMotor.getEmbeddedEncoder().setPositionOffset();
+  }
+
+  /**
+   * Getter method for relative encoder,
+   * sets the absolute encoder to relative encoder.
+   */
+  public void getRelativeEncoder() {   
+    m_leftAngledMotor.getEmbeddedEncoder().setPositionOffset(
         m_absoluteEncoder.getAbsolutePosition());
   }
 
@@ -148,7 +154,8 @@ public class Arm extends CougarSubsystem {
   }
   
   /**
-   * This method calculates the maximum arm length the arm can go to without damaging the robot.
+   * This method calculates the maximum arm
+   * length the arm can go to without damaging the robot.
    *
    * @pararm absoluteArmAngle arm angle relative to ground
    * @param relativeWristAngle wrist angle relative to itself
@@ -278,7 +285,8 @@ public class Arm extends CougarSubsystem {
   }
   
   /**
-   * Move the arm to a length between 0 and max length arm can go to where 0 is positive x axis
+   * Move the arm to a length between 0 and max
+    length arm can go to where 0 is positive x axis
    * and 90 is positive y axis.
    *
    * @param length you want the arm move to

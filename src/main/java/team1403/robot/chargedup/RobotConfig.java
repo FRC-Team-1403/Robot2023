@@ -25,6 +25,11 @@ public class RobotConfig {
    */
   public static final Dimension robotDimensions = new Dimension(0, 0, 0);
 
+  public static double kRobotHeight = 32;
+  public static double kHeightFromGround = 33.72326;
+  public static double kGroundToTopOfFrame = 1.72326;
+  public static double kFrameHeight = 2;
+
   /**
    * Swerve Constants.
    * 
@@ -197,11 +202,7 @@ public class RobotConfig {
     public static double angleHittingRobot = 0;
     public static double angleHittingGround = 0;
 
-    public static double kRobotHeight = 32;
-    public static double kHeightFromGround = 33.72326;
-    public static double kGroundToTopOfFrame = 1.72326;
     public static double kPhysicalArmMaxExtension = 60.218;
-    public static double kFrameHeight = 2;
 
     public static final int kP = 0; //constant for Proportional
     public static final int kI = 0; //constant for Integral
