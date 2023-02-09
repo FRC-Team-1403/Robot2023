@@ -56,7 +56,7 @@ public class ArmCommands extends CommandBase {
       * RobotConfig.Arm.kMaxArmExtension;
 
     m_armExtension -= m_armExtensionDecreaseSupplier.getAsDouble()
-      * RobotConfig.Arm.kMinArmExtension;
+      * RobotConfig.Arm.kMaxArmExtension;
     
     m_wristAngle += m_wristAngleSupplier.getAsDouble() * 360;
 
