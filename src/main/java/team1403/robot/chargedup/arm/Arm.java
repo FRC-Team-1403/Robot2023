@@ -82,8 +82,8 @@ public class Arm extends CougarSubsystem {
     m_wristAngleMotor.getEmbeddedEncoder().setPositionTickConversionFactor(
         RobotConfig.Arm.kWristConversionFactor);
     
-    m_absoluteEncoder.setPositionOffset(180);
     m_wristAngleMotor.getEmbeddedEncoder().setPositionOffset(180);
+    m_leftArmAngleMotor.getEmbeddedEncoder().setPositionOffset((m_absoluteEncoder.getAbsolutePosition() - 180));
 
     m_pidArmAngle = new PIDController(0, 0, 0);
     m_pidWristAngle = new PIDController(0, 0, 0);
@@ -106,8 +106,8 @@ public class Arm extends CougarSubsystem {
   }
 
 
-  public void resetArmAngleEncoder() {   
-    m_leftArmAngleMotor.getEmbeddedEncoder().setPositionOffset();
+  public void resetArmAngleEncoder() {
+    m_leftArmAngleMotor.getEmbeddedEncoder().setPositionOffset(getArmAngle() - 180);
   }
 
   /**
@@ -115,7 +115,7 @@ public class Arm extends CougarSubsystem {
    * sets the absolute encoder to relative encoder.
    */
   public void getRelativeEncoder() {   
-    m_leftAngledMotor.getEmbeddedEncoder().setPositionOffset(
+    m_leftArmAngleMotor.getEmbeddedEncoder().setPositionOffset(
         m_absoluteEncoder.getAbsolutePosition());
   }
 
@@ -200,9 +200,9 @@ public class Arm extends CougarSubsystem {
     double max = 0;
 
     if (angle > 0 && angle < RobotConfig.Arm.angleHittingRobot){
-      max = maxGroundArmLength(getArmAngle(), getWristAngle(), RobotConfig.Arm.kRobotHeight - RobotConfig.Arm.kFrameHeight);
+      max = maxGroundArmLength(getArmAngle(), getWristAngle(), RobotConfig.kRobotHeight - RobotConfig.kFrameHeight);
     } else if (angle > RobotConfig.Arm.angleHittingRobot && angle < RobotConfig.Arm.angleHittingGround) {
-      max = maxGroundArmLength(getArmAngle(), getWristAngle(), RobotConfig.Arm.kHeightFromGround);
+      max = maxGroundArmLength(getArmAngle(), getWristAngle(), RobotConfig.kHeightFromGround);
     } else {
       max = RobotConfig.Arm.kPhysicalArmMaxExtension;
     }
