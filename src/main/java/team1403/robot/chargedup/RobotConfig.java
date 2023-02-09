@@ -32,7 +32,7 @@ public class RobotConfig {
 
     public static final double kPTurning = 0.5;
     public static final double kITurning = 0.0;
-    public static final double kDTurning = 5.0;
+    public static final double kDTurning = 5;
 
     public static final double kTrackWidth = Units.inchesToMeters(21);
     public static final double kWheelBase = Units.inchesToMeters(25.5);
@@ -47,10 +47,10 @@ public class RobotConfig {
         // Back right
         new Translation2d(-kTrackWidth / 2.0, -kWheelBase / 2.0));
 
-    public static final double frontLeftEncoderOffset = -Math.toRadians(180.263671875);
-    public static final double frontRightEncoderOffset = -Math.toRadians(267.1875);
-    public static final double backLeftEncoderOffset = -Math.toRadians(268.2421875);
-    public static final double backRightEncoderOffset = -Math.toRadians(153.544921875);
+    public static final double frontLeftEncoderOffset = -Math.toRadians(267.71484375 + 180);
+    public static final double frontRightEncoderOffset = -Math.toRadians(179.384765625);
+    public static final double backLeftEncoderOffset = -Math.toRadians(88.857421875);
+    public static final double backRightEncoderOffset = -Math.toRadians(153.720703125);
 
     public static final double kDriveReduction = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
     public static final double kSteerReduction = (15.0 / 32.0) * (10.0 / 60.0);
@@ -98,11 +98,11 @@ public class RobotConfig {
     // Swerve CanBus ids
     public static final int frontLeftDriveId = 1;
     public static final int frontLeftSteerId = 2;
-    public static final int frontLeftEncoderId = 1;
+    public static final int frontLeftEncoderId = 3;
 
     public static final int frontRightDriveId = 8;
     public static final int frontRightSteerId = 3;
-    public static final int frontRightEncoderId = 3;
+    public static final int frontRightEncoderId = 1;
 
     public static final int backLeftDriveId = 14;
     public static final int backLeftSteerId = 4;

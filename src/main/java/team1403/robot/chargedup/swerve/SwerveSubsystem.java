@@ -45,18 +45,18 @@ public class SwerveSubsystem extends CougarSubsystem {
     super("Swerve Subsystem", parameters);
     CougarLogger logger = getLogger();
     m_modules = new SwerveModule[] {
-        new SwerveModule("Back Right Module",
-            CanBus.backRightDriveId, CanBus.backRightSteerId,
-            CanBus.backRightEncoderId, SwerveConfig.backRightEncoderOffset, logger),
-        new SwerveModule("Back Left Module",
-            CanBus.backLeftDriveId, CanBus.backLeftSteerId,
-            CanBus.backLeftEncoderId, SwerveConfig.backLeftEncoderOffset, logger),
         new SwerveModule("Front Left Module",
             CanBus.frontLeftDriveId, CanBus.frontLeftSteerId,
             CanBus.frontLeftEncoderId, SwerveConfig.frontLeftEncoderOffset, logger),
         new SwerveModule("Front Right Module",
             CanBus.frontRightDriveId, CanBus.frontRightSteerId,
-            CanBus.frontRightEncoderId, SwerveConfig.frontRightEncoderOffset, logger)
+            CanBus.frontRightEncoderId, SwerveConfig.frontRightEncoderOffset, logger),
+        new SwerveModule("Back Left Module",
+            CanBus.backLeftDriveId, CanBus.backLeftSteerId,
+            CanBus.backLeftEncoderId, SwerveConfig.backLeftEncoderOffset, logger),
+        new SwerveModule("Back Right Module",
+            CanBus.backRightDriveId, CanBus.backRightSteerId,
+            CanBus.backRightEncoderId, SwerveConfig.backRightEncoderOffset, logger),
     };
 
     m_odometer = new SwerveDriveOdometry(
@@ -174,9 +174,7 @@ public class SwerveSubsystem extends CougarSubsystem {
    */
   public void drive(ChassisSpeeds chassisSpeeds) {
     m_chassisSpeeds = chassisSpeeds;
-    SmartDashboard.putNumber("chassisSpeeds X", m_chassisSpeeds.vxMetersPerSecond);
-    SmartDashboard.putNumber("chassisSpeeds Y", m_chassisSpeeds.vyMetersPerSecond);
-    SmartDashboard.putNumber("chassisSpeeds Omega", m_chassisSpeeds.omegaRadiansPerSecond);
+    SmartDashboard.putString("chassisSpeeds X", m_chassisSpeeds.toString());
   }
 
   /**
@@ -242,10 +240,13 @@ public class SwerveSubsystem extends CougarSubsystem {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Gyro Reading", getGyroscopeRotation().getDegrees());
+    SmartDashboard.putNumber("back right angle", m_modules[0].getSteerAngle());
+    SmartDashboard.putNumber("back left angle", m_modules[1].getSteerAngle());
+    SmartDashboard.putNumber("front left angle", m_modules[2].getSteerAngle());
+    SmartDashboard.putNumber("front right angle", m_modules[3].getSteerAngle());
     m_odometer.update(getGyroscopeRotation(), getModulePositions());
-    SmartDashboard.putString("Odometry", m_odometer.getPoseMeters().toString());
 
-    // driftCorrection();
+    driftCorrection();
 
     SwerveModuleState[] states = SwerveConfig.kDriveKinematics
         .toSwerveModuleStates(m_chassisSpeeds);

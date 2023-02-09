@@ -144,11 +144,7 @@ public class SwerveModule implements Device {
   public double getSteerAngle() {
     double motorAngleRadians = m_steerMotor.getSelectedSensorPosition()
         * SwerveConfig.kSteerRelativeEncoderPositionConversionFactor;
-    motorAngleRadians %= 2.0 * Math.PI;
-    if (motorAngleRadians < 0) {
-      motorAngleRadians += 2.0 * Math.PI;
-    }
-    return motorAngleRadians;
+    return normalizeAngle(motorAngleRadians);
   }
 
   /**
@@ -193,18 +189,16 @@ public class SwerveModule implements Device {
    */
   private double normalizeAngleError(double targetAngle) {
     // Angle is inbetween 0 to 2pi
-    double normalizedAngleError = targetAngle;
 
-    double difference = normalizedAngleError - getSteerAngle();
+    double difference = targetAngle - getSteerAngle();
     // Change the target angle so the difference is in the range [-pi, pi) instead
     // of [0, 2pi)
     if (difference >= Math.PI) {
-      return normalizedAngleError - 2.0 * Math.PI;
+      targetAngle -= 2.0 * Math.PI;
     } else if (difference < -Math.PI) {
-      return normalizedAngleError - 2.0 * Math.PI;
+      targetAngle += 2.0 * Math.PI;
     } 
-    difference = normalizedAngleError - getSteerAngle();
-    return difference;
+    return targetAngle - getSteerAngle();
   }
 
   /**
@@ -213,20 +207,8 @@ public class SwerveModule implements Device {
    * @param steerAngle the current steer angle.
    */
   private double convertSteerAngle(double steerAngle) {
-    steerAngle %= (2.0 * Math.PI);
-        if (steerAngle < 0.0) {
-            steerAngle += 2.0 * Math.PI;
-        }
-
-        double difference = steerAngle - getSteerAngle();
-        // Change the target angle so the difference is in the range [-pi, pi) instead
-        // of [0, 2pi)
-        if (difference >= Math.PI) {
-            steerAngle -= 2.0 * Math.PI;
-        } else if (difference < -Math.PI) {
-            steerAngle += 2.0 * Math.PI;
-        }
-        difference = steerAngle - getSteerAngle(); // Recalculate difference
+    steerAngle = normalizeAngle(steerAngle);
+    double difference = normalizeAngleError(steerAngle);        
 
     // If the difference is greater than 90 deg or less than -90 deg the drive can
     // be inverted so the total
@@ -238,10 +220,7 @@ public class SwerveModule implements Device {
     }
 
     // Put the target angle back into the range [0, 2pi)
-    steerAngle %= (2.0 * Math.PI);
-    if (steerAngle < 0.0) {
-        steerAngle += 2.0 * Math.PI;
-    }
+    steerAngle = normalizeAngle(steerAngle);
 
     // Angle to be changed is now in radians
     double referenceAngleRadians = steerAngle;
@@ -268,10 +247,7 @@ public class SwerveModule implements Device {
       m_absoluteEncoderResetIterations = 0;
     }
 
-    double currentAngleRadiansMod = currentAngleRadians % (2.0 * Math.PI);
-    if (currentAngleRadiansMod < 0.0) {
-        currentAngleRadiansMod += 2.0 * Math.PI;
-    }
+    double currentAngleRadiansMod = normalizeAngle(currentAngleRadians);
 
     // The reference angle has the range [0, 2pi)
     // but the Falcon's encoder can go above that
@@ -308,8 +284,6 @@ public class SwerveModule implements Device {
       driveMetersPerSecond *= -1.0;
     }
 
-    SmartDashboard.putNumber("Converted Drive Meters", driveMetersPerSecond);
-
     return driveMetersPerSecond;
   }
 
@@ -329,7 +303,7 @@ public class SwerveModule implements Device {
     double angle = convertSteerAngle(steerAngle);
     SmartDashboard.putNumber("Steer motor angle ", angle);
 
-    this.m_steerMotor.set(TalonFXControlMode.Position, steerAngle);
+    this.m_steerMotor.set(TalonFXControlMode.Position, angle);
   }
 
   /**
