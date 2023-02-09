@@ -81,9 +81,6 @@ public class Arm extends CougarSubsystem {
     
     m_wristAngleMotor.getEmbeddedEncoder().setPositionTickConversionFactor(
         RobotConfig.Arm.kWristConversionFactor);
-    
-    m_wristAngleMotor.getEmbeddedEncoder().setPositionOffset(180);
-    m_leftArmAngleMotor.getEmbeddedEncoder().setPositionOffset((m_absoluteEncoder.getAbsolutePosition() - 180));
 
     m_pidArmAngle = new PIDController(0, 0, 0);
     m_pidWristAngle = new PIDController(0, 0, 0);
@@ -93,6 +90,7 @@ public class Arm extends CougarSubsystem {
     m_desiredWristAngle = getWristAngle();
     m_desiredArmExtension = getArmExtension();
 
+    m_wristAngleMotor.getEmbeddedEncoder().setPositionOffset(180);
     resetArmAngleEncoder();
   }
 
