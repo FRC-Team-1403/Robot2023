@@ -118,7 +118,7 @@ public class Arm extends CougarSubsystem {
   }
 
   /**
-   * Will return the absolute wrist angle from current angle
+   * Will return the absolute wrist angle from current angle.
    *
    * @param desiredWristAngle desired wrist angle
    * @param desiredArmAngle desired arm angle
@@ -181,7 +181,7 @@ public class Arm extends CougarSubsystem {
       angle = RobotConfig.Arm.kMinArmRotation;
     }
 
-      return angle;
+    return angle;
   }
 
   /**
@@ -197,9 +197,11 @@ public class Arm extends CougarSubsystem {
   public double limitArmExtension(double angle, double length) {
     double max = 0;
 
-    if (angle > 0 && angle < RobotConfig.Arm.angleHittingRobot){
-      max = maxGroundArmLength(getArmAngle(), getWristAngle(), RobotConfig.kRobotHeight - RobotConfig.kFrameHeight);
-    } else if (angle > RobotConfig.Arm.angleHittingRobot && angle < RobotConfig.Arm.angleHittingGround) {
+    if (angle > 0 && angle < RobotConfig.Arm.angleHittingRobot) {
+      max = maxGroundArmLength(getArmAngle(), getWristAngle(), RobotConfig.kRobotHeight
+        - RobotConfig.kFrameHeight);
+    } else if (angle > RobotConfig.Arm.angleHittingRobot && angle
+        < RobotConfig.Arm.angleHittingGround) {
       max = maxGroundArmLength(getArmAngle(), getWristAngle(), RobotConfig.kHeightFromGround);
     } else {
       max = RobotConfig.Arm.kPhysicalArmMaxExtension;
