@@ -15,8 +15,8 @@ import team1403.robot.chargedup.RobotConfig.SwerveConfig;
 public class SwerveCommand extends CommandBase {
   private final SwerveSubsystem m_drivetrainSubsystem;
 
-  private final DoubleSupplier m_horizontalTranslationSupplier;
   private final DoubleSupplier m_verticalTranslationSupplier;
+  private final DoubleSupplier m_horizontalTranslationSupplier;
   private final DoubleSupplier m_rotationSupplier;
   private final BooleanSupplier m_fieldRelativeSupplier;
   private boolean m_isFieldRelative;
@@ -25,10 +25,13 @@ public class SwerveCommand extends CommandBase {
    * Creates the swerve command.
    *
    * @param drivetrain the instance of the {@link SwerveSubsystem}
-   * @param horizontalTranslationSupplier supplies the horizontal speed of the drivetrain
-   * @param verticalTranslationSupplier supplies the the vertical speed of the drivetrain
+   * @param horizontalTranslationSupplier
+    supplies the horizontal speed of the drivetrain
+   * @param verticalTranslationSupplier
+    supplies the the vertical speed of the drivetrain
    * @param rotationSupplier supplies the rotational speed of the drivetrain
-   * @param fieldRelativeSupplier supplies the boolean value to enable field relative mode
+   * @param fieldRelativeSupplier supplies the
+    boolean value to enable field relative mode
    */
   public SwerveCommand(SwerveSubsystem drivetrain,
                                DoubleSupplier horizontalTranslationSupplier,
@@ -36,8 +39,8 @@ public class SwerveCommand extends CommandBase {
                                DoubleSupplier rotationSupplier,
                                BooleanSupplier fieldRelativeSupplier) {
     this.m_drivetrainSubsystem = drivetrain;
-    this.m_horizontalTranslationSupplier = horizontalTranslationSupplier;
     this.m_verticalTranslationSupplier = verticalTranslationSupplier;
+    this.m_horizontalTranslationSupplier = horizontalTranslationSupplier;
     this.m_rotationSupplier = rotationSupplier;
     this.m_fieldRelativeSupplier = fieldRelativeSupplier;
     m_isFieldRelative = true;
@@ -46,7 +49,6 @@ public class SwerveCommand extends CommandBase {
 
   @Override
   public void execute() {
-    SmartDashboard.putNumber("Axis", m_verticalTranslationSupplier.getAsDouble());
     if (m_fieldRelativeSupplier.getAsBoolean()) {
       m_isFieldRelative = !m_isFieldRelative;
     }
@@ -56,17 +58,16 @@ public class SwerveCommand extends CommandBase {
     if (m_isFieldRelative) {
       m_drivetrainSubsystem.drive(
           ChassisSpeeds.fromFieldRelativeSpeeds(
-              m_horizontalTranslationSupplier.getAsDouble() * SwerveConfig.kMaxSpeed,
               m_verticalTranslationSupplier.getAsDouble() * SwerveConfig.kMaxSpeed,
+              m_horizontalTranslationSupplier.getAsDouble() * SwerveConfig.kMaxSpeed,
               m_rotationSupplier.getAsDouble() * SwerveConfig.kMaxAngularSpeed,
               m_drivetrainSubsystem.getGyroscopeRotation()));
     } else {
       m_drivetrainSubsystem.drive(
           new ChassisSpeeds(
-              m_horizontalTranslationSupplier.getAsDouble() * SwerveConfig.kMaxSpeed,
               m_verticalTranslationSupplier.getAsDouble() * SwerveConfig.kMaxSpeed,
+              m_horizontalTranslationSupplier.getAsDouble() * SwerveConfig.kMaxSpeed,
               m_rotationSupplier.getAsDouble() * SwerveConfig.kMaxAngularSpeed));
     }
-
   }
 }

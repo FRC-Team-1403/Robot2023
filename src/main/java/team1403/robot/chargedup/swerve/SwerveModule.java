@@ -30,7 +30,8 @@ import team1403.robot.chargedup.RobotConfig.SwerveConfig;
 
 /**
  * Represents a swerve module. Consists of a drive motor, steer motor, 
- * and their respective relative encoders. Also consists of a absolute encoder to track steer angle.
+ * and their respective relative encoders.
+ * Also consists of a absolute encoder to track steer angle.
  */
 public class SwerveModule implements Device {
   private double m_absoluteEncoderResetIterations = 0;
@@ -93,9 +94,9 @@ public class SwerveModule implements Device {
     // Config drive relative encoder
     double drivePositionConversionFactor = Math.PI * SwerveConfig.kWheelDiameterMeters 
           * SwerveConfig.kDriveReduction;
-    m_driveRelativeEncoder.setPositionTickConversionFactor(drivePositionConversionFactor);
+    m_driveRelativeEncoder.setPositionConversionFactor(drivePositionConversionFactor);
     // Set velocity in terms of seconds
-    m_driveRelativeEncoder.setVelocityTickConversionFactor(drivePositionConversionFactor / 60.0);
+    m_driveRelativeEncoder.setVelocityConversionFactor(drivePositionConversionFactor / 60.0);
 
   }
 
@@ -182,7 +183,8 @@ public class SwerveModule implements Device {
   }
 
   /**
-   * Returns difference (targetAngle - getSteerAngle()) normalized in range -pi .. pi
+   * Returns difference (targetAngle - getSteerAngle())
+    normalized in range -pi .. pi
    *
    * @param targetAngle the angle to be moved to
    * @return The steer angle after accounting for error.
@@ -363,7 +365,7 @@ public class SwerveModule implements Device {
    *         travelled and the angle of the module.
    */
   public SwerveModulePosition getModulePosition() {
-    return new SwerveModulePosition(m_driveRelativeEncoder.getPositionTicks(), 
+    return new SwerveModulePosition(m_driveRelativeEncoder.getPositionValue(), 
           new Rotation2d(getSteerAngle()));
   }
   
@@ -373,7 +375,7 @@ public class SwerveModule implements Device {
    * @return the current velocity of the drive motor
    */
   public double getDriveVelocity() {
-    return m_driveRelativeEncoder.getVelocityTicks();
+    return m_driveRelativeEncoder.getVelocityValue();
   }
 
   /**

@@ -7,15 +7,18 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import team1403.lib.core.CougarLibInjectedParameters;
-import team1403.lib.core.CougarSubsystem;
+
 import team1403.lib.device.GyroscopeDevice;
 import team1403.lib.device.wpi.NavxAhrs;
 import team1403.lib.util.CougarLogger;
+import team1403.lib.util.SwerveDriveOdometry;
+
+import team1403.lib.core.CougarLibInjectedParameters;
+import team1403.lib.core.CougarSubsystem;
+
 import team1403.robot.chargedup.RobotConfig.CanBus;
 import team1403.robot.chargedup.RobotConfig.SwerveConfig;
 
@@ -30,16 +33,19 @@ public class SwerveSubsystem extends CougarSubsystem {
   private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds();
   private final SwerveDriveOdometry m_odometer;
 
-  private PIDController m_driftCorrectionPid = new PIDController(0.33, 0, 0);
+  private final PIDController m_driftCorrectionPid = new PIDController(0.33, 0, 0);
   private double m_desiredHeading = 0;
   private double m_speedLimiter = 0.6;
 
   /**
-   * Creates a new {@link SwerveSubsystem}. Instantiates the 4 {@link SwerveModule}s, 
+   * Creates a new {@link SwerveSubsystem}.
+    Instantiates the 4 {@link SwerveModule}s, 
    * the {@link SwerveDriveOdometry}, and the {@link NavxAhrs}. 
-   * Also sets drivetrain ramp rate, and idle mode to default values.
+   * Also sets drivetrain ramp rate,
+    and idle mode to default values.
    *
-   * @param CougarLibInjectedParameters the {@link CougarLibInjectedParameters} used to construct this subsystem
+   * @param parameters the {@link CougarLibInjectedParameters}
+   used to construct this subsystem
    */
   public SwerveSubsystem(CougarLibInjectedParameters parameters) {
     super("Swerve Subsystem", parameters);
@@ -148,6 +154,10 @@ public class SwerveSubsystem extends CougarSubsystem {
    */
   public Pose2d getPose() {
     return m_odometer.getPoseMeters();
+  }
+
+  public void setPose(Pose2d pose) {
+    m_odometer.setPoseMeters(pose);
   }
 
   /**
