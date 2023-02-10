@@ -204,9 +204,9 @@ public class SwerveSubsystem extends CougarSubsystem {
       //       m_modules[i].getName(), 
       //       states[i].speedMetersPerSecond, 
       //       states[i].angle.getRadians());
-
-      m_modules[i].set((states[i].speedMetersPerSecond
-          / SwerveConfig.kMaxSpeed) * m_speedLimiter, states[i].angle.getRadians());
+      states[i].speedMetersPerSecond = (states[i].speedMetersPerSecond 
+          / SwerveConfig.kMaxSpeed) * m_speedLimiter;
+      m_modules[i].set(states[i]);
     }
   }
 

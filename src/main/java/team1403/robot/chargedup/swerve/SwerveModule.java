@@ -137,7 +137,7 @@ public class SwerveModule implements Device {
   }
 
   /**
-   * The angle for getting the steer angle.
+   * The method for getting the steer angle.
    *
    * @return The motor angles in radians.
    */
@@ -294,16 +294,12 @@ public class SwerveModule implements Device {
    * @param steerAngle           steering angle.
    *
    */
-  public void set(double driveMetersPerSecond, double steerAngle) {
-
+  public void set(SwerveModuleState state) {
+    state = SwerveModuleState.optimize(state, new Rotation2d(getSteerAngle()));
     // Set driveMotor according to percentage output
-    this.m_driveMotor.set(convertDriveMetersPerSecond(driveMetersPerSecond, steerAngle));
-
+    this.m_driveMotor.set(state.speedMetersPerSecond);
     // Set steerMotor according to position of encoder
-    double angle = convertSteerAngle(steerAngle);
-    SmartDashboard.putNumber("Steer motor angle ", angle);
-
-    this.m_steerMotor.set(TalonFXControlMode.Position, angle);
+    this.m_steerMotor.set(TalonFXControlMode.Position, state.angle.getRadians());
   }
 
   /**
