@@ -4,7 +4,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-
 import team1403.lib.util.Dimension;
 
 /**
@@ -243,5 +242,9 @@ public class RobotConfig {
      * limited by the arm hitting the ground.
      */
     public static final double kMaxGroundArmLengthThreshold = 0;
+  }
+  public static class Lights {
+    public static int portNumber = 9;
+    public static int ledBufferValue = 60;
   }
 }

@@ -18,6 +18,8 @@ import team1403.lib.subsystems.BuiltinSubsystem;
 import team1403.lib.util.CougarLogger;
 import team1403.robot.chargedup.cse.CougarScriptObject;
 import team1403.robot.chargedup.cse.CougarScriptReader;
+import team1403.robot.chargedup.cse.SequentialCommandGroup;
+import team1403.robot.chargedup.lights.LightSubsystem;
 import team1403.robot.chargedup.swerve.SwerveCommand;
 import team1403.robot.chargedup.swerve.SwerveDrivePath;
 import team1403.robot.chargedup.RobotConfig.OperatorConfig;
@@ -54,6 +56,7 @@ public class CougarRobotImpl extends CougarRobot {
     m_builtins = new BuiltinSubsystem(parameters, logger);
     m_arm = new Arm(parameters);
     m_swerveSubsystem = new SwerveSubsystem(parameters);
+    m_lightSubsystem = new LightSubsystem("light", parameters);
 
     var scheduler = CommandScheduler.getInstance();
     scheduler.registerSubsystem(m_builtins);
@@ -194,14 +197,27 @@ public class CougarRobotImpl extends CougarRobot {
    * @param xboxOperator defines which controller is being used
    */
   public void autoOperatorMode(XboxController xboxOperator) {
+    
+    SequentialCommandGroup highCommand = new SequentialCommandGroup(
+      new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)),
+      new InstantCommand(() -> m_lightSubsystem.setGreen())
+    );
+
+    SequentialCommandGroup lowCommand = new SequentialCommandGroup(
+      new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)),
+      new InstantCommand(() -> m_lightSubsystem.setRed())
+    );
+
     new Trigger(() -> xboxOperator.getAButton()).onFalse(
       new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+
     new Trigger(() -> xboxOperator.getBButton()).onFalse(
         new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadDown)).onFalse(
-        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadUp)).onFalse(
-      new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+
+    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadDown)).onFalse(lowCommand);
+
+    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadUp)).onFalse(highCommand);
+
     new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadRight)).onFalse(
         new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
   }
@@ -233,4 +249,5 @@ public class CougarRobotImpl extends CougarRobot {
   private final Arm m_arm;
   private boolean m_armOperatorManual = true;
   private final SwerveSubsystem m_swerveSubsystem;
+  private final LightSubsystem m_lightSubsystem;
 }
