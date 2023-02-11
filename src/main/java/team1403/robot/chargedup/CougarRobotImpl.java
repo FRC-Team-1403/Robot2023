@@ -54,14 +54,15 @@ public class CougarRobotImpl extends CougarRobot {
         parameters.getRobotLogger(), "BuiltinDevices");
 
     m_builtins = new BuiltinSubsystem(parameters, logger);
-    m_arm = new Arm(parameters);
+    // m_arm = new Arm(parameters);
     m_swerveSubsystem = new SwerveSubsystem(parameters);
     m_lightSubsystem = new LightSubsystem("light", parameters);
 
     var scheduler = CommandScheduler.getInstance();
-    scheduler.registerSubsystem(m_builtins);
+    // scheduler.registerSubsystem(m_builtins);
+    // scheduler.registerSubsystem(m_swerveSubsystem);
 
-    configureOperatorInterface();
+    // configureOperatorInterface();
     configureDriverInterface();
     registerAutoCommands();
 
@@ -78,15 +79,15 @@ public class CougarRobotImpl extends CougarRobot {
   private void configureOperatorInterface() {
     XboxController xboxOperator = getJoystick("Operator", OperatorConfig.pilotPort);
 
-    new Trigger(() -> xboxOperator.getYButton()).onFalse(
-        new InstantCommand(() -> switchOperatorMode()));
+//     new Trigger(() -> xboxOperator.getYButton()).onFalse(
+//         new InstantCommand(() -> switchOperatorMode()));
     
-    if (m_armOperatorManual) {
-      manualOperatorMode(xboxOperator);
-    } else {
-      autoOperatorMode(xboxOperator);
-    }
-  }
+//     if (m_armOperatorManual) {
+//       manualOperatorMode(xboxOperator);
+//     } else {
+//       autoOperatorMode(xboxOperator);
+//   }
+}
 
   /**
    * Configures the driver commands and their bindings.
@@ -182,60 +183,47 @@ public class CougarRobotImpl extends CougarRobot {
     return new XboxController(port);
   }
 
-  //TODO, figure out actual setpoint values
+  // //TODO, figure out actual setpoint values
   
-  /**
-   * This is the auto mode for operator.
-   * Has 5 setpoints, which will each set the arm
-   * in different positions
-   * A Button -> Ground
-   * B Button -> Shelf
-   * Dpad down Button -> Tuck
-   * DPad Up -> High
-   * DPad Right -> Mid
-   *
-   * @param xboxOperator defines which controller is being used
-   */
-  public void autoOperatorMode(XboxController xboxOperator) {
-    
-    SequentialCommandGroup highCommand = new SequentialCommandGroup(
-      new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)),
-      new InstantCommand(() -> m_lightSubsystem.setGreen())
-    );
+  // /**
+  //  * This is the auto mode for operator.
+  //  * Has 5 setpoints, which will each set the arm
+  //  * in different positions
+  //  * A Button -> Ground
+  //  * B Button -> Shelf
+  //  * Dpad down Button -> Tuck
+  //  * DPad Up -> High
+  //  * DPad Right -> Mid
+  //  *
+  //  * @param xboxOperator defines which controller is being used
+  //  */
+  // public void autoOperatorMode(XboxController xboxOperator) {
+  //   new Trigger(() -> xboxOperator.getAButton()).onFalse(
+  //     new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  //   new Trigger(() -> xboxOperator.getBButton()).onFalse(
+  //       new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  //   new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadDown)).onFalse(
+  //       new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  //   new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadUp)).onFalse(
+  //     new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  //   new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadRight)).onFalse(
+  //       new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  // }
 
-    SequentialCommandGroup lowCommand = new SequentialCommandGroup(
-      new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)),
-      new InstantCommand(() -> m_lightSubsystem.setRed())
-    );
+  // /**
+  //  * This is the manual mode for operator.
+  //  * Minutely control arm with joysticks
+  //  * 
+  //  * @param xboxOperator defines which controller is being used
+  //  */
+  // private void manualOperatorMode(XboxController xboxOperator) {
+  //   m_arm.setDefaultCommand(new ArmCommands(m_arm,
+  //       () -> xboxOperator.getLeftY(),
+  //       () -> xboxOperator.getRightY(),
+  //       () -> xboxOperator.getRightTriggerAxis(),
+  //       () -> xboxOperator.getLeftTriggerAxis()));
 
-    new Trigger(() -> xboxOperator.getAButton()).onFalse(
-      new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-
-    new Trigger(() -> xboxOperator.getBButton()).onFalse(
-        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-
-    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadDown)).onFalse(lowCommand);
-
-    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadUp)).onFalse(highCommand);
-
-    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadRight)).onFalse(
-        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-  }
-
-  /**
-   * This is the manual mode for operator.
-   * Minutely control arm with joysticks
-   * 
-   * @param xboxOperator defines which controller is being used
-   */
-  private void manualOperatorMode(XboxController xboxOperator) {
-    m_arm.setDefaultCommand(new ArmCommands(m_arm,
-        () -> xboxOperator.getLeftY(),
-        () -> xboxOperator.getRightY(),
-        () -> xboxOperator.getRightTriggerAxis(),
-        () -> xboxOperator.getLeftTriggerAxis()));
-
-  }
+  // }
 
   /**
    * Switches the operator mode.
@@ -246,7 +234,7 @@ public class CougarRobotImpl extends CougarRobot {
 
   private final BuiltinSubsystem m_builtins;
   private CougarScriptReader m_reader;
-  private final Arm m_arm;
+  // private final Arm m_arm;
   private boolean m_armOperatorManual = true;
   private final SwerveSubsystem m_swerveSubsystem;
   private final LightSubsystem m_lightSubsystem;
