@@ -55,13 +55,13 @@ public class Arm extends CougarSubsystem {
     RobotConfig.CanBus.telescopicArmMotor, Type.kHallSensor, getLogger());
 
     m_leftArmAngleMotor = CougarSparkMax.makeBrushless("leftAngledArmMotor",
-        RobotConfig.CanBus.leftAngledArmMotor, null, logger);
+        RobotConfig.CanBus.leftAngledArmMotor, Type.kHallSensor, logger);
 
     m_rightArmAngleMotor = CougarSparkMax.makeBrushless("rightAngledArmMotor",
-        RobotConfig.CanBus.rightAngledArmMotor, null, logger);
+        RobotConfig.CanBus.rightAngledArmMotor, Type.kHallSensor, logger);
 
     m_wristAngleMotor = CougarSparkMax.makeBrushless("wristMotor",
-    RobotConfig.CanBus.wristMotor, null, logger);
+    RobotConfig.CanBus.wristMotor, Type.kHallSensor, logger);
 
     m_frontLimitSwitch = new WpiLimitSwitch("frontSwitch",
     RobotConfig.RioPorts.exampleRailForwardLimitSwitch);
