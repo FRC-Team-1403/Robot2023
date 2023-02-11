@@ -190,7 +190,7 @@ public class SwerveSubsystem extends CougarSubsystem {
    * @param chassisSpeeds the speed to move at
    */
   public void drive(ChassisSpeeds chassisSpeeds) {
-    m_chassisSpeeds = chassisSpeeds;
+    m_chassisSpeeds = translationalDriftCorrection(rotationalDriftCorrection(chassisSpeeds));
   }
 
   /**
@@ -254,7 +254,6 @@ public class SwerveSubsystem extends CougarSubsystem {
       tracef("driftCorrection %f, corrected omegaRadiansPerSecond %f", 
             calc, chassisSpeeds.omegaRadiansPerSecond);
     }
-
     return chassisSpeeds;
   }
 
@@ -277,7 +276,7 @@ public class SwerveSubsystem extends CougarSubsystem {
         chassisSpeeds.vyMetersPerSecond * deltaTime, 
         new Rotation2d(chassisSpeeds.omegaRadiansPerSecond * deltaTime));
 
-    Twist2d twistVel = robotPoseVel.log(robotPoseVel);
+    Twist2d twistVel = getPose().log(robotPoseVel);
     return new ChassisSpeeds(
             twistVel.dx / deltaTime, twistVel.dy / deltaTime, 
             twistVel.dtheta / deltaTime);
@@ -288,9 +287,6 @@ public class SwerveSubsystem extends CougarSubsystem {
     SmartDashboard.putNumber("Gyro Reading", getGyroscopeRotation().getDegrees());
     m_odometer.update(getGyroscopeRotation(), getModulePositions());
     SmartDashboard.putString("Odometry", m_odometer.getPoseMeters().toString());
-
-    m_chassisSpeeds = rotationalDriftCorrection(m_chassisSpeeds);
-    m_chassisSpeeds = translationalDriftCorrection(m_chassisSpeeds);
 
     SwerveModuleState[] states = SwerveConfig.kDriveKinematics
         .toSwerveModuleStates(m_chassisSpeeds);
