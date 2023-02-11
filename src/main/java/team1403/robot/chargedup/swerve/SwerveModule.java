@@ -11,6 +11,7 @@ import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import com.ctre.phoenix.sensors.CANCoderStatusFrame;
+import com.ctre.phoenix.sensors.MagnetFieldStrength;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel;
@@ -84,6 +85,9 @@ public class SwerveModule implements Device {
 
   private void initEncoders() {
     // Config absolute encoder
+    if (m_absoluteEncoder.getMagnetFieldStrength() != MagnetFieldStrength.Good_GreenLED) {
+      System.err.println("CANCoder magnetic field strength is unacceptable.");
+    }
     CANCoderConfiguration config = new CANCoderConfiguration();
     config.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
     config.magnetOffsetDegrees = Math.toDegrees(this.m_absoluteEncoderOffset);

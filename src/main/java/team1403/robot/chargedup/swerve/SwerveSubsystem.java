@@ -5,10 +5,12 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import team1403.lib.device.GyroscopeDevice;
@@ -156,6 +158,11 @@ public class SwerveSubsystem extends CougarSubsystem {
     return m_odometer.getPoseMeters();
   }
 
+  /**
+   * Set the position of thte odometry.
+   *
+   * @param pose the new position of the odometry.
+   */
   public void setPose(Pose2d pose) {
     m_odometer.setPoseMeters(pose);
   }
@@ -184,6 +191,14 @@ public class SwerveSubsystem extends CougarSubsystem {
    */
   public void drive(ChassisSpeeds chassisSpeeds) {
     m_chassisSpeeds = chassisSpeeds;
+  }
+
+  /**
+   * Stops the drivetrain.
+   */
+  public void stop() {
+    tracef("stop");
+    m_chassisSpeeds = new ChassisSpeeds();
   }
 
   /**
@@ -221,8 +236,12 @@ public class SwerveSubsystem extends CougarSubsystem {
   /**
    * Adds rotational velocity to the chassis speed to compensate for 
    * unwanted changes in gyroscope heading.
+   * 
+   * @param chassisSpeeds the given chassispeeds
+   * @return the corrected chassisspeeds
    */
-  private void driftCorrection() {
+  private ChassisSpeeds translationalDriftCorrection(ChassisSpeeds chassisSpeeds) {
+
     double translationalVelocity = Math.abs(m_modules[0].getDriveVelocity());
     if (Math.abs(m_navx2.getAngularVelocity()) > 0.2) {
       m_desiredHeading = getGyroscopeRotation().getDegrees();
@@ -230,19 +249,38 @@ public class SwerveSubsystem extends CougarSubsystem {
       double calc = m_driftCorrectionPid.calculate(getGyroscopeRotation().getDegrees(),
           m_desiredHeading);
       if (Math.abs(calc) >= 0.55) {
-        m_chassisSpeeds.omegaRadiansPerSecond += calc;
+        chassisSpeeds.omegaRadiansPerSecond += calc;
       }
       tracef("driftCorrection %f, corrected omegaRadiansPerSecond %f", 
-            calc, m_chassisSpeeds.omegaRadiansPerSecond);
+            calc, chassisSpeeds.omegaRadiansPerSecond);
     }
+
+    return chassisSpeeds;
   }
 
   /**
-   * Stops the drivetrain.
+   * Accounts for the drift caused by the first order kinematics 
+   * while doing both translational and rotational movement. 
+   * 
+   * <p> Looks forward one control loop to figure out where the robot 
+   * should be given the chassisspeed and backs out a twist command from that.
+   * 
+   * @param chassisSpeeds the given chassisspeeds
+   * @return the corrected chassisspeeds
    */
-  public void stop() {
-    tracef("stop");
-    m_chassisSpeeds = new ChassisSpeeds();
+  private ChassisSpeeds rotationalDriftCorrection(ChassisSpeeds chassisSpeeds) {
+    //Assuming the control loop runs in 20ms
+    final double deltaTime = 0.02;
+
+    //The position of the bot one control loop in the future given the chassisspeed
+    Pose2d robotPoseVel = new Pose2d(chassisSpeeds.vxMetersPerSecond * deltaTime, 
+        chassisSpeeds.vyMetersPerSecond * deltaTime, 
+        new Rotation2d(chassisSpeeds.omegaRadiansPerSecond * deltaTime));
+
+    Twist2d twistVel = robotPoseVel.log(robotPoseVel);
+    return new ChassisSpeeds(
+            twistVel.dx / deltaTime, twistVel.dy / deltaTime, 
+            twistVel.dtheta / deltaTime);
   }
 
   @Override
@@ -251,7 +289,8 @@ public class SwerveSubsystem extends CougarSubsystem {
     m_odometer.update(getGyroscopeRotation(), getModulePositions());
     SmartDashboard.putString("Odometry", m_odometer.getPoseMeters().toString());
 
-    driftCorrection();
+    m_chassisSpeeds = rotationalDriftCorrection(m_chassisSpeeds);
+    m_chassisSpeeds = translationalDriftCorrection(m_chassisSpeeds);
 
     SwerveModuleState[] states = SwerveConfig.kDriveKinematics
         .toSwerveModuleStates(m_chassisSpeeds);
