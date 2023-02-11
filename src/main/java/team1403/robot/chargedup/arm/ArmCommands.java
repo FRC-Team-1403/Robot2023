@@ -38,7 +38,9 @@ public class ArmCommands extends CommandBase {
     the decrease of arm extension, 0 to 1
    */
   public ArmCommands(Arm arm, DoubleSupplier armAngle, DoubleSupplier wristAngle,
-      DoubleSupplier armExtensionIncrease, DoubleSupplier armExtensionDecrease) {
+      DoubleSupplier armExtensionIncrease, DoubleSupplier armExtensionDecrease,
+        BooleanSupplier wheelIntake) {
+    this.m_wheelIntakeSupplier = wheelIntake;
     this.m_arm = arm;
     this.m_armAngleSupplier = armAngle;
     this.m_wristAngleSupplier = wristAngle;

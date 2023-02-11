@@ -167,7 +167,8 @@ public class CougarRobotImpl extends CougarRobot {
         () -> xboxOperator.getLeftY(),
         () -> xboxOperator.getRightY(),
         () -> xboxOperator.getRightTriggerAxis(),
-        () -> xboxOperator.getLeftTriggerAxis()));
+        () -> xboxOperator.getLeftTriggerAxis(),
+        () -> xboxOperator.getXButton()));
 
   }
 

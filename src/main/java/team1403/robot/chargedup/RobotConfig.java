@@ -204,9 +204,17 @@ public class RobotConfig {
 
     public static double kPhysicalArmMaxExtension = 60.218;
 
-    public static final int kP = 0; //constant for Proportional
-    public static final int kI = 0; //constant for Integral
-    public static final int kD = 0; //constant for Derivative
+    public static final int kPArmAngle = 0;
+    public static final int kIArmAngle = 0;
+    public static final int kDArmAngle = 0;
+
+    public static final int kPArmExtension = 0;
+    public static final int kIArmExtension = 0;
+    public static final int kDArmExtension = 0;
+
+    public static final int kPWristAngle = 0;
+    public static final int kIWristAngle = 0;
+    public static final int kDWristAngle = 0;
 
     public static final double kArmConversionFactor = 1;
     public static final double kWristConversionFactor = 2;
