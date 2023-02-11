@@ -11,14 +11,11 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import team1403.lib.device.GyroscopeDevice;
+import team1403.lib.core.CougarLibInjectedParameters;
+import team1403.lib.core.CougarSubsystem;
 import team1403.lib.device.wpi.NavxAhrs;
 import team1403.lib.util.CougarLogger;
 import team1403.lib.util.SwerveDriveOdometry;
-
-import team1403.lib.core.CougarLibInjectedParameters;
-import team1403.lib.core.CougarSubsystem;
-
 import team1403.robot.chargedup.RobotConfig.CanBus;
 import team1403.robot.chargedup.RobotConfig.SwerveConfig;
 
@@ -37,7 +34,7 @@ public class SwerveSubsystem extends CougarSubsystem {
   private double m_desiredHeading = 0;
   private double m_speedLimiter = 0.6;
 
-  private double calc = 0;
+  private double m_calc = 0;
 
   /**
    * Creates a new {@link SwerveSubsystem}.
@@ -70,11 +67,9 @@ public class SwerveSubsystem extends CougarSubsystem {
     m_navx2 = new NavxAhrs("Gyroscope");
     addDevice(m_navx2.getName(), m_navx2);
     new Thread(() -> {
-      int time = 0;
-      while(m_navx2.isCalibrating()) {
+      while (m_navx2.isCalibrating()) {
         try {
           Thread.sleep(10);
-          time+=10;
         } catch (InterruptedException e) {
           e.printStackTrace();
         }
@@ -85,7 +80,7 @@ public class SwerveSubsystem extends CougarSubsystem {
 
     m_odometer = new SwerveDriveOdometry(
       SwerveConfig.kDriveKinematics,
-      new Rotation2d(), getModulePositions(), new Pose2d());
+        new Rotation2d(), getModulePositions(), new Pose2d());
 
     m_desiredHeading = getGyroscopeRotation().getDegrees();
     SmartDashboard.putNumber("Desired Heading", m_desiredHeading);
@@ -159,7 +154,7 @@ public class SwerveSubsystem extends CougarSubsystem {
    * 'forwards' direction.
    */
   public void zeroGyroscope() {
-    // tracef("zeroGyroscope %d", getGyroscopeRotation());
+    // tracef("zeroGyroscope %f", getGyroscopeRotation());
     m_navx2.reset();
     m_desiredHeading = 0;
   }
@@ -232,7 +227,7 @@ public class SwerveSubsystem extends CougarSubsystem {
       //       states[i].speedMetersPerSecond, 
       //       states[i].angle.getRadians());
       m_modules[i].set((states[i].speedMetersPerSecond 
-      / SwerveConfig.kMaxSpeed) * m_speedLimiter, states[i].angle.getRadians());
+          / SwerveConfig.kMaxSpeed) * m_speedLimiter, states[i].angle.getRadians());
     }
   }
 
@@ -245,15 +240,15 @@ public class SwerveSubsystem extends CougarSubsystem {
     if (Math.abs(m_navx2.getAngularVelocity()) > 0.1) {
       m_desiredHeading = getGyroscopeRotation().getDegrees();
     } else if (translationalVelocity > 1) {
-      calc = m_driftCorrectionPid.calculate(getGyroscopeRotation().getDegrees(),
+      m_calc = m_driftCorrectionPid.calculate(getGyroscopeRotation().getDegrees(),
           m_desiredHeading);
-      SmartDashboard.putNumber("Calc Drift Correction", calc);
-      if (Math.abs(calc) >= 0.55) {
-        m_chassisSpeeds.omegaRadiansPerSecond += calc;
+      SmartDashboard.putNumber("Calc Drift Correction", m_calc);
+      if (Math.abs(m_calc) >= 0.55) {
+        m_chassisSpeeds.omegaRadiansPerSecond += m_calc;
         SmartDashboard.putNumber("Omega Radians Correction", m_chassisSpeeds.omegaRadiansPerSecond);
       }
       tracef("driftCorrection %f, corrected omegaRadiansPerSecond %f", 
-            calc, m_chassisSpeeds.omegaRadiansPerSecond);
+            m_calc, m_chassisSpeeds.omegaRadiansPerSecond);
     }
   }
 

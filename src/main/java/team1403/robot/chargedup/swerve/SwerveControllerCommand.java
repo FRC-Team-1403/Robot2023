@@ -6,20 +6,18 @@ package team1403.robot.chargedup.swerve;
 
 import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import java.util.function.Supplier;
 
 /**
  * A command that uses two PID controllers ({@link PIDController}) and a ProfiledPIDController
@@ -54,13 +52,12 @@ public class SwerveControllerCommand extends CommandBase {
    * @param trajectory The trajectory to follow.
    * @param pose A function that supplies the robot pose - use one of the odometry classes to
    *     provide this.
-   * @param kinematics The kinematics for the robot drivetrain.
    * @param xController The Trajectory Tracker PID controller for the robot's x position.
    * @param yController The Trajectory Tracker PID controller for the robot's y position.
    * @param thetaController The Trajectory Tracker PID controller for angle for the robot.
    * @param desiredRotation The angle that the drivetrain should be facing. This is sampled at each
    *     time step.
-   * @param requirements The subsystems to require.
+   * @param subsystem The subsystems to require.
    */
   public SwerveControllerCommand(
       Trajectory trajectory,
@@ -100,7 +97,7 @@ public class SwerveControllerCommand extends CommandBase {
    * @param xController The Trajectory Tracker PID controller for the robot's x position.
    * @param yController The Trajectory Tracker PID controller for the robot's y position.
    * @param thetaController The Trajectory Tracker PID controller for angle for the robot.
-   * @param requirements The subsystems to require.
+   * @param subsystem The subsystems to require.
    */
   public SwerveControllerCommand(
       Trajectory trajectory,
@@ -137,7 +134,7 @@ public class SwerveControllerCommand extends CommandBase {
    * @param pose A function that supplies the robot pose - use one of the odometry classes to
    *     provide this.
    * @param controller The HolonomicDriveController for the drivetrain.
-   * @param requirements The subsystems to require.
+   * @param subsystem The subsystems to require.
    */
   public SwerveControllerCommand(
       Trajectory trajectory,
@@ -167,7 +164,7 @@ public class SwerveControllerCommand extends CommandBase {
    * @param controller The HolonomicDriveController for the drivetrain.
    * @param desiredRotation The angle that the drivetrain should be facing. This is sampled at each
    *     time step.
-   * @param requirements The subsystems to require.
+   * @param subsystem The subsystems to require.
    */
   public SwerveControllerCommand(
       Trajectory trajectory,
@@ -205,13 +202,13 @@ public class SwerveControllerCommand extends CommandBase {
     m_subsystem.drive(targetChassisSpeeds);
   }
 
-//   @Override
-//   public void end(boolean interrupted) {
-//     m_timer.stop();
-//   }
+  //   @Override
+  //   public void end(boolean interrupted) {
+  //     m_timer.stop();
+  //   }
 
-//   @Override
-//   public boolean isFinished() {
-//     return m_timer.hasElapsed(m_trajectory.getTotalTimeSeconds());
-//   }
+  //   @Override
+  //   public boolean isFinished() {
+  //     return m_timer.hasElapsed(m_trajectory.getTotalTimeSeconds());
+  //   }
 }

@@ -2,21 +2,13 @@ package team1403.robot.chargedup;
 
 import java.util.List;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import team1403.lib.core.CougarLibInjectedParameters;
@@ -26,12 +18,7 @@ import team1403.lib.util.CougarLogger;
 import team1403.robot.chargedup.cse.CougarScriptObject;
 import team1403.robot.chargedup.cse.CougarScriptReader;
 import team1403.robot.chargedup.swerve.SwerveCommand;
-import team1403.robot.chargedup.swerve.SwerveControllerCommand;
 import team1403.robot.chargedup.swerve.SwerveDrivePath;
-import team1403.robot.chargedup.RobotConfig.OperatorConfig;
-import team1403.robot.chargedup.arm.Arm;
-import team1403.robot.chargedup.arm.ArmCommands;
-import team1403.robot.chargedup.swerve.SwerveCommand;
 import team1403.robot.chargedup.swerve.SwerveSubsystem;
 
 /**
@@ -73,65 +60,23 @@ public class CougarRobotImpl extends CougarRobot {
   public Command getAutonomousCommand() {
     return m_reader.importScript("ForwardsBackwards.json");
   } 
-  // @Override
-  // public Command getAutonomousCommand() {
-    // 1. Create trajectory settings
-    // TrajectoryConfig trajectoryConfig = new TrajectoryConfig(
-    //     RobotConfig.SwerveConfig.kMaxSpeed/4,
-    //     RobotConfig.SwerveConfig.kMaxAngularSpeed/3).setKinematics(RobotConfig.SwerveConfig.kDriveKinematics);
+  
 
-    //     // 2. Generate trajectory
-    // Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
-    //     new Pose2d(0, 0, new Rotation2d(0)),
-    //     List.of(
-    //         new Translation2d(0, -1)
-    //         ),
-    //     new Pose2d(0, -2, Rotation2d.fromDegrees(0)),
-    //     trajectoryConfig);
+  //   /**
+  //    * Configures the operator commands and their bindings.
+  //    */
+  //   private void configureOperatorInterface() {
+  //     XboxController xboxOperator = getJoystick("Operator", OperatorConfig.pilotPort);
 
-    //   System.out.println("States: " + trajectory.getStates());
-    // // 3. Define PID controllers for tracking trajectory
-    // double kP = 5.5;
-    // double kI = 0;
-    // double kD = 0.4;
-    // PIDController xController = new PIDController(kP, kI, kD);
-    // PIDController yController = new PIDController(kP, kI, kD);
-    // ProfiledPIDController thetaController = new ProfiledPIDController(
-    //     0.0, 0, 0, RobotConfig.SwerveConfig.kThetaControllerConstraints);
-    // thetaController.enableContinuousInput(-Math.PI, Math.PI);
-
-    // // 4. Construct command to follow trajectory
-    // SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
-    //     trajectory,
-    //     m_swerveSubsystem::getPose,
-    //     xController,
-    //     yController,
-    //     thetaController,
-    //     m_swerveSubsystem);
-
-    // // 5. Add some init and wrap-up, and return everything
-    // // return new SequentialCommandGroup(
-    // //     new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry()),
-    // //     swerveControllerCommand,
-    // //     new InstantCommand(() -> m_drivetrainSubsystem.stop()));
-    // return swerveControllerCommand;
-  // }
-
-  /**
-   * Configures the operator commands and their bindings.
-   */
-  private void configureOperatorInterface() {
-    XboxController xboxOperator = getJoystick("Operator", OperatorConfig.pilotPort);
-
-//     new Trigger(() -> xboxOperator.getYButton()).onFalse(
-//         new InstantCommand(() -> switchOperatorMode()));
+  //     new Trigger(() -> xboxOperator.getYButton()).onFalse(
+  //         new InstantCommand(() -> switchOperatorMode()));
     
-//     if (m_armOperatorManual) {
-//       manualOperatorMode(xboxOperator);
-//     } else {
-//       autoOperatorMode(xboxOperator);
-//   }
-}
+  //     if (m_armOperatorManual) {
+  //       manualOperatorMode(xboxOperator);
+  //     } else {
+  //       autoOperatorMode(xboxOperator);
+  //   }
+  // }
 
   /**
    * Configures the driver commands and their bindings.
@@ -162,11 +107,6 @@ public class CougarRobotImpl extends CougarRobot {
     new Trigger(() -> xboxDriver.getBButton()).onFalse(
       new InstantCommand(() -> m_swerveSubsystem.zeroGyroscope()));
     
-    // SwerveTestPID testPid = new SwerveTestPID(m_swerveSubsystem);
-
-    // RepeatCommand repeatTestPid = new RepeatCommand(testPid);
-
-    // new Trigger(() -> xboxDriver.getAButton()).whileTrue(repeatTestPid);
   }
 
   /**
@@ -180,9 +120,6 @@ public class CougarRobotImpl extends CougarRobot {
 
       Translation2d flippedXandY = new Translation2d(
           startPose.getY() * feetToMeters, startPose.getX() * feetToMeters);
-
-      // Translation2d correctXandY = new Translation2d(
-      //     startPose.getX() * feetToMeters * -1, startPose.getY() * feetToMeters * -1);
 
       Rotation2d theta = new Rotation2d(
           startPose.getRotation().getDegrees());

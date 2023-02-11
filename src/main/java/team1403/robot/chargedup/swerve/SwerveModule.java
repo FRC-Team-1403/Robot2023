@@ -1,6 +1,5 @@
 package team1403.robot.chargedup.swerve;
 
-import org.opencv.calib3d.StereoBM;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
@@ -22,6 +21,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import team1403.lib.device.Device;
 import team1403.lib.device.Encoder;
 import team1403.lib.device.wpi.CougarSparkMax;
@@ -229,7 +229,8 @@ public class SwerveModule implements Device {
 
     // Angle to be changed is now in radians
     double referenceAngleRadians = steerAngle;
-    double currentAngleRadians = m_steerMotor.getSelectedSensorPosition() * SwerveConfig.kSteerRelativeEncoderPositionConversionFactor;
+    double currentAngleRadians = m_steerMotor.getSelectedSensorPosition() 
+        * SwerveConfig.kSteerRelativeEncoderPositionConversionFactor;
 
     // Reset the NEO's encoder periodically when the module is not rotating.
     // Sometimes (~5% of the time) when we initialize, the absolute encoder isn't
