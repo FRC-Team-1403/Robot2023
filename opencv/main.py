@@ -1,9 +1,6 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
 import cv2
+import time
 import numpy as np
 
 resize_size = 60
@@ -15,17 +12,24 @@ print(feature_txt.shape)
 label_txt = np.loadtxt("label.txt", np.float32).reshape((feature_txt.shape[0], 1))
 knn.train(feature_txt, cv2.ml.ROW_SAMPLE, label_txt)
 
-vid = cv2.VideoCapture(2)
+vid = cv2.VideoCapture(0, cv2.CAP_V4L2)
+vid.set(cv2.CAP_PROP_FRAME_WIDTH, 400)
+vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 300)
+
 
 H_low = 9
 H_high = 52
 S_low = 100
 S_high = 255
-V_low = 115
+V_low = 165
 V_high = 255
 
-print(np.array([[ord('c')]], dtype=np.float32).shape)
-print(label_txt.shape)
+debug_msg = False
+debug_pic = False
+
+if(debug_msg):
+    print(np.array([[ord('c')]], dtype=np.float32).shape)
+    print(label_txt.shape)
 
 
 def label_img(frame):
@@ -34,7 +38,6 @@ def label_img(frame):
     cv2.destroyWindow("looks good?")
     if (key == 'u' or key == 's' or key == 'h'):
         arr = frame.reshape(1, resize_size ** 2)
-
         return np.array([[ord(key)]], dtype=np.float32), arr
     else:
         return ()
@@ -52,7 +55,7 @@ def callback(x):
     V_high = cv2.getTrackbarPos('high V', 'controls')
 
 
-recal = False
+recal = True
 
 # create a seperate window named 'controls' for trackbar
 
@@ -70,26 +73,29 @@ if (recal):
     cv2.createTrackbar('low V', 'controls', V_low, 255, callback)
     cv2.createTrackbar('high V', 'controls', V_high, 255, callback)
 
-min_cone_area = 2500
+min_cone_area = 1000
 
 # cone_vert_mask = cv2.imread("cone_upward.png")
 # cone_vert_mask = cv2.cvtColor(cone_vert_mask, cv2.COLOR_BGR2GRAY)
 # cone_vert_mask = cv2.resize(cone_vert_mask, (80, 160))
 
-while True:
 
+
+while True:
+    start = time.process_time()
     _, frame = vid.read()
 
-    frame = cv2.bilateralFilter(frame, 13, 21, 31)
+    #frame = cv2.bilateralFilter(frame, 3, 21, 31)
+    frame = cv2.GaussianBlur(frame, (3,3), 0)
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
     hsv_low = np.array([H_low, S_low, V_low])
     hsv_high = np.array([H_high, S_high, V_high])
-
-    inrange = cv2.inRange(hsv, hsv_low, hsv_high)
-    new_img = cv2.bitwise_and(frame, frame, mask=inrange)
+    
+    new_img = cv2.bitwise_and(frame, frame, mask=cv2.inRange(hsv, hsv_low, hsv_high))
 
     new_img_gray = cv2.cvtColor(new_img, cv2.COLOR_BGR2GRAY)
+    mask = np.zeros(new_img_gray.shape[:2], dtype=new_img_gray.dtype)
     # new_img_gray2 = cv2.adaptiveThreshold(new_img_gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 11, 2)
     # new_img_gray = cv2.Canny(new_img_gray, 100,200)
     (contours2, _) = cv2.findContours(new_img_gray, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -98,66 +104,66 @@ while True:
 
     for cont in contours2:
         x, y, w, h = cv2.boundingRect(cont)
-        if (w / h >= 0.5 and w / h <= 1.8 and cv2.contourArea(cont) >= min_cone_area):
+        if (w / h >= 0.5 and w / h <= 1.8 and w*h >= min_cone_area):
             contours.append(cont)
 
     if (len(contours) > 0):
         cont = max(contours, key=cv2.contourArea)
-        if (cv2.contourArea(cont) >= min_cone_area):
-            cv2.drawContours(frame, [cont], -1, 255, -1)
-            x, y, w, h = cv2.boundingRect(cont)
+        cv2.drawContours(frame, [cont], -1, 255, -1)
+        x, y, w, h = cv2.boundingRect(cont)
+        if(debug_pic):
             cone = frame[y: y + h, x: x + w]
 
-            hull = cv2.convexHull(cont)
-            mask = np.zeros(new_img_gray.shape[:2], dtype=new_img_gray.dtype)
+        hull = cv2.convexHull(cont)
 
-            cv2.drawContours(mask, [cont], -1, 255, -1)
-            mask = mask[y: y + h, x: x + w]
-            # hull2 = cv2.convexHull(cont, returnPoints = False)
-            # if(len(hull) > 0):
-            # defects = cv2.convexityDefects(cont, hull2)
-            # for i in range(defects.shape[0]):
-            # s, e, f, d = defects[i, 0]
-            # start = tuple(cont[s][0])
-            # end = tuple(cont[e][0])
-            # far = tuple(cont[f][0])
-            # cv2.line(frame, start, end, [0, 255, 0], 2)
-            # cv2.circle(frame, far, 5, [0, 0, 255], -1)
+        cv2.drawContours(mask, [cont], -1, 255, -1)
+        mask = mask[y: y + h, x: x + w]
+        # hull2 = cv2.convexHull(cont, returnPoints = False)
+        # if(len(hull) > 0):
+        # defects = cv2.convexityDefects(cont, hull2)
+        # for i in range(defects.shape[0]):
+        # s, e, f, d = defects[i, 0]
+        # start = tuple(cont[s][0])
+        # end = tuple(cont[e][0])
+        # far = tuple(cont[f][0])
+        # cv2.line(frame, start, end, [0, 255, 0], 2)
+        # cv2.circle(frame, far, 5, [0, 0, 255], -1)
 
-            cv2.drawContours(frame, [hull], -1, (0, 255, 0))
+        cv2.drawContours(frame, [hull], -1, (0, 255, 0))
 
-            # print(w / h)
+        # print(w / h)
 
-            mask = cv2.resize(mask, (resize_size, resize_size))
+        mask = cv2.resize(mask, (resize_size, resize_size))
 
-            resized_mask = mask.copy()
+        resized_mask = mask.copy()
 
-            resized_mask = resized_mask.reshape((1, resize_size ** 2)).astype(np.float32)
+        resized_mask = resized_mask.reshape((1, resize_size ** 2)).astype(np.float32)
 
-            _, result, nears, dists = knn.findNearest(resized_mask, 5)
+        _, result, nears, dists = knn.findNearest(resized_mask, 5)
 
-            if (dists[0][0] >= 1000000):
+        if (dists[0][0] >= 1000000):
+            if(debug_msg):
                 print("result: " + str(int(result)))
-                print("score; " + str(dists[0][0]))
+                print("score: " + str(dists[0][0]))
 
-                if (int(result) == 117):
-                    cv2.putText(frame, 'Upward Cone', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2,
-                                cv2.LINE_AA)
-                if (int(result) == 115):
-                    cv2.putText(frame, 'Sideways Cone', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2,
-                                cv2.LINE_AA)
-                if (int(result) == 104):
-                    cv2.putText(frame, 'Headon Cone', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2,
-                                cv2.LINE_AA)
+        if (int(result) == 117):
+            cv2.putText(frame, 'Upward Cone', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
+                        cv2.LINE_AA)
+        if (int(result) == 115):
+            cv2.putText(frame, 'Sideways Cone', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
+                        cv2.LINE_AA)
+        if (int(result) == 104):
+            cv2.putText(frame, 'Head on Cone', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
+                        cv2.LINE_AA)
 
+        if(debug_msg):
             print(mask.shape)
 
-    cv2.imshow('raw', frame)
-    cv2.imshow('hsv', hsv)
-    cv2.imshow('inrange', new_img_gray)
+    cv2.putText(frame, str(int(1 / (time.process_time() - start))) + " FPS" , (50,200), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2, cv2.LINE_AA)
+    cv2.imshow('frame', frame)
 
     # cv2.imshow('wow', new_img_gray2)
-    if (len(contours) > 0 and cv2.contourArea(cont) >= min_cone_area):
+    if (len(contours) > 0 and cv2.contourArea(cont) >= min_cone_area and debug_pic):
         cv2.imshow('cone', cone)
         cv2.imshow('contour', mask)
         # if (mask.shape[0] == cone_vert_mask.shape[0] and mask.shape[1] == cone_vert_mask.shape[1]):
