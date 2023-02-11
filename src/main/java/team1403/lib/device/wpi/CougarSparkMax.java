@@ -56,9 +56,13 @@ public final class CougarSparkMax extends CANSparkMax implements AdvancedMotorCo
     super(channel, motorType);
     m_name = name;
     m_logger = logger;
-    m_encoder = encoderType != SparkMaxRelativeEncoder.Type.kNoSensor
-        ? new EmbeddedEncoder(name + ".Encoder", getEncoder(encoderType, 4096))
-        : null;
+    if (encoderType == SparkMaxRelativeEncoder.Type.kNoSensor) {
+      m_encoder = null;
+    } else if (encoderType == SparkMaxRelativeEncoder.Type.kHallSensor) {
+      m_encoder = new EmbeddedEncoder(name + ".Encoder", getEncoder(encoderType, 42));
+    } else {
+      m_encoder = new EmbeddedEncoder(name + ".Encoder", getEncoder(encoderType, 4096));
+    }
     m_currentSensor = new EmbeddedCurrentSensor(name + ".CurrentSensor");
   }
 
@@ -199,22 +203,22 @@ public final class CougarSparkMax extends CANSparkMax implements AdvancedMotorCo
     }
 
     @Override
-    public final double getPositionTicks() {
+    public final double getPositionValue() {
       return m_encoder.getPosition();
     }
 
     @Override
-    public final double getRpm() {
+    public final double getVelocityValue() {
       return m_encoder.getVelocity();
     }
 
     @Override
-    public void setPositionTickConversionFactor(double conversionFactor) {
+    public void setPositionConversionFactor(double conversionFactor) {
       m_encoder.setPositionConversionFactor(conversionFactor);
     }
 
     @Override
-    public void setVelocityTickConversionFactor(double conversionFactor) {
+    public void setVelocityConversionFactor(double conversionFactor) {
       m_encoder.setVelocityConversionFactor(conversionFactor);
     }
 
@@ -223,11 +227,6 @@ public final class CougarSparkMax extends CANSparkMax implements AdvancedMotorCo
       m_encoder.setPosition(position);
     }
     
-    @Override
-    public double getVelocityTicks() {
-      return m_encoder.getVelocity();
-    }
-
     private final String m_encoderName;
     private final RelativeEncoder m_encoder;
     

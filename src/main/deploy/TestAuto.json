@@ -1,0 +1,32 @@
+[
+    {
+        "Parameters": {
+            "x": 0,
+            "angle": 0,
+            "y": 0
+        },
+        "CommandName": "SetStartPosition"
+    },
+    {
+        "Parameters": {
+            "Waypoints": [
+                {
+                    "x": 0,
+                    "y": 4
+                },
+                {
+                    "x": 0,
+                    "y": 2
+                },
+                {
+                    "x": 0,
+                    "y": 0
+                }
+            ],
+            "EndAngle": 0,
+            "StartAngle": 0,
+            "Inverted": false
+        },
+        "CommandName": "DrivePath"
+    }
+]

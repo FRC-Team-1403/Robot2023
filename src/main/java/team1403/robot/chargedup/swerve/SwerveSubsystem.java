@@ -7,16 +7,18 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import team1403.lib.core.CougarLibInjectedParameters;
-import team1403.lib.core.CougarSubsystem;
 import team1403.lib.device.GyroscopeDevice;
 import team1403.lib.device.wpi.NavxAhrs;
 import team1403.lib.util.CougarLogger;
+import team1403.lib.util.SwerveDriveOdometry;
+
+import team1403.lib.core.CougarLibInjectedParameters;
+import team1403.lib.core.CougarSubsystem;
+
 import team1403.robot.chargedup.RobotConfig.CanBus;
 import team1403.robot.chargedup.RobotConfig.SwerveConfig;
 
@@ -49,18 +51,18 @@ public class SwerveSubsystem extends CougarSubsystem {
     super("Swerve Subsystem", parameters);
     CougarLogger logger = getLogger();
     m_modules = new SwerveModule[] {
-        new SwerveModule("Back Right Module",
-            CanBus.backRightDriveId, CanBus.backRightSteerId,
-            CanBus.backRightEncoderId, SwerveConfig.backRightEncoderOffset, logger),
-        new SwerveModule("Back Left Module",
-            CanBus.backLeftDriveId, CanBus.backLeftSteerId,
-            CanBus.backLeftEncoderId, SwerveConfig.backLeftEncoderOffset, logger),
         new SwerveModule("Front Left Module",
             CanBus.frontLeftDriveId, CanBus.frontLeftSteerId,
             CanBus.frontLeftEncoderId, SwerveConfig.frontLeftEncoderOffset, logger),
         new SwerveModule("Front Right Module",
             CanBus.frontRightDriveId, CanBus.frontRightSteerId,
-            CanBus.frontRightEncoderId, SwerveConfig.frontRightEncoderOffset, logger)
+            CanBus.frontRightEncoderId, SwerveConfig.frontRightEncoderOffset, logger),
+        new SwerveModule("Back Left Module",
+            CanBus.backLeftDriveId, CanBus.backLeftSteerId,
+            CanBus.backLeftEncoderId, SwerveConfig.backLeftEncoderOffset, logger),
+        new SwerveModule("Back Right Module",
+            CanBus.backRightDriveId, CanBus.backRightSteerId,
+            CanBus.backRightEncoderId, SwerveConfig.backRightEncoderOffset, logger),
     };
 
     m_odometer = new SwerveDriveOdometry(
@@ -154,6 +156,10 @@ public class SwerveSubsystem extends CougarSubsystem {
     return m_odometer.getPoseMeters();
   }
 
+  public void setPose(Pose2d pose) {
+    m_odometer.setPoseMeters(pose);
+  }
+
   /**
    * Reset the position of the drivetrain odometry.
    */
@@ -178,6 +184,7 @@ public class SwerveSubsystem extends CougarSubsystem {
    */
   public void drive(ChassisSpeeds chassisSpeeds) {
     m_chassisSpeeds = chassisSpeeds;
+    SmartDashboard.putString("chassisSpeeds X", m_chassisSpeeds.toString());
   }
 
   /**
@@ -187,28 +194,29 @@ public class SwerveSubsystem extends CougarSubsystem {
    */
   public void setModuleStates(SwerveModuleState[] states) {
     // Prevent wheels from going back to 0 degrees as the default state.
-    if (states[0].speedMetersPerSecond < 0.001) {
-      for (int i = 0; i < m_modules.length; i++) {
-        tracef("ModuleState of %s. Speed: %f, Angle: %f", 
-            m_modules[i].getName(), 
-            states[i].speedMetersPerSecond, 
-            states[i].angle.getRadians());
+    // if (states[0].speedMetersPerSecond < 0.001) {
+    //   for (int i = 0; i < m_modules.length; i++) {
+    //     // tracef("ModuleState of %s. Speed: %f, Angle: %f", 
+    //     //     m_modules[i].getName(), 
+    //     //     states[i].speedMetersPerSecond, 
+    //     //     states[i].angle.getRadians());
         
-        m_modules[i].set(0, m_modules[i].getSteerAngle());
-      }
-      return;
-    }
+    //     m_modules[i].set(0, m_modules[i].getSteerAngle());
+    //   }
+    //   return;
+    // }
 
     SwerveDriveKinematics.desaturateWheelSpeeds(states, SwerveConfig.kMaxSpeed);
 
-    for (int i = 0; i < m_modules.length; i++) {
-      tracef("ModuleState of %s. Speed: %f, Angle: %f", 
-            m_modules[i].getName(), 
-            states[i].speedMetersPerSecond, 
-            states[i].angle.getRadians());
 
-      m_modules[i].set((states[i].speedMetersPerSecond
-          / SwerveConfig.kMaxSpeed) * m_speedLimiter, states[i].angle.getRadians());
+    for (int i = 0; i < m_modules.length; i++) {
+      // tracef("ModuleState of %s. Speed: %f, Angle: %f", 
+      //       m_modules[i].getName(), 
+      //       states[i].speedMetersPerSecond, 
+      //       states[i].angle.getRadians());
+      states[i].speedMetersPerSecond = (states[i].speedMetersPerSecond 
+          / SwerveConfig.kMaxSpeed) * m_speedLimiter;
+      m_modules[i].set(states[i]);
     }
   }
 
@@ -242,8 +250,11 @@ public class SwerveSubsystem extends CougarSubsystem {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Gyro Reading", getGyroscopeRotation().getDegrees());
+    SmartDashboard.putNumber("back right angle", m_modules[0].getSteerAngle());
+    SmartDashboard.putNumber("back left angle", m_modules[1].getSteerAngle());
+    SmartDashboard.putNumber("front left angle", m_modules[2].getSteerAngle());
+    SmartDashboard.putNumber("front right angle", m_modules[3].getSteerAngle());
     m_odometer.update(getGyroscopeRotation(), getModulePositions());
-    SmartDashboard.putString("Odometry", m_odometer.getPoseMeters().toString());
 
     driftCorrection();
 
