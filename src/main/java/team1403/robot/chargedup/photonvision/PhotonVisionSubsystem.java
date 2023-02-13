@@ -5,7 +5,6 @@
 package team1403.robot.chargedup.photonvision;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import edu.wpi.first.wpilibj.XboxController;
@@ -22,7 +21,6 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.networktables.NetworkTable;
@@ -31,49 +29,30 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import team1403.lib.device.Limelight;
 
 public class PhotonVisionSubsystem extends SubsystemBase {
-  
   private PhotonCamera limeLight;
   private PhotonPoseEstimator photonPoseEstimator;
   private PhotonPipelineResult result;
-  private List<Pose3d> targetPoses;
-  // private boolean hasTargets;
-  // private List<PhotonTrackedTarget> targets;
   private PhotonTrackedTarget target = new PhotonTrackedTarget();
   private double previousPipelineTimestamp =0;
   private Transform3d CAM_TO_ROBOT;
-  private Shuffleboard shuffleboard;
-  private NetworkTableEntry networkTableEntry;
   private static NetworkTable table; 
-  private CameraServer cameraServer;
-  private int AprilTagIndex;
-  private int TapeIndex;
   private Transform3d camToTarget;
   private Transform3d camToTargetTape;
-
-  private int indexNum = 1;
-
-  private NetworkTableEntry pipelineEntry;
-  private XboxController m_Controller;
+  private double XDistance;
+  private double YDistance;
+  private double ZDistance;
   private ArrayList<AprilTag> tagList;
   private AprilTagFieldLayout fieldLayout;
-  private int tapeX;
-  private int tapeY;
-  private int tapeZ;
 
   public PhotonVisionSubsystem() {
 
-    // int currentIndex = limeLight.getPipelineIndex();
 
     table = NetworkTableInstance.getDefault().getTable("OV5647");
-    m_Controller = new XboxController(0);
 
     PortForwarder.add(5810, "photonvision.local", 5810);
-    
-    //var cameraPose  = robotPose.transformBy(ROBOT_TO_CAMERA); 
-  
+      
     
     camToTarget =  new Transform3d();
 
@@ -106,10 +85,9 @@ public class PhotonVisionSubsystem extends SubsystemBase {
     photonPoseEstimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.CLOSEST_TO_REFERENCE_POSE, limeLight, CAM_TO_ROBOT);
 
       limeLight =  new PhotonCamera("OV5647");
-      // AprilTagIndex = limeLight.getPipelineIndex();
       
-      pipelineEntry = table.getEntry("pipeline");
-      limeLight.setPipelineIndex(1);
+     // pipelineEntry = table.getEntry("pipeline");
+      limeLight.setPipelineIndex(0);
       // 0: April Tags
       // 1: Reflective Tape
   }
@@ -134,10 +112,10 @@ public class PhotonVisionSubsystem extends SubsystemBase {
       limeLight.setPipelineIndex(0);
     }
   }
+
   @Override
   public void periodic() {
 
-    // Timer.delay(10);
     var pipelineResult = limeLight.getLatestResult();
     var resultTimestamp = pipelineResult.getTimestampSeconds();
     if(resultTimestamp != previousPipelineTimestamp && pipelineResult.hasTargets()){
@@ -149,29 +127,32 @@ public class PhotonVisionSubsystem extends SubsystemBase {
             camToTarget = target.getBestCameraToTarget();
 
         }
-        
-  
     
       }
+
       if(limeLight.getPipelineIndex() == 1){
           camToTargetTape = pipelineResult.getBestTarget().getBestCameraToTarget();
           SmartDashboard.putNumber("X distance for tape", camToTargetTape.getX());
           
       }
-      
+      XDistance = ((1.11*camToTarget.getX())-0.173);
+      YDistance = ((-1.28*Math.pow((camToTarget.getY()), 2)) -(0.668 * camToTarget.getY())-0.3);
+      ZDistance = (camToTarget.getZ()*1.1);
+
+  
+
       SmartDashboard.putNumber("Tag Yaw", target.getYaw());
       SmartDashboard.putNumber("Tag Pitch", target.getPitch());
       SmartDashboard.putNumber("Tag Skew", target.getSkew());
       SmartDashboard.putNumber("Tag FiducialId", target.getFiducialId());
       SmartDashboard.putNumber("Tag Pose Ambiguity",target.getPoseAmbiguity());
-      SmartDashboard.putNumber("Pipeline ID", limeLight.getPipelineIndex());      SmartDashboard.putNumber("X Distance",camToTarget.getX());
+      SmartDashboard.putNumber("Pipeline ID", limeLight.getPipelineIndex());      
+      SmartDashboard.putNumber("X Distance",camToTarget.getX());
       SmartDashboard.putNumber("Y distance ", camToTarget.getY());
       SmartDashboard.putNumber("Z Distance", camToTarget.getZ());
-      SmartDashboard.putNumber("x Distance with offset",((1.11*camToTarget.getX())-0.173));
-      SmartDashboard.putNumber("Y Distance with offset", ((-1.28*Math.pow((camToTarget.getY()), 2)) -(0.668 * camToTarget.getY())-0.3));
-      SmartDashboard.putNumber("Z Distance with offset",camToTarget.getZ()*1.1);
+      SmartDashboard.putNumber("x Distance with offset",XDistance);
+      SmartDashboard.putNumber("Y Distance with offset", YDistance);
+      SmartDashboard.putNumber("Z Distance with offset", ZDistance);
 
-      
-    
   }
-  }
+}

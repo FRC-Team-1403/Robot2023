@@ -58,8 +58,9 @@ public class CougarRobotImpl extends CougarRobot {
 
     m_visionSubsystem = new PhotonVisionSubsystem();
 
-    var scheduler = CommandScheduler.getInstance();
-    scheduler.registerSubsystem(m_builtins);
+    m_arm = new Arm(parameters);
+    m_swerveSubsystem = new SwerveSubsystem(parameters);
+ 
 
     configureOperatorInterface();
     configureDriverInterface();
@@ -79,7 +80,7 @@ public class CougarRobotImpl extends CougarRobot {
     XboxController xboxOperator = getJoystick("Driver", OperatorConfig.pilotPort);
 
     new Trigger(() -> xboxOperator.getYButton()).onFalse(
-        new InstantCommand(() -> m_visionSubsystem.switchOperatorMode()));
+        new InstantCommand(() -> m_visionSubsystem.SwitchPipeline()));
     
     if (m_armOperatorManual) {
       manualOperatorMode(xboxOperator);
@@ -87,7 +88,7 @@ public class CougarRobotImpl extends CougarRobot {
       autoOperatorMode(xboxOperator);
     }
   }
-
+  
   /**
    * Configures the driver commands and their bindings.
    */
@@ -189,4 +190,28 @@ public class CougarRobotImpl extends CougarRobot {
   private final Arm m_arm;
   private boolean m_armOperatorManual = true;
   private final SwerveSubsystem m_swerveSubsystem;
+
+  public void autoOperatorMode(XboxController xboxOperator) {
+    new Trigger(() -> xboxOperator.getAButton()).onFalse(
+      new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+    new Trigger(() -> xboxOperator.getBButton()).onFalse(
+        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadDown)).onFalse(
+        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadUp)).onFalse(
+      new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadRight)).onFalse(
+        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  }
+  
+  private void manualOperatorMode(XboxController xboxOperator) {
+    m_arm.setDefaultCommand(new ArmCommands(m_arm,
+        () -> xboxOperator.getLeftY(),
+        () -> xboxOperator.getRightY(),
+        () -> xboxOperator.getRightTriggerAxis(),
+        () -> xboxOperator.getLeftTriggerAxis()));
+
+  }
+
 }
+

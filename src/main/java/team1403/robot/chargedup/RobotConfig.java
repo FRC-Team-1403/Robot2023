@@ -1,6 +1,5 @@
 package team1403.robot.chargedup;
 
-
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -103,12 +102,27 @@ public class RobotConfig {
    * and understand overall wiring.
    */
   public static class CanBus {
+
+    public static final int wheelIntakeMotor = 1;
+    
+    public static final int telescopicArmMotor = 1;
+
+    public static final int leftAngledArmMotor = 2; 
+
+    public static final int rightAngledArmMotor = 3;
+
+    public static final int wristMotor = 4;
+
+    public static final int frontArmSwitch = 1;
+
+    public static final int backArmSwitch = 2;
+
     /**
      * The can bus port for the rail motor if it is a TalonSRX.
      *
      * <p>Should be -1 if exampleRailSparkMotor was set.
      */
-    public static final int exampleRailMotor = 10;  // talon
+    public static final int exampleRailMotor = 10; // talon
 
     /**
      * The can bus port for the rail motor if it is a SparkMax.
@@ -116,12 +130,30 @@ public class RobotConfig {
      * <p>Should be -1 if exampleRailMotor was set.
      */
     public static final int exampleRailSparkMotor = -1;
+
+    // Swerve CanBus ids
+    public static final int frontLeftDriveId = 1;
+    public static final int frontLeftSteerId = 2;
+    public static final int frontLeftEncoderId = 1;
+
+    public static final int frontRightDriveId = 8;
+    public static final int frontRightSteerId = 3;
+    public static final int frontRightEncoderId = 3;
+
+    public static final int backLeftDriveId = 14;
+    public static final int backLeftSteerId = 4;
+    public static final int backLeftEncoderId = 2;
+
+    public static final int backRightDriveId = 2;
+    public static final int backRightSteerId = 1;
+    public static final int backRightEncoderId = 4;
   }
 
   /**
    * Ports on the RoboRIO.
    */
-  public static class RioPorts {
+  public class RioPorts {
+
     /**
      * The rio port that the forward limit switch uses.
      */
@@ -136,7 +168,13 @@ public class RobotConfig {
   /**
    * Config parameters for tuning the operator interface.
    */
-  public static class OperatorConfig {
+  public class OperatorConfig {
+
+    public static final int dPadUp = 0;
+    public static final int dPadRight = 1;
+    public static final int dPadDown = 2;
+    public static final int dPadLeft = 3;
+
     /**
      * The joystick port for the operator's controller.
      */
@@ -200,24 +238,10 @@ public class RobotConfig {
     public static final double kAngleToMeters = 0;
 
     /**
-     * The default motor speed for commands.
+     * This is the angular threshold to determine at what
+     * point the maximum extenstion of the arm should be
+     * limited by the arm hitting the ground.
      */
-    public static final double motorSpeed = 0.75;
-
-    /**
-     * The minimum motor speed to move.
-     *
-     * <p>Anything less will be considered stopping.
-     */
-    public static final double minSpeed = 0.01;
-
-    /**
-     * Assumed length of rail in encoder ticks.
-     *
-     * <p>This is used if we have no exampleRailReverseLimitSwitch.
-     * In that case we will use a virtual one that will trigger when
-     * the encoder is this far from the front switch.
-     */
-    public static final long virtualBackLimitSwitchTicks = 2000;
+    public static final double kMaxGroundArmLengthThreshold = 0;
   }
 }

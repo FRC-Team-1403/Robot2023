@@ -34,16 +34,16 @@ import team1403.robot.chargedup.RobotConfig.SwerveConfig;
  * Also consists of a absolute encoder to track steer angle.
  */
 public class SwerveModule implements Device {
-  private double m_absoluteEncoderResetIterations = 0;
+  public double m_absoluteEncoderResetIterations = 0;
 
-  private final CougarSparkMax m_driveMotor;
-  private final CougarTalonFx m_steerMotor;
+  public final CougarSparkMax m_driveMotor;
+  public final CougarTalonFx m_steerMotor;
 
-  private final CANCoder m_absoluteEncoder;
-  private final double m_absoluteEncoderOffset;
-  private final Encoder m_driveRelativeEncoder;
-  private final CougarLogger m_logger;
-  private final String m_name;
+  public final CANCoder m_absoluteEncoder;
+  public final double m_absoluteEncoderOffset;
+  public final Encoder m_driveRelativeEncoder;
+  public final CougarLogger m_logger;
+  public final String m_name;
 
   /**
    * Swerve Module represents a singular swerve module for a
@@ -82,7 +82,7 @@ public class SwerveModule implements Device {
     return m_name;
   }
 
-  private void initEncoders() {
+  public void initEncoders() {
     // Config absolute encoder
     CANCoderConfiguration config = new CANCoderConfiguration();
     config.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
@@ -100,7 +100,7 @@ public class SwerveModule implements Device {
 
   }
 
-  private void initSteerMotor() {
+  public void initSteerMotor() {
     TalonFXConfiguration motorConfiguration = new TalonFXConfiguration();
     motorConfiguration.slot0.kP = RobotConfig.SwerveConfig.kPTurning;
     motorConfiguration.slot0.kI = RobotConfig.SwerveConfig.kITurning;
@@ -125,7 +125,7 @@ public class SwerveModule implements Device {
         SwerveConfig.kCanTimeoutMs);
   }
 
-  private void initDriveMotor() {
+  public void initDriveMotor() {
     m_driveMotor.setInverted(true);
     m_driveMotor.setVoltageCompensation(RobotConfig.SwerveConfig.kVoltageSaturation);
     m_driveMotor.setAmpLimit(RobotConfig.SwerveConfig.kCurrentLimit);
@@ -178,7 +178,7 @@ public class SwerveModule implements Device {
    * @param angle angle to be normalized
    * @return angle value between 0 to 2pi
    */
-  private double normalizeAngle(double angle) {
+  public double normalizeAngle(double angle) {
     double normalizedAngle = angle;
 
     normalizedAngle %= (2.0 * Math.PI);
@@ -195,7 +195,7 @@ public class SwerveModule implements Device {
    * @param targetAngle the angle to be moved to
    * @return The steer angle after accounting for error.
    */
-  private double normalizeAngleError(double targetAngle) {
+  public double normalizeAngleError(double targetAngle) {
     // Angle is inbetween 0 to 2pi
     double normalizedAngleError = normalizeAngle(targetAngle);
 
@@ -216,7 +216,7 @@ public class SwerveModule implements Device {
    *
    * @param steerAngle the current steer angle.
    */
-  private double convertSteerAngle(double steerAngle) {
+  public double convertSteerAngle(double steerAngle) {
 
     double newSteerAngle = steerAngle;
 
@@ -283,7 +283,7 @@ public class SwerveModule implements Device {
    * @param steerAngle          the current steer angle.
    * @param driveMetersPerSecond the current drive voltage
    */
-  private double convertDriveMetersPerSecond(double driveMetersPerSecond, double steerAngle) {
+  public double convertDriveMetersPerSecond(double driveMetersPerSecond, double steerAngle) {
 
     double convertedDriveMetersPerSecond = driveMetersPerSecond;
 
