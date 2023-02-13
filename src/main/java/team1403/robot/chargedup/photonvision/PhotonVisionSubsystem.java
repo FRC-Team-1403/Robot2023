@@ -4,6 +4,7 @@
 
 package team1403.robot.chargedup.photonvision;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -11,12 +12,17 @@ import edu.wpi.first.wpilibj.XboxController;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
+
+import edu.wpi.first.apriltag.AprilTag;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.networktables.NetworkTable;
@@ -25,6 +31,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import team1403.lib.device.Limelight;
 
 public class PhotonVisionSubsystem extends SubsystemBase {
   
@@ -43,11 +50,18 @@ public class PhotonVisionSubsystem extends SubsystemBase {
   private CameraServer cameraServer;
   private int AprilTagIndex;
   private int TapeIndex;
+  private Transform3d camToTarget;
+  private Transform3d camToTargetTape;
 
   private int indexNum = 1;
 
   private NetworkTableEntry pipelineEntry;
   private XboxController m_Controller;
+  private ArrayList<AprilTag> tagList;
+  private AprilTagFieldLayout fieldLayout;
+  private int tapeX;
+  private int tapeY;
+  private int tapeZ;
 
   public PhotonVisionSubsystem() {
 
@@ -60,35 +74,44 @@ public class PhotonVisionSubsystem extends SubsystemBase {
     
     //var cameraPose  = robotPose.transformBy(ROBOT_TO_CAMERA); 
   
-    targetPoses = Collections.unmodifiableList(List.of(
-        
-    new Pose3d(610.77,42.19,18.22,new Rotation3d(610.77, 42.19, 18.22)),
-
-    new Pose3d(610.77,108.19,18.22,new Rotation3d(610.77, 108.19, 18.22)),
-
-    new Pose3d(610.77,174.19,18.22, new Rotation3d(610.77, 174.19, 18.22)),
-
-    new Pose3d(610.77,174.19,18.22, new Rotation3d(610.77, 174.19, 18.22)),
-
-    new Pose3d(636.96,265.74,27.38, new Rotation3d(636.96, 265.74, 27.38)),
     
-    new Pose3d(14.25, 265.74,27.38, new Rotation3d(14.25, 265.74, 27.38)), 
+    camToTarget =  new Transform3d();
 
-    new Pose3d(40.45, 174.19,18.22, new Rotation3d(40.45, 174.19, 18.22)),
+    final AprilTag tag01 = new AprilTag(1,new Pose3d(15.51,1.07,0.46,new Rotation3d(15.51,1.07,0.46)));
+
+    final AprilTag tag02 = new AprilTag(2,new Pose3d(15.51,2.75,0.46,new Rotation3d(15.51,2.75,0.46)));
+
+    final AprilTag tag03 = new AprilTag(3, new Pose3d(15.51,4.43,0.46, new Rotation3d(15.51,4.43,0.46)));
+
+    final AprilTag tag04  = new AprilTag(4, new Pose3d(16.18,6.75,0.695, new Rotation3d(16.18,6.75,0.695))); 
+
+    final AprilTag tag05 = new AprilTag(5, new Pose3d(0.36, 6.75,0.695, new Rotation3d(0.36, 6.75,0.695)));
+
+    final AprilTag tag06 = new AprilTag(6,  new Pose3d(1.03, 4.43,0.46, new Rotation3d(1.03, 4.43,0.46))); 
+
+    final AprilTag tag07 = new AprilTag(7,  new Pose3d(1.03, 2.75,0.46, new Rotation3d(1.03, 2.75,0.46))); 
     
-    new Pose3d(40.45, 108.19,18.22, new Rotation3d(40.45, 108.19, 18.22)),
-    
-    new Pose3d(40.45, 42.19, 18.22, new Rotation3d(40.45, 42.19, 18.22))
-    
-    ));
-    
+    final AprilTag tag08 = new AprilTag(8, new Pose3d(1.03, 1.07, 0.46, new Rotation3d(1.03, 1.07, 0.46))); 
+
+    tagList = new ArrayList<AprilTag>();
+    tagList.add(tag01);
+    tagList.add(tag02);
+    tagList.add(tag03);
+    tagList.add(tag04);
+    tagList.add(tag05);
+    tagList.add(tag06);
+    tagList.add(tag07);
+    tagList.add(tag08);
+    fieldLayout = new AprilTagFieldLayout(tagList,16.54  ,8.02 );
+    photonPoseEstimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.CLOSEST_TO_REFERENCE_POSE, limeLight, CAM_TO_ROBOT);
+
       limeLight =  new PhotonCamera("OV5647");
       // AprilTagIndex = limeLight.getPipelineIndex();
       
       pipelineEntry = table.getEntry("pipeline");
       limeLight.setPipelineIndex(1);
-      // 1: April Tags
-      // 0: Reflective Tape
+      // 0: April Tags
+      // 1: Reflective Tape
   }
 
   public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
@@ -104,17 +127,17 @@ public class PhotonVisionSubsystem extends SubsystemBase {
     return result.getBestTarget();
   }
 
+  public void SwitchPipeline(){
+    if(limeLight.getPipelineIndex() == 0){
+      limeLight.setPipelineIndex(1);
+    }else{
+      limeLight.setPipelineIndex(0);
+    }
+  }
   @Override
   public void periodic() {
 
     // Timer.delay(10);
-
-    // if(m_Controller.getAButtonPressed()){
-    //   limeLight.setPipelineIndex(1);
-    // } else {
-    //   limeLight.setPipelineIndex(0);
-    // } 
-
     var pipelineResult = limeLight.getLatestResult();
     var resultTimestamp = pipelineResult.getTimestampSeconds();
     if(resultTimestamp != previousPipelineTimestamp && pipelineResult.hasTargets()){
@@ -122,18 +145,33 @@ public class PhotonVisionSubsystem extends SubsystemBase {
         var target = pipelineResult.getBestTarget();
         var fiducialId = target.getFiducialId();
 
-        if(target.getPoseAmbiguity() <= .2 && fiducialId >= 0 && fiducialId < targetPoses.size() ){
-            var targetpose = targetPoses.get(fiducialId);
-            Transform3d camToTarget = target.getBestCameraToTarget();
+        if(target.getPoseAmbiguity() <= 1 && fiducialId >= 0){
+            camToTarget = target.getBestCameraToTarget();
 
         }
+        
+  
+    
+      }
+      if(limeLight.getPipelineIndex() == 1){
+          camToTargetTape = pipelineResult.getBestTarget().getBestCameraToTarget();
+          SmartDashboard.putNumber("X distance for tape", camToTargetTape.getX());
+          
+      }
+      
       SmartDashboard.putNumber("Tag Yaw", target.getYaw());
       SmartDashboard.putNumber("Tag Pitch", target.getPitch());
       SmartDashboard.putNumber("Tag Skew", target.getSkew());
       SmartDashboard.putNumber("Tag FiducialId", target.getFiducialId());
       SmartDashboard.putNumber("Tag Pose Ambiguity",target.getPoseAmbiguity());
-      SmartDashboard.putNumber("Tag ID", limeLight.getPipelineIndex());
+      SmartDashboard.putNumber("Pipeline ID", limeLight.getPipelineIndex());      SmartDashboard.putNumber("X Distance",camToTarget.getX());
+      SmartDashboard.putNumber("Y distance ", camToTarget.getY());
+      SmartDashboard.putNumber("Z Distance", camToTarget.getZ());
+      SmartDashboard.putNumber("x Distance with offset",((1.11*camToTarget.getX())-0.173));
+      SmartDashboard.putNumber("Y Distance with offset", ((-1.28*Math.pow((camToTarget.getY()), 2)) -(0.668 * camToTarget.getY())-0.3));
+      SmartDashboard.putNumber("Z Distance with offset",camToTarget.getZ()*1.1);
+
       
-    }
+    
   }
   }

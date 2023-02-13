@@ -1,18 +1,15 @@
 package team1403.robot.chargedup;
 
-<<<<<<< HEAD
 import edu.wpi.first.wpilibj.XboxController;
 import team1403.robot.chargedup.photonvision.PhotonVisionSubsystem;
 
 
-=======
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
 import team1403.lib.util.Dimension;
->>>>>>> main
 
 /**
  * This class holds attributes for the robot configuration.

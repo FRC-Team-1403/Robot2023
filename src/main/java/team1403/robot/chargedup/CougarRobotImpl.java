@@ -10,15 +10,12 @@ import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarRobot;
 import team1403.lib.subsystems.BuiltinSubsystem;
 import team1403.lib.util.CougarLogger;
-<<<<<<< HEAD
 import team1403.robot.chargedup.photonvision.PhotonVisionSubsystem;
-=======
 import team1403.robot.chargedup.RobotConfig.OperatorConfig;
 import team1403.robot.chargedup.arm.Arm;
 import team1403.robot.chargedup.arm.ArmCommands;
 import team1403.robot.chargedup.swerve.SwerveCommand;
 import team1403.robot.chargedup.swerve.SwerveSubsystem;
->>>>>>> main
 
 /**
  * The heart of the robot.
@@ -80,6 +77,8 @@ public class CougarRobotImpl extends CougarRobot {
    */
   private void configureDriverInterface() {
     XboxController xboxDriver = getJoystick("Driver", RobotConfig.DriverConfig.pilotPort);
+    XboxController xboxDriver = getJoystick("Driver", RobotConfig.OperatorConfig.pilotPort);
+    new Trigger(() -> xboxDriver.getRawButton(1)).onFalse(new InstantCommand(() -> m_visionSubsystem.SwitchPipeline()));
 
     // Setting default command of swerve subsystem
      m_swerveSubsystem.setDefaultCommand(new SwerveCommand(
@@ -185,13 +184,10 @@ public class CougarRobotImpl extends CougarRobot {
   }
 
   private final BuiltinSubsystem m_builtins;
-<<<<<<< HEAD
   // private final Command m_autoCommand;
 
   private final PhotonVisionSubsystem m_visionSubsystem;
-=======
   private final Arm m_arm;
   private boolean m_armOperatorManual = true;
   private final SwerveSubsystem m_swerveSubsystem;
->>>>>>> main
 }
