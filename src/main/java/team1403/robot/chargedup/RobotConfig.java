@@ -226,7 +226,7 @@ public class RobotConfig {
     public static final double kMaxGroundArmLengthThreshold = 0;
   }
   public static class Lights {
-    public static int portNumber = 9;
+    public static int portNumber = 6;
     public static int ledBufferValue = 60;
   }
 }
