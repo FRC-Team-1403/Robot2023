@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.revrobotics.SparkMaxRelativeEncoder;
 
 import edu.wpi.first.networktables.NetworkTable;
@@ -16,6 +15,7 @@ import team1403.lib.device.CougarAccelerometer;
 import team1403.lib.device.CougarDoubleSolenoid;
 import team1403.lib.device.Device;
 import team1403.lib.device.DeviceFactory;
+import team1403.lib.device.GyroscopeDevice;
 import team1403.lib.device.LimitSwitch;
 import team1403.lib.device.MotorController;
 import team1403.lib.device.NoSuchDeviceError;
@@ -193,7 +193,8 @@ public class MappedDeviceFactory implements DeviceFactory {
   }
 
   @Override
-  public AdvancedMotorController makeCougarTalonFx(String name, int deviceNumber, CougarLogger logger) {
+  public AdvancedMotorController makeCougarTalonFx(String name, int deviceNumber,
+        CougarLogger logger) {
     m_calls.put(name, Arrays.asList(name, deviceNumber, logger));
     return (AdvancedMotorController)takeDevice(name);
   }
@@ -237,6 +238,12 @@ public class MappedDeviceFactory implements DeviceFactory {
   public AnalogDevice makeAnalogDevice(String name, int channel) {
     m_calls.put(name, Arrays.asList(name, Integer.valueOf(channel)));
     return (AnalogDevice)takeDevice(name);
+  }
+
+  @Override
+  public GyroscopeDevice makeGyroscopeDevice(String name) {
+    m_calls.put(name, Arrays.asList(name));
+    return (GyroscopeDevice) takeDevice(name);
   }
   
   private final Map<String, Device> m_deviceMap = new HashMap<>();
