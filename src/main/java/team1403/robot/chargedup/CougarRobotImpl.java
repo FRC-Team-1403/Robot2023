@@ -184,8 +184,6 @@ public class CougarRobotImpl extends CougarRobot {
   }
 
   private final BuiltinSubsystem m_builtins;
-  // private final Command m_autoCommand;
-
   private final PhotonVisionSubsystem m_visionSubsystem;
   private CougarScriptReader m_reader;
   private final Arm m_arm;
