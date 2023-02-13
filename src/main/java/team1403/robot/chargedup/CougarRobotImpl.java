@@ -20,6 +20,7 @@ import team1403.robot.chargedup.cse.CougarScriptReader;
 import team1403.robot.chargedup.photonvision.PhotonVisionSubsystem;
 import team1403.robot.chargedup.swerve.SwerveCommand;
 import team1403.robot.chargedup.swerve.SwerveDrivePath;
+import team1403.robot.chargedup.RobotConfig.DriverConfig;
 import team1403.robot.chargedup.RobotConfig.OperatorConfig;
 import team1403.robot.chargedup.arm.Arm;
 import team1403.robot.chargedup.arm.ArmCommands;
@@ -73,10 +74,10 @@ public class CougarRobotImpl extends CougarRobot {
    * Configures the operator commands and their bindings.
    */
   private void configureOperatorInterface() {
-    XboxController xboxDriver = getJoystick("Driver", OperatorConfig.pilotPort);
+    XboxController xboxOperator = getJoystick("Driver", OperatorConfig.pilotPort);
 
     new Trigger(() -> xboxOperator.getYButton()).onFalse(
-        new InstantCommand(() -> switchOperatorMode()));
+        new InstantCommand(() -> m_visionSubsystem.switchOperatorMode()));
     
     if (m_armOperatorManual) {
       manualOperatorMode(xboxOperator);
