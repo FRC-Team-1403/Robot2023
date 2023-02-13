@@ -149,12 +149,23 @@ public class RobotConfig {
   }
 
   /**
-   * exampleRail subsystem configuration.
-   *
-   * <p>Encapsulates the parameters controlling the rail subsystem behavior.
-   * The device wiring parameters are specified with their respective bus's
-   * configuration.
-   *
+   * Config parameters for tuning the operator interface.
+   */
+  public class DriverConfig {
+
+    /**
+     * The joystick port for the operator's controller.
+     */
+    public static final int pilotPort = 1;
+
+    /**
+     * Encoder ticks from center still considered close enough to be at center.
+     */
+    public static final double seekCenterTolerance = 10.0;
+  }
+
+  /**
+   * class Arm, sets constant values for PID for Arm.java.
    */
   public static class Arm {
 
