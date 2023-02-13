@@ -26,7 +26,7 @@ public class Arm extends CougarSubsystem {
   private final CougarSparkMax m_rightArmAngleMotor;
   private final CougarSparkMax m_wristAngleMotor;
   private final WpiLimitSwitch m_frontLimitSwitch;
-  private final WpiLimitSwitch m_backLimitSwitch;
+  private final WpiLimitSwitch m_telescopicLimitSwitch;
   private final PIDController m_pidArmAngle;
   private final PIDController m_pidWristAngle;
   private final PIDController m_pidArmLength;
@@ -66,7 +66,7 @@ public class Arm extends CougarSubsystem {
     m_frontLimitSwitch = new WpiLimitSwitch("frontSwitch",
     RobotConfig.RioPorts.exampleRailForwardLimitSwitch);
 
-    m_backLimitSwitch = new WpiLimitSwitch("backSwitch",
+    m_telescopicLimitSwitch = new WpiLimitSwitch("telescopicLimitSwitch",
     RobotConfig.RioPorts.exampleRailReverseLimitSwitch);
 
     m_rightArmAngleMotor.setInverted(true);
@@ -393,8 +393,8 @@ public class Arm extends CougarSubsystem {
    *
    * @return if back limit switch is triggered
    */
-  public boolean isBackSwitchActive() {
-    return m_backLimitSwitch.isTriggered();
+  public boolean isTelescopicSwitchActive() {
+    return m_telescopicLimitSwitch.isTriggered();
   }
 
   /**
@@ -438,10 +438,14 @@ public class Arm extends CougarSubsystem {
 
   @Override
   public void periodic() {
-    if (isFrontSwitchActive() || isBackSwitchActive() || !isArmAngleWithinBounds()
+    if (isFrontSwitchActive() || !isArmAngleWithinBounds()
         || getCurrentAmps() <= RobotConfig.Arm.kMaxAmperage) {
       setArmAngleMotorSpeed(0);
       return;
+    }
+
+    if (isTelescopicSwitchActive()) {
+      setArmExtensionMotorSpeed(0);
     }
 
     if (isWristAngleWithinBounds()) {
