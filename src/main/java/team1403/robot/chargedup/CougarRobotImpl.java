@@ -77,7 +77,6 @@ public class CougarRobotImpl extends CougarRobot {
    */
   private void configureDriverInterface() {
     XboxController xboxDriver = getJoystick("Driver", RobotConfig.DriverConfig.pilotPort);
-    XboxController xboxDriver = getJoystick("Driver", RobotConfig.OperatorConfig.pilotPort);
     new Trigger(() -> xboxDriver.getRawButton(1)).onFalse(new InstantCommand(() -> m_visionSubsystem.SwitchPipeline()));
 
     // Setting default command of swerve subsystem
