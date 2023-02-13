@@ -1,5 +1,6 @@
 package team1403.robot.chargedup.swerve;
 
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
@@ -20,6 +21,7 @@ import com.revrobotics.SparkMaxRelativeEncoder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import team1403.lib.device.Device;
 import team1403.lib.device.Encoder;
@@ -89,6 +91,7 @@ public class SwerveModule implements Device {
       System.err.println("CANCoder magnetic field strength is unacceptable.");
     }
     CANCoderConfiguration config = new CANCoderConfiguration();
+    m_absoluteEncoder.setPositionToAbsolute();
     config.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
     config.magnetOffsetDegrees = Math.toDegrees(this.m_absoluteEncoderOffset);
     config.sensorDirection = false;
@@ -142,18 +145,14 @@ public class SwerveModule implements Device {
   }
 
   /**
-   * The angle for getting the steer angle.
+   * The method for getting the steer angle.
    *
    * @return The motor angles in radians.
    */
   public double getSteerAngle() {
     double motorAngleRadians = m_steerMotor.getSelectedSensorPosition()
         * SwerveConfig.kSteerRelativeEncoderPositionConversionFactor;
-    motorAngleRadians %= 2.0 * Math.PI;
-    if (motorAngleRadians < 0) {
-      motorAngleRadians += 2.0 * Math.PI;
-    }
-    return motorAngleRadians;
+    return normalizeAngle(motorAngleRadians);
   }
 
   /**
@@ -183,13 +182,11 @@ public class SwerveModule implements Device {
    * @return angle value between 0 to 2pi
    */
   private double normalizeAngle(double angle) {
-    double normalizedAngle = angle;
-
-    normalizedAngle %= (2.0 * Math.PI);
-    if (normalizedAngle < 0.0) {
-      normalizedAngle += 2.0 * Math.PI;
+    angle %= (2.0 * Math.PI);
+    if (angle < 0.0) {
+      angle += 2.0 * Math.PI;
     }
-    return normalizedAngle;
+    return angle;
   }
 
   /**
@@ -201,18 +198,16 @@ public class SwerveModule implements Device {
    */
   private double normalizeAngleError(double targetAngle) {
     // Angle is inbetween 0 to 2pi
-    double normalizedAngleError = normalizeAngle(targetAngle);
 
-    double difference = normalizedAngleError - getSteerAngle();
+    double difference = targetAngle - getSteerAngle();
     // Change the target angle so the difference is in the range [-pi, pi) instead
     // of [0, 2pi)
     if (difference >= Math.PI) {
-      return difference - 2 * Math.PI;
+      targetAngle -= 2.0 * Math.PI;
     } else if (difference < -Math.PI) {
-      return difference - 2 * Math.PI;
-    } else {
-      return difference;
-    }
+      targetAngle += 2.0 * Math.PI;
+    } 
+    return targetAngle - getSteerAngle();
   }
 
   /**
@@ -221,10 +216,8 @@ public class SwerveModule implements Device {
    * @param steerAngle the current steer angle.
    */
   private double convertSteerAngle(double steerAngle) {
-
-    double newSteerAngle = steerAngle;
-
-    double difference = normalizeAngleError(newSteerAngle);
+    steerAngle = normalizeAngle(steerAngle);
+    double difference = normalizeAngleError(steerAngle);        
 
     // If the difference is greater than 90 deg or less than -90 deg the drive can
     // be inverted so the total
@@ -232,15 +225,16 @@ public class SwerveModule implements Device {
     if (difference > Math.PI / 2.0 || difference < -Math.PI / 2.0) {
       // Only need to add 180 deg here because the target angle will be put back into
       // the range [0, 2pi)
-      newSteerAngle += Math.PI;
+      steerAngle += Math.PI;
     }
 
     // Put the target angle back into the range [0, 2pi)
-    newSteerAngle = normalizeAngle(newSteerAngle);
+    steerAngle = normalizeAngle(steerAngle);
 
     // Angle to be changed is now in radians
-    double referenceAngleRadians = newSteerAngle;
-    double currentAngleRadians = m_steerMotor.getSelectedSensorPosition();
+    double referenceAngleRadians = steerAngle;
+    double currentAngleRadians = m_steerMotor.getSelectedSensorPosition() 
+        * SwerveConfig.kSteerRelativeEncoderPositionConversionFactor;
 
     // Reset the NEO's encoder periodically when the module is not rotating.
     // Sometimes (~5% of the time) when we initialize, the absolute encoder isn't
@@ -251,7 +245,7 @@ public class SwerveModule implements Device {
         * SwerveConfig.kSteerRelativeEncoderVelocityConversionFactor 
             < SwerveConfig.kEncoderResetMaxAngularVelocity) {
       if (++m_absoluteEncoderResetIterations >= SwerveConfig.kEncoderResetIterations) {
-        m_logger.tracef("Resetting steer relative encoder. Reset iteration %d", 
+        m_logger.tracef("Resetting steer relative encoder. Reset iteration %f", 
             m_absoluteEncoderResetIterations);
         m_absoluteEncoderResetIterations = 0;
         double absoluteAngle = getAbsoluteAngle();
@@ -289,8 +283,6 @@ public class SwerveModule implements Device {
    */
   private double convertDriveMetersPerSecond(double driveMetersPerSecond, double steerAngle) {
 
-    double convertedDriveMetersPerSecond = driveMetersPerSecond;
-
     double difference = normalizeAngleError(steerAngle);
 
     // If the difference is greater than 90 deg or less than -90 deg the drive can
@@ -299,22 +291,22 @@ public class SwerveModule implements Device {
     if (difference > Math.PI / 2.0 || difference < -Math.PI / 2.0) {
       // Only need to add 180 deg here because the target angle will be put back into
       // the range [0, 2pi)
-      convertedDriveMetersPerSecond *= -1.0;
+      driveMetersPerSecond *= -1.0;
     }
 
-    return convertedDriveMetersPerSecond;
+    return driveMetersPerSecond;
   }
 
   /**
    * Method for setting the drive voltage and steering angle.
    *
    * @param driveMetersPerSecond driving meters per second.
-   *
    * @param steerAngle           steering angle.
    *
    */
   public void set(double driveMetersPerSecond, double steerAngle) {
-
+    SmartDashboard.putString(getName() + " state",
+        "Speed: " + driveMetersPerSecond + " | Angle: " + steerAngle);
     // Set driveMotor according to percentage output
     this.m_driveMotor.set(convertDriveMetersPerSecond(driveMetersPerSecond, steerAngle));
 

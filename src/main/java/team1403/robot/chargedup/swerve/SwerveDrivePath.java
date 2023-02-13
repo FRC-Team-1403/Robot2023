@@ -11,7 +11,6 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 
 import team1403.robot.chargedup.RobotConfig.SwerveConfig;
 
@@ -64,7 +63,7 @@ public class SwerveDrivePath extends CommandBase {
     wayPoints.remove(wayPoints.size() - 1);
 
     m_trajectoryConfig = new TrajectoryConfig(
-        SwerveConfig.kMaxSpeed / 3,
+        SwerveConfig.kMaxSpeed,
         SwerveConfig.kMaxAccelerationMetersPerSecondSquared)
         .setKinematics(SwerveConfig.kDriveKinematics);
 
@@ -81,7 +80,8 @@ public class SwerveDrivePath extends CommandBase {
   @Override
   public void initialize() {
     m_drivetrain.zeroGyroscope();
-    m_drivetrain.resetOdometry();
+
+    m_drivetrain.increaseSpeed(1);
 
     m_trajectory = TrajectoryGenerator.generateTrajectory(
         m_startPose,
@@ -92,11 +92,9 @@ public class SwerveDrivePath extends CommandBase {
     m_swerveControllerCommand = new SwerveControllerCommand(
         m_trajectory,
         m_drivetrain::getPose,
-        SwerveConfig.kDriveKinematics,
-        m_verticalTranslationController,
         m_horizontalTranslationController,
+        m_verticalTranslationController,
         m_angleController,
-        m_drivetrain::setModuleStates,
         m_drivetrain);
 
     m_swerveControllerCommand.schedule();
