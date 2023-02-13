@@ -1,5 +1,6 @@
 package team1403.lib.device.wpi;
 
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.revrobotics.SparkMaxRelativeEncoder.Type;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -9,7 +10,6 @@ import team1403.lib.device.AnalogDevice;
 import team1403.lib.device.CougarAccelerometer;
 import team1403.lib.device.CougarDoubleSolenoid;
 import team1403.lib.device.DeviceFactory;
-import team1403.lib.device.GyroscopeDevice;
 import team1403.lib.device.LimitSwitch;
 import team1403.lib.device.MotorController;
 import team1403.lib.device.PowerDistributor;
@@ -88,8 +88,7 @@ public class RealDeviceFactory implements DeviceFactory {
   }
 
   @Override
-  public AdvancedMotorController makeCougarTalonFx(String name, int deviceNumber,
-      CougarLogger logger) {
+  public AdvancedMotorController makeCougarTalonFx(String name, int deviceNumber, CougarLogger logger) {
     return new CougarTalonFx(name, deviceNumber, logger);
   }
 
@@ -124,10 +123,5 @@ public class RealDeviceFactory implements DeviceFactory {
   @Override
   public AnalogDevice makeAnalogDevice(String name, int channel) {
     return new WpiAnalogDevice(name, channel);
-  }
-
-  @Override
-  public GyroscopeDevice makeGyroscopeDevice(String name) {
-    return new NavxAhrs(name);
   }
 }
