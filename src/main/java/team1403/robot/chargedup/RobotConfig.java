@@ -40,17 +40,17 @@ public class RobotConfig {
     public static final int kStatusFrameGeneralPeriodMs = 250;
     public static final int kCanTimeoutMs = 250;
 
-    public static final double kPTurning = 0.5;
+    public static final double kPTurning = 0.25;
     public static final double kITurning = 0.0;
-    public static final double kDTurning = 5;
+    public static final double kDTurning = 0.025;
 
-    public static final double kPAutoTurning = 0.5;
+    public static final double kPAutoTurning = 3;
     public static final double kIAutoTurning = 0.0;
-    public static final double kDAutoTurning = 5.0;
+    public static final double kDAutoTurning = 0.0;
 
-    public static final double kPTranslation = 2.0;
-    public static final double kITranslation = 0.25;
-    public static final double kDTranslation = 0.2;
+    public static final double kPTranslation = 12;
+    public static final double kITranslation = 0.0;
+    public static final double kDTranslation = 0.5;
 
     public static final double kTrackWidth = Units.inchesToMeters(21);
     public static final double kWheelBase = Units.inchesToMeters(25.5);

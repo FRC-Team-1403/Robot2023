@@ -158,4 +158,9 @@ public class SwerveDriveOdometry {
 
     return m_poseMeters;
   }
+
+  @Override
+  public String toString() {
+    return "Pose: " + getPoseMeters();
+  }
 }

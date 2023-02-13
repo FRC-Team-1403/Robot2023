@@ -1,5 +1,6 @@
 package team1403.robot.chargedup.swerve;
 
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
@@ -19,6 +20,7 @@ import com.revrobotics.SparkMaxRelativeEncoder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import team1403.lib.device.Device;
 import team1403.lib.device.Encoder;
@@ -85,6 +87,7 @@ public class SwerveModule implements Device {
   private void initEncoders() {
     // Config absolute encoder
     CANCoderConfiguration config = new CANCoderConfiguration();
+    m_absoluteEncoder.setPositionToAbsolute();
     config.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
     config.magnetOffsetDegrees = Math.toDegrees(this.m_absoluteEncoderOffset);
     config.sensorDirection = false;
@@ -294,12 +297,14 @@ public class SwerveModule implements Device {
    * Method for setting the drive voltage and steering angle.
    *
    */
-  public void set(SwerveModuleState state) {
-    state = SwerveModuleState.optimize(state, new Rotation2d(getSteerAngle()));
+  public void set(double driveMetersPerSecond, double steerAngle) {
+    SmartDashboard.putString(getName() + " state",
+        "Speed: " + driveMetersPerSecond + " | Angle: " + steerAngle);
     // Set driveMotor according to percentage output
-    this.m_driveMotor.set(state.speedMetersPerSecond);
+    this.m_driveMotor.set(convertDriveMetersPerSecond(driveMetersPerSecond, steerAngle));
+
     // Set steerMotor according to position of encoder
-    this.m_steerMotor.set(TalonFXControlMode.Position, state.angle.getRadians());
+    this.m_steerMotor.set(TalonFXControlMode.Position, convertSteerAngle(steerAngle));
   }
 
   /**

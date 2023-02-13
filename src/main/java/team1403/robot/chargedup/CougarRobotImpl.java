@@ -53,10 +53,6 @@ public class CougarRobotImpl extends CougarRobot {
     m_arm = new Arm(parameters);
     m_swerveSubsystem = new SwerveSubsystem(parameters);
 
-    // var scheduler = CommandScheduler.getInstance();
-    // scheduler.registerSubsystem(m_builtins);
-    // scheduler.registerSubsystem(m_swerveSubsystem);
-
     configureOperatorInterface();
     configureDriverInterface();
     registerAutoCommands();
@@ -65,24 +61,25 @@ public class CougarRobotImpl extends CougarRobot {
 
   @Override
   public Command getAutonomousCommand() {
-    return m_reader.importScript("TestAuto.json");
+    return m_reader.importScript("ForwardsBackwards.json");
   } 
+  
 
-  /**
-   * Configures the operator commands and their bindings.
-   */
-  private void configureOperatorInterface() {
-    XboxController xboxOperator = getJoystick("Operator", OperatorConfig.pilotPort);
+  //   /**
+  //    * Configures the operator commands and their bindings.
+  //    */
+  //   private void configureOperatorInterface() {
+  //     XboxController xboxOperator = getJoystick("Operator", OperatorConfig.pilotPort);
 
-    new Trigger(() -> xboxOperator.getYButton()).onFalse(
-        new InstantCommand(() -> switchOperatorMode()));
+  //     new Trigger(() -> xboxOperator.getYButton()).onFalse(
+  //         new InstantCommand(() -> switchOperatorMode()));
     
-    if (m_armOperatorManual) {
-      manualOperatorMode(xboxOperator);
-    } else {
-      autoOperatorMode(xboxOperator);
-    }
-  }
+  //     if (m_armOperatorManual) {
+  //       manualOperatorMode(xboxOperator);
+  //     } else {
+  //       autoOperatorMode(xboxOperator);
+  //   }
+  // }
 
   /**
    * Configures the driver commands and their bindings.
@@ -97,8 +94,8 @@ public class CougarRobotImpl extends CougarRobot {
     // Setting default command of swerve subsystem
     m_swerveSubsystem.setDefaultCommand(new SwerveCommand(
         m_swerveSubsystem,
-        () -> -deadband(xboxDriver.getLeftY(), 0.05),
         () -> -deadband(xboxDriver.getLeftX(), 0.05),
+        () -> -deadband(xboxDriver.getLeftY(), 0.05),
         () -> -deadband(xboxDriver.getRightX(), 0.05),
         () -> xboxDriver.getYButtonReleased())
     );
@@ -109,6 +106,10 @@ public class CougarRobotImpl extends CougarRobot {
 
     new Trigger(() -> xboxDriver.getLeftBumper()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.decreaseSpeed(0.2)));
+
+    new Trigger(() -> xboxDriver.getBButton()).onFalse(
+      new InstantCommand(() -> m_swerveSubsystem.zeroGyroscope()));
+    
   }
 
   /**
@@ -126,9 +127,7 @@ public class CougarRobotImpl extends CougarRobot {
       Rotation2d theta = new Rotation2d(
           startPose.getRotation().getDegrees());
 
-      Pose2d transformedStartPose;
-
-      transformedStartPose = new Pose2d(flippedXandY, theta);
+      Pose2d transformedStartPose = new Pose2d(flippedXandY, theta);
       m_swerveSubsystem.setPose(transformedStartPose);
     });
 
