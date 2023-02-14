@@ -54,7 +54,8 @@ public class SwerveCommand extends CommandBase {
     }
 
     SmartDashboard.putBoolean("isFieldRelative", m_isFieldRelative);
-    SmartDashboard.putNumber("Horizontal Translation", m_horizontalTranslationSupplier.getAsDouble());
+    SmartDashboard.putNumber("Horizontal Translation", 
+        m_horizontalTranslationSupplier.getAsDouble());
     if (m_isFieldRelative) {
       m_drivetrainSubsystem.drive(
           ChassisSpeeds.fromFieldRelativeSpeeds(

@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+
 import team1403.lib.util.Dimension;
 
 /**
@@ -82,8 +83,8 @@ public class RobotConfig {
 
     public static final double kMaxSpeed = 14.5;
 
-    public static final double kMaxAngularSpeed = (kMaxSpeed /
-    Math.hypot(kTrackWidth / 2.0, kWheelBase / 2.0) );
+    public static final double kMaxAngularSpeed = (kMaxSpeed 
+        / Math.hypot(kTrackWidth / 2.0, kWheelBase / 2.0));
 
     public static final double kVoltageSaturation = 12.0;
     public static final double kCurrentLimit = 20.0;
@@ -225,6 +226,12 @@ public class RobotConfig {
      */
     public static final double kMaxGroundArmLengthThreshold = 0;
   }
+  
+  /**
+   * Contains the constants for the light subsystem.
+   * 
+   */
+
   public static class Lights {
     public static int portNumber = 6;
     public static int ledBufferValue = 60;

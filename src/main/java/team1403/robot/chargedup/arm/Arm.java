@@ -181,7 +181,7 @@ public class Arm extends CougarSubsystem {
       angle = RobotConfig.Arm.kMinArmRotation;
     }
 
-      return angle;
+    return angle;
   }
 
   /**

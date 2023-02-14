@@ -10,22 +10,21 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarRobot;
 import team1403.lib.subsystems.BuiltinSubsystem;
 import team1403.lib.util.CougarLogger;
-import team1403.robot.chargedup.cse.CougarScriptObject;
-import team1403.robot.chargedup.cse.CougarScriptReader;
-import team1403.robot.chargedup.cse.SequentialCommandGroup;
-import team1403.robot.chargedup.lights.LightSubsystem;
-import team1403.robot.chargedup.swerve.SwerveCommand;
-import team1403.robot.chargedup.swerve.SwerveDrivePath;
 import team1403.robot.chargedup.RobotConfig.OperatorConfig;
 import team1403.robot.chargedup.arm.Arm;
 import team1403.robot.chargedup.arm.ArmCommands;
+import team1403.robot.chargedup.cse.CougarScriptObject;
+import team1403.robot.chargedup.cse.CougarScriptReader;
+import team1403.robot.chargedup.lights.LightSubsystem;
 import team1403.robot.chargedup.swerve.SwerveCommand;
+import team1403.robot.chargedup.swerve.SwerveDrivePath;
 import team1403.robot.chargedup.swerve.SwerveSubsystem;
 
 /**
@@ -54,17 +53,17 @@ public class CougarRobotImpl extends CougarRobot {
         parameters.getRobotLogger(), "BuiltinDevices");
 
     m_builtins = new BuiltinSubsystem(parameters, logger);
-    // m_arm = new Arm(parameters);
-    // m_swerveSubsystem = new SwerveSubsystem(parameters);
-    m_lightSubsystem = new LightSubsystem("light", parameters);
+    m_lightSubsystem = new LightSubsystem(parameters);
+    m_arm = new Arm(parameters);
+    m_swerveSubsystem = new SwerveSubsystem(parameters);
 
     var scheduler = CommandScheduler.getInstance();
-    // scheduler.registerSubsystem(m_builtins);
-    // scheduler.registerSubsystem(m_swerveSubsystem);
+    scheduler.registerSubsystem(m_builtins);
 
     configureOperatorInterface();
-    // configureDriverInterface();
-    // registerAutoCommands();
+    configureDriverInterface();
+    registerAutoCommands();
+
   }
 
   @Override
@@ -77,73 +76,73 @@ public class CougarRobotImpl extends CougarRobot {
    */
   private void configureOperatorInterface() {
     XboxController xboxOperator = getJoystick("Operator", OperatorConfig.pilotPort);
-  
-//     new Trigger(() -> xboxOperator.getYButton()).onFalse(
-//         new InstantCommand(() -> switchOperatorMode()));
+
+    new Trigger(() -> xboxOperator.getYButton()).onFalse(
+        new InstantCommand(() -> switchOperatorMode()));
     
-//     if (m_armOperatorManual) {
-//       manualOperatorMode(xboxOperator);
-//     } else {
-//       autoOperatorMode(xboxOperator);
-//   }
-}
+    if (m_armOperatorManual) {
+      manualOperatorMode(xboxOperator);
+    } else {
+      autoOperatorMode(xboxOperator);
+    }
+  }
 
   /**
    * Configures the driver commands and their bindings.
    */
-  // private void configureDriverInterface() {
-  //   XboxController xboxDriver = getJoystick("Driver", RobotConfig.DriverConfig.pilotPort);
+  private void configureDriverInterface() {
+    XboxController xboxDriver = getJoystick("Driver", RobotConfig.DriverConfig.pilotPort);
 
     // The controls are for field-oriented driving:
     // Left stick Y axis -> forward and backwards movement
     // Left stick X axis -> left and right movement
     // Right stick X axis -> rotation
     // Setting default command of swerve subsystem
-  //   m_swerveSubsystem.setDefaultCommand(new SwerveCommand(
-  //       m_swerveSubsystem,
-  //       () -> -deadband(xboxDriver.getLeftY(), 0.05),
-  //       () -> -deadband(xboxDriver.getLeftX(), 0.05),
-  //       () -> -deadband(xboxDriver.getRightX(), 0.05),
-  //       () -> xboxDriver.getYButtonReleased())
-  //   );
+    m_swerveSubsystem.setDefaultCommand(new SwerveCommand(
+        m_swerveSubsystem,
+        () -> -deadband(xboxDriver.getLeftY(), 0.05),
+        () -> -deadband(xboxDriver.getLeftX(), 0.05),
+        () -> -deadband(xboxDriver.getRightX(), 0.05),
+        () -> xboxDriver.getYButtonReleased())
+    );
 
 
-  //   new Trigger(() -> xboxDriver.getRightBumper()).onFalse(
-  //       new InstantCommand(() -> m_swerveSubsystem.increaseSpeed(0.2)));
+    new Trigger(() -> xboxDriver.getRightBumper()).onFalse(
+        new InstantCommand(() -> m_swerveSubsystem.increaseSpeed(0.2)));
 
-  //   new Trigger(() -> xboxDriver.getLeftBumper()).onFalse(
-  //       new InstantCommand(() -> m_swerveSubsystem.decreaseSpeed(0.2)));
-  // }
+    new Trigger(() -> xboxDriver.getLeftBumper()).onFalse(
+        new InstantCommand(() -> m_swerveSubsystem.decreaseSpeed(0.2)));
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
    */
-  // private void registerAutoCommands() {
-  //   m_reader = new CougarScriptReader((Pose2d startPose) -> {
-  //     double feetToMeters = 0.30478512648;
+  private void registerAutoCommands() {
+    m_reader = new CougarScriptReader((Pose2d startPose) -> {
+      double feetToMeters = 0.30478512648;
 
-  //     Translation2d flippedXandY = new Translation2d(
-  //         startPose.getY() * feetToMeters, startPose.getX() * feetToMeters);
+      Translation2d flippedXandY = new Translation2d(
+          startPose.getY() * feetToMeters, startPose.getX() * feetToMeters);
 
-  //     Rotation2d theta = new Rotation2d(
-  //         startPose.getRotation().getDegrees());
+      Rotation2d theta = new Rotation2d(
+          startPose.getRotation().getDegrees());
 
-  //     Pose2d transformedStartPose;
+      Pose2d transformedStartPose;
 
-  //     transformedStartPose = new Pose2d(flippedXandY, theta);
-  //     m_swerveSubsystem.setPose(transformedStartPose);
-  //   });
+      transformedStartPose = new Pose2d(flippedXandY, theta);
+      m_swerveSubsystem.setPose(transformedStartPose);
+    });
 
-  //   m_reader.registerCommand("SwerveDrivePath", (CougarScriptObject p) -> {
-  //     List<Translation2d> wayPoints = p.getPointList("Waypoints");
-  //     return new SwerveDrivePath(m_swerveSubsystem,
-  //         p.getDouble("StartAngle"),
-  //         p.getDouble("EndAngle"),
-  //         wayPoints);
-  //   });
-  // }
+    m_reader.registerCommand("SwerveDrivePath", (CougarScriptObject p) -> {
+      List<Translation2d> wayPoints = p.getPointList("Waypoints");
+      return new SwerveDrivePath(m_swerveSubsystem,
+          p.getDouble("StartAngle"),
+          p.getDouble("EndAngle"),
+          wayPoints);
+    });
+  }
 
   /**
    * Applies a deadband to the given value.
@@ -182,47 +181,62 @@ public class CougarRobotImpl extends CougarRobot {
     return new XboxController(port);
   }
 
-  // //TODO, figure out actual setpoint values
+  //TODO, figure out actual setpoint values
   
-  // /**
-  //  * This is the auto mode for operator.
-  //  * Has 5 setpoints, which will each set the arm
-  //  * in different positions
-  //  * A Button -> Ground
-  //  * B Button -> Shelf
-  //  * Dpad down Button -> Tuck
-  //  * DPad Up -> High
-  //  * DPad Right -> Mid
-  //  *
-  //  * @param xboxOperator defines which controller is being used
-  //  */
-  // public void autoOperatorMode(XboxController xboxOperator) {
-  //   new Trigger(() -> xboxOperator.getAButton()).onFalse(
-  //     new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-  //   new Trigger(() -> xboxOperator.getBButton()).onFalse(
-  //       new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-  //   new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadDown)).onFalse(
-  //       new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-  //   new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadUp)).onFalse(
-  //     new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-  //   new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadRight)).onFalse(
-  //       new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-  // }
+  /**
+   * This is the auto mode for operator.
+   * Has 5 setpoints, which will each set the arm
+   * in different positions
+   * A Button -> Ground
+   * B Button -> Shelf
+   * Dpad down Button -> Tuck
+   * DPad Up -> High
+   * DPad Right -> Mid
+   *
+   * @param xboxOperator defines which controller is being used
+   */
+  public void autoOperatorMode(XboxController xboxOperator) {
+    SequentialCommandGroup shelfCommand = new SequentialCommandGroup(
+        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)), 
+        new InstantCommand(() -> m_lightSubsystem.setGreen()));
 
-  // /**
-  //  * This is the manual mode for operator.
-  //  * Minutely control arm with joysticks
-  //  * 
-  //  * @param xboxOperator defines which controller is being used
-  //  */
-  // private void manualOperatorMode(XboxController xboxOperator) {
-  //   m_arm.setDefaultCommand(new ArmCommands(m_arm,
-  //       () -> xboxOperator.getLeftY(),
-  //       () -> xboxOperator.getRightY(),
-  //       () -> xboxOperator.getRightTriggerAxis(),
-  //       () -> xboxOperator.getLeftTriggerAxis()));
+    SequentialCommandGroup floorCommand = new SequentialCommandGroup(
+        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)), 
+        new InstantCommand(() -> m_lightSubsystem.setRed()));
 
-  // }
+    SequentialCommandGroup tuck = new SequentialCommandGroup(
+        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)), 
+        new InstantCommand(() -> m_lightSubsystem.setBlue()));
+
+    SequentialCommandGroup high = new SequentialCommandGroup(
+        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)), 
+        new InstantCommand(() -> m_lightSubsystem.setDeepBlue()));
+    
+    SequentialCommandGroup low = new SequentialCommandGroup(
+        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)), 
+        new InstantCommand(() -> m_lightSubsystem.setPink()));
+
+    new Trigger(() -> xboxOperator.getAButton()).onFalse(floorCommand);
+    new Trigger(() -> xboxOperator.getBButton()).onFalse(shelfCommand);
+    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadDown)).onFalse(tuck);
+    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadUp)).onFalse(high);
+    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadRight)).onFalse(low);
+  }
+
+  /**
+   * This is the manual mode for operator.
+   * Minutely control arm with joysticks
+   * 
+   * @param xboxOperator defines which controller is being used
+   */
+  private void manualOperatorMode(XboxController xboxOperator) {
+    m_arm.setDefaultCommand(new ArmCommands(m_arm,
+        () -> xboxOperator.getLeftY(),
+        () -> xboxOperator.getRightY(),
+        () -> xboxOperator.getRightTriggerAxis(),
+        () -> xboxOperator.getLeftTriggerAxis()));
+
+  }
 
   /**
    * Switches the operator mode.
@@ -233,8 +247,8 @@ public class CougarRobotImpl extends CougarRobot {
 
   private final BuiltinSubsystem m_builtins;
   private CougarScriptReader m_reader;
-  // private final Arm m_arm;
+  private final Arm m_arm;
   private boolean m_armOperatorManual = true;
-  // private final SwerveSubsystem m_swerveSubsystem;
+  private final SwerveSubsystem m_swerveSubsystem;
   private final LightSubsystem m_lightSubsystem;
 }
