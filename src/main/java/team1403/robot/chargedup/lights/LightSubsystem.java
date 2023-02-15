@@ -2,6 +2,8 @@ package team1403.robot.chargedup.lights;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarSubsystem;
@@ -26,6 +28,8 @@ public class LightSubsystem extends CougarSubsystem {
     m_lights.setLength(m_ledBuffer.getLength());
     m_lights.setData(m_ledBuffer);
     ledBufferClear();
+
+    
   }
 
   /**
@@ -39,7 +43,6 @@ public class LightSubsystem extends CougarSubsystem {
     m_lights.setData(m_ledBuffer);
     m_lights.start();
   }
-
   /** 
   * Green light.
   * For shelf pick up.
@@ -144,5 +147,42 @@ public class LightSubsystem extends CougarSubsystem {
          
     m_lights.setData(m_ledBuffer);
     m_lights.start();
+  }
+
+  /**
+   * Makes the lights blink.
+   * 
+   */
+
+  public void setBlinking() {
+
+    ledBufferClear();
+    CommandScheduler.getInstance().schedule(new WaitCommand(0.5));
+
+    m_lights.setData(m_ledBuffer);
+    m_lights.start();
+
+    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+      m_ledBuffer.setRGB(i, 225, 0, 0);
+      CommandScheduler.getInstance().schedule(new WaitCommand(0.5));
+    }
+         
+    m_lights.setData(m_ledBuffer);
+    m_lights.start();
+  }
+
+  /**
+   * sets alternating lights to different colors.
+   * 
+   */
+  public void setAlternating() {
+    for (var i = 0; i < m_ledBuffer.getLength(); i = i + 2) {
+      m_ledBuffer.setRGB(i, 225, 0, 0);
+    }   
+    m_lights.setData(m_ledBuffer);
+    m_lights.start();
+    for (var i = 1; i < m_ledBuffer.getLength(); i = i + 2) {
+      m_ledBuffer.setRGB(i, 0, 255, 0);
+    } 
   }
 }
