@@ -189,6 +189,7 @@ public class RobotConfig {
    */
   public static class Arm {
 
+    public static double maxVerticalAngle = Math.acos(44.3 / 60.218);
     public static double angleHittingRobot = 0;
     public static double angleHittingGround = 0;
 

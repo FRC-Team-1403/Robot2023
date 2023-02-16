@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarSubsystem;
-import team1403.lib.device.GyroscopeDevice;
 import team1403.lib.device.wpi.NavxAhrs;
 import team1403.lib.util.CougarLogger;
 import team1403.lib.util.SwerveDriveOdometry;

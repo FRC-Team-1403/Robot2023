@@ -27,10 +27,12 @@ import team1403.robot.chargedup.swerve.SwerveSubsystem;
 /**
  * The heart of the robot.
  *
- * <p>The bulk of the robot will be implemented through various subsystems.
+ * <p>
+ * The bulk of the robot will be implemented through various subsystems.
  * This class creates those subsystems and configures their behaviors.
  *
- * <p>This class has little to do with the runtime operation. It acts more as
+ * <p>
+ * This class has little to do with the runtime operation. It acts more as
  * a factory to create the subsystems and write them together and to external
  * controls (both human and software). Once that has happened, the controls
  * take over and issue commands that interact with the subsystem to actually
@@ -62,24 +64,23 @@ public class CougarRobotImpl extends CougarRobot {
   @Override
   public Command getAutonomousCommand() {
     return m_reader.importScript("ForwardsBackwards.json");
-  } 
-  
+  }
 
-  //   /**
-  //    * Configures the operator commands and their bindings.
-  //    */
-  //   private void configureOperatorInterface() {
-  //     XboxController xboxOperator = getJoystick("Operator", OperatorConfig.pilotPort);
+  /**
+   * Configures the operator commands and their bindings.
+   */
+  private void configureOperatorInterface() {
+    XboxController xboxOperator = getJoystick("Operator", OperatorConfig.pilotPort);
 
-  //     new Trigger(() -> xboxOperator.getYButton()).onFalse(
-  //         new InstantCommand(() -> switchOperatorMode()));
-    
-  //     if (m_armOperatorManual) {
-  //       manualOperatorMode(xboxOperator);
-  //     } else {
-  //       autoOperatorMode(xboxOperator);
-  //   }
-  // }
+    new Trigger(() -> xboxOperator.getYButton()).onFalse(
+        new InstantCommand(() -> switchOperatorMode()));
+
+    if (m_armOperatorManual) {
+      manualOperatorMode(xboxOperator);
+    } else {
+      autoOperatorMode(xboxOperator);
+    }
+  }
 
   /**
    * Configures the driver commands and their bindings.
@@ -97,9 +98,7 @@ public class CougarRobotImpl extends CougarRobot {
         () -> -deadband(xboxDriver.getLeftX(), 0.05),
         () -> -deadband(xboxDriver.getLeftY(), 0.05),
         () -> -deadband(xboxDriver.getRightX(), 0.05),
-        () -> xboxDriver.getYButtonReleased())
-    );
-
+        () -> xboxDriver.getYButtonReleased()));
 
     new Trigger(() -> xboxDriver.getRightBumper()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.increaseSpeed(0.2)));
@@ -108,8 +107,8 @@ public class CougarRobotImpl extends CougarRobot {
         new InstantCommand(() -> m_swerveSubsystem.decreaseSpeed(0.2)));
 
     new Trigger(() -> xboxDriver.getBButton()).onFalse(
-      new InstantCommand(() -> m_swerveSubsystem.zeroGyroscope()));
-    
+        new InstantCommand(() -> m_swerveSubsystem.zeroGyroscope()));
+
   }
 
   /**
@@ -143,7 +142,7 @@ public class CougarRobotImpl extends CougarRobot {
   /**
    * Applies a deadband to the given value.
    *
-   * @param value the value to apply a deadband to
+   * @param value    the value to apply a deadband to
    * @param deadband the deadband to apply to the value
    * @return 0 if the value is < deadband,
    *         or value if value > deadband
@@ -177,8 +176,8 @@ public class CougarRobotImpl extends CougarRobot {
     return new XboxController(port);
   }
 
-  //TODO, figure out actual setpoint values
-  
+  // TODO, figure out actual setpoint values
+
   /**
    * This is the auto mode for operator.
    * Has 5 setpoints, which will each set the arm
@@ -193,13 +192,13 @@ public class CougarRobotImpl extends CougarRobot {
    */
   public void autoOperatorMode(XboxController xboxOperator) {
     new Trigger(() -> xboxOperator.getAButton()).onFalse(
-      new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
     new Trigger(() -> xboxOperator.getBButton()).onFalse(
         new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
     new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadDown)).onFalse(
         new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
     new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadUp)).onFalse(
-      new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
     new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadRight)).onFalse(
         new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
   }
