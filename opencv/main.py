@@ -2,17 +2,28 @@
 import cv2
 import time
 import numpy as np
+import ntcore as nt
+import os
 
-resize_size = 60
+inst = nt.NetworkTableInstance.getDefault()
+
+table = inst.getTable("conetable")
+xPub = table.getDoubleTopic("xcone").publish()
+conePub = table.getBooleanTopic("presentcone").publish()
+coneRotationPub = table.getIntegerTopic("rotcone").publish()
+
+resize_size = 30
 label_txt = np.empty((1, 1)).astype('float32')
 feature_txt = np.empty((1, resize_size ** 2)).astype('float32')
 knn = cv2.ml.KNearest_create()
-feature_txt = np.loadtxt("feature.txt", np.float32)
-print(feature_txt.shape)
-label_txt = np.loadtxt("label.txt", np.float32).reshape((feature_txt.shape[0], 1))
+if(os.path.exists("feature.txt")):
+    feature_txt = np.loadtxt("feature.txt", np.float32)
+# print(feature_txt.shape)
+if(os.path.exists("label.txt")):
+    label_txt = np.loadtxt("label.txt", np.float32).reshape((feature_txt.shape[0], 1))
 knn.train(feature_txt, cv2.ml.ROW_SAMPLE, label_txt)
 
-vid = cv2.VideoCapture(0, cv2.CAP_V4L2)
+vid = cv2.VideoCapture(2, cv2.CAP_V4L2)
 vid.set(cv2.CAP_PROP_FRAME_WIDTH, 400)
 vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 300)
 
@@ -24,7 +35,7 @@ S_high = 255
 V_low = 165
 V_high = 255
 
-debug_msg = False
+debug_msg = True
 debug_pic = False
 
 if(debug_msg):
@@ -36,7 +47,7 @@ def label_img(frame):
     cv2.imshow("looks good?", frame)
     key = chr(cv2.waitKey(0)).lower()
     cv2.destroyWindow("looks good?")
-    if (key == 'u' or key == 's' or key == 'h'):
+    if (key == 'u' or key == 's' or key == 'h' or h == 'a'):
         arr = frame.reshape(1, resize_size ** 2)
         return np.array([[ord(key)]], dtype=np.float32), arr
     else:
@@ -79,8 +90,6 @@ min_cone_area = 1000
 # cone_vert_mask = cv2.cvtColor(cone_vert_mask, cv2.COLOR_BGR2GRAY)
 # cone_vert_mask = cv2.resize(cone_vert_mask, (80, 160))
 
-
-
 while True:
     start = time.process_time()
     _, frame = vid.read()
@@ -118,6 +127,7 @@ while True:
 
         cv2.drawContours(mask, [cont], -1, 255, -1)
         mask = mask[y: y + h, x: x + w]
+        xPub.set(float(x) / float(mask.shape[1]))
         # hull2 = cv2.convexHull(cont, returnPoints = False)
         # if(len(hull) > 0):
         # defects = cv2.convexityDefects(cont, hull2)
@@ -141,23 +151,31 @@ while True:
 
         _, result, nears, dists = knn.findNearest(resized_mask, 5)
 
-        if (dists[0][0] >= 1000000):
+        min_dist = 5000000
+
+        if (dists[0][0] <= min_dist):
             if(debug_msg):
                 print("result: " + str(int(result)))
                 print("score: " + str(dists[0][0]))
 
-        if (int(result) == 117):
-            cv2.putText(frame, 'Upward Cone', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
+            if (int(result) == 117):
+                cv2.putText(frame, 'Upward Cone', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
                         cv2.LINE_AA)
-        if (int(result) == 115):
-            cv2.putText(frame, 'Sideways Cone', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
+            if (int(result) == 115):
+             cv2.putText(frame, 'Sideways Cone', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
                         cv2.LINE_AA)
-        if (int(result) == 104):
-            cv2.putText(frame, 'Head on Cone', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
+            if (int(result) == 104):
+                cv2.putText(frame, 'Head on Cone', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
                         cv2.LINE_AA)
 
+            coneRotationPub.set(int(result))
+        
+        #print(dists[0][0] >= min_dist)
+        conePub.set(dists[0][0] <= min_dist)
         if(debug_msg):
             print(mask.shape)
+    else:
+        conePub.set(False)
 
     cv2.putText(frame, str(int(1 / (time.process_time() - start))) + " FPS" , (50,200), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2, cv2.LINE_AA)
     cv2.imshow('frame', frame)
@@ -192,5 +210,3 @@ if str(input())[0] == 'y':
     print("data has been written")
 
 vid.release()
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
