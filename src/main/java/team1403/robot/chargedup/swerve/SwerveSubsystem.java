@@ -10,7 +10,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import team1403.lib.core.CougarLibInjectedParameters;
@@ -81,7 +80,7 @@ public class SwerveSubsystem extends CougarSubsystem {
     
 
     m_odometer = new SwerveDriveOdometry(
-      SwerveConfig.kDriveKinematics,
+      SwerveConfig.kFirstOrderDriveKinematics,
         new Rotation2d(), getModulePositions(), new Pose2d());
 
     m_desiredHeading = getGyroscopeRotation().getDegrees();
@@ -232,16 +231,13 @@ public class SwerveSubsystem extends CougarSubsystem {
     //   return;
     // }
 
-    SwerveDriveKinematics.desaturateWheelSpeeds(states, SwerveConfig.kMaxSpeed);
-
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        states, SwerveConfig.kMaxSpeed);
 
     for (int i = 0; i < m_modules.length; i++) {
-      // tracef("ModuleState of %s. Speed: %f, Angle: %f", 
-      //       m_modules[i].getName(), 
-      //       states[i].speedMetersPerSecond, 
-      //       states[i].angle.getRadians());
       m_modules[i].set((states[i].speedMetersPerSecond 
-          / SwerveConfig.kMaxSpeed) * m_speedLimiter, states[i].angle.getRadians());
+          / SwerveConfig.kMaxSpeed) * m_speedLimiter, 
+          states[i].angle.getRadians());
     }
   }
 
@@ -300,11 +296,6 @@ public class SwerveSubsystem extends CougarSubsystem {
 
   @Override
   public void periodic() {
-    // SmartDashboard.putNumber("Front Left absolute encoder", m_modules[0].getAbsoluteAngle());
-    // SmartDashboard.putNumber("Front Right absolute encoder", m_modules[1].getAbsoluteAngle());
-    // SmartDashboard.putNumber("Back Left absolute encoder", m_modules[2].getAbsoluteAngle());
-    // SmartDashboard.putNumber("Back Right absolute encoder", m_modules[3].getAbsoluteAngle());
-
     SmartDashboard.putNumber("Front Left relative encoder", 
         Math.toDegrees(m_modules[0].getSteerAngle()));
     SmartDashboard.putNumber("Front Right relative encoder", 
@@ -319,10 +310,10 @@ public class SwerveSubsystem extends CougarSubsystem {
     SmartDashboard.putString("Odometry", m_odometer.toString());
     SmartDashboard.putString("Chassis Speeds", m_chassisSpeeds.toString());
 
-    m_chassisSpeeds = rotationalDriftCorrection(m_chassisSpeeds);
     m_chassisSpeeds = translationalDriftCorrection(m_chassisSpeeds);
+    m_chassisSpeeds = rotationalDriftCorrection(m_chassisSpeeds);
 
-    SwerveModuleState[] states = SwerveConfig.kDriveKinematics
+    SwerveModuleState[] states = SwerveConfig.kFirstOrderDriveKinematics
         .toSwerveModuleStates(m_chassisSpeeds);
 
     setModuleStates(states);

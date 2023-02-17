@@ -65,7 +65,7 @@ public class SwerveDrivePath extends CommandBase {
     m_trajectoryConfig = new TrajectoryConfig(
         SwerveConfig.kMaxSpeed,
         SwerveConfig.kMaxAccelerationMetersPerSecondSquared)
-        .setKinematics(SwerveConfig.kDriveKinematics);
+        .setKinematics(SwerveConfig.kFirstOrderDriveKinematics);
 
     m_verticalTranslationController = new PIDController(SwerveConfig.kPTranslation, 
         SwerveConfig.kITranslation, SwerveConfig.kDTranslation);
