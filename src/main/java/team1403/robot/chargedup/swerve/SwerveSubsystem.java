@@ -218,19 +218,6 @@ public class SwerveSubsystem extends CougarSubsystem {
    * @param states an array of states for each module.
    */
   public void setModuleStates(SwerveModuleState[] states) {
-    // Prevent wheels from going back to 0 degrees as the default state.
-    // if (states[0].speedMetersPerSecond < 0.001) {
-    //   for (int i = 0; i < m_modules.length; i++) {
-    //     // tracef("ModuleState of %s. Speed: %f, Angle: %f", 
-    //     //     m_modules[i].getName(), 
-    //     //     states[i].speedMetersPerSecond, 
-    //     //     states[i].angle.getRadians());
-        
-    //     m_modules[i].set(0, m_modules[i].getSteerAngle());
-    //   }
-    //   return;
-    // }
-
     SwerveDriveKinematics.desaturateWheelSpeeds(
         states, SwerveConfig.kMaxSpeed);
 
@@ -292,19 +279,8 @@ public class SwerveSubsystem extends CougarSubsystem {
             twistVel.dtheta / deltaTime);
   }
 
-
-
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Front Left relative encoder", 
-        Math.toDegrees(m_modules[0].getSteerAngle()));
-    SmartDashboard.putNumber("Front Right relative encoder", 
-        Math.toDegrees(m_modules[1].getSteerAngle()));
-    SmartDashboard.putNumber("Back Left relative encoder", 
-        Math.toDegrees(m_modules[2].getSteerAngle()));
-    SmartDashboard.putNumber("Back Right relative encoder", 
-        Math.toDegrees(m_modules[3].getSteerAngle()));
-
     SmartDashboard.putNumber("Gyro Reading", getGyroscopeRotation().getDegrees());
     m_odometer.update(getGyroscopeRotation(), getModulePositions());
     SmartDashboard.putString("Odometry", m_odometer.toString());
