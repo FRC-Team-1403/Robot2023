@@ -58,7 +58,7 @@ public class CougarRobotImpl extends CougarRobot {
 
   @Override
   public Command getAutonomousCommand() {
-    return m_reader.importScript("ForwardsBackwards.json");
+    return m_reader.importScript("Circle.json");
   } 
   
 

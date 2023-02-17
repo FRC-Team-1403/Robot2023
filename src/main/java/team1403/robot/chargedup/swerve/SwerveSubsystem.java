@@ -5,6 +5,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -30,7 +31,7 @@ public class SwerveSubsystem extends CougarSubsystem {
   private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds();
   private final SwerveDriveOdometry m_odometer;
 
-  private final PIDController m_driftCorrectionPid = new PIDController(0.33, 0, 0);
+  private final PIDController m_driftCorrectionPid = new PIDController(0.35, 0, 0);
   private double m_desiredHeading = 0;
   private double m_speedLimiter = 0.6;
 
@@ -79,7 +80,7 @@ public class SwerveSubsystem extends CougarSubsystem {
     
 
     m_odometer = new SwerveDriveOdometry(
-      SwerveConfig.kDriveKinematics,
+      SwerveConfig.kFirstOrderDriveKinematics,
         new Rotation2d(), getModulePositions(), new Pose2d());
 
     m_desiredHeading = getGyroscopeRotation().getDegrees();
@@ -168,6 +169,11 @@ public class SwerveSubsystem extends CougarSubsystem {
     return m_odometer.getPoseMeters();
   }
 
+  /**
+   * Set the position of thte odometry.
+   *
+   * @param pose the new position of the odometry.
+   */
   public void setPose(Pose2d pose) {
     m_odometer.setPoseMeters(pose);
   }
@@ -196,7 +202,14 @@ public class SwerveSubsystem extends CougarSubsystem {
    */
   public void drive(ChassisSpeeds chassisSpeeds) {
     m_chassisSpeeds = chassisSpeeds;
-    SmartDashboard.putString("Chassis Speeds", m_chassisSpeeds.toString());
+  }
+
+  /**
+   * Stops the drivetrain.
+   */
+  public void stop() {
+    tracef("stop");
+    m_chassisSpeeds = new ChassisSpeeds();
   }
 
   /**
@@ -218,24 +231,25 @@ public class SwerveSubsystem extends CougarSubsystem {
     //   return;
     // }
 
-    SwerveDriveKinematics.desaturateWheelSpeeds(states, SwerveConfig.kMaxSpeed);
-
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        states, SwerveConfig.kMaxSpeed);
 
     for (int i = 0; i < m_modules.length; i++) {
-      // tracef("ModuleState of %s. Speed: %f, Angle: %f", 
-      //       m_modules[i].getName(), 
-      //       states[i].speedMetersPerSecond, 
-      //       states[i].angle.getRadians());
       m_modules[i].set((states[i].speedMetersPerSecond 
-          / SwerveConfig.kMaxSpeed) * m_speedLimiter, states[i].angle.getRadians());
+          / SwerveConfig.kMaxSpeed) * m_speedLimiter, 
+          states[i].angle.getRadians());
     }
   }
 
   /**
    * Adds rotational velocity to the chassis speed to compensate for 
    * unwanted changes in gyroscope heading.
+   * 
+   * @param chassisSpeeds the given chassisspeeds
+   * @return the corrected chassisspeeds
    */
-  private void driftCorrection() {
+  private ChassisSpeeds translationalDriftCorrection(ChassisSpeeds chassisSpeeds) {
+
     double translationalVelocity = Math.abs(m_modules[0].getDriveVelocity());
     if (Math.abs(m_navx2.getAngularVelocity()) > 0.1) {
       m_desiredHeading = getGyroscopeRotation().getDegrees();
@@ -250,27 +264,56 @@ public class SwerveSubsystem extends CougarSubsystem {
       tracef("driftCorrection %f, corrected omegaRadiansPerSecond %f", 
             m_calc, m_chassisSpeeds.omegaRadiansPerSecond);
     }
+    return chassisSpeeds;
   }
 
   /**
-   * Stops the drivetrain.
+   * Accounts for the drift caused by the first order kinematics 
+   * while doing both translational and rotational movement. 
+   * 
+   * <p> Looks forward one control loop to figure out where the robot 
+   * should be given the chassisspeed and backs out a twist command from that.
+   * 
+   * @param chassisSpeeds the given chassisspeeds
+   * @return the corrected chassisspeeds
    */
-  public void stop() {
-    tracef("stop");
-    m_chassisSpeeds = new ChassisSpeeds();
+  private ChassisSpeeds rotationalDriftCorrection(ChassisSpeeds chassisSpeeds) {
+    //Assuming the control loop runs in 20ms
+    final double deltaTime = 0.02;
+
+    //The position of the bot one control loop in the future given the chassisspeed
+    Pose2d robotPoseVel = new Pose2d(chassisSpeeds.vxMetersPerSecond * deltaTime, 
+        chassisSpeeds.vyMetersPerSecond * deltaTime, 
+        new Rotation2d(chassisSpeeds.omegaRadiansPerSecond * deltaTime));
+        
+    Twist2d twistVel = new Pose2d(0, 0, new Rotation2d()).log(robotPoseVel);
+    return new ChassisSpeeds(
+            twistVel.dx / deltaTime, twistVel.dy / deltaTime, 
+            twistVel.dtheta / deltaTime);
   }
 
 
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("Front Left relative encoder", 
+        Math.toDegrees(m_modules[0].getSteerAngle()));
+    SmartDashboard.putNumber("Front Right relative encoder", 
+        Math.toDegrees(m_modules[1].getSteerAngle()));
+    SmartDashboard.putNumber("Back Left relative encoder", 
+        Math.toDegrees(m_modules[2].getSteerAngle()));
+    SmartDashboard.putNumber("Back Right relative encoder", 
+        Math.toDegrees(m_modules[3].getSteerAngle()));
+
     SmartDashboard.putNumber("Gyro Reading", getGyroscopeRotation().getDegrees());
     m_odometer.update(getGyroscopeRotation(), getModulePositions());
     SmartDashboard.putString("Odometry", m_odometer.toString());
+    SmartDashboard.putString("Chassis Speeds", m_chassisSpeeds.toString());
 
-    driftCorrection();
+    m_chassisSpeeds = translationalDriftCorrection(m_chassisSpeeds);
+    m_chassisSpeeds = rotationalDriftCorrection(m_chassisSpeeds);
 
-    SwerveModuleState[] states = SwerveConfig.kDriveKinematics
+    SwerveModuleState[] states = SwerveConfig.kFirstOrderDriveKinematics
         .toSwerveModuleStates(m_chassisSpeeds);
 
     setModuleStates(states);
