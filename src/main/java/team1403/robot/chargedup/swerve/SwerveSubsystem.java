@@ -19,9 +19,6 @@ import team1403.lib.device.wpi.NavxAhrs;
 import team1403.lib.util.CougarLogger;
 import team1403.lib.util.SwerveDriveOdometry;
 import team1403.lib.util.SwerveDrivePoseEstimator;
-import team1403.lib.core.CougarLibInjectedParameters;
-import team1403.lib.core.CougarSubsystem;
-import team1403.robot.chargedup.RobotConfig;
 import team1403.robot.chargedup.RobotConfig.CanBus;
 import team1403.robot.chargedup.RobotConfig.SwerveConfig;
 
@@ -52,7 +49,7 @@ public class SwerveSubsystem extends CougarSubsystem {
    * @param parameters the {@link CougarLibInjectedParameters}
    used to construct this subsystem
    */
-  private SwerveSubsystem(CougarLibInjectedParameters parameters) {
+  public SwerveSubsystem(CougarLibInjectedParameters parameters) {
     super("Swerve Subsystem", parameters);
     CougarLogger logger = getLogger();
     m_modules = new SwerveModule[] {
@@ -92,24 +89,6 @@ public class SwerveSubsystem extends CougarSubsystem {
     setRobotRampRate(0.0);
     setRobotIdleMode(IdleMode.kBrake);
     
-  }
-
-
-  public static SwerveSubsystem getInstance(CougarLibInjectedParameters parameters) {
-    if(instance == null) {
-      instance = new SwerveSubsystem(parameters);
-    }
-    return instance;
-  }
-
-  /**
-   * Move the swerve subsystem to a certain position.
-   * 
-   * @param xPos the position to move the robot vertically in meters
-   * @param yPos the position to move the robot horizontally in meters
-   */
-  public void movetoPosition(double xPos, double yPos) {
-    translationController.calculate(yPos);
   }
 
   /**
@@ -245,6 +224,7 @@ public class SwerveSubsystem extends CougarSubsystem {
 
   public Pose2d getOdometryValue() {
     return m_odometer.getEstimatedPosition();
+  }
   /**
    * Sets the module speed and heading for all 4 modules.
    *
@@ -321,7 +301,7 @@ public class SwerveSubsystem extends CougarSubsystem {
     m_chassisSpeeds = translationalDriftCorrection(m_chassisSpeeds);
     m_chassisSpeeds = rotationalDriftCorrection(m_chassisSpeeds);
 
-    SwerveModuleState[] states = SwerveConfig.kFirstOrderDriveKinematics
+    SwerveModuleState[] states = SwerveConfig.kDriveKinematics
         .toSwerveModuleStates(m_chassisSpeeds);
 
     setModuleStates(states);

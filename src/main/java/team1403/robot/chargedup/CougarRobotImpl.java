@@ -20,6 +20,9 @@ import team1403.robot.chargedup.photonvision.PhotonVisionSubsystem;
 import team1403.robot.chargedup.swerve.SwerveCommand;
 import team1403.robot.chargedup.swerve.SwerveDrivePath;
 import team1403.robot.chargedup.RobotConfig.DriverConfig;
+import team1403.robot.chargedup.RobotConfig.OperatorConfig;
+import team1403.robot.chargedup.arm.Arm;
+import team1403.robot.chargedup.arm.ArmCommand;
 import team1403.robot.chargedup.swerve.SwerveCommand;
 import team1403.robot.chargedup.swerve.SwerveDrivePath;
 import team1403.robot.chargedup.swerve.SwerveSubsystem;
@@ -49,12 +52,10 @@ public class CougarRobotImpl extends CougarRobot {
     var logger = CougarLogger.getChildLogger(
         parameters.getRobotLogger(), "BuiltinDevices");
 
+        
     m_builtins = new BuiltinSubsystem(parameters, logger);
-
-
-    // m_arm = new Arm(parameters); 
     m_visionSubsystem = new PhotonVisionSubsystem(parameters);
-    // m_arm = new Arm(parameters);
+    m_arm = new Arm(parameters);
     m_swerveSubsystem = new SwerveSubsystem(parameters);
 
     configureOperatorInterface();
@@ -211,7 +212,7 @@ public class CougarRobotImpl extends CougarRobot {
    * @param xboxOperator defines which controller is being used
    */
   private void manualOperatorMode(XboxController xboxOperator) {
-    m_arm.setDefaultCommand(new ArmCommands(m_arm,
+    m_arm.setDefaultCommand(new ArmCommand(m_arm,
         () -> xboxOperator.getLeftY(),
         () -> xboxOperator.getRightY(),
         () -> xboxOperator.getRightTriggerAxis(),

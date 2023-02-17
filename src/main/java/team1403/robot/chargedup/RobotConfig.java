@@ -64,7 +64,7 @@ public class RobotConfig {
     public static final double kTrackWidth = Units.inchesToMeters(21);
     public static final double kWheelBase = Units.inchesToMeters(25.5);
 
-    public static final SwerveDriveKinematics kFirstOrderDriveKinematics = 
+    public static final SwerveDriveKinematics kDriveKinematics = 
         new SwerveDriveKinematics(
             // Front left
             new Translation2d(kTrackWidth / 2.0, kWheelBase / 2.0),
