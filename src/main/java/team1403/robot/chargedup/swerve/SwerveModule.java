@@ -274,7 +274,7 @@ public class SwerveModule implements Device {
    * @param steerAngle          the current steer angle.
    * @param driveMetersPerSecond the current drive voltage
    */
-  public double convertDriveMetersPerSecond(double driveMetersPerSecond, double steerAngle) {
+  private double convertDriveMetersPerSecond(double driveMetersPerSecond, double steerAngle) {
 
     double difference = normalizeAngleError(steerAngle);
 

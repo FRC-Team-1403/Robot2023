@@ -178,32 +178,32 @@ public class CougarRobotImpl extends CougarRobot {
     return new XboxController(port);
   }
 
-  //TODO, figure out actual setpoint values
+  // //TODO, figure out actual setpoint values
   
-  /**
-   * This is the auto mode for operator.
-   * Has 5 setpoints, which will each set the arm
-   * in different positions
-   * A Button -> Ground
-   * B Button -> Shelf
-   * Dpad down Button -> Tuck
-   * DPad Up -> High
-   * DPad Right -> Mid
-   *
-   * @param xboxOperator defines which controller is being used
-   */
-  public void autoOperatorMode(XboxController xboxOperator) {
-    new Trigger(() -> xboxOperator.getAButton()).onFalse(
-      new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-    new Trigger(() -> xboxOperator.getBButton()).onFalse(
-        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadDown)).onFalse(
-        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadUp)).onFalse(
-      new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadRight)).onFalse(
-        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-  }
+  // /**
+  //  * This is the auto mode for operator.
+  //  * Has 5 setpoints, which will each set the arm
+  //  * in different positions
+  //  * A Button -> Ground
+  //  * B Button -> Shelf
+  //  * Dpad down Button -> Tuck
+  //  * DPad Up -> High
+  //  * DPad Right -> Mid
+  //  *
+  //  * @param xboxOperator defines which controller is being used
+  //  */
+  // public void autoOperatorMode(XboxController xboxOperator) {
+  //   new Trigger(() -> xboxOperator.getAButton()).onFalse(
+  //     new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  //   new Trigger(() -> xboxOperator.getBButton()).onFalse(
+  //       new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  //   new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadDown)).onFalse(
+  //       new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  //   new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadUp)).onFalse(
+  //     new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  //   new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadRight)).onFalse(
+  //       new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  // }
 
   /**
    * This is the manual mode for operator.
@@ -218,7 +218,7 @@ public class CougarRobotImpl extends CougarRobot {
         () -> xboxOperator.getRightTriggerAxis(),
         () -> xboxOperator.getLeftTriggerAxis()));
 
-  }
+  // }
 
   /**
    * Switches the operator mode.
@@ -230,7 +230,7 @@ public class CougarRobotImpl extends CougarRobot {
   private final BuiltinSubsystem m_builtins;
   private final PhotonVisionSubsystem m_visionSubsystem;
   private CougarScriptReader m_reader;
-  private final Arm m_arm;
+  // private final Arm m_arm;
   private boolean m_armOperatorManual = true;
   private final SwerveSubsystem m_swerveSubsystem;
 
