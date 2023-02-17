@@ -1,13 +1,5 @@
 package team1403.robot.chargedup.swerve;
 
-
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
-import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
-import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
@@ -15,6 +7,8 @@ import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel;
+import com.revrobotics.MotorFeedbackSensor;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.SparkMaxRelativeEncoder;
 
@@ -22,11 +16,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import team1403.lib.device.Device;
 import team1403.lib.device.Encoder;
 import team1403.lib.device.wpi.CougarSparkMax;
-import team1403.lib.device.wpi.CougarTalonFx;
 import team1403.lib.util.CougarLogger;
 import team1403.robot.chargedup.RobotConfig;
 import team1403.robot.chargedup.RobotConfig.SwerveConfig;
@@ -45,6 +37,8 @@ public class SwerveModule implements Device {
   private final CANCoder m_absoluteEncoder;
   private final double m_absoluteEncoderOffset;
   private final Encoder m_driveRelativeEncoder;
+  private final RelativeEncoder m_steerRelativeEncoder;
+  private final SparkMaxPIDController m_steerPidController;
   private final CougarLogger m_logger;
   private final String m_name;
 
@@ -75,6 +69,8 @@ public class SwerveModule implements Device {
     m_absoluteEncoder = new CANCoder(canCoderPort);
     m_driveRelativeEncoder = m_driveMotor.getEmbeddedEncoder();
     m_absoluteEncoderOffset = offset;
+    m_steerRelativeEncoder = m_steerMotor.getEncoder();
+    m_steerPidController = m_steerMotor.getPIDController();
 
     initEncoders();
     initSteerMotor();
@@ -104,11 +100,11 @@ public class SwerveModule implements Device {
     m_driveRelativeEncoder.setVelocityConversionFactor(drivePositionConversionFactor / 60.0);
 
     //Config steer relative encoder
-    m_steerMotor.getEncoder().setPositionConversionFactor(
-        2.0 * Math.PI * SwerveConfig.kSteerReduction);
-    m_steerMotor.getEncoder().setVelocityConversionFactor(
-        2.0 * Math.PI * SwerveConfig.kSteerReduction / 60.0);
-    m_steerMotor.getEncoder().setPosition(getAbsoluteAngle());
+    m_steerRelativeEncoder.setPositionConversionFactor(
+        SwerveConfig.kSteerRelativeEncoderPositionConversionFactor);
+    m_steerRelativeEncoder.setVelocityConversionFactor(
+        SwerveConfig.kSteerRelativeEncoderVelocityConversionFactor);
+    m_steerRelativeEncoder.setPosition(getAbsoluteAngle());
   }
 
   private void initSteerMotor() {
@@ -120,11 +116,13 @@ public class SwerveModule implements Device {
     m_steerMotor.enableVoltageCompensation(12);
     m_steerMotor.setSmartCurrentLimit(20);
 
-    SparkMaxPIDController controller = m_steerMotor.getPIDController();
-    controller.setP(RobotConfig.SwerveConfig.kPTurning);
-    controller.setI(RobotConfig.SwerveConfig.kITurning);
-    controller.setD(RobotConfig.SwerveConfig.kDTurning);
-    controller.setFeedbackDevice(m_steerMotor.getEncoder());
+    m_steerPidController.setP(SwerveConfig.kPTurning);
+    m_steerPidController.setI(SwerveConfig.kITurning);
+    m_steerPidController.setD(SwerveConfig.kDTurning);
+    m_steerPidController.setFeedbackDevice((MotorFeedbackSensor) m_steerRelativeEncoder);
+    m_steerPidController.setPositionPIDWrappingMaxInput(180);
+    m_steerPidController.setPositionPIDWrappingMinInput(-180);
+    m_steerPidController.setPositionPIDWrappingEnabled(true);
   }
 
   private void initDriveMotor() {
@@ -226,27 +224,28 @@ public class SwerveModule implements Device {
 
     // Angle to be changed is now in radians
     double referenceAngleRadians = steerAngle;
+    SmartDashboard.putNumber("Target Angle", Math.toDegrees(referenceAngleRadians));
+
     double currentAngleRadians = m_steerMotor.getEncoder().getPosition();
 
-    // Reset the NEO's encoder periodically when the module is not rotating.
-    // Sometimes (~5% of the time) when we initialize, the absolute encoder isn't
-    // fully set up, and we don't
-    // end up getting a good reading. If we reset periodically this won't matter
-    // anymore.
-    if (m_steerMotor.getEncoder().getVelocity() 
-            < SwerveConfig.kEncoderResetMaxAngularVelocity) {
-      if (++m_absoluteEncoderResetIterations >= SwerveConfig.kEncoderResetIterations) {
-        m_logger.tracef("Resetting steer relative encoder. Reset iteration %f", 
-            m_absoluteEncoderResetIterations);
-        m_absoluteEncoderResetIterations = 0;
-        double absoluteAngle = getAbsoluteAngle();    
-        m_steerMotor.getEncoder().setPosition(getAbsoluteAngle()
-            / SwerveConfig.kSteerRelativeEncoderPositionConversionFactor);
-        currentAngleRadians = absoluteAngle;
-      }
-    } else {
-      m_absoluteEncoderResetIterations = 0;
-    }
+    // // Reset the NEO's encoder periodically when the module is not rotating.
+    // // Sometimes (~5% of the time) when we initialize, the absolute encoder isn't
+    // // fully set up, and we don't
+    // // end up getting a good reading. If we reset periodically this won't matter
+    // // anymore.
+    // if (m_steerMotor.getEncoder().getVelocity() 
+    //         < SwerveConfig.kEncoderResetMaxAngularVelocity) {
+    //   if (++m_absoluteEncoderResetIterations >= SwerveConfig.kEncoderResetIterations) {
+    //     m_logger.tracef("Resetting steer relative encoder. Reset iteration %f", 
+    //         m_absoluteEncoderResetIterations);
+    //     m_absoluteEncoderResetIterations = 0;
+    //     double absoluteAngle = getAbsoluteAngle();    
+    //     m_steerMotor.getEncoder().setPosition(getAbsoluteAngle());
+    //     currentAngleRadians = absoluteAngle;
+    //   }
+    // } else {
+    //   m_absoluteEncoderResetIterations = 0;
+    // }
 
     double currentAngleRadiansMod = normalizeAngle(currentAngleRadians);
 
@@ -262,8 +261,7 @@ public class SwerveModule implements Device {
 
     // The position that the motor should turn to
     // when taking into account the ticks of the motor
-    return adjustedReferenceAngleRadians 
-      / SwerveConfig.kSteerRelativeEncoderPositionConversionFactor;
+    return adjustedReferenceAngleRadians;
   }
 
   /**

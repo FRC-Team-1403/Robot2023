@@ -30,7 +30,7 @@ public class SwerveSubsystem extends CougarSubsystem {
   private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds();
   private final SwerveDriveOdometry m_odometer;
 
-  private final PIDController m_driftCorrectionPid = new PIDController(0.33, 0, 0);
+  private final PIDController m_driftCorrectionPid = new PIDController(0.35, 0, 0);
   private double m_desiredHeading = 0;
   private double m_speedLimiter = 0.6;
 
@@ -264,9 +264,24 @@ public class SwerveSubsystem extends CougarSubsystem {
 
   @Override
   public void periodic() {
+    // SmartDashboard.putNumber("Front Left absolute encoder", m_modules[0].getAbsoluteAngle());
+    // SmartDashboard.putNumber("Front Right absolute encoder", m_modules[1].getAbsoluteAngle());
+    // SmartDashboard.putNumber("Back Left absolute encoder", m_modules[2].getAbsoluteAngle());
+    // SmartDashboard.putNumber("Back Right absolute encoder", m_modules[3].getAbsoluteAngle());
+
+    SmartDashboard.putNumber("Front Left relative encoder", 
+        Math.toDegrees(m_modules[0].getSteerAngle()));
+    SmartDashboard.putNumber("Front Right relative encoder", 
+        Math.toDegrees(m_modules[1].getSteerAngle()));
+    SmartDashboard.putNumber("Back Left relative encoder", 
+        Math.toDegrees(m_modules[2].getSteerAngle()));
+    SmartDashboard.putNumber("Back Right relative encoder", 
+        Math.toDegrees(m_modules[3].getSteerAngle()));
+
     SmartDashboard.putNumber("Gyro Reading", getGyroscopeRotation().getDegrees());
     m_odometer.update(getGyroscopeRotation(), getModulePositions());
     SmartDashboard.putString("Odometry", m_odometer.toString());
+    SmartDashboard.putString("Chassis Speeds", m_chassisSpeeds.toString());
 
     driftCorrection();
 
