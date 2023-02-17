@@ -232,24 +232,24 @@ public class SwerveModule implements Device {
 
     double currentAngleRadians = m_steerMotor.getEncoder().getPosition();
 
-    // // Reset the NEO's encoder periodically when the module is not rotating.
-    // // Sometimes (~5% of the time) when we initialize, the absolute encoder isn't
-    // // fully set up, and we don't
-    // // end up getting a good reading. If we reset periodically this won't matter
-    // // anymore.
-    // if (m_steerMotor.getEncoder().getVelocity() 
-    //         < SwerveConfig.kEncoderResetMaxAngularVelocity) {
-    //   if (++m_absoluteEncoderResetIterations >= SwerveConfig.kEncoderResetIterations) {
-    //     m_logger.tracef("Resetting steer relative encoder. Reset iteration %f", 
-    //         m_absoluteEncoderResetIterations);
-    //     m_absoluteEncoderResetIterations = 0;
-    //     double absoluteAngle = getAbsoluteAngle();    
-    //     m_steerMotor.getEncoder().setPosition(getAbsoluteAngle());
-    //     currentAngleRadians = absoluteAngle;
-    //   }
-    // } else {
-    //   m_absoluteEncoderResetIterations = 0;
-    // }
+    // Reset the NEO's encoder periodically when the module is not rotating.
+    // Sometimes (~5% of the time) when we initialize, the absolute encoder isn't
+    // fully set up, and we don't
+    // end up getting a good reading. If we reset periodically this won't matter
+    // anymore.
+    if (m_steerMotor.getEncoder().getVelocity() 
+            < SwerveConfig.kEncoderResetMaxAngularVelocity) {
+      if (++m_absoluteEncoderResetIterations >= SwerveConfig.kEncoderResetIterations) {
+        m_logger.tracef("Resetting steer relative encoder. Reset iteration %f", 
+            m_absoluteEncoderResetIterations);
+        m_absoluteEncoderResetIterations = 0;
+        double absoluteAngle = getAbsoluteAngle();    
+        m_steerMotor.getEncoder().setPosition(getAbsoluteAngle());
+        currentAngleRadians = absoluteAngle;
+      }
+    } else {
+      m_absoluteEncoderResetIterations = 0;
+    }
 
     double currentAngleRadiansMod = normalizeAngle(currentAngleRadians);
 
