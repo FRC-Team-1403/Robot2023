@@ -56,15 +56,15 @@ public class CougarRobotImpl extends CougarRobot {
 
     m_builtins = new BuiltinSubsystem(parameters, logger);
 
-    m_visionSubsystem = new PhotonVisionSubsystem();
 
-    m_arm = new Arm(parameters);
-    m_swerveSubsystem = new SwerveSubsystem(parameters);
+    // m_arm = new Arm(parameters);
+    // m_swerveSubsystem = SwerveSubsystem.getInstance(parameters);
  
+    m_visionSubsystem = new PhotonVisionSubsystem(parameters);
 
     configureOperatorInterface();
-    configureDriverInterface();
-    registerAutoCommands();
+    // configureDriverInterface();
+    // registerAutoCommands();
 
   }
 
@@ -82,70 +82,70 @@ public class CougarRobotImpl extends CougarRobot {
     new Trigger(() -> xboxOperator.getYButton()).onFalse(
         new InstantCommand(() -> m_visionSubsystem.SwitchPipeline()));
     
-    if (m_armOperatorManual) {
-      manualOperatorMode(xboxOperator);
-    } else {
-      autoOperatorMode(xboxOperator);
-    }
+    // if (m_armOperatorManual) {
+    //   manualOperatorMode(xboxOperator);
+    // } else {
+    //   autoOperatorMode(xboxOperator);
+    // }
   }
   
-  /**
-   * Configures the driver commands and their bindings.
-   */
-  private void configureDriverInterface() {
-    XboxController xboxDriver = getJoystick("Driver", DriverConfig.pilotPort);
-    new Trigger(() -> xboxDriver.getRawButton(1)).onFalse(new InstantCommand(() -> m_visionSubsystem.SwitchPipeline()));
+  // /**
+  //  * Configures the driver commands and their bindings.
+  //  */
+  // private void configureDriverInterface() {
+  //   XboxController xboxDriver = getJoystick("Driver", DriverConfig.pilotPort);
+  //   new Trigger(() -> xboxDriver.getRawButton(1)).onFalse(new InstantCommand(() -> m_visionSubsystem.SwitchPipeline()));
 
-    // The controls are for field-oriented driving:
-    // Left stick Y axis -> forward and backwards movement
-    // Left stick X axis -> left and right movement
-    // Right stick X axis -> rotation
-    // Setting default command of swerve subsystem
-    m_swerveSubsystem.setDefaultCommand(new SwerveCommand(
-        m_swerveSubsystem,
-        () -> -deadband(xboxDriver.getLeftY(), 0.05),
-        () -> -deadband(xboxDriver.getLeftX(), 0.05),
-        () -> -deadband(xboxDriver.getRightX(), 0.05),
-        () -> xboxDriver.getYButtonReleased())
-    );
+  //   // The controls are for field-oriented driving:
+  //   // Left stick Y axis -> forward and backwards movement
+  //   // Left stick X axis -> left and right movement
+  //   // Right stick X axis -> rotation
+  //   // Setting default command of swerve subsystem
+  //   m_swerveSubsystem.setDefaultCommand(new SwerveCommand(
+  //       m_swerveSubsystem,
+  //       () -> -deadband(xboxDriver.getLeftY(), 0.05),
+  //       () -> -deadband(xboxDriver.getLeftX(), 0.05),
+  //       () -> -deadband(xboxDriver.getRightX(), 0.05),
+  //       () -> xboxDriver.getYButtonReleased())
+  //   );
 
 
-    new Trigger(() -> xboxDriver.getRightBumper()).onFalse(
-        new InstantCommand(() -> m_swerveSubsystem.increaseSpeed(0.2)));
+  //   new Trigger(() -> xboxDriver.getRightBumper()).onFalse(
+  //       new InstantCommand(() -> m_swerveSubsystem.increaseSpeed(0.2)));
 
-    new Trigger(() -> xboxDriver.getLeftBumper()).onFalse(
-        new InstantCommand(() -> m_swerveSubsystem.decreaseSpeed(0.2)));
-  }
+  //   new Trigger(() -> xboxDriver.getLeftBumper()).onFalse(
+  //       new InstantCommand(() -> m_swerveSubsystem.decreaseSpeed(0.2)));
+  // }
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  private void registerAutoCommands() {
-    m_reader = new CougarScriptReader((Pose2d startPose) -> {
-      double feetToMeters = 0.30478512648;
+  // /**
+  //  * Use this to pass the autonomous command to the main {@link Robot} class.
+  //  *
+  //  * @return the command to run in autonomous
+  //  */
+  // private void registerAutoCommands() {
+  //   m_reader = new CougarScriptReader((Pose2d startPose) -> {
+  //     double feetToMeters = 0.30478512648;
 
-      Translation2d flippedXandY = new Translation2d(
-          startPose.getY() * feetToMeters, startPose.getX() * feetToMeters);
+  //     Translation2d flippedXandY = new Translation2d(
+  //         startPose.getY() * feetToMeters, startPose.getX() * feetToMeters);
 
-      Rotation2d theta = new Rotation2d(
-          startPose.getRotation().getDegrees());
+  //     Rotation2d theta = new Rotation2d(
+  //         startPose.getRotation().getDegrees());
 
-      Pose2d transformedStartPose;
+  //     Pose2d transformedStartPose;
 
-      transformedStartPose = new Pose2d(flippedXandY, theta);
-      m_swerveSubsystem.setPose(transformedStartPose);
-    });
+  //     transformedStartPose = new Pose2d(flippedXandY, theta);
+  //     m_swerveSubsystem.setPose(transformedStartPose);
+  //   });
 
-    m_reader.registerCommand("SwerveDrivePath", (CougarScriptObject p) -> {
-      List<Translation2d> wayPoints = p.getPointList("Waypoints");
-      return new SwerveDrivePath(m_swerveSubsystem,
-          p.getDouble("StartAngle"),
-          p.getDouble("EndAngle"),
-          wayPoints);
-    });
-  }
+  //   m_reader.registerCommand("SwerveDrivePath", (CougarScriptObject p) -> {
+  //     List<Translation2d> wayPoints = p.getPointList("Waypoints");
+  //     return new SwerveDrivePath(m_swerveSubsystem,
+  //         p.getDouble("StartAngle"),
+  //         p.getDouble("EndAngle"),
+  //         wayPoints);
+  //   });
+  // }
 
   /**
    * Applies a deadband to the given value.
@@ -184,34 +184,34 @@ public class CougarRobotImpl extends CougarRobot {
     return new XboxController(port);
   }
 
+  // public void autoOperatorMode(XboxController xboxOperator) {
+  //   new Trigger(() -> xboxOperator.getAButton()).onFalse(
+  //     new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  //   new Trigger(() -> xboxOperator.getBButton()).onFalse(
+  //       new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  //   new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadDown)).onFalse(
+  //       new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  //   new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadUp)).onFalse(
+  //     new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  //   new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadRight)).onFalse(
+  //       new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  // }
+  
+  // private void manualOperatorMode(XboxController xboxOperator) {
+  //   m_arm.setDefaultCommand(new ArmCommands(m_arm,
+  //       () -> xboxOperator.getLeftY(),
+  //       () -> xboxOperator.getRightY(),
+  //       () -> xboxOperator.getRightTriggerAxis(),
+  //       () -> xboxOperator.getLeftTriggerAxis()));
+
+  // }
+
   private final BuiltinSubsystem m_builtins;
   private final PhotonVisionSubsystem m_visionSubsystem;
   private CougarScriptReader m_reader;
-  private final Arm m_arm;
+  // private final Arm m_arm;
   private boolean m_armOperatorManual = true;
-  private final SwerveSubsystem m_swerveSubsystem;
-
-  public void autoOperatorMode(XboxController xboxOperator) {
-    new Trigger(() -> xboxOperator.getAButton()).onFalse(
-      new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-    new Trigger(() -> xboxOperator.getBButton()).onFalse(
-        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadDown)).onFalse(
-        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadUp)).onFalse(
-      new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadRight)).onFalse(
-        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-  }
-  
-  private void manualOperatorMode(XboxController xboxOperator) {
-    m_arm.setDefaultCommand(new ArmCommands(m_arm,
-        () -> xboxOperator.getLeftY(),
-        () -> xboxOperator.getRightY(),
-        () -> xboxOperator.getRightTriggerAxis(),
-        () -> xboxOperator.getLeftTriggerAxis()));
-
-  }
+  // private final SwerveSubsystem m_swerveSubsystem;
 
 }
 
