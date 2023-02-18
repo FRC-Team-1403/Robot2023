@@ -21,7 +21,7 @@ public class NavxAhrs extends AHRS implements GyroscopeDevice{
   }
 
   @Override
-  public String getName() {
+  public String getName() { 
     return m_name;
   }
 

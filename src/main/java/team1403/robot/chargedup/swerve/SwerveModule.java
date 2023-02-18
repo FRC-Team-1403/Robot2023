@@ -30,7 +30,7 @@ import team1403.robot.chargedup.RobotConfig.SwerveConfig;
  * Also consists of a absolute encoder to track steer angle.
  */
 public class SwerveModule implements Device {
-  private double m_absoluteEncoderResetIterations = 0;
+  public double m_absoluteEncoderResetIterations = 0;
 
   private final CougarSparkMax m_driveMotor;
   private final CougarSparkMax m_steerMotor;
@@ -83,7 +83,7 @@ public class SwerveModule implements Device {
     return m_name;
   }
 
-  private void initEncoders() {
+  public void initEncoders() {
     // Config absolute encoder
     if (m_absoluteEncoder.getMagnetFieldStrength() != MagnetFieldStrength.Good_GreenLED) {
       System.err.println("CANCoder magnetic field strength is unacceptable.");
@@ -129,7 +129,7 @@ public class SwerveModule implements Device {
     m_steerPidController.setPositionPIDWrappingEnabled(true);
   }
 
-  private void initDriveMotor() {
+  public void initDriveMotor() {
     m_driveMotor.setInverted(true);
     m_driveMotor.setVoltageCompensation(RobotConfig.SwerveConfig.kVoltageSaturation);
     m_driveMotor.setAmpLimit(RobotConfig.SwerveConfig.kCurrentLimit);
@@ -191,7 +191,7 @@ public class SwerveModule implements Device {
    * @param targetAngle the angle to be moved to
    * @return The steer angle after accounting for error.
    */
-  private double normalizeAngleError(double targetAngle) {
+  public double normalizeAngleError(double targetAngle) {
     // Angle is inbetween 0 to 2pi
 
     double difference = targetAngle - getSteerAngle();

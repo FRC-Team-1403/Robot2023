@@ -11,7 +11,7 @@ import team1403.robot.chargedup.RobotConfig;
 /**
  * class ArmCommands is the where the commands for Arm.java is located
  */
-public class ArmCommands extends CommandBase {
+public class ArmCommand extends CommandBase {
   private final DoubleSupplier m_armAngleSupplier;
   private final DoubleSupplier m_wristAngleSupplier;
   private final DoubleSupplier m_armExtensionIncreaseSupplier;
@@ -37,7 +37,7 @@ public class ArmCommands extends CommandBase {
    * @param armExtensionDecrease function that determines
     the decrease of arm extension, 0 to 1
    */
-  public ArmCommands(Arm arm, DoubleSupplier armAngle, DoubleSupplier wristAngle,
+  public ArmCommand(Arm arm, DoubleSupplier armAngle, DoubleSupplier wristAngle,
       DoubleSupplier armExtensionIncrease, DoubleSupplier armExtensionDecrease) {
     this.m_arm = arm;
     this.m_armAngleSupplier = armAngle;

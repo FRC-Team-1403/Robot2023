@@ -229,7 +229,6 @@ public final class CougarSparkMax extends CANSparkMax implements AdvancedMotorCo
     
     private final String m_encoderName;
     private final RelativeEncoder m_encoder;
-    
   }
 
   /**

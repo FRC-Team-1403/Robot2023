@@ -168,8 +168,6 @@ public class TalonSrx extends WPI_TalonSRX
     }
 
     private final String m_encoderName;
-
-    
   }
 
   /**
