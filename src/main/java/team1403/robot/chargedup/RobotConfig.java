@@ -105,13 +105,13 @@ public class RobotConfig {
   public static class CanBus {
 
     //Arm Ports
-    public static final int wheelIntakeMotor = 3;
-    public static final int telescopicArmMotor = 4;
-    public static final int leftAngledArmMotor = 5; 
-    public static final int rightAngledArmMotor = 6;
-    public static final int wristMotor = 7;
-    public static final int frontArmSwitch = 9;
-    public static final int backArmSwitch = 10;
+    public static final int wheelIntakeMotor = 5;
+    public static final int telescopicArmMotor = 4; //Done
+    public static final int leftPivotMotor = 2; //Done
+    public static final int rightPivotMotor = 3; //Done
+    public static final int wristMotor = 1; //Done
+    public static final int frontArmSwitch = 6;
+    public static final int backArmSwitch = 7;
 
     // Swerve CanBus ids
     public static final int frontLeftDriveId = 1;
@@ -160,7 +160,7 @@ public class RobotConfig {
     /**
      * The joystick port for the operator's controller.
      */
-    public static final int pilotPort = 1;
+    public static final int pilotPort = 0;
 
     /**
      * Encoder ticks from center still considered close enough to be at center.

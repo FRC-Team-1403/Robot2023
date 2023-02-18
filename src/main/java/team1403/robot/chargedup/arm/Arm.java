@@ -55,10 +55,10 @@ public class Arm extends CougarSubsystem {
     RobotConfig.CanBus.telescopicArmMotor, Type.kHallSensor, getLogger());
 
     m_leftArmAngleMotor = CougarSparkMax.makeBrushless("leftAngledArmMotor",
-        RobotConfig.CanBus.leftAngledArmMotor, Type.kHallSensor, logger);
+        RobotConfig.CanBus.leftPivotMotor, Type.kHallSensor, logger);
 
     m_rightArmAngleMotor = CougarSparkMax.makeBrushless("rightAngledArmMotor",
-        RobotConfig.CanBus.rightAngledArmMotor, Type.kHallSensor, logger);
+        RobotConfig.CanBus.rightPivotMotor, Type.kHallSensor, logger);
 
     m_wristAngleMotor = CougarSparkMax.makeBrushless("wristMotor",
     RobotConfig.CanBus.wristMotor, Type.kHallSensor, logger);
