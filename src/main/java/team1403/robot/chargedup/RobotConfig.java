@@ -190,49 +190,41 @@ public class RobotConfig {
   public static class Arm {
 
     public static double maxVerticalAngle = Math.acos(44.3 / 60.218);
-    public static double angleHittingRobot = 0;
-    public static double angleHittingGround = 0;
+    public static double angleHittingRobot = 66;
+    public static double angleHittingGround = 80;
 
     public static double kPhysicalArmMaxExtension = 60.218;
 
-    public static final int kPArmAngle = 0;
+    public static final int kPArmAngle = 1;
     public static final int kIArmAngle = 0;
     public static final int kDArmAngle = 0;
 
-    public static final int kPArmExtension = 0;
+    public static final int kPArmExtension = 1;
     public static final int kIArmExtension = 0;
     public static final int kDArmExtension = 0;
 
-    public static final int kPWristAngle = 0;
+    public static final int kPWristAngle = 1;
     public static final int kIWristAngle = 0;
     public static final int kDWristAngle = 0;
 
     public static final double kArmConversionFactor = 1;
-    public static final double kWristConversionFactor = 2;
-    public static final double kArmLengthConversionFactor = 3;
-    public static final double kWheelIntakeConversionFactor = 4;
+    public static final double kWristConversionFactor = 1; //TODO
+    public static final double kArmLengthConversionFactor = 1; //TODO
+    public static final double kWheelIntakeConversionFactor = 1; //TODO
 
-    public static final double kMaxArmRotation = 270;
-    public static final double kMinArmRotation = 66.72;
-    public static final double kMaxWristRotation = 90;
-    public static final double kMinWristRotation = 0;
-    public static final double kMinArmExtension = 5;
-    public static final double kMaxArmExtension = 15;
-
-    
+    public static final double kMaxArmRotation = 246;
+    public static final double kMinArmRotation = 90;
+    public static final double kMaxWristRotation = 0; //TODO
+    public static final double kMinWristRotation = 0; //TODO
+    public static final double kMinArmExtension = 1;
+    public static final double kMaxArmExtension = 1;
 
     public static final Dimension wristDimensions = new Dimension(0, 0, 0);
 
-    public static final double kMaxAmperage = 0;
+    public static final double kArmAngleMaxAmperage = 100;
+    public static final double kArmExtensionMaxAmperage = 95;
 
-    public static final double kMaxArmLengthOffset = 0;
-    public static final double kAngleToMeters = 0;
-
-    /**
-     * This is the angular threshold to determine at what
-     * point the maximum extenstion of the arm should be
-     * limited by the arm hitting the ground.
-     */
-    public static final double kMaxGroundArmLengthThreshold = 0;
+    public static final double kMaxArmLengthOffset = 1;
+    public static final double kAngleToMeters = 0; //TODO
   }
 }

@@ -78,7 +78,7 @@ public class Arm extends CougarSubsystem {
 
     m_leftArmAngleMotor.getEmbeddedEncoder().setPositionConversionFactor(
         RobotConfig.Arm.kArmConversionFactor);
-    
+
     m_wristAngleMotor.getEmbeddedEncoder().setPositionConversionFactor(
         RobotConfig.Arm.kWristConversionFactor);
 
@@ -421,8 +421,12 @@ public class Arm extends CougarSubsystem {
    *
    * @return current amps
    */
-  public double getCurrentAmps() {
+  public double getCurrentArmAngleAmps() {
     return m_leftArmAngleMotor.getEmbeddedCurrentSensor().getAmps();
+  }
+
+  public double getCurrentArmExtensionAmps() {
+    return m_telescopicMotor.getEmbeddedCurrentSensor().getAmps();
   }
 
   /**
@@ -458,7 +462,8 @@ public class Arm extends CougarSubsystem {
   @Override
   public void periodic() {
     if (isFrontSwitchActive() || !isArmAngleWithinBounds()
-        || getCurrentAmps() <= RobotConfig.Arm.kMaxAmperage) {
+        || getCurrentArmAngleAmps() <= RobotConfig.Arm.kArmAngleMaxAmperage
+        || getCurrentArmExtensionAmps() <= RobotConfig.Arm.kArmExtensionMaxAmperage) {
       setArmAngleMotorSpeed(0);
       return;
     }
