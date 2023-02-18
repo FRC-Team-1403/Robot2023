@@ -15,21 +15,24 @@ import team1403.lib.device.wpi.WpiAnalogDevice;
 import team1403.lib.device.wpi.WpiLimitSwitch;
 
 public class ExperimentalSubsystem extends CougarSubsystem{
-    private final WpiLimitSwitch limitSwitch;
-    private final WpiAnalogDevice potentiometer;
-    private final DutyCycleEncoder grayhill;
+    // private final WpiLimitSwitch limitSwitch;
+    // private final WpiAnalogDevice potentiometer;
+    //private final DutyCycleEncoder grayhill;
+    private final AnalogEncoder ma3;
     public ExperimentalSubsystem(String name, CougarLibInjectedParameters injectedParameters) {
         super(name, injectedParameters);
-        grayhill = new DutyCycleEncoder(0);
-        limitSwitch = new WpiLimitSwitch("limitSwitch", 0);
-        potentiometer = new WpiAnalogDevice("potentiometer", 0);
+        //grayhill = new DutyCycleEncoder(0);
+        // limitSwitch = new WpiLimitSwitch("limitSwitch", 0);
+        // potentiometer = new WpiAnalogDevice("potentiometer", 0);
+        ma3 = new AnalogEncoder(0);
       }
 
     @Override
     public void periodic() {
-        SmartDashboard.putBoolean("Limit Switch Value", limitSwitch.get());
-        SmartDashboard.putNumber("Potentiometer Value", potentiometer.getAnalogValue());
-        SmartDashboard.putNumber("Encoder Value", grayhill.get());
+        // SmartDashboard.putBoolean("Limit Switch Value", limitSwitch.get());
+        // SmartDashboard.putNumber("Potentiometer Value", potentiometer.getAnalogValue());
+        //SmartDashboard.putNumber("Encoder Value", grayhill.get());
+        SmartDashboard.putNumber("ma3", ma3.get());
     }
 
 }
