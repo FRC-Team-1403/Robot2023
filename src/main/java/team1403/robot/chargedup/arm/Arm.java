@@ -9,8 +9,9 @@ import edu.wpi.first.wpilibj.Encoder;
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarSubsystem;
 import team1403.lib.device.AdvancedMotorController;
-import team1403.lib.device.DeviceFactory;
-import team1403.lib.device.LimitSwitch;
+import team1403.lib.device.wpi.CougarSparkMax;
+import team1403.lib.device.wpi.WpiAnalogDevice;
+import team1403.lib.device.wpi.WpiLimitSwitch;
 import team1403.lib.util.CougarLogger;
 import team1403.robot.chargedup.RobotConfig;
 
@@ -20,17 +21,17 @@ import team1403.robot.chargedup.RobotConfig;
  * Arm angle, arm extension, and then wrist angle
  */
 public class Arm extends CougarSubsystem {
-  private final AdvancedMotorController m_wheelIntakeMotor;
-  private final AdvancedMotorController m_telescopicMotor;
-  private final AdvancedMotorController m_leftArmAngleMotor;
-  private final AdvancedMotorController m_rightArmAngleMotor;
-  private final AdvancedMotorController m_wristAngleMotor;
-  private final LimitSwitch m_frontLimitSwitch;
-  private final LimitSwitch m_telescopicLimitSwitch;
+  private final CougarSparkMax m_wheelIntakeMotor;
+  private final CougarSparkMax m_telescopicMotor;
+  private final CougarSparkMax m_leftArmAngleMotor;
+  private final CougarSparkMax m_rightArmAngleMotor;
+  private final CougarSparkMax m_wristAngleMotor;
+  private final WpiLimitSwitch m_frontLimitSwitch;
+  private final WpiLimitSwitch m_telescopicLimitSwitch;
   private final PIDController m_pidArmAngle;
   private final PIDController m_pidWristAngle;
   private final PIDController m_pidArmLength;
-  private Encoder m_absoluteArmEncoder;
+  private WpiAnalogDevice m_absoluteArmEncoder;
   private Encoder m_absoluteWristEncoder;
   private Double m_wheelSpeed;
   private Double m_desiredArmAngle;
@@ -46,27 +47,26 @@ public class Arm extends CougarSubsystem {
     super("TelescopicArm", injectedParameters);
 
     CougarLogger logger = getLogger(); //after game, to see what robot did
-    DeviceFactory factory = injectedParameters.getDeviceFactory();
 
-    m_wheelIntakeMotor = factory.makeBrushlessCanSparkMax("wheelIntake",
+    m_wheelIntakeMotor = CougarSparkMax.makeBrushless("wheelIntake",
     RobotConfig.CanBus.wheelIntakeMotor, Type.kHallSensor, getLogger());
        
-    m_telescopicMotor = factory.makeBrushlessCanSparkMax("telescopic",
+    m_telescopicMotor = CougarSparkMax.makeBrushless("telescopic",
     RobotConfig.CanBus.telescopicArmMotor, Type.kHallSensor, getLogger());
 
-    m_leftArmAngleMotor = factory.makeBrushlessCanSparkMax("leftAngledArmMotor",
+    m_leftArmAngleMotor = CougarSparkMax.makeBrushless("leftAngledArmMotor",
         RobotConfig.CanBus.leftAngledArmMotor, Type.kHallSensor, logger);
 
-    m_rightArmAngleMotor = factory.makeBrushlessCanSparkMax("rightAngledArmMotor",
+    m_rightArmAngleMotor = CougarSparkMax.makeBrushless("rightAngledArmMotor",
         RobotConfig.CanBus.rightAngledArmMotor, Type.kHallSensor, logger);
 
-    m_wristAngleMotor = factory.makeBrushlessCanSparkMax("wristMotor",
+    m_wristAngleMotor = CougarSparkMax.makeBrushless("wristMotor",
     RobotConfig.CanBus.wristMotor, Type.kHallSensor, logger);
 
-    m_frontLimitSwitch = factory.makeLimitSwitch("frontSwitch",
+    m_frontLimitSwitch = new WpiLimitSwitch("frontSwitch",
     RobotConfig.RioPorts.exampleRailForwardLimitSwitch);
 
-    m_telescopicLimitSwitch = factory.makeLimitSwitch("telescopicLimitSwitch",
+    m_telescopicLimitSwitch = new WpiLimitSwitch("telescopicLimitSwitch",
     RobotConfig.RioPorts.exampleRailReverseLimitSwitch);
 
     m_rightArmAngleMotor.setInverted(true);
@@ -108,7 +108,7 @@ public class Arm extends CougarSubsystem {
    *
    * @return arm absolute encoder
    */
-  public Encoder getArmEncoder() {
+  public WpiAnalogDevice getArmEncoder() {
     return m_absoluteArmEncoder; 
   }
 
@@ -129,9 +129,9 @@ public class Arm extends CougarSubsystem {
    * Getter method for relative arm encoder,
    * sets the absolute wrist encoder to relative arm encoder.
    */
-  public void getRelativeArmEncoder() {   
+  public void getRelativeArmEncoder() {
     m_leftArmAngleMotor.getEmbeddedEncoder().setPositionOffset(
-        m_absoluteArmEncoder.get());
+        m_absoluteArmEncoder.getAnalogValue());
   }
 
   /**

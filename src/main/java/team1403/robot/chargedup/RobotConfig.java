@@ -213,7 +213,7 @@ public class RobotConfig {
     public static final double kWheelIntakeConversionFactor = 4;
 
     public static final double kMaxArmRotation = 270;
-    public static final double kMinArmRotation = 0;
+    public static final double kMinArmRotation = 66.72;
     public static final double kMaxWristRotation = 90;
     public static final double kMinWristRotation = 0;
     public static final double kMinArmExtension = 5;
