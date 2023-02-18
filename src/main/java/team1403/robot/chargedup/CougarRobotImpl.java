@@ -53,11 +53,11 @@ public class CougarRobotImpl extends CougarRobot {
 
     m_builtins = new BuiltinSubsystem(parameters, logger);
     m_arm = new Arm(parameters);
-    m_swerveSubsystem = new SwerveSubsystem(parameters);
+    // m_swerveSubsystem = new SwerveSubsystem(parameters);
 
     configureOperatorInterface();
-    configureDriverInterface();
-    registerAutoCommands();
+    // configureDriverInterface();
+    // registerAutoCommands();
 
   }
 
@@ -82,62 +82,62 @@ public class CougarRobotImpl extends CougarRobot {
     }
   }
 
-  /**
-   * Configures the driver commands and their bindings.
-   */
-  private void configureDriverInterface() {
-    XboxController xboxDriver = getJoystick("Driver", RobotConfig.DriverConfig.pilotPort);
+  // /**
+  //  * Configures the driver commands and their bindings.
+  //  */
+  // private void configureDriverInterface() {
+  //   XboxController xboxDriver = getJoystick("Driver", RobotConfig.DriverConfig.pilotPort);
 
-    // The controls are for field-oriented driving:
-    // Left stick Y axis -> forward and backwards movement
-    // Left stick X axis -> left and right movement
-    // Right stick X axis -> rotation
-    // Setting default command of swerve subsystem
-    m_swerveSubsystem.setDefaultCommand(new SwerveCommand(
-        m_swerveSubsystem,
-        () -> -deadband(xboxDriver.getLeftX(), 0.05),
-        () -> -deadband(xboxDriver.getLeftY(), 0.05),
-        () -> -deadband(xboxDriver.getRightX(), 0.05),
-        () -> xboxDriver.getYButtonReleased()));
+  //   // The controls are for field-oriented driving:
+  //   // Left stick Y axis -> forward and backwards movement
+  //   // Left stick X axis -> left and right movement
+  //   // Right stick X axis -> rotation
+  //   // Setting default command of swerve subsystem
+  //   m_swerveSubsystem.setDefaultCommand(new SwerveCommand(
+  //       m_swerveSubsystem,
+  //       () -> -deadband(xboxDriver.getLeftX(), 0.05),
+  //       () -> -deadband(xboxDriver.getLeftY(), 0.05),
+  //       () -> -deadband(xboxDriver.getRightX(), 0.05),
+  //       () -> xboxDriver.getYButtonReleased()));
 
-    new Trigger(() -> xboxDriver.getRightBumper()).onFalse(
-        new InstantCommand(() -> m_swerveSubsystem.increaseSpeed(0.2)));
+  //   new Trigger(() -> xboxDriver.getRightBumper()).onFalse(
+  //       new InstantCommand(() -> m_swerveSubsystem.increaseSpeed(0.2)));
 
-    new Trigger(() -> xboxDriver.getLeftBumper()).onFalse(
-        new InstantCommand(() -> m_swerveSubsystem.decreaseSpeed(0.2)));
+  //   new Trigger(() -> xboxDriver.getLeftBumper()).onFalse(
+  //       new InstantCommand(() -> m_swerveSubsystem.decreaseSpeed(0.2)));
 
-    new Trigger(() -> xboxDriver.getBButton()).onFalse(
-        new InstantCommand(() -> m_swerveSubsystem.zeroGyroscope()));
+  //   new Trigger(() -> xboxDriver.getBButton()).onFalse(
+  //       new InstantCommand(() -> m_swerveSubsystem.zeroGyroscope()));
 
-  }
+  // }
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  private void registerAutoCommands() {
-    m_reader = new CougarScriptReader((Pose2d startPose) -> {
-      double feetToMeters = 0.30478512648;
+  // /**
+  //  * Use this to pass the autonomous command to the main {@link Robot} class.
+  //  *
+  //  * @return the command to run in autonomous
+  //  */
+  // private void registerAutoCommands() {
+  //   m_reader = new CougarScriptReader((Pose2d startPose) -> {
+  //     double feetToMeters = 0.30478512648;
 
-      Translation2d flippedXandY = new Translation2d(
-          startPose.getY() * feetToMeters, startPose.getX() * feetToMeters);
+  //     Translation2d flippedXandY = new Translation2d(
+  //         startPose.getY() * feetToMeters, startPose.getX() * feetToMeters);
 
-      Rotation2d theta = new Rotation2d(
-          startPose.getRotation().getDegrees());
+  //     Rotation2d theta = new Rotation2d(
+  //         startPose.getRotation().getDegrees());
 
-      Pose2d transformedStartPose = new Pose2d(flippedXandY, theta);
-      m_swerveSubsystem.setPose(transformedStartPose);
-    });
+  //     Pose2d transformedStartPose = new Pose2d(flippedXandY, theta);
+  //     m_swerveSubsystem.setPose(transformedStartPose);
+  //   });
 
-    m_reader.registerCommand("SwerveDrivePath", (CougarScriptObject p) -> {
-      List<Translation2d> wayPoints = p.getPointList("Waypoints");
-      return new SwerveDrivePath(m_swerveSubsystem,
-          p.getDouble("StartAngle"),
-          p.getDouble("EndAngle"),
-          wayPoints);
-    });
-  }
+  //   m_reader.registerCommand("SwerveDrivePath", (CougarScriptObject p) -> {
+  //     List<Translation2d> wayPoints = p.getPointList("Waypoints");
+  //     return new SwerveDrivePath(m_swerveSubsystem,
+  //         p.getDouble("StartAngle"),
+  //         p.getDouble("EndAngle"),
+  //         wayPoints);
+  //   });
+  // }
 
   /**
    * Applies a deadband to the given value.
@@ -230,5 +230,5 @@ public class CougarRobotImpl extends CougarRobot {
   private CougarScriptReader m_reader;
   private final Arm m_arm;
   private boolean m_armOperatorManual = true;
-  private final SwerveSubsystem m_swerveSubsystem;
+  // private final SwerveSubsystem m_swerveSubsystem;
 }

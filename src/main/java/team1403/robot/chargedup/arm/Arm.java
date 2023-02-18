@@ -21,7 +21,7 @@ import team1403.robot.chargedup.RobotConfig;
  * Arm angle, arm extension, and then wrist angle
  */
 public class Arm extends CougarSubsystem {
-  private final CougarSparkMax m_wheelIntakeMotor;
+  // private final CougarSparkMax m_wheelIntakeMotor;
   private final CougarSparkMax m_telescopicMotor;
   private final CougarSparkMax m_leftArmAngleMotor;
   private final CougarSparkMax m_rightArmAngleMotor;
@@ -48,8 +48,8 @@ public class Arm extends CougarSubsystem {
 
     CougarLogger logger = getLogger(); //after game, to see what robot did
 
-    m_wheelIntakeMotor = CougarSparkMax.makeBrushless("wheelIntake",
-    RobotConfig.CanBus.wheelIntakeMotor, Type.kHallSensor, getLogger());
+    // m_wheelIntakeMotor = CougarSparkMax.makeBrushless("wheelIntake",
+    // RobotConfig.CanBus.wheelIntakeMotor, Type.kHallSensor, getLogger());
        
     m_telescopicMotor = CougarSparkMax.makeBrushless("telescopic",
     RobotConfig.CanBus.telescopicArmMotor, Type.kHallSensor, getLogger());
@@ -283,14 +283,14 @@ public class Arm extends CougarSubsystem {
     m_desiredWristAngle = limitWristAngle(wristAngle);
   }
 
-  /**
-   * sets the intake motor's speed.
-   *
-   * @param speed speed of motor
-   */
-  public void setWheelSpeed(double speed) {
-    m_wheelIntakeMotor.setSpeed(speed);
-  }
+  // /**
+  //  * sets the intake motor's speed.
+  //  *
+  //  * @param speed speed of motor
+  //  */
+  // public void setWheelSpeed(double speed) {
+  //   m_wheelIntakeMotor.setSpeed(speed);
+  // }
 
   /**
    * Move the arm to the desired angle where 0 is positive x axis
@@ -352,14 +352,14 @@ public class Arm extends CougarSubsystem {
     return (m_telescopicMotor.getEmbeddedEncoder().getPositionValue());
   }
 
-  /**
-   * Setter for wheel intake motor speed.
-   *
-   * @param speed speed for motor
-   */
-  public void setWheelIntakeMotorSpeed(double speed) {
-    m_wheelIntakeMotor.setSpeed(speed);
-  }
+  // /**
+  //  * Setter for wheel intake motor speed.
+  //  *
+  //  * @param speed speed for motor
+  //  */
+  // public void setWheelIntakeMotorSpeed(double speed) {
+  //   m_wheelIntakeMotor.setSpeed(speed);
+  // }
 
   /**
    * Setter for arm extension motor speed.
@@ -395,7 +395,7 @@ public class Arm extends CougarSubsystem {
     m_telescopicMotor.setSpeed(0);
     m_leftArmAngleMotor.setSpeed(0);
     m_wristAngleMotor.setSpeed(0);
-    m_wheelIntakeMotor.setSpeed(0);
+    // m_wheelIntakeMotor.setSpeed(0);
   }
      
   /**
@@ -485,6 +485,6 @@ public class Arm extends CougarSubsystem {
     setArmAngle(m_desiredArmAngle);
     setWristAngle(m_desiredWristAngle);
     setArmExtension(m_desiredArmExtension);
-    setWheelSpeed(m_wheelSpeed);
+    // setWheelSpeed(m_wheelSpeed);
   }
 }

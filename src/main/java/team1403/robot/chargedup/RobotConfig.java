@@ -105,13 +105,13 @@ public class RobotConfig {
   public static class CanBus {
 
     //Arm Ports
-    public static final int wheelIntakeMotor = 5;
+    // public static final int wheelIntakeMotor = 5;
     public static final int telescopicArmMotor = 4; //Done
     public static final int leftPivotMotor = 2; //Done
     public static final int rightPivotMotor = 3; //Done
     public static final int wristMotor = 1; //Done
-    public static final int frontArmSwitch = 6;
-    public static final int backArmSwitch = 7;
+    // public static final int frontArmSwitch = 6;
+    // public static final int telescopicSwitch = 7;
 
     // Swerve CanBus ids
     public static final int frontLeftDriveId = 1;
