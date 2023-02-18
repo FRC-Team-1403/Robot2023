@@ -213,8 +213,8 @@ public class CougarRobotImpl extends CougarRobot {
     m_arm.setDefaultCommand(new ArmCommands(m_arm,
         () -> xboxOperator.getLeftY(),
         () -> xboxOperator.getRightY(),
-        () -> xboxOperator.getRightTriggerAxis(),
-        () -> xboxOperator.getLeftTriggerAxis(),
+        () -> xboxOperator.getRightBumper(),
+        () -> xboxOperator.getLeftBumper(),
         () -> xboxOperator.getXButton()));
 
   }

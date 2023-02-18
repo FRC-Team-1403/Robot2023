@@ -6,16 +6,14 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-import team1403.robot.chargedup.RobotConfig;
-
 /**
  * class ArmCommands is the where the commands for Arm.java is located
  */
 public class ArmCommands extends CommandBase {
   private final DoubleSupplier m_armAngleSupplier;
   private final DoubleSupplier m_wristAngleSupplier;
-  private final DoubleSupplier m_armExtensionIncreaseSupplier;
-  private final DoubleSupplier m_armExtensionDecreaseSupplier;
+  private final BooleanSupplier m_armExtensionIncreaseSupplier;
+  private final BooleanSupplier m_armExtensionDecreaseSupplier;
   private BooleanSupplier m_wheelIntakeSupplier;
 
   private final Arm m_arm;
@@ -38,7 +36,7 @@ public class ArmCommands extends CommandBase {
     the decrease of arm extension, 0 to 1
    */
   public ArmCommands(Arm arm, DoubleSupplier armAngle, DoubleSupplier wristAngle,
-      DoubleSupplier armExtensionIncrease, DoubleSupplier armExtensionDecrease,
+      BooleanSupplier armExtensionIncrease, BooleanSupplier armExtensionDecrease,
         BooleanSupplier wheelIntake) {
     this.m_wheelIntakeSupplier = wheelIntake;
     this.m_arm = arm;
@@ -54,11 +52,13 @@ public class ArmCommands extends CommandBase {
   public void execute() {
     m_armAngle += m_armAngleSupplier.getAsDouble() * 2 /*360*/;
 
-    m_armExtension += m_armExtensionIncreaseSupplier.getAsDouble()
-      * 2 /*RobotConfig.Arm.kMaxArmExtension*/;
+    if (m_armExtensionIncreaseSupplier.getAsBoolean()) {
+      m_armExtension += 2;
+    }
 
-    m_armExtension -= m_armExtensionDecreaseSupplier.getAsDouble()
-      * 2 /*RobotConfig.Arm.kMaxArmExtension*/;
+    if (m_armExtensionDecreaseSupplier.getAsBoolean()) {
+      m_armExtension -= 2;
+    }
     
     m_wristAngle += m_wristAngleSupplier.getAsDouble() * 2 /*360*/;
 
