@@ -11,7 +11,7 @@ import team1403.robot.chargedup.RobotConfig;
 /**
  * class ArmCommands is the where the commands for Arm.java is located
  */
-public class ArmCommands extends CommandBase {
+public class ArmCommand extends CommandBase {
   private final DoubleSupplier m_armAngleSupplier;
   private final DoubleSupplier m_wristAngleSupplier;
   private final DoubleSupplier m_armExtensionIncreaseSupplier;

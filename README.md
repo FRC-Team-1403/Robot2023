@@ -1,4 +1,4 @@
-chargedup
+chargedup [![Build Status](https://github.com/FRC-Team-1403/Robot2023/actions/workflows/gradle.yml/badge.svg)](https://github.com/FRC-Team-1403/Robot2023/actions)
 ===
 
 This is a starting repository template for Team 1403 robots.

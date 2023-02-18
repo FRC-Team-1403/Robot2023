@@ -37,8 +37,13 @@ public class BuiltinSubsystem extends CougarSubsystem {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("BuiltinDevices.Pdp.Temp", m_pdp.getCelsius());
+    SmartDashboard.putNumber("BuiltinDevices.Pdp.Amps", m_pdp.getAmps());
+    SmartDashboard.putNumber("BuiltinDevices.Pdp.Volts", m_pdp.getVoltage());
+    SmartDashboard.putNumber("BuiltinDevices.Pdp.Joules", m_pdp.getTotalJoules());
+
     // Let's show memory usage (in MB) for curiosity.
-    // There doesnt seem to be a way to see in-use so we will show free.
+    // There doesnt seem to be a wawy to see in-use so we will show free.
     var runtime = Runtime.getRuntime();
     SmartDashboard.putNumber("Java.FreeMB",
                              ((double)runtime.freeMemory()) / (1000.0 * 1000.0));
