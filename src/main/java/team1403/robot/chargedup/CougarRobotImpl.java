@@ -53,15 +53,14 @@ public class CougarRobotImpl extends CougarRobot {
         parameters.getRobotLogger(), "BuiltinDevices");
 
         
-    m_builtins = new BuiltinSubsystem(parameters, logger);
-    m_visionSubsystem = new PhotonVisionSubsystem(parameters);
-    m_arm = new Arm(parameters);
+    // m_builtins = new BuiltinSubsystem(parameters, logger);
+    // m_visionSubsystem = new PhotonVisionSubsystem(parameters);
+    // m_arm = new Arm(parameters);
     m_swerveSubsystem = new SwerveSubsystem(parameters);
 
-    configureOperatorInterface();
+    // configureOperatorInterface();
     configureDriverInterface();
-    registerAutoCommands();
-
+    // registerAutoCommands();
   }
 
   @Override
@@ -73,18 +72,18 @@ public class CougarRobotImpl extends CougarRobot {
     /**
      * Configures the operator commands and their bindings.
      */
-    private void configureOperatorInterface() {
-      XboxController xboxOperator = getJoystick("Operator", OperatorConfig.pilotPort);
+  //   private void configureOperatorInterface() {
+  //     XboxController xboxOperator = getJoystick("Operator", OperatorConfig.pilotPort);
 
-      new Trigger(() -> xboxOperator.getYButton()).onFalse(
-          new InstantCommand(() -> switchOperatorMode()));
+  //     new Trigger(() -> xboxOperator.getYButton()).onFalse(
+  //         new InstantCommand(() -> switchOperatorMode()));
     
-      if (m_armOperatorManual) {
-        manualOperatorMode(xboxOperator);
-      } else {
-        autoOperatorMode(xboxOperator);
-    }
-  }
+  //     if (m_armOperatorManual) {
+  //       manualOperatorMode(xboxOperator);
+  //     } else {
+  //       autoOperatorMode(xboxOperator);
+  //   }
+  // }
 
   /**
    * Configures the driver commands and their bindings.
@@ -192,18 +191,18 @@ public class CougarRobotImpl extends CougarRobot {
    *
    * @param xboxOperator defines which controller is being used
    */
-  public void autoOperatorMode(XboxController xboxOperator) {
-    new Trigger(() -> xboxOperator.getAButton()).onFalse(
-      new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-    new Trigger(() -> xboxOperator.getBButton()).onFalse(
-        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadDown)).onFalse(
-        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadUp)).onFalse(
-      new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadRight)).onFalse(
-        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-  }
+  // public void autoOperatorMode(XboxController xboxOperator) {
+  //   new Trigger(() -> xboxOperator.getAButton()).onFalse(
+  //     new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  //   new Trigger(() -> xboxOperator.getBButton()).onFalse(
+  //       new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  //   new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadDown)).onFalse(
+  //       new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  //   new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadUp)).onFalse(
+  //     new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  //   new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadRight)).onFalse(
+  //       new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  // }
 
   /**
    * This is the manual mode for operator.
@@ -211,26 +210,26 @@ public class CougarRobotImpl extends CougarRobot {
    * 
    * @param xboxOperator defines which controller is being used
    */
-  private void manualOperatorMode(XboxController xboxOperator) {
-    m_arm.setDefaultCommand(new ArmCommand(m_arm,
-        () -> xboxOperator.getLeftY(),
-        () -> xboxOperator.getRightY(),
-        () -> xboxOperator.getRightTriggerAxis(),
-        () -> xboxOperator.getLeftTriggerAxis()));
-  }
+  // private void manualOperatorMode(XboxController xboxOperator) {
+  //   m_arm.setDefaultCommand(new ArmCommand(m_arm,
+  //       () -> xboxOperator.getLeftY(),
+  //       () -> xboxOperator.getRightY(),
+  //       () -> xboxOperator.getRightTriggerAxis(),
+  //       () -> xboxOperator.getLeftTriggerAxis()));
+  // }
 
   /**
    * Switches the operator mode.
    */
-  public void switchOperatorMode() {
-    m_armOperatorManual = !m_armOperatorManual;
-  }
+  // public void switchOperatorMode() {
+  //   m_armOperatorManual = !m_armOperatorManual;
+  // }
 
-  private final BuiltinSubsystem m_builtins;
-  private final PhotonVisionSubsystem m_visionSubsystem;
+  // private final BuiltinSubsystem m_builtins;
+  // private final PhotonVisionSubsystem m_visionSubsystem;
   private CougarScriptReader m_reader;
-  private final Arm m_arm;
-  private boolean m_armOperatorManual = true;
+  // private final Arm m_arm;
+  // private boolean m_armOperatorManual = true;
   private final SwerveSubsystem m_swerveSubsystem;
 
 }

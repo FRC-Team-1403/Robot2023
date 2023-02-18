@@ -93,8 +93,8 @@ public class RobotConfig {
 
     public static final double kMaxSpeed = 14.5;
 
-    public static final double kMaxAngularSpeed = (kMaxSpeed
-        / Math.hypot(kTrackWidth / 2.0, kWheelBase / 2.0)); // 39.795095397
+    public static final double kMaxAngularSpeed = 50;
+    // (kMaxSpeed / Math.hypot(kTrackWidth / 2.0, kWheelBase / 2.0)); // 39.795095397
 
     public static final double kVoltageSaturation = 12.0;
     public static final double kCurrentLimit = 20.0;
