@@ -5,10 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.revrobotics.SparkMaxRelativeEncoder;
-
-import edu.wpi.first.networktables.NetworkTable;
 
 import team1403.lib.device.AdvancedMotorController;
 import team1403.lib.device.AnalogDevice;
@@ -20,7 +17,6 @@ import team1403.lib.device.LimitSwitch;
 import team1403.lib.device.MotorController;
 import team1403.lib.device.NoSuchDeviceError;
 import team1403.lib.device.PowerDistributor;
-import team1403.lib.device.virtual.Limelight;
 import team1403.lib.util.CougarLogger;
 
 
@@ -65,15 +61,6 @@ public class MappedDeviceFactory implements DeviceFactory {
    */
   public void putLimitSwitch(LimitSwitch limitSwitch) {
     putDevice(limitSwitch);
-  }
-
-  /**
-   * Adds a limelight.
-   *
-   * @param limelight The limelight to return when asked for.
-   */
-  public void putLimelight(Limelight limelight) {
-    putDevice(limelight);
   }
 
   /**
@@ -213,19 +200,6 @@ public class MappedDeviceFactory implements DeviceFactory {
   public LimitSwitch makeLimitSwitch(String name, int channel) {
     m_calls.put(name, Arrays.asList(name, Integer.valueOf(channel)));
     return (LimitSwitch)takeDevice(name);
-  }
-
-  /**
-   * Creates a Limelight.
-   *
-   * @param name The name of the new device instance.
-   * @param table The table to acted upon.
-   *
-   * @return a new Limelight instance.
-   */
-  public Limelight makeLimelight(String name, NetworkTable table) {
-    m_calls.put(name, Arrays.asList(name, table));
-    return (Limelight)takeDevice(name);
   }
 
   @Override

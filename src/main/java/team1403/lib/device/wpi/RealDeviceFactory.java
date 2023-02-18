@@ -13,7 +13,6 @@ import team1403.lib.device.DeviceFactory;
 import team1403.lib.device.LimitSwitch;
 import team1403.lib.device.MotorController;
 import team1403.lib.device.PowerDistributor;
-import team1403.lib.device.virtual.Limelight;
 import team1403.lib.util.CougarLogger;
 
 
@@ -111,13 +110,6 @@ public class RealDeviceFactory implements DeviceFactory {
       String name, int forwardChannel,
       int reverseChannel, CougarLogger logger) {
     return new WpiDoubleSolenoid(name, forwardChannel, reverseChannel, logger);
-  }
-
-  /**
-   * Returns a limelight instance.
-   */
-  public Limelight makeLimelight(String name) {
-    return new Limelight(name, NetworkTableInstance.getDefault().getTable("limelight"));
   }
 
   /**
