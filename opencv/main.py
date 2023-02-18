@@ -1,9 +1,9 @@
-
 import cv2
 import time
 import numpy as np
 import ntcore as nt
 import os
+
 
 inst = nt.NetworkTableInstance.getDefault()
 
@@ -36,7 +36,7 @@ V_low = 165
 V_high = 255
 
 debug_msg = True
-debug_pic = False
+debug_pic = True
 
 if(debug_msg):
     print(np.array([[ord('c')]], dtype=np.float32).shape)
@@ -52,7 +52,6 @@ def label_img(frame):
         return np.array([[ord(key)]], dtype=np.float32), arr
     else:
         return ()
-
 
 # trackbar callback fucntion to update HSV value
 def callback(x):
@@ -103,7 +102,10 @@ while True:
     
     new_img = cv2.bitwise_and(frame, frame, mask=cv2.inRange(hsv, hsv_low, hsv_high))
 
-    new_img_gray = cv2.cvtColor(new_img, cv2.COLOR_BGR2GRAY)
+    #new_img_gray = cv2.Canny(new_img, 100, 200)
+    #print(new_img_gray.shape)
+    new_img_gray = cv2.cvtColor(new_img_gray, cv2.COLOR_BGR2GRAY)
+
     mask = np.zeros(new_img_gray.shape[:2], dtype=new_img_gray.dtype)
     # new_img_gray2 = cv2.adaptiveThreshold(new_img_gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 11, 2)
     # new_img_gray = cv2.Canny(new_img_gray, 100,200)
@@ -180,6 +182,9 @@ while True:
     cv2.putText(frame, str(int(1 / (time.process_time() - start))) + " FPS" , (50,200), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2, cv2.LINE_AA)
     cv2.imshow('frame', frame)
 
+    if(debug_pic):
+        cv2.imshow('new_img_gray', new_img_gray)
+
     # cv2.imshow('wow', new_img_gray2)
     if (len(contours) > 0 and cv2.contourArea(cont) >= min_cone_area and debug_pic):
         cv2.imshow('cone', cone)
@@ -210,3 +215,6 @@ if str(input())[0] == 'y':
     print("data has been written")
 
 vid.release()
+
+#pycharm moment
+#pycharm is cooler than vs code
