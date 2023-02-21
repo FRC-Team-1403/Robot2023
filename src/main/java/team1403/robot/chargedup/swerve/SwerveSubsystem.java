@@ -5,6 +5,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -31,11 +32,14 @@ public class SwerveSubsystem extends CougarSubsystem {
   private final SwerveModule[] m_modules;
 
   private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds();
+  private SwerveModuleState[] m_states = new SwerveModuleState[4];
   private final SwerveDrivePoseEstimator m_odometer;
 
   private final PIDController m_driftCorrectionPid = new PIDController(0.35, 0, 0);
   private double m_desiredHeading = 0;
   private double m_speedLimiter = 0.6;
+
+  private Translation2d m_offset;
 
   private double m_calc = 0;
 
@@ -87,6 +91,8 @@ public class SwerveSubsystem extends CougarSubsystem {
 
     setRobotRampRate(0.0);
     setRobotIdleMode(IdleMode.kBrake);
+
+    m_offset = new Translation2d();
     
   }
 
@@ -208,9 +214,11 @@ public class SwerveSubsystem extends CougarSubsystem {
    * Moves the drivetrain at the given chassis speeds.
    *
    * @param chassisSpeeds the speed to move at
+   * @param offset the swerve module to pivot around
    */
-  public void drive(ChassisSpeeds chassisSpeeds) {
+  public void drive(ChassisSpeeds chassisSpeeds, Translation2d offset) {
     m_chassisSpeeds = chassisSpeeds;
+    m_offset = offset;
   }
 
   /**
@@ -300,9 +308,8 @@ public class SwerveSubsystem extends CougarSubsystem {
     m_chassisSpeeds = translationalDriftCorrection(m_chassisSpeeds);
     m_chassisSpeeds = rotationalDriftCorrection(m_chassisSpeeds);
 
-    SwerveModuleState[] states = SwerveConfig.kDriveKinematics
-        .toSwerveModuleStates(m_chassisSpeeds);
+    m_states = SwerveConfig.kDriveKinematics.toSwerveModuleStates(m_chassisSpeeds, m_offset);
 
-    setModuleStates(states);
+    setModuleStates(m_states);
   }
 }

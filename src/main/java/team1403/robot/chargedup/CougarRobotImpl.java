@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarRobot;
@@ -101,14 +102,22 @@ public class CougarRobotImpl extends CougarRobot {
         () -> -deadband(xboxDriver.getLeftX(), 0.05),
         () -> -deadband(xboxDriver.getLeftY(), 0.05),
         () -> -deadband(xboxDriver.getRightX(), 0.05),
-        () -> xboxDriver.getYButtonReleased())
+        () -> xboxDriver.getYButtonReleased(),
+        () -> xboxDriver.getRightTriggerAxis(),
+        () -> xboxDriver.getLeftTriggerAxis())
     );
 
     new Trigger(() -> xboxDriver.getLeftBumper()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.decreaseSpeed(0.2)));
 
+    new Trigger(() -> xboxDriver.getRightBumper()).onFalse(
+        new InstantCommand(() -> m_swerveSubsystem.increaseSpeed(0.2)));
+
     new Trigger(() -> xboxDriver.getBButton()).onFalse(
       new InstantCommand(() -> m_swerveSubsystem.zeroGyroscope()));
+
+    new Trigger(() -> xboxDriver.getXButton()).whileTrue(
+      new RepeatCommand(new InstantCommand(() -> m_swerveSubsystem.stop())));
     
   }
 
