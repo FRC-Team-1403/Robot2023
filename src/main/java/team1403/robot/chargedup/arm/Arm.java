@@ -92,8 +92,8 @@ public class Arm extends CougarSubsystem {
     m_telescopicMotor.setPidGains(RobotConfig.Arm.kPArmExtension, RobotConfig.Arm.kIArmExtension,
         RobotConfig.Arm.kDArmExtension);
 
-    m_wristAngleMotor.setPidGains(RobotConfig.Arm.kPWristAngle, RobotConfig.Arm.kIWristAngle,
-        RobotConfig.Arm.kDWristAngle);
+    m_wristAngleMotor.setPidGains(RobotConfig.Arm.kPWristMotor, RobotConfig.Arm.kIWristMotor,
+        RobotConfig.Arm.kDWristMotor);
 
     m_desiredArmAngle = getArmAngle();
     m_desiredWristAngle = getWristAngle();

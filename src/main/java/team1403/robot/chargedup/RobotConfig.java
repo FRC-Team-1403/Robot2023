@@ -203,9 +203,9 @@ public class RobotConfig {
     public static final int kIArmExtension = 0;
     public static final int kDArmExtension = 0;
 
-    public static final int kPWristAngle = 1;
-    public static final int kIWristAngle = 0;
-    public static final int kDWristAngle = 0;
+    public static final int kPWristMotor = 1;
+    public static final int kIWristMotor = 0;
+    public static final int kDWristMotor = 0;
 
     public static final double kArmConversionFactor = 1;
     public static final double kWristConversionFactor = 1; //TODO

@@ -53,9 +53,9 @@ public class ArmCommands extends CommandBase {
     
     super.initialize();
 
-    this.m_armAngle = arm.getArmAngle();
-    this.m_wristAngle = arm.getWristAngle();
-    this.m_armExtension = arm.getArmExtension();
+    this.m_armAngle = m_arm.getArmAngle();
+    this.m_wristAngle = m_arm.getWristAngle();
+    this.m_armExtension = m_arm.getArmExtension();
   }
 
   @Override
