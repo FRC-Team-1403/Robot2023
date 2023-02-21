@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 /**
  * class ArmCommands is the where the commands for Arm.java is located
  */
-public class ArmCommands extends CommandBase {
+public class ArmCommand extends CommandBase {
   private final DoubleSupplier m_armAngleSupplier;
   private final DoubleSupplier m_wristAngleSupplier;
   private final BooleanSupplier m_armExtensionIncreaseSupplier;

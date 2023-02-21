@@ -5,15 +5,22 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarRobot;
 import team1403.lib.subsystems.BuiltinSubsystem;
 import team1403.lib.util.CougarLogger;
-import team1403.robot.chargedup.RobotConfig.OperatorConfig;
-import team1403.robot.chargedup.arm.Arm_Subsystem;
+import team1403.robot.chargedup.cse.CougarScriptObject;
 import team1403.robot.chargedup.cse.CougarScriptReader;
-
+import team1403.robot.chargedup.photonvision.PhotonVisionSubsystem;
+import team1403.robot.chargedup.swerve.SwerveCommand;
+import team1403.robot.chargedup.swerve.SwerveDrivePath;
+import team1403.robot.chargedup.RobotConfig.DriverConfig;
+import team1403.robot.chargedup.RobotConfig.OperatorConfig;
+import team1403.robot.chargedup.arm.Arm;
+import team1403.robot.chargedup.arm.ArmCommand;
+import team1403.robot.chargedup.swerve.SwerveCommand;
+import team1403.robot.chargedup.swerve.SwerveDrivePath;
+import team1403.robot.chargedup.swerve.SwerveSubsystem;
 
 /**
  * The heart of the robot.
@@ -35,13 +42,14 @@ public class CougarRobotImpl extends CougarRobot {
    * Constructor.
    *
    * @param parameters Standard framework injected parameters.
+   * @param config Our robot's custom configuration values.
    */
   public CougarRobotImpl(CougarLibInjectedParameters parameters) {
     super(parameters);
-
     var logger = CougarLogger.getChildLogger(
         parameters.getRobotLogger(), "BuiltinDevices");
 
+        
     m_builtins = new BuiltinSubsystem(parameters, logger);
     m_arm = new Arm_Subsystem(parameters);
     // m_swerveSubsystem = new SwerveSubsystem(parameters);
@@ -54,14 +62,15 @@ public class CougarRobotImpl extends CougarRobot {
 
   @Override
   public Command getAutonomousCommand() {
-    return m_reader.importScript("ForwardsBackwards.json");
-  }
+    return m_reader.importScript("Circle.json");
+  } 
+  
 
-  /**
-   * Configures the operator commands and their bindings.
-   */
-  private void configureOperatorInterface() {
-    XboxController xboxOperator = getJoystick("Operator", OperatorConfig.pilotPort);
+    /**
+     * Configures the operator commands and their bindings.
+     */
+    private void configureOperatorInterface() {
+      XboxController xboxOperator = getJoystick("Operator", OperatorConfig.pilotPort);
 
     new Trigger(() -> xboxOperator.getYButton()).onFalse(
         new InstantCommand(() -> switchOperatorMode()));
@@ -162,7 +171,7 @@ public class CougarRobotImpl extends CougarRobot {
     if (!DriverStation.isJoystickConnected(port)) {
       DriverStation.silenceJoystickConnectionWarning(true);
       CougarLogger.getAlwaysOn().warningf("No controller found on port %d for '%s'",
-          port, role);
+                                          port, role);
     }
     return new XboxController(port);
   }
@@ -218,8 +227,10 @@ public class CougarRobotImpl extends CougarRobot {
   }
 
   private final BuiltinSubsystem m_builtins;
+  private final PhotonVisionSubsystem m_visionSubsystem;
   private CougarScriptReader m_reader;
   private boolean m_armOperatorManual = true;
   private Arm_Subsystem m_arm;
   // private final SwerveSubsystem m_swerveSubsystem;
 }
+

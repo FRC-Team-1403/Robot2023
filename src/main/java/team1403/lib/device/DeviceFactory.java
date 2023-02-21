@@ -1,5 +1,6 @@
 package team1403.lib.device;
 
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.revrobotics.SparkMaxRelativeEncoder;
 
 import team1403.lib.util.CougarLogger;
@@ -8,7 +9,6 @@ import team1403.lib.util.CougarLogger;
  *
  * <p>Subsystems create their devices through this factory.
  */
-
 public interface DeviceFactory {
   /**
    * Creates a PowerDistributor for monitoring the power panel.
@@ -77,18 +77,18 @@ public interface DeviceFactory {
    *
    * @param name    The name of the new device instance.
    * @param deviceNumber  The CAN bus channel the motor controller is on.
+   * @param mode  The control mode for the TalonFX
    * @param logger  The logger to use with the new instance.
    *
    * @return a new MotorController for a TalonFX.
    */
-  public AdvancedMotorController makeCougarTalonFx(String name, 
-      int deviceNumber, CougarLogger logger);
+  public AdvancedMotorController makeCougarTalonFx(String name, int deviceNumber, CougarLogger logger);
 
   /**
    * Creates a VictorSpPwm MotorController.
    *
    * @param name    The name of the new device instance.
-   * @param channel CAN bus channel the motor controller is on.
+   * @param channel The CAN bus channel the motor controller is on.
    * @param logger  The logger to use with the new instance.
    *
    * @return a new MotorController for a VictorSp.
@@ -142,14 +142,4 @@ public interface DeviceFactory {
    * @return a new AnalogDevice for a WPILib AnalogDevice.
    */
   public AnalogDevice makeAnalogDevice(String name, int channel);
-
-  /**
-   * Creates an Gyroscope Device.
-   *
-   * @param name The name of the new device instance.
-   *
-   * @return a new GyroscopeDevice for a NavxAhrs device.
-   */
-  public GyroscopeDevice makeGyroscopeDevice(String name);
 }
-
