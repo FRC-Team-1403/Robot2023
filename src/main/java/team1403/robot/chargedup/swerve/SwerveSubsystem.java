@@ -211,6 +211,15 @@ public class SwerveSubsystem extends CougarSubsystem {
   }
 
   /**
+   * Gets the roll of the gyro (Y axis of gyro rotation).
+   * 
+   * @return a double representing the roll of robot in degrees
+   */
+  public double getGyroRoll() {
+    return m_navx2.getRoll();
+  }
+
+  /**
    * Moves the drivetrain at the given chassis speeds.
    *
    * @param chassisSpeeds the speed to move at
@@ -304,6 +313,7 @@ public class SwerveSubsystem extends CougarSubsystem {
     SmartDashboard.putNumber("Gyro Reading", getGyroscopeRotation().getDegrees());
     m_odometer.updateWithTime(Timer.getFPGATimestamp(), getGyroscopeRotation(), getModulePositions());
     SmartDashboard.putString("Odometry", m_odometer.getEstimatedPosition().toString());
+    SmartDashboard.putNumber("Roll Value", getGyroRoll());
 
     m_chassisSpeeds = translationalDriftCorrection(m_chassisSpeeds);
     m_chassisSpeeds = rotationalDriftCorrection(m_chassisSpeeds);

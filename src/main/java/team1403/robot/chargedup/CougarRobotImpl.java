@@ -18,6 +18,7 @@ import team1403.lib.util.CougarLogger;
 import team1403.robot.chargedup.cse.CougarScriptObject;
 import team1403.robot.chargedup.cse.CougarScriptReader;
 import team1403.robot.chargedup.photonvision.PhotonVisionSubsystem;
+import team1403.robot.chargedup.swerve.SwerveAutoBalanceYaw;
 import team1403.robot.chargedup.swerve.SwerveCommand;
 import team1403.robot.chargedup.swerve.SwerveDrivePath;
 import team1403.robot.chargedup.RobotConfig.DriverConfig;
@@ -91,6 +92,7 @@ public class CougarRobotImpl extends CougarRobot {
    */
   private void configureDriverInterface() {
     XboxController xboxDriver = getJoystick("Driver", RobotConfig.DriverConfig.pilotPort);
+    SwerveAutoBalanceYaw autoBalanceYaw = new SwerveAutoBalanceYaw(m_swerveSubsystem);
 
     // The controls are for field-oriented driving:
     // Left stick Y axis -> forward and backwards movement
@@ -118,6 +120,8 @@ public class CougarRobotImpl extends CougarRobot {
 
     new Trigger(() -> xboxDriver.getXButton()).whileTrue(
       new RepeatCommand(new InstantCommand(() -> m_swerveSubsystem.stop())));
+
+    new Trigger(() -> xboxDriver.getAButton()).whileTrue(autoBalanceYaw);
     
   }
 
@@ -240,6 +244,5 @@ public class CougarRobotImpl extends CougarRobot {
   // private final Arm m_arm;
   // private boolean m_armOperatorManual = true;
   private final SwerveSubsystem m_swerveSubsystem;
-
 }
 

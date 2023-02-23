@@ -16,8 +16,6 @@ public class SwerveAutoBalance extends CommandBase {
     private double xVelocity;
     private double yVelocity;
 
-    private boolean isFinished = true;
-
     public SwerveAutoBalance(SwerveSubsystem drivetrainSubsystem) {
         m_drivetrainSubsystem = drivetrainSubsystem;
         m_xPIDController = new PIDController(
@@ -41,8 +39,8 @@ public class SwerveAutoBalance extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        if ((Math.abs(m_drivetrainSubsystem.getPose().getX()) > 1.96 
-        && (Math.abs(m_drivetrainSubsystem.getPose().getX()) < 2.04))) {
+        if (m_drivetrainSubsystem.getPose().getX() > 1.96 
+        && (m_drivetrainSubsystem.getPose().getX() < 2.04)) {
             return true;
         }
         return false;
