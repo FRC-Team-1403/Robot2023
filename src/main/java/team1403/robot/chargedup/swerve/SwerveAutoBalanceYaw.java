@@ -17,7 +17,7 @@ public class SwerveAutoBalanceYaw extends CommandBase {
     private double rollValue;
     private double rollSetpoint;
 
-    // Roll velocity is in degrees per second
+    // Roll velocity is in degrees per 20 milliseconds
     private double rollVelocity;
 
     public SwerveAutoBalanceYaw(SwerveSubsystem drivetrainSubsystem) {
@@ -27,6 +27,7 @@ public class SwerveAutoBalanceYaw extends CommandBase {
             RobotConfig.SwerveConfig.kITranslation, 
             0,
             new TrapezoidProfile.Constraints(200, 200));
+        m_drivetrainSubsystem.resetOdometry();
         previousRollValue = 0;
         rollValue = 0;
         rollSetpoint = 0;
@@ -34,20 +35,20 @@ public class SwerveAutoBalanceYaw extends CommandBase {
 
     @Override
     public void execute() {
-        rollVelocity = (previousRollValue - m_drivetrainSubsystem.getGyroRoll()) * -50;
-        rollValue = m_drivetrainSubsystem.getGyroRoll() * .5;
+      rollVelocity = ((previousRollValue - m_drivetrainSubsystem.getGyroRoll()) / 0.02) * -50;
+      rollValue = m_drivetrainSubsystem.getGyroRoll() * .5;
 
-        rollSetpoint = rollVelocity + rollValue;
+      rollSetpoint = rollVelocity + rollValue;
 
-        SmartDashboard.putNumber("roll velocity", rollSetpoint);
-        System.out.println(rollSetpoint);
+      SmartDashboard.putNumber("roll velocity", rollSetpoint);
+      System.out.println(rollSetpoint);
 
-        velocity = m_xPIDController.calculate(rollSetpoint, 0);
+      velocity = m_xPIDController.calculate(rollSetpoint, 0);
 
-        m_drivetrainSubsystem.drive(new ChassisSpeeds(0, velocity, 0),
-            new Translation2d());
-    
-        previousRollValue = m_drivetrainSubsystem.getGyroRoll();
+      m_drivetrainSubsystem.drive(new ChassisSpeeds(velocity, 0, 0),
+          new Translation2d());
+  
+      previousRollValue = m_drivetrainSubsystem.getGyroRoll();
     }
 
     @Override

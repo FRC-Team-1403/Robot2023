@@ -220,6 +220,15 @@ public class SwerveSubsystem extends CougarSubsystem {
   }
 
   /**
+   * Gets the pitch of the gyro (X axis of gyro rotation).
+   * 
+   * @return a double representing the pitch of robot in degrees
+   */
+  public double getGyroPitch() {
+    return m_navx2.getPitch();
+  }
+
+  /**
    * Moves the drivetrain at the given chassis speeds.
    *
    * @param chassisSpeeds the speed to move at
