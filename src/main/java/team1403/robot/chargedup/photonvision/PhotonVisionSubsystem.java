@@ -21,6 +21,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.net.PortForwarder;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarSubsystem;
@@ -36,9 +37,12 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
   private PIDController yController;
   private SwerveSubsystem m_drivetrain;
   private boolean reachedTarget = false;
+  private XboxController controller;
+  private int limelightImportance;
 
-  public PhotonVisionSubsystem(CougarLibInjectedParameters injectedParameters) {
+  public PhotonVisionSubsystem(CougarLibInjectedParameters injectedParameters, SwerveSubsystem drivetrain) {
     super("Vision Subsystem", injectedParameters);
+    m_drivetrain = drivetrain;
     PortForwarder.add(5800, "photonvision.local", 5800);
 
     limeLight = new PhotonCamera("OV5647");
@@ -48,12 +52,12 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
     // 1: Reflective Tape
 
     photonPoseEstimator = new PhotonPoseEstimator(VisionConfig.fieldLayout, PoseStrategy.LOWEST_AMBIGUITY, limeLight,
-        new Transform3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0)));
+        new Transform3d(new Translation3d(0.762,0.254, 0.229), new Rotation3d(0, 0, 0)));
   }
 
-  public void SwitchPipeline() {
+  public void switchPipeline() {
     System.out.println("asdf");
-    if (limeLight.getPipelineIndex() == 0) {
+    if (limeLight.getPipelineIndex() == 0) { 
       limeLight.setPipelineIndex(1);
     } else {
       limeLight.setPipelineIndex(0);
@@ -68,37 +72,37 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
       }
     }
 
-    if (reachedTarget) {
-      drivetrain.drive(
-          new ChassisSpeeds(xController.calculate(yaw, targetYaw), yController.calculate(pitch, targetPitch), 0));
-    }
-    if (xController.calculate(yaw, targetYaw) <= 0.1 && yController.calculate(pitch, targetPitch) <= 0.1) {
-      reachedTarget = true;
-    }
+    drivetrain.drive(new ChassisSpeeds(xController.calculate(yaw, targetYaw), 
+          yController.calculate(pitch, targetPitch), 0));
   }
 
-  public void moveToTag(SwerveSubsystem drivetrain, Pose2d targetPos) {
-    if (reachedTarget) {
-      drivetrain.drive(new ChassisSpeeds(xController.calculate(drivetrain.getPose().getX(), targetPos.getX()),
-          yController.calculate(drivetrain.getPose().getY(), targetPos.getY()), 0));
-    }
-    if (xController.calculate(drivetrain.getPose().getX(), targetPos.getX()) <= 0.1
-        && yController.calculate(drivetrain.getPose().getY(), targetPos.getY()) <= 0.1) {
-      reachedTarget = true;
-    }
+  public void moveToTag(Pose2d targetPos) {
+    m_drivetrain.drive(new ChassisSpeeds(xController.calculate(m_drivetrain.getPose().getX(), 
+          targetPos.getX()),
+          yController.calculate(m_drivetrain.getPose().getY(), targetPos.getY()), 0));
   }
 
   public void updatePos(Pose2d pose) {
+    double xPos = m_drivetrain.getPose().getX();
+    double yPos = m_drivetrain.getPose().getY();
+    double rotation = m_drivetrain.getPose().getRotation().getRotations();
+    for (int i = 0; i < limelightImportance; i++) {
+      xPos = (xPos + pose.getX()) / 2;
+      yPos = (yPos + pose.getY()) / 2;
+      rotation = (rotation + pose.getRotation().getRotations()) / 2;
+    }
     m_drivetrain.setPose(new Pose2d(
-        new Translation2d((m_drivetrain.getPose().getX() + pose.getX()) / 2,
-            (m_drivetrain.getPose().getX() + pose.getY()) / 2),
+        new Translation2d(xPos,
+            yPos),
         new Rotation2d(
-            (m_drivetrain.getPose().getRotation().getRotations() + pose.getRotation().getRotations()) / 2)));
+            (rotation))));
   }
 
-  public Pose2d makePose2d(Pose3d pose) {
-    return new Pose2d(new Translation2d(pose.getX(), pose.getY()),
-        new Rotation2d(pose.getRotation().getX(), pose.getRotation().getY()));
+  public void poseImportance(Pose3d pose) {
+    if (pose.getY() > 1) {
+      limelightImportance += 1;
+    }
+
   }
 
   @Override
@@ -106,11 +110,22 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
     Optional<EstimatedRobotPose> photonPose = photonPoseEstimator.update();
     if (photonPose.isPresent()) {
       SmartDashboard.putString("Odometry", photonPose.get().estimatedPose.toString());
-      moveToTag(m_drivetrain, makePose2d(photonPose.get().estimatedPose));
+      moveToTag(photonPose.get().estimatedPose.toPose2d());
+      updatePos(photonPose.get().estimatedPose.toPose2d());
     }
 
-    if (limeLight.getPipelineIndex() == 1) {
-      // moveToTape(i, i,m_drivetrain, limeLight.getLatestResult().getTargets());
-    }
+    // if (controller.getAButtonPressed()) {
+    // limeLight.setPipelineIndex(1);
+    // //pressing the a button makes the pipeline reflective tape
+    // }
+
+    // if (controller.getBButtonPressed()) {
+    // limeLight.setPipelineIndex(2);
+    // //pressing the b button makes the pipeline april tags
+    // }
+
+    // if (limeLight.getPipelineIndex() == 1) {
+    // // moveToTape(i, i,m_drivetrain, limeLight.getLatestResult().getTargets());
+    // }
   }
 }

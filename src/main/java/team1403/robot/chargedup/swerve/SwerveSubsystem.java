@@ -67,7 +67,8 @@ public class SwerveSubsystem extends CougarSubsystem {
             CanBus.backRightEncoderId, SwerveConfig.backRightEncoderOffset, logger),
     };
 
-    m_odometer = new SwerveDrivePoseEstimator(SwerveConfig.kDriveKinematics, getGyroscopeRotation() , getModulePositions(), new Pose2d(0, 0, new Rotation2d(0)));
+    m_odometer = new SwerveDrivePoseEstimator(SwerveConfig.kDriveKinematics, 
+        getGyroscopeRotation(), getModulePositions(), new Pose2d(0, 0, new Rotation2d(0)));
 
     m_navx2 = new NavxAhrs("Gyroscope");
     addDevice(m_navx2.getName(), m_navx2);
@@ -285,7 +286,7 @@ public class SwerveSubsystem extends CougarSubsystem {
 
     //The position of the bot one control loop in the future given the chassisspeed
     Pose2d robotPoseVel = new Pose2d(chassisSpeeds.vxMetersPerSecond * deltaTime, 
-        chassisSpeeds.vyMetersPerSecond * deltaTime, 
+        chassisSpeeds.vyMetersPerSecond * deltaTime,
         new Rotation2d(chassisSpeeds.omegaRadiansPerSecond * deltaTime));
         
     Twist2d twistVel = new Pose2d(0, 0, new Rotation2d()).log(robotPoseVel);
@@ -297,9 +298,10 @@ public class SwerveSubsystem extends CougarSubsystem {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Gyro Reading", getGyroscopeRotation().getDegrees());
-    m_odometer.updateWithTime(Timer.getFPGATimestamp(), getGyroscopeRotation(), getModulePositions());
+    m_odometer.updateWithTime(Timer.getFPGATimestamp(), getGyroscopeRotation(), 
+        getModulePositions());
     SmartDashboard.putString("Odometry", m_odometer.getEstimatedPosition().toString());
-
+    
     m_chassisSpeeds = translationalDriftCorrection(m_chassisSpeeds);
     m_chassisSpeeds = rotationalDriftCorrection(m_chassisSpeeds);
 

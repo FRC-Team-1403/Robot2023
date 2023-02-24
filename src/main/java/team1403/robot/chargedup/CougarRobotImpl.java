@@ -54,7 +54,8 @@ public class CougarRobotImpl extends CougarRobot {
 
         
     m_builtins = new BuiltinSubsystem(parameters, logger);
-    m_visionSubsystem = new PhotonVisionSubsystem(parameters);
+    m_drivetrain = new SwerveSubsystem(parameters);
+    m_visionSubsystem = new PhotonVisionSubsystem(parameters, m_drivetrain);
     // m_arm = new Arm(parameters);
     // m_swerveSubsystem = new SwerveSubsystem(parameters);
 
@@ -76,7 +77,7 @@ public class CougarRobotImpl extends CougarRobot {
     private void configureOperatorInterface() {
       XboxController xboxOperator = getJoystick("Operator", OperatorConfig.pilotPort);
 
-      new Trigger(() -> xboxOperator.getAButton()).onFalse(new InstantCommand(() -> m_visionSubsystem.SwitchPipeline()));
+      new Trigger(() -> xboxOperator.getAButton()).onFalse(new InstantCommand(() -> m_visionSubsystem.switchPipeline()));
 
     //   new Trigger(() -> xboxOperator.getYButton()).onFalse(
     //       new InstantCommand(() -> switchOperatorMode()));
@@ -230,6 +231,7 @@ public class CougarRobotImpl extends CougarRobot {
 
   private final BuiltinSubsystem m_builtins;
   private final PhotonVisionSubsystem m_visionSubsystem;
+  private final SwerveSubsystem m_drivetrain; 
   // private CougarScriptReader m_reader;
   // private final Arm m_arm;
   // private boolean m_armOperatorManual = true;
