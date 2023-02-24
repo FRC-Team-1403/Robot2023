@@ -4,6 +4,7 @@ package team1403.robot.chargedup.arm;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /**
@@ -16,11 +17,11 @@ public class ArmCommand extends CommandBase {
   private final BooleanSupplier m_armExtensionDecreaseSupplier;
   private BooleanSupplier m_wheelIntakeSupplier;
 
-  private final Arm m_arm;
+  private final Arm_Subsystem m_arm;
 
-  private Double m_armAngle;
-  private Double m_wristAngle;
-  private Double m_armExtension;
+  private double m_armAngle;
+  private double m_wristAngle;
+  private double m_armExtension;
 
   /**
    * Defines the constructor for ArmCommands,
@@ -35,7 +36,7 @@ public class ArmCommand extends CommandBase {
    * @param armExtensionDecrease function that determines
     the decrease of arm extension, 0 to 1
    */
-  public ArmCommands(Arm arm, DoubleSupplier armAngle, DoubleSupplier wristAngle,
+  public ArmCommand(Arm_Subsystem arm, DoubleSupplier armAngle, DoubleSupplier wristAngle,
       BooleanSupplier armExtensionIncrease, BooleanSupplier armExtensionDecrease,
         BooleanSupplier wheelIntake) {
     this.m_wheelIntakeSupplier = wheelIntake;
@@ -50,30 +51,19 @@ public class ArmCommand extends CommandBase {
 
   @Override
   public void initialize() {
-    
+    this.m_wristAngle = m_arm.getWristAbsoluteAngle();
+    System.out.println("Angle: " + m_wristAngle);
     super.initialize();
-
-    this.m_armAngle = m_arm.getArmAngle();
-    this.m_wristAngle = m_arm.getWristAngle();
-    this.m_armExtension = m_arm.getArmExtension();
   }
 
   @Override
   public void execute() {
-    m_armAngle += m_armAngleSupplier.getAsDouble() * 2 /*360*/;
+    m_wristAngle += (m_wristAngleSupplier.getAsDouble() * 4);
+    m_wristAngle = m_arm.limitWristAngle(m_wristAngle);
 
-    if (m_armExtensionIncreaseSupplier.getAsBoolean()) {
-      m_armExtension += 2;
-    }
+    SmartDashboard.putNumber("Arm Setpoint", m_wristAngle);
 
-    if (m_armExtensionDecreaseSupplier.getAsBoolean()) {
-      m_armExtension -= 2;
-    }
-    
-    m_wristAngle += m_wristAngleSupplier.getAsDouble() * 2 /*360*/;
-
-    m_arm.moveArm(m_armAngle, m_armExtension, m_wristAngle,
-        m_wheelIntakeSupplier.getAsBoolean() ? 1 : 0);
+    m_arm.move(m_wristAngle);
   }
 
 }

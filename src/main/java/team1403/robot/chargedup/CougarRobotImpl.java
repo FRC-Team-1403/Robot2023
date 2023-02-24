@@ -18,6 +18,7 @@ import team1403.robot.chargedup.RobotConfig.DriverConfig;
 import team1403.robot.chargedup.RobotConfig.OperatorConfig;
 import team1403.robot.chargedup.arm.Arm;
 import team1403.robot.chargedup.arm.ArmCommand;
+import team1403.robot.chargedup.arm.Arm_Subsystem;
 import team1403.robot.chargedup.swerve.SwerveCommand;
 import team1403.robot.chargedup.swerve.SwerveDrivePath;
 import team1403.robot.chargedup.swerve.SwerveSubsystem;
@@ -75,9 +76,10 @@ public class CougarRobotImpl extends CougarRobot {
     new Trigger(() -> xboxOperator.getYButton()).onFalse(
         new InstantCommand(() -> switchOperatorMode()));
 
-    // if (m_armOperatorManual) {
-    //   manualOperatorMode(xboxOperator);
-    // } else {
+    if (m_armOperatorManual) {
+      manualOperatorMode(xboxOperator);
+    } 
+    // else {
     //   autoOperatorMode(xboxOperator);
     // }
   }
@@ -209,15 +211,15 @@ public class CougarRobotImpl extends CougarRobot {
    * 
    * @param xboxOperator defines which controller is being used
    */
-  // private void manualOperatorMode(XboxController xboxOperator) {
-  //   m_arm.setDefaultCommand(new ArmCommands(m_arm,
-  //       () -> xboxOperator.getLeftY(),
-  //       () -> xboxOperator.getRightY(),
-  //       () -> xboxOperator.getRightBumper(),
-  //       () -> xboxOperator.getLeftBumper(),
-  //       () -> xboxOperator.getXButton()));
+  private void manualOperatorMode(XboxController xboxOperator) {
+    m_arm.setDefaultCommand(new ArmCommand(m_arm,
+        () -> xboxOperator.getLeftY(),
+        () -> deadband(xboxOperator.getRightY(), 0.05),
+        () -> xboxOperator.getRightBumper(),
+        () -> xboxOperator.getLeftBumper(),
+        () -> xboxOperator.getXButton()));
 
-  // }
+  }
 
   /**
    * Switches the operator mode.
@@ -227,7 +229,7 @@ public class CougarRobotImpl extends CougarRobot {
   }
 
   private final BuiltinSubsystem m_builtins;
-  private final PhotonVisionSubsystem m_visionSubsystem;
+  // private final PhotonVisionSubsystem m_visionSubsystem;
   private CougarScriptReader m_reader;
   private boolean m_armOperatorManual = true;
   private Arm_Subsystem m_arm;

@@ -199,6 +199,13 @@ public class RobotConfig {
      * This switch is optional. Set to port -1 if it is not available.
      */
     public static final int exampleRailReverseLimitSwitch = 2;
+
+    
+    public static final int kWristAbsoluteEncoder = 1;
+
+    public static final int kArmAbsoluteEncoder = 0; ///Analog
+
+    public static final int kArmLimitSwitch = 0; //DIO
   }
 
   /**
@@ -253,13 +260,13 @@ public class RobotConfig {
     public static final int kIArmAngle = 0;
     public static final int kDArmAngle = 0;
 
-    public static final int kPArmExtension = 1;
-    public static final int kIArmExtension = 0;
-    public static final int kDArmExtension = 0;
+    public static final double kPArmExtension = 1;
+    public static final double kIArmExtension = 0;
+    public static final double kDArmExtension = 0;
 
-    public static final int kPWristMotor = 1;
-    public static final int kIWristMotor = 0;
-    public static final int kDWristMotor = 0;
+    public static final double kPWristMotor = 0.95;
+    public static final double kIWristMotor = 0;
+    public static final double kDWristMotor = 90;
 
     public static final double kArmConversionFactor = 1;
     public static final double kWristConversionFactor = 1; //TODO
@@ -268,8 +275,8 @@ public class RobotConfig {
 
     public static final double kMaxArmRotation = 246;
     public static final double kMinArmRotation = 90;
-    public static final double kMaxWristRotation = 0; //TODO
-    public static final double kMinWristRotation = 0; //TODO
+    public static final double kMaxWristAngle = 270; //TODO
+    public static final double kMinWristAngle = 30; //TODO
     public static final double kMinArmExtension = 1;
     public static final double kMaxArmExtension = 1;
 

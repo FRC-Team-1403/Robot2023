@@ -258,10 +258,10 @@ public class Arm extends CougarSubsystem {
    * @return angle
    */
   private double limitWristAngle(double angle) {
-    if (angle > RobotConfig.Arm.kMaxWristRotation) {
-      angle = RobotConfig.Arm.kMaxWristRotation;
-    } else  if (angle < RobotConfig.Arm.kMinWristRotation) {
-      angle = RobotConfig.Arm.kMinWristRotation;
+    if (angle > RobotConfig.Arm.kMaxWristAngle) {
+      angle = RobotConfig.Arm.kMaxWristAngle;
+    } else  if (angle < RobotConfig.Arm.kMinWristAngle) {
+      angle = RobotConfig.Arm.kMinWristAngle;
     }
 
     return angle;
@@ -455,8 +455,8 @@ public class Arm extends CougarSubsystem {
    * @return limit for wrist angle
    */
   private boolean isWristAngleWithinBounds() {
-    return getWristAngle() <= RobotConfig.Arm.kMaxWristRotation && getWristAngle()
-      >= RobotConfig.Arm.kMinWristRotation;
+    return getWristAngle() <= RobotConfig.Arm.kMaxWristAngle && getWristAngle()
+      >= RobotConfig.Arm.kMinWristAngle;
   }
 
   @Override
