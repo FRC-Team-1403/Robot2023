@@ -75,7 +75,7 @@ public class CougarRobotImpl extends CougarRobot {
 
     new Trigger(() -> xboxOperator.getYButton()).onFalse(
         new InstantCommand(() -> switchOperatorMode()));
-
+      
     if (m_armOperatorManual) {
       manualOperatorMode(xboxOperator);
     } 
@@ -213,12 +213,12 @@ public class CougarRobotImpl extends CougarRobot {
    */
   private void manualOperatorMode(XboxController xboxOperator) {
     m_arm.setDefaultCommand(new ArmCommand(m_arm,
-        () -> xboxOperator.getLeftY(),
+        () -> -deadband(xboxOperator.getLeftY(), 0.05),
         () -> deadband(xboxOperator.getRightY(), 0.05),
+        () -> xboxOperator.getLeftTriggerAxis(),
+        () -> xboxOperator.getRightTriggerAxis(),
         () -> xboxOperator.getRightBumper(),
-        () -> xboxOperator.getLeftBumper(),
-        () -> xboxOperator.getXButton()));
-
+        () -> xboxOperator.getLeftBumper()));
   }
 
   /**

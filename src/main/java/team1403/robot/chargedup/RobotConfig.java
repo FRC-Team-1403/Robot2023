@@ -159,7 +159,7 @@ public class RobotConfig {
   public static class CanBus {
 
     //Arm Ports
-    // public static final int wheelIntakeMotor = 5;
+    public static final int wheelIntakeMotor = 5; //Done
     public static final int telescopicArmMotor = 4; //Done
     public static final int leftPivotMotor = 2; //Done
     public static final int rightPivotMotor = 3; //Done
@@ -256,9 +256,9 @@ public class RobotConfig {
 
     public static double kPhysicalArmMaxExtension = 60.218;
 
-    public static final int kPArmAngle = 1;
-    public static final int kIArmAngle = 0;
-    public static final int kDArmAngle = 0;
+    public static final int kPArmPivot = 1;
+    public static final int kIArmPivot = 0;
+    public static final int kDArmPivot = 0;
 
     public static final double kPArmExtension = 1;
     public static final double kIArmExtension = 0;

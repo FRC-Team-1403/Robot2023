@@ -13,9 +13,11 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class ArmCommand extends CommandBase {
   private final DoubleSupplier m_armAngleSupplier;
   private final DoubleSupplier m_wristAngleSupplier;
-  private final BooleanSupplier m_armExtensionIncreaseSupplier;
-  private final BooleanSupplier m_armExtensionDecreaseSupplier;
-  private BooleanSupplier m_wheelIntakeSupplier;
+  private final DoubleSupplier m_armExtensionDecreaseSupplier;
+  private final DoubleSupplier m_armExtensionIncreaseSupplier;
+  private final BooleanSupplier m_wheelIntakeSupplier;
+  private final BooleanSupplier m_wheelOuttakeSupplier;
+
 
   private final Arm_Subsystem m_arm;
 
@@ -31,27 +33,30 @@ public class ArmCommand extends CommandBase {
    * @param arm the Armsubsystem
    * @param armAngle function that determines arm angle, -1 to 1
    * @param wristAngle function that determines wrist angle, -1 to 1
-   * @param armExtensionIncrease function that determines
+   * @param armExtensionDecrease function that determines
     the increase of arm extension, 0 to 1
    * @param armExtensionDecrease function that determines
     the decrease of arm extension, 0 to 1
    */
   public ArmCommand(Arm_Subsystem arm, DoubleSupplier armAngle, DoubleSupplier wristAngle,
-      BooleanSupplier armExtensionIncrease, BooleanSupplier armExtensionDecrease,
-        BooleanSupplier wheelIntake) {
+  DoubleSupplier armExtensionDecrease, DoubleSupplier armExtensionIncrease,
+        BooleanSupplier wheelIntake, BooleanSupplier wheelOuttake) {
     this.m_wheelIntakeSupplier = wheelIntake;
     this.m_arm = arm;
     this.m_armAngleSupplier = armAngle;
     this.m_wristAngleSupplier = wristAngle;
-    this.m_armExtensionIncreaseSupplier = armExtensionIncrease;
     this.m_armExtensionDecreaseSupplier = armExtensionDecrease;
+    this.m_armExtensionIncreaseSupplier = armExtensionIncrease;
+    this.m_wheelOuttakeSupplier = wheelOuttake;
 
     addRequirements(arm);
   }
 
   @Override
   public void initialize() {
+    this.m_armAngle = 0;
     this.m_wristAngle = m_arm.getWristAbsoluteAngle();
+    this.m_armExtension = 0;
     System.out.println("Angle: " + m_wristAngle);
     super.initialize();
   }
@@ -61,9 +66,26 @@ public class ArmCommand extends CommandBase {
     m_wristAngle += (m_wristAngleSupplier.getAsDouble() * 4);
     m_wristAngle = m_arm.limitWristAngle(m_wristAngle);
 
-    SmartDashboard.putNumber("Arm Setpoint", m_wristAngle);
+    m_armAngle = m_armAngleSupplier.getAsDouble()/5;
 
-    m_arm.move(m_wristAngle);
+    if(m_armExtensionDecreaseSupplier.getAsDouble()>0) {
+      m_armExtension = -(m_armExtensionDecreaseSupplier.getAsDouble()/2);
+    } else if(m_armExtensionIncreaseSupplier.getAsDouble() > 0) {
+      m_armExtension = m_armExtensionIncreaseSupplier.getAsDouble()/2;
+    } else {
+      m_armExtension = 0;
+    }
+
+    if(this.m_wheelIntakeSupplier.getAsBoolean()) {
+      m_arm.move(m_wristAngle, -0.75, m_armAngle, m_armExtension);
+    } else if(this.m_wheelOuttakeSupplier.getAsBoolean()) {
+      m_arm.move(m_wristAngle, 0.75, m_armAngle, m_armExtension);
+    }else {
+      m_arm.move(m_wristAngle, 0, m_armAngle, m_armExtension);
+    }
+
+
+    
   }
 
 }
