@@ -52,6 +52,7 @@ public class SwerveSubsystem extends CougarSubsystem {
   public SwerveSubsystem(CougarLibInjectedParameters parameters) {
     super("Swerve Subsystem", parameters);
     CougarLogger logger = getLogger();
+    m_navx2 = new NavxAhrs("Gyroscope");
     m_modules = new SwerveModule[] {
         new SwerveModule("Front Left Module",
             CanBus.frontLeftDriveId, CanBus.frontLeftSteerId,
@@ -67,10 +68,6 @@ public class SwerveSubsystem extends CougarSubsystem {
             CanBus.backRightEncoderId, SwerveConfig.backRightEncoderOffset, logger),
     };
 
-    m_odometer = new SwerveDrivePoseEstimator(SwerveConfig.kDriveKinematics, 
-        getGyroscopeRotation(), getModulePositions(), new Pose2d(0, 0, new Rotation2d(0)));
-
-    m_navx2 = new NavxAhrs("Gyroscope");
     addDevice(m_navx2.getName(), m_navx2);
     new Thread(() -> {
       while (m_navx2.isCalibrating()) {
@@ -82,7 +79,9 @@ public class SwerveSubsystem extends CougarSubsystem {
       }
       zeroGyroscope();
     }).start(); 
-    
+
+    m_odometer = new SwerveDrivePoseEstimator(SwerveConfig.kDriveKinematics, 
+        getGyroscopeRotation(), getModulePositions(), new Pose2d(0, 0, new Rotation2d(0)));
 
     m_desiredHeading = getGyroscopeRotation().getDegrees();
     SmartDashboard.putNumber("Desired Heading", m_desiredHeading);
@@ -298,10 +297,9 @@ public class SwerveSubsystem extends CougarSubsystem {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Gyro Reading", getGyroscopeRotation().getDegrees());
-    m_odometer.updateWithTime(Timer.getFPGATimestamp(), getGyroscopeRotation(), 
-        getModulePositions());
+    m_odometer.update(getGyroscopeRotation(), getModulePositions());
     SmartDashboard.putString("Odometry", m_odometer.getEstimatedPosition().toString());
-    
+
     m_chassisSpeeds = translationalDriftCorrection(m_chassisSpeeds);
     m_chassisSpeeds = rotationalDriftCorrection(m_chassisSpeeds);
 

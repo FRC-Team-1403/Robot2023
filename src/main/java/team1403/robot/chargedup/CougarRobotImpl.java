@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarRobot;
@@ -54,13 +55,13 @@ public class CougarRobotImpl extends CougarRobot {
 
         
     m_builtins = new BuiltinSubsystem(parameters, logger);
-    m_drivetrain = new SwerveSubsystem(parameters);
-    m_visionSubsystem = new PhotonVisionSubsystem(parameters, m_drivetrain);
+    m_swerveSubsystem = new SwerveSubsystem(parameters);
+    m_visionSubsystem = new PhotonVisionSubsystem(parameters, m_swerveSubsystem);
     // m_arm = new Arm(parameters);
     // m_swerveSubsystem = new SwerveSubsystem(parameters);
 
     // configureOperatorInterface();
-    // configureDriverInterface();
+    configureDriverInterface();
     // registerAutoCommands();
 
   }
@@ -74,10 +75,8 @@ public class CougarRobotImpl extends CougarRobot {
     /**
      * Configures the operator commands and their bindings.
      */
-    private void configureOperatorInterface() {
-      XboxController xboxOperator = getJoystick("Operator", OperatorConfig.pilotPort);
-
-      new Trigger(() -> xboxOperator.getAButton()).onFalse(new InstantCommand(() -> m_visionSubsystem.switchPipeline()));
+    // private void configureOperatorInterface() {
+    //   XboxController xboxOperator = getJoystick("Operator", OperatorConfig.pilotPort);
 
     //   new Trigger(() -> xboxOperator.getYButton()).onFalse(
     //       new InstantCommand(() -> switchOperatorMode()));
@@ -87,34 +86,44 @@ public class CougarRobotImpl extends CougarRobot {
     //   } else {
     //     autoOperatorMode(xboxOperator);
     // }
-  }
+  // }
 
   /**
    * Configures the driver commands and their bindings.
    */
-  // private void configureDriverInterface() {
-  //   XboxController xboxDriver = getJoystick("Driver", RobotConfig.DriverConfig.pilotPort);
+  private void configureDriverInterface() {
+    XboxController xboxDriver = getJoystick("Driver", RobotConfig.DriverConfig.pilotPort);
 
     // The controls are for field-oriented driving:
     // Left stick Y axis -> forward and backwards movement
     // Left stick X axis -> left and right movement
     // Right stick X axis -> rotation
     // Setting default command of swerve subsystem
-  //   m_swerveSubsystem.setDefaultCommand(new SwerveCommand(
-  //       m_swerveSubsystem,
-  //       () -> -deadband(xboxDriver.getLeftX(), 0.05),
-  //       () -> -deadband(xboxDriver.getLeftY(), 0.05),
-  //       () -> -deadband(xboxDriver.getRightX(), 0.05),
-  //       () -> xboxDriver.getYButtonReleased())
-  //   );
+    m_swerveSubsystem.setDefaultCommand(new SwerveCommand(
+        m_swerveSubsystem,
+        () -> -deadband(xboxDriver.getLeftX(), 0.05),
+        () -> -deadband(xboxDriver.getLeftY(), 0.05),
+        () -> -deadband(xboxDriver.getRightX(), 0.05),
+        () -> xboxDriver.getYButtonReleased())
+    );
 
-  //   new Trigger(() -> xboxDriver.getLeftBumper()).onFalse(
-  //       new InstantCommand(() -> m_swerveSubsystem.decreaseSpeed(0.2)));
-
-  //   new Trigger(() -> xboxDriver.getBButton()).onFalse(
-  //     new InstantCommand(() -> m_swerveSubsystem.zeroGyroscope()));
+    new Trigger(() -> xboxDriver.getLeftBumper()).onFalse(
+      new InstantCommand(() -> m_swerveSubsystem.decreaseSpeed(0.2)));
     
-  // }
+    new Trigger(() -> xboxDriver.getRightBumper()).onFalse(
+      new InstantCommand(() -> m_swerveSubsystem.increaseSpeed(0.2)));
+
+    new Trigger(() -> xboxDriver.getBButton()).onFalse(
+      new InstantCommand(() -> m_swerveSubsystem.zeroGyroscope()));
+
+    new Trigger(() -> xboxDriver.getAButton()).onFalse(
+      new InstantCommand(() -> m_visionSubsystem.switchPipeline()));
+
+    new Trigger(() -> (xboxDriver.getYButton()) && (m_visionSubsystem.hasTarget())).whileTrue(
+      new RepeatCommand(new InstantCommand(() -> m_visionSubsystem.moveToTag()))
+    );
+    
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -231,11 +240,11 @@ public class CougarRobotImpl extends CougarRobot {
 
   private final BuiltinSubsystem m_builtins;
   private final PhotonVisionSubsystem m_visionSubsystem;
-  private final SwerveSubsystem m_drivetrain; 
+  // private final SwerveSubsystem m_drivetrain; 
   // private CougarScriptReader m_reader;
   // private final Arm m_arm;
   // private boolean m_armOperatorManual = true;
-  // private final SwerveSubsystem m_swerveSubsystem;
+  private final SwerveSubsystem m_swerveSubsystem;
 
 }
 
