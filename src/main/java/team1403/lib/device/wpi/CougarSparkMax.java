@@ -56,9 +56,13 @@ public final class CougarSparkMax extends CANSparkMax implements AdvancedMotorCo
     super(channel, motorType);
     m_name = name;
     m_logger = logger;
-    m_encoder = encoderType != SparkMaxRelativeEncoder.Type.kNoSensor
-        ? new EmbeddedEncoder(name + ".Encoder", getEncoder(encoderType, 4096))
-        : null;
+    if (encoderType == SparkMaxRelativeEncoder.Type.kNoSensor) {
+      m_encoder = null;
+    } else if (encoderType == SparkMaxRelativeEncoder.Type.kHallSensor) {
+      m_encoder = new EmbeddedEncoder(name + ".Encoder", getEncoder(encoderType, 42));
+    } else {
+      m_encoder = new EmbeddedEncoder(name + ".Encoder", getEncoder(encoderType, 4096));
+    }
     m_currentSensor = new EmbeddedCurrentSensor(name + ".CurrentSensor");
   }
 
@@ -225,7 +229,6 @@ public final class CougarSparkMax extends CANSparkMax implements AdvancedMotorCo
     
     private final String m_encoderName;
     private final RelativeEncoder m_encoder;
-    
   }
 
   /**

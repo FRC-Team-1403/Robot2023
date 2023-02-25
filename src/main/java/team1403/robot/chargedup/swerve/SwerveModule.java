@@ -1,29 +1,25 @@
 package team1403.robot.chargedup.swerve;
 
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
-import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
-import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import com.ctre.phoenix.sensors.CANCoderStatusFrame;
+import com.ctre.phoenix.sensors.MagnetFieldStrength;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel;
+import com.revrobotics.MotorFeedbackSensor;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.SparkMaxRelativeEncoder;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import team1403.lib.device.Device;
 import team1403.lib.device.Encoder;
 import team1403.lib.device.wpi.CougarSparkMax;
-import team1403.lib.device.wpi.CougarTalonFx;
 import team1403.lib.util.CougarLogger;
 import team1403.robot.chargedup.RobotConfig;
 import team1403.robot.chargedup.RobotConfig.SwerveConfig;
@@ -34,14 +30,16 @@ import team1403.robot.chargedup.RobotConfig.SwerveConfig;
  * Also consists of a absolute encoder to track steer angle.
  */
 public class SwerveModule implements Device {
-  private double m_absoluteEncoderResetIterations = 0;
+  public double m_absoluteEncoderResetIterations = 0;
 
   private final CougarSparkMax m_driveMotor;
-  private final CougarTalonFx m_steerMotor;
+  private final CougarSparkMax m_steerMotor;
 
   private final CANCoder m_absoluteEncoder;
   private final double m_absoluteEncoderOffset;
   private final Encoder m_driveRelativeEncoder;
+  private final RelativeEncoder m_steerRelativeEncoder;
+  private final SparkMaxPIDController m_steerPidController;
   private final CougarLogger m_logger;
   private final String m_name;
 
@@ -67,10 +65,13 @@ public class SwerveModule implements Device {
 
     m_driveMotor = CougarSparkMax.makeBrushless("DriveMotor", driveMotorPort,
         SparkMaxRelativeEncoder.Type.kHallSensor, logger);
-    m_steerMotor = new CougarTalonFx("SteerMotor", steerMotorPort, logger);
+    m_steerMotor = CougarSparkMax.makeBrushless("SteerMotor", steerMotorPort, 
+        SparkMaxRelativeEncoder.Type.kHallSensor, logger);
     m_absoluteEncoder = new CANCoder(canCoderPort);
     m_driveRelativeEncoder = m_driveMotor.getEmbeddedEncoder();
     m_absoluteEncoderOffset = offset;
+    m_steerRelativeEncoder = m_steerMotor.getEncoder();
+    m_steerPidController = m_steerMotor.getPIDController();
 
     initEncoders();
     initSteerMotor();
@@ -82,9 +83,13 @@ public class SwerveModule implements Device {
     return m_name;
   }
 
-  private void initEncoders() {
+  public void initEncoders() {
     // Config absolute encoder
+    if (m_absoluteEncoder.getMagnetFieldStrength() != MagnetFieldStrength.Good_GreenLED) {
+      System.err.println("CANCoder magnetic field strength is unacceptable.");
+    }
     CANCoderConfiguration config = new CANCoderConfiguration();
+    m_absoluteEncoder.setPositionToAbsolute();
     config.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
     config.magnetOffsetDegrees = Math.toDegrees(this.m_absoluteEncoderOffset);
     config.sensorDirection = false;
@@ -98,34 +103,33 @@ public class SwerveModule implements Device {
     // Set velocity in terms of seconds
     m_driveRelativeEncoder.setVelocityConversionFactor(drivePositionConversionFactor / 60.0);
 
+    //Config steer relative encoder
+    m_steerRelativeEncoder.setPositionConversionFactor(
+        SwerveConfig.kSteerRelativeEncoderPositionConversionFactor);
+    m_steerRelativeEncoder.setVelocityConversionFactor(
+        SwerveConfig.kSteerRelativeEncoderVelocityConversionFactor);
+    m_steerRelativeEncoder.setPosition(getAbsoluteAngle());
   }
 
   private void initSteerMotor() {
-    TalonFXConfiguration motorConfiguration = new TalonFXConfiguration();
-    motorConfiguration.slot0.kP = RobotConfig.SwerveConfig.kPTurning;
-    motorConfiguration.slot0.kI = RobotConfig.SwerveConfig.kITurning;
-    motorConfiguration.slot0.kD = RobotConfig.SwerveConfig.kDTurning;
-    motorConfiguration.voltageCompSaturation = RobotConfig.SwerveConfig.kVoltageSaturation;
-    motorConfiguration.supplyCurrLimit.currentLimit = RobotConfig.SwerveConfig.kCurrentLimit;
-    motorConfiguration.supplyCurrLimit.enable = true;
+    m_steerMotor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 100);
+    m_steerMotor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus1, 20);
+    m_steerMotor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 20);
+    m_steerMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    m_steerMotor.setInverted(false);
+    m_steerMotor.enableVoltageCompensation(12);
+    m_steerMotor.setSmartCurrentLimit(20);
 
-    m_steerMotor.configAllSettings(motorConfiguration, SwerveConfig.kCanTimeoutMs);
-    m_steerMotor.enableVoltageCompensation(true);
-    m_steerMotor.configSelectedFeedbackSensor(
-        TalonFXFeedbackDevice.IntegratedSensor, 0, SwerveConfig.kCanTimeoutMs);
-    m_steerMotor.setSensorPhase(true);
-    m_steerMotor.setInverted(TalonFXInvertType.CounterClockwise);
-    m_steerMotor.setNeutralMode(NeutralMode.Brake);
-    m_steerMotor.setSelectedSensorPosition(
-        getAbsoluteAngle() / SwerveConfig.kSteerRelativeEncoderPositionConversionFactor,
-        0, SwerveConfig.kCanTimeoutMs);
-    m_steerMotor.setStatusFramePeriod(
-        StatusFrameEnhanced.Status_1_General,
-        SwerveConfig.kStatusFrameGeneralPeriodMs,
-        SwerveConfig.kCanTimeoutMs);
+    m_steerPidController.setP(SwerveConfig.kPTurning);
+    m_steerPidController.setI(SwerveConfig.kITurning);
+    m_steerPidController.setD(SwerveConfig.kDTurning);
+    m_steerPidController.setFeedbackDevice((MotorFeedbackSensor) m_steerRelativeEncoder);
+    m_steerPidController.setPositionPIDWrappingMaxInput(180);
+    m_steerPidController.setPositionPIDWrappingMinInput(-180);
+    m_steerPidController.setPositionPIDWrappingEnabled(true);
   }
 
-  private void initDriveMotor() {
+  public void initDriveMotor() {
     m_driveMotor.setInverted(true);
     m_driveMotor.setVoltageCompensation(RobotConfig.SwerveConfig.kVoltageSaturation);
     m_driveMotor.setAmpLimit(RobotConfig.SwerveConfig.kCurrentLimit);
@@ -138,18 +142,12 @@ public class SwerveModule implements Device {
   }
 
   /**
-   * The angle for getting the steer angle.
+   * The method for getting the steer angle.
    *
    * @return The motor angles in radians.
    */
   public double getSteerAngle() {
-    double motorAngleRadians = m_steerMotor.getSelectedSensorPosition()
-        * SwerveConfig.kSteerRelativeEncoderPositionConversionFactor;
-    motorAngleRadians %= 2.0 * Math.PI;
-    if (motorAngleRadians < 0) {
-      motorAngleRadians += 2.0 * Math.PI;
-    }
-    return motorAngleRadians;
+    return normalizeAngle(m_steerMotor.getEncoder().getPosition());
   }
 
   /**
@@ -179,13 +177,11 @@ public class SwerveModule implements Device {
    * @return angle value between 0 to 2pi
    */
   private double normalizeAngle(double angle) {
-    double normalizedAngle = angle;
-
-    normalizedAngle %= (2.0 * Math.PI);
-    if (normalizedAngle < 0.0) {
-      normalizedAngle += 2.0 * Math.PI;
+    angle %= (2.0 * Math.PI);
+    if (angle < 0.0) {
+      angle += 2.0 * Math.PI;
     }
-    return normalizedAngle;
+    return angle;
   }
 
   /**
@@ -195,20 +191,18 @@ public class SwerveModule implements Device {
    * @param targetAngle the angle to be moved to
    * @return The steer angle after accounting for error.
    */
-  private double normalizeAngleError(double targetAngle) {
+  public double normalizeAngleError(double targetAngle) {
     // Angle is inbetween 0 to 2pi
-    double normalizedAngleError = normalizeAngle(targetAngle);
 
-    double difference = normalizedAngleError - getSteerAngle();
+    double difference = targetAngle - getSteerAngle();
     // Change the target angle so the difference is in the range [-pi, pi) instead
     // of [0, 2pi)
     if (difference >= Math.PI) {
-      return difference - 2 * Math.PI;
+      targetAngle -= 2.0 * Math.PI;
     } else if (difference < -Math.PI) {
-      return difference - 2 * Math.PI;
-    } else {
-      return difference;
-    }
+      targetAngle += 2.0 * Math.PI;
+    } 
+    return targetAngle - getSteerAngle();
   }
 
   /**
@@ -217,10 +211,8 @@ public class SwerveModule implements Device {
    * @param steerAngle the current steer angle.
    */
   private double convertSteerAngle(double steerAngle) {
-
-    double newSteerAngle = steerAngle;
-
-    double difference = normalizeAngleError(newSteerAngle);
+    steerAngle = normalizeAngle(steerAngle);
+    double difference = normalizeAngleError(steerAngle);        
 
     // If the difference is greater than 90 deg or less than -90 deg the drive can
     // be inverted so the total
@@ -228,31 +220,31 @@ public class SwerveModule implements Device {
     if (difference > Math.PI / 2.0 || difference < -Math.PI / 2.0) {
       // Only need to add 180 deg here because the target angle will be put back into
       // the range [0, 2pi)
-      newSteerAngle += Math.PI;
+      steerAngle += Math.PI;
     }
 
     // Put the target angle back into the range [0, 2pi)
-    newSteerAngle = normalizeAngle(newSteerAngle);
+    steerAngle = normalizeAngle(steerAngle);
 
     // Angle to be changed is now in radians
-    double referenceAngleRadians = newSteerAngle;
-    double currentAngleRadians = m_steerMotor.getSelectedSensorPosition();
+    double referenceAngleRadians = steerAngle;
+    SmartDashboard.putNumber("Target Angle", Math.toDegrees(referenceAngleRadians));
+
+    double currentAngleRadians = m_steerMotor.getEncoder().getPosition();
 
     // Reset the NEO's encoder periodically when the module is not rotating.
     // Sometimes (~5% of the time) when we initialize, the absolute encoder isn't
     // fully set up, and we don't
     // end up getting a good reading. If we reset periodically this won't matter
     // anymore.
-    if (m_steerMotor.getSelectedSensorVelocity()
-        * SwerveConfig.kSteerRelativeEncoderVelocityConversionFactor 
+    if (m_steerMotor.getEncoder().getVelocity() 
             < SwerveConfig.kEncoderResetMaxAngularVelocity) {
       if (++m_absoluteEncoderResetIterations >= SwerveConfig.kEncoderResetIterations) {
-        m_logger.tracef("Resetting steer relative encoder. Reset iteration %d", 
+        m_logger.tracef("Resetting steer relative encoder. Reset iteration %f", 
             m_absoluteEncoderResetIterations);
         m_absoluteEncoderResetIterations = 0;
-        double absoluteAngle = getAbsoluteAngle();
-        m_steerMotor.setSelectedSensorPosition(getAbsoluteAngle()
-            / SwerveConfig.kSteerRelativeEncoderPositionConversionFactor);
+        double absoluteAngle = getAbsoluteAngle();    
+        m_steerMotor.getEncoder().setPosition(getAbsoluteAngle());
         currentAngleRadians = absoluteAngle;
       }
     } else {
@@ -273,8 +265,7 @@ public class SwerveModule implements Device {
 
     // The position that the motor should turn to
     // when taking into account the ticks of the motor
-    return adjustedReferenceAngleRadians 
-      / SwerveConfig.kSteerRelativeEncoderPositionConversionFactor;
+    return adjustedReferenceAngleRadians;
   }
 
   /**
@@ -285,8 +276,6 @@ public class SwerveModule implements Device {
    */
   private double convertDriveMetersPerSecond(double driveMetersPerSecond, double steerAngle) {
 
-    double convertedDriveMetersPerSecond = driveMetersPerSecond;
-
     double difference = normalizeAngleError(steerAngle);
 
     // If the difference is greater than 90 deg or less than -90 deg the drive can
@@ -295,27 +284,28 @@ public class SwerveModule implements Device {
     if (difference > Math.PI / 2.0 || difference < -Math.PI / 2.0) {
       // Only need to add 180 deg here because the target angle will be put back into
       // the range [0, 2pi)
-      convertedDriveMetersPerSecond *= -1.0;
+      driveMetersPerSecond *= -1.0;
     }
 
-    return convertedDriveMetersPerSecond;
+    return driveMetersPerSecond;
   }
 
   /**
    * Method for setting the drive voltage and steering angle.
    *
    * @param driveMetersPerSecond driving meters per second.
-   *
    * @param steerAngle           steering angle.
    *
    */
   public void set(double driveMetersPerSecond, double steerAngle) {
-
+    SmartDashboard.putString(getName() + " state",
+        "Speed: " + driveMetersPerSecond + " | Angle: " + steerAngle);
     // Set driveMotor according to percentage output
     this.m_driveMotor.set(convertDriveMetersPerSecond(driveMetersPerSecond, steerAngle));
 
     // Set steerMotor according to position of encoder
-    this.m_steerMotor.set(TalonFXControlMode.Position, convertSteerAngle(steerAngle));
+    this.m_steerMotor.getPIDController()
+        .setReference(convertSteerAngle(steerAngle), CANSparkMax.ControlType.kPosition);
   }
 
   /**
@@ -348,7 +338,7 @@ public class SwerveModule implements Device {
    * @return the steer motor object.
    * 
    */
-  public TalonFX getSteerMotor() {
+  public CANSparkMax getSteerMotor() {
     return m_steerMotor;
   }
 

@@ -44,7 +44,7 @@ public class SwerveCommand extends CommandBase {
     this.m_rotationSupplier = rotationSupplier;
     this.m_fieldRelativeSupplier = fieldRelativeSupplier;
     m_isFieldRelative = true;
-    addRequirements(drivetrain);
+    addRequirements(m_drivetrainSubsystem);
   }
 
   @Override
