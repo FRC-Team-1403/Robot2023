@@ -78,8 +78,9 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
   }
 
   public Transform3d getTarget(){
-    return target;
+    return target; 
   }
+
   public boolean hasTarget(){
     if(limeLight.getLatestResult().hasTargets()){
       return true;
@@ -165,21 +166,5 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
     //   SmartDashboard.putNumber("X Distance", );
     //   SmartDashboard.putNumber("Y Distance", swervePoseEstimator.getEstimatedPosition().getY());
 
-
-    // }
-
-    // if (controller.getAButtonPressed()) {
-    // limeLight.setPipelineIndex(1);
-    // //pressing the a button makes the pipeline reflective tape
-    // }
-
-    // if (controller.getBButtonPressed()) {
-    // limeLight.setPipelineIndex(2);
-    // //pressing the b button makes the pipeline april tags
-    // }
-
-    // if (limeLight.getPipelineIndex() == 1) {
-    // // moveToTape(i, i,m_drivetrain, limeLight.getLatestResult().getTargets());
-    // }
   }
 }
