@@ -29,14 +29,13 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
-
-public class Arm_Subsystem extends CougarSubsystem{
-  //Wrist
+public class Arm_Subsystem extends CougarSubsystem {
+  // Wrist
   private final CougarSparkMax m_wristMotor;
   private final DutyCycleEncoder m_wristAbsoluteEncoder;
   private double m_absoluteWristOffset = 30;
 
-  //Arm
+  // Arm
   private final CANSparkMax m_leftPivotMotor;
   private final CANSparkMax m_rightPivotMotor;
   private final AnalogEncoder m_armAbsoluteEncoder;
@@ -44,13 +43,13 @@ public class Arm_Subsystem extends CougarSubsystem{
   private final ProfiledPIDController m_pivotPid;
   private final ArmFeedforward m_pivotFeedForward;
 
-  //Intake
+  // Intake
   private final CANSparkMax m_intakeMotor;
 
-  //Telescope
+  // Telescope
   private final CANSparkMax m_telescopicMotor;
 
-  //Setpoints
+  // Setpoints
   private double m_wristAngle;
   private double m_pivotAngle;
   private double m_intakeSpeed;
@@ -60,7 +59,7 @@ public class Arm_Subsystem extends CougarSubsystem{
     super("Arm", injectedParameters);
     CougarLogger logger = getLogger();
 
-    m_wristMotor = CougarSparkMax.makeBrushless("Wrist Motor", RobotConfig.CanBus.wristMotor,  Type.kHallSensor, logger);
+    m_wristMotor = CougarSparkMax.makeBrushless("Wrist Motor", RobotConfig.CanBus.wristMotor, Type.kHallSensor, logger);
     m_wristAbsoluteEncoder = new DutyCycleEncoder(RobotConfig.RioPorts.kWristAbsoluteEncoder);
 
     m_leftPivotMotor = new CANSparkMax(RobotConfig.CanBus.leftPivotMotor, MotorType.kBrushless);
@@ -75,35 +74,35 @@ public class Arm_Subsystem extends CougarSubsystem{
     configWristMotor();
     configEncoders();
 
-    //TODO, tune feedforward with arm pivot
+    // TODO, tune feedforward with arm pivot
     m_pivotFeedForward = new ArmFeedforward(0, 0.17, 1, 0);
-    //TODO Constraints
-    m_pivotPid = new ProfiledPIDController(1, 0, 0, new TrapezoidProfile.Constraints(5, 10));
-    m_pivotPid.disableContinuousInput();
+    // TODO Constraints
+    m_pivotPid = new ProfiledPIDController(0.001, 0, 0, new TrapezoidProfile.Constraints(5, 10));
+    m_pivotPid.enableContinuousInput(0, 360);
+
   }
 
-
   private void configEncoders() {
-    //Wrist encoders
-    m_wristMotor.getEncoder().setPositionConversionFactor(90.0/100);
+    // Wrist encoders
+    m_wristMotor.getEncoder().setPositionConversionFactor(90.0 / 100);
     new Thread(() -> {
-        try {
-          Thread.sleep(2000);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
+      try {
+        Thread.sleep(2000);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
       double wristAngle = getWristAbsoluteAngle();
       m_wristMotor.getEncoder().setPosition(wristAngle);
       m_wristAngle = wristAngle;
     }).start();
 
-    //Arm encoders
+    // Arm encoders
     m_leftPivotMotor.getEncoder().setPositionConversionFactor(1.53285964552);
     m_leftPivotMotor.getEncoder().setPosition(getAbsolutePivotAngle());
   }
-  
+
   private void configWristMotor() {
-    //Wrist
+    // Wrist
     SparkMaxPIDController wristController = m_wristMotor.getPIDController();
     m_wristMotor.setIdleMode(IdleMode.kBrake);
     m_wristMotor.setInverted(false);
@@ -117,7 +116,7 @@ public class Arm_Subsystem extends CougarSubsystem{
     wristController.setFeedbackDevice((MotorFeedbackSensor) m_wristMotor.getEncoder());
     wristController.setPositionPIDWrappingEnabled(false);
 
-    //Pivot
+    // Pivot
     m_leftPivotMotor.setIdleMode(IdleMode.kBrake);
     m_leftPivotMotor.enableVoltageCompensation(12);
     m_leftPivotMotor.setSmartCurrentLimit(25);
@@ -125,14 +124,14 @@ public class Arm_Subsystem extends CougarSubsystem{
     m_rightPivotMotor.follow(m_leftPivotMotor, true);
   }
 
-  //Wrist Methods
+  // Wrist Methods
   public double getWristAbsoluteAngle() {
     double value = (m_wristAbsoluteEncoder.getAbsolutePosition() * 360) + m_absoluteWristOffset;
 
-    if(value < 0) {
+    if (value < 0) {
       value += 360;
     }
-    if(value > 360) {
+    if (value > 360) {
       value -= 360;
     }
     return value;
@@ -151,41 +150,60 @@ public class Arm_Subsystem extends CougarSubsystem{
     return MathUtil.clamp(angle, Arm.kMinWristAngle, Arm.kMaxWristAngle);
   }
 
-
-  //Pivot Methods
+  // Pivot Methods
 
   public double getAbsolutePivotAngle() {
     double value = (m_armAbsoluteEncoder.getAbsolutePosition() * 360) + m_absoluteArmOffset;
 
-    if(value < 0) {
+    if (value < 0) {
       value += 360;
     }
-    if(value > 360) {
+    if (value > 360) {
       value -= 360;
     }
     return value;
   }
 
-  private void setAbsolutePivotAngle(double angle) {
-    // double pidValue = this.m_pivotPid.calculate(this.m_leftPivotMotor.getEncoder().getPosition(), angle);
-    double pidValue = 0;
-    double feedforward = this.m_pivotFeedForward.calculate(angle, 1);
-    SmartDashboard.putNumber("Arm FeedForward", feedforward); 
-    m_leftPivotMotor.set(pidValue + feedforward);
+  private void setAbsolutePivotAngle(double desiredAngle) {
+    // TODO convert to use actual extension
+    double currentAngle = getAbsolutePivotAngle();
+    double feedforward = Math.cos(Math.toRadians(currentAngle));
+    double feedback = m_pivotPid.calculate(currentAngle, desiredAngle);
+    SmartDashboard.putNumber("Arm Feedback", feedback);
+    double speed = MathUtil.clamp(feedback+feedforward, -1, 1);
+    m_leftPivotMotor.set(speed);
   }
 
   private void setPivotSpeed(double speed) {
     m_leftPivotMotor.set(speed);
   }
 
+  private double calculatePivotFeedForward(double armExtension, double currentAngle) {
+    double armLength = armExtension + RobotConfig.Arm.kBaseArmLength;
+    // Neo motors
+    double mortorOhms = 0.036 * 2; // internal Resistance
+    double motorTorqe = 23.0119 * 2; // Inch*lbs
+    double motorStallCurrent = 105 * 2; // amps
 
-  //Intake
+    // Total Gear Reduction
+    double gearBox = 300;
+    double Kt = (motorTorqe / motorStallCurrent);
+
+    if((currentAngle > 0 || currentAngle < 90) || (currentAngle > 270 || currentAngle < 360)) {
+
+    }
+
+    return ((armLength * RobotConfig.Arm.kArmWeight * mortorOhms) / (Kt * gearBox))
+        * -Math.cos(Math.toRadians(currentAngle));
+  }
+
+  // Intake
 
   public void runIntake(double intakeSpeed) {
     m_intakeMotor.set(m_intakeSpeed);
   }
 
-  //Extension
+  // Extension
   public void extendMotor(double extensionSpeed) {
     m_telescopicMotor.set(extensionSpeed);
   }
@@ -209,7 +227,7 @@ public class Arm_Subsystem extends CougarSubsystem{
 
   @Override
   public void periodic() {
-    if(isInWristBounds(m_wristMotor.getEncoder().getPosition()) || isInWristBounds(this.m_wristAngle)) {
+    if (isInWristBounds(m_wristMotor.getEncoder().getPosition()) || isInWristBounds(this.m_wristAngle)) {
       setAbsoluteWristAngle(this.m_wristAngle);
     } else {
       setAbsoluteWristAngle(m_wristMotor.getEncoder().getPosition());
@@ -217,15 +235,15 @@ public class Arm_Subsystem extends CougarSubsystem{
 
     runIntake(m_intakeSpeed);
 
-    setPivotSpeed(m_pivotAngle);
+    // setPivotSpeed(m_pivotAngle);
+    setAbsolutePivotAngle(200);
 
     extendMotor(m_extension);
-    
 
     SmartDashboard.putNumber("Wrist Setpoint", m_wristAngle);
     SmartDashboard.putNumber("Arm Absolute", getAbsolutePivotAngle());
     SmartDashboard.putNumber("Arm Relative", m_leftPivotMotor.getEncoder().getPosition());
-    
+
   }
-  
+
 }

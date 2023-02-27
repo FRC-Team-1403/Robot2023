@@ -273,6 +273,9 @@ public class RobotConfig {
     public static final double kArmLengthConversionFactor = 1; //TODO
     public static final double kWheelIntakeConversionFactor = 1; //TODO
 
+    public static final double kBaseArmLength = 37;
+    public static final double kArmWeight = 16; //Pounds
+
     public static final double kMaxArmRotation = 246;
     public static final double kMinArmRotation = 90;
     public static final double kMaxWristAngle = 270; //TODO
