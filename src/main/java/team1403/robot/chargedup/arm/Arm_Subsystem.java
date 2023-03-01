@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarSubsystem;
 import team1403.lib.device.wpi.CougarSparkMax;
+import team1403.lib.device.wpi.WpiLimitSwitch;
 import team1403.lib.util.CougarLogger;
 import team1403.robot.chargedup.RobotConfig.Arm;
 import team1403.robot.chargedup.RobotConfig;
@@ -30,6 +31,7 @@ public class Arm_Subsystem extends CougarSubsystem {
   private final CANSparkMax m_rightPivotMotor;
   private final AnalogEncoder m_armAbsoluteEncoder;
   private final PIDController m_pivotPid;
+  private final WpiLimitSwitch m_maxArmLimitSwitch;
 
   // Intake
   private final CANSparkMax m_intakeMotor;
@@ -57,6 +59,9 @@ public class Arm_Subsystem extends CougarSubsystem {
     m_intakeMotor = new CANSparkMax(RobotConfig.CanBus.wheelIntakeMotor, MotorType.kBrushed);
 
     m_telescopicMotor = new CANSparkMax(RobotConfig.CanBus.telescopicArmMotor, MotorType.kBrushless);
+
+    m_maxArmLimitSwitch = new WpiLimitSwitch("maxArmLimitSwitch",
+    RobotConfig.RioPorts.kArmLimitSwitch);
 
     m_intakeSpeed = 0;
     configWristMotor();
@@ -148,8 +153,17 @@ public class Arm_Subsystem extends CougarSubsystem {
 
   // Pivot Methods
 
+  /**
+   * Getter for arm limit switch.
+   *
+   * @return if arm limit switch is triggered
+   */
+  public boolean isArmSwitchActive() {
+    return m_maxArmLimitSwitch.isTriggered();
+  }
+
   public double getAbsolutePivotAngle() {
-    double value = (m_armAbsoluteEncoder.getAbsolutePosition() * 360) + RobotConfig.Arm.m_absolutePivotOffset;
+    double value = (m_armAbsoluteEncoder.getAbsolutePosition() * 360) + 38.1111122229;
 
     if (value < 0) {
       value += 360;
@@ -226,17 +240,22 @@ public class Arm_Subsystem extends CougarSubsystem {
 
     runIntake(m_intakeSpeed);
 
-    if(isInPivotBounds(getAbsolutePivotAngle()) || isInPivotBounds(this.m_pivotAngle)) {
+    if((isInPivotBounds(getAbsolutePivotAngle()) && !isArmSwitchActive()) || isInPivotBounds(this.m_pivotAngle)) {
       setAbsolutePivotAngle(this.m_pivotAngle);
+    } else if(m_leftPivotMotor.getOutputCurrent() > RobotConfig.Arm.kPivotAngleMaxAmperage) {
+      m_leftPivotMotor.stopMotor();
     } else {
       setAbsolutePivotAngle(getAbsolutePivotAngle());
     }
+
+
 
     extendMotor(m_extension);
 
     SmartDashboard.putNumber("Wrist Setpoint", m_wristAngle);
     SmartDashboard.putNumber("Arm Absolute", getAbsolutePivotAngle());
     SmartDashboard.putNumber("Arm Relative", m_leftPivotMotor.getEncoder().getPosition());
+    SmartDashboard.putBoolean("Limit Switch", isArmSwitchActive());
 
   }
 

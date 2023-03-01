@@ -459,7 +459,7 @@ public class Arm extends CougarSubsystem {
   @Override
   public void periodic() {
     if (isFrontSwitchActive() || !isArmAngleWithinBounds()
-        || getCurrentArmAngleAmps() <= RobotConfig.Arm.kArmAngleMaxAmperage
+        || getCurrentArmAngleAmps() <= RobotConfig.Arm.kPivotAngleMaxAmperage
         || getCurrentArmExtensionAmps() <= RobotConfig.Arm.kArmExtensionMaxAmperage) {
       setArmAngleMotorSpeed(0);
       return;

@@ -66,7 +66,7 @@ public class ArmCommand extends CommandBase {
     m_wristAngle += m_wristAngleSupplier.getAsDouble() * 4;
     m_wristAngle = m_arm.limitWristAngle(m_wristAngle);
 
-    m_pivotAngle += m_armAngleSupplier.getAsDouble()*4;
+    m_pivotAngle += (-1 * m_armAngleSupplier.getAsDouble());
     m_pivotAngle = m_arm.limitPivotAngle(m_pivotAngle);
 
     if(m_armExtensionDecreaseSupplier.getAsDouble()>0) {

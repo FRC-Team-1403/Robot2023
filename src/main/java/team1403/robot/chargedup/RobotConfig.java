@@ -255,36 +255,35 @@ public class RobotConfig {
     public static final int kIArmPivot = 0;
     public static final int kDArmPivot = 0;
     public final static double m_absolutePivotOffset = 64.4245336;
-    public static final double kMaxPivotAngle = 270;
+    public static final double kMaxPivotAngle = 245;
     public static final double kMinPivotAngle = 145;
-    public static final double kArmAngleMaxAmperage = 100;
+    public static final double kPivotAngleMaxAmperage = 40;
 
     //Wrist
     public static final double kPWristMotor = 0.95;
     public static final double kIWristMotor = 0;
     public static final double kDWristMotor = 90;
     public static final double kMaxWristAngle = 270; 
-    public static final double kMinWristAngle = 30; 
+    public static final double kMinWristAngle = 31; 
     public static final double kWristConversionFactor = 90.0 / 100;
 
     //Extension
-    public static final double kPArmExtension = 1;
-    public static final double kIArmExtension = 0;
-    public static final double kDArmExtension = 0;
+    public static final double kPArmExtension = 1; //TODO
+    public static final double kIArmExtension = 0; //TODO
+    public static final double kDArmExtension = 0; //TODO
     public static final double kPhysicalArmMaxExtension = 60.218;
-    public static final double kMinArmExtension = 1;
-    public static final double kMaxArmExtension = 1;
+    public static final double kMinArmExtension = 1; //TODO
+    public static final double kMaxArmExtension = 1; //TODO
     public static final double kArmLengthConversionFactor = 0.00007055555;  //1 inch / 360 deg
-    public static final double kMaxArmLengthOffset = 1;
-    public static final double kArmExtensionMaxAmperage = 95;
-    public static final double maxVerticalAngle = Math.acos(44.3 / 60.218);
-    public static final double angleHittingRobot = 66;
-    public static final double angleHittingGround = 80;
+    public static final double kMaxArmLengthOffset = 1;//TODO
+    public static final double kArmExtensionMaxAmperage = 95; //TODO
+    public static final double maxVerticalAngle = Math.acos(44.3 / 60.218); //TODO
+    public static final double angleHittingRobot = 66; //TODO
+    public static final double angleHittingGround = 80; //TODO
 
     //Dimensions
     public static final double kBaseArmLength = 37;
     public static final double kArmWeight = 16; //Pounds
-    public static final Dimension wristDimensions = new Dimension(0, 0, 0);
-    
+    public static final Dimension wristDimensions = new Dimension(0, 0, 0); //TODO
   }
 }
