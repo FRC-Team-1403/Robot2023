@@ -21,7 +21,7 @@ public class ArmCommand extends CommandBase {
 
   private final Arm_Subsystem m_arm;
 
-  private double m_armAngle;
+  private double m_pivotAngle;
   private double m_wristAngle;
   private double m_armExtension;
 
@@ -54,7 +54,7 @@ public class ArmCommand extends CommandBase {
 
   @Override
   public void initialize() {
-    this.m_armAngle = 0;
+    this.m_pivotAngle = m_arm.getAbsolutePivotAngle();
     this.m_wristAngle = m_arm.getWristAbsoluteAngle();
     this.m_armExtension = 0;
     System.out.println("Angle: " + m_wristAngle);
@@ -63,10 +63,11 @@ public class ArmCommand extends CommandBase {
 
   @Override
   public void execute() {
-    m_wristAngle += (m_wristAngleSupplier.getAsDouble() * 4);
+    m_wristAngle += m_wristAngleSupplier.getAsDouble() * 4;
     m_wristAngle = m_arm.limitWristAngle(m_wristAngle);
 
-    m_armAngle = m_armAngleSupplier.getAsDouble()/5;
+    m_pivotAngle += m_armAngleSupplier.getAsDouble()*4;
+    m_pivotAngle = m_arm.limitPivotAngle(m_pivotAngle);
 
     if(m_armExtensionDecreaseSupplier.getAsDouble()>0) {
       m_armExtension = -(m_armExtensionDecreaseSupplier.getAsDouble()/2);
@@ -77,11 +78,11 @@ public class ArmCommand extends CommandBase {
     }
 
     if(this.m_wheelIntakeSupplier.getAsBoolean()) {
-      m_arm.move(m_wristAngle, -0.75, m_armAngle, m_armExtension);
+      m_arm.move(m_wristAngle, -0.75, m_pivotAngle, m_armExtension);
     } else if(this.m_wheelOuttakeSupplier.getAsBoolean()) {
-      m_arm.move(m_wristAngle, 0.75, m_armAngle, m_armExtension);
+      m_arm.move(m_wristAngle, 0.75, m_pivotAngle, m_armExtension);
     }else {
-      m_arm.move(m_wristAngle, 0, m_armAngle, m_armExtension);
+      m_arm.move(m_wristAngle, 0, m_pivotAngle, m_armExtension);
     }
 
 

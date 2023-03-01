@@ -1,7 +1,5 @@
 package team1403.robot.chargedup.arm;
 
-import org.opencv.features2d.Feature2D;
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.MotorFeedbackSensor;
 import com.revrobotics.SparkMaxPIDController;
@@ -11,23 +9,15 @@ import com.revrobotics.SparkMaxRelativeEncoder.Type;
 
 import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarSubsystem;
-import team1403.lib.device.AdvancedMotorController;
-import team1403.lib.device.AnalogDevice;
-import team1403.lib.device.DeviceFactory;
 import team1403.lib.device.wpi.CougarSparkMax;
-import team1403.lib.device.wpi.WpiAnalogDevice;
 import team1403.lib.util.CougarLogger;
 import team1403.robot.chargedup.RobotConfig.Arm;
 import team1403.robot.chargedup.RobotConfig;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.controller.PIDController;
 
 public class Arm_Subsystem extends CougarSubsystem {
   // Wrist
@@ -39,9 +29,7 @@ public class Arm_Subsystem extends CougarSubsystem {
   private final CANSparkMax m_leftPivotMotor;
   private final CANSparkMax m_rightPivotMotor;
   private final AnalogEncoder m_armAbsoluteEncoder;
-  private final double m_absoluteArmOffset = 64.4245336;
-  private final ProfiledPIDController m_pivotPid;
-  private final ArmFeedforward m_pivotFeedForward;
+  private final PIDController m_pivotPid;
 
   // Intake
   private final CANSparkMax m_intakeMotor;
@@ -75,16 +63,14 @@ public class Arm_Subsystem extends CougarSubsystem {
     configEncoders();
 
     // TODO, tune feedforward with arm pivot
-    m_pivotFeedForward = new ArmFeedforward(0, 0.17, 1, 0);
     // TODO Constraints
-    m_pivotPid = new ProfiledPIDController(0.001, 0, 0, new TrapezoidProfile.Constraints(5, 10));
-    m_pivotPid.enableContinuousInput(0, 360);
+    m_pivotPid = new PIDController(0.025, RobotConfig.Arm.kIArmPivot, RobotConfig.Arm.kDArmPivot);
 
   }
 
   private void configEncoders() {
     // Wrist encoders
-    m_wristMotor.getEncoder().setPositionConversionFactor(90.0 / 100);
+    m_wristMotor.getEncoder().setPositionConversionFactor(RobotConfig.Arm.kWristConversionFactor);
     new Thread(() -> {
       try {
         Thread.sleep(2000);
@@ -150,10 +136,20 @@ public class Arm_Subsystem extends CougarSubsystem {
     return MathUtil.clamp(angle, Arm.kMinWristAngle, Arm.kMaxWristAngle);
   }
 
+  /**
+   * Checks if the given angle is in the bounds of the wrist.
+   * 
+   * @param angle the given angle
+   * @return true if the given angle is in the bounds of the wrist.
+   */
+  private boolean isInWristBounds(double angle) {
+    return (angle > Arm.kMinWristAngle && angle < Arm.kMaxWristAngle);
+  }
+
   // Pivot Methods
 
   public double getAbsolutePivotAngle() {
-    double value = (m_armAbsoluteEncoder.getAbsolutePosition() * 360) + m_absoluteArmOffset;
+    double value = (m_armAbsoluteEncoder.getAbsolutePosition() * 360) + RobotConfig.Arm.m_absolutePivotOffset;
 
     if (value < 0) {
       value += 360;
@@ -165,36 +161,41 @@ public class Arm_Subsystem extends CougarSubsystem {
   }
 
   private void setAbsolutePivotAngle(double desiredAngle) {
-    // TODO convert to use actual extension
+    //Feedforward
     double currentAngle = getAbsolutePivotAngle();
-    double feedforward = Math.cos(Math.toRadians(currentAngle));
-    double feedback = m_pivotPid.calculate(currentAngle, desiredAngle);
-    SmartDashboard.putNumber("Arm Feedback", feedback);
-    double speed = MathUtil.clamp(feedback+feedforward, -1, 1);
-    m_leftPivotMotor.set(speed);
-  }
-
-  private void setPivotSpeed(double speed) {
-    m_leftPivotMotor.set(speed);
-  }
-
-  private double calculatePivotFeedForward(double armExtension, double currentAngle) {
-    double armLength = armExtension + RobotConfig.Arm.kBaseArmLength;
-    // Neo motors
-    double mortorOhms = 0.036 * 2; // internal Resistance
-    double motorTorqe = 23.0119 * 2; // Inch*lbs
-    double motorStallCurrent = 105 * 2; // amps
-
-    // Total Gear Reduction
-    double gearBox = 300;
-    double Kt = (motorTorqe / motorStallCurrent);
-
-    if((currentAngle > 0 || currentAngle < 90) || (currentAngle > 270 || currentAngle < 360)) {
-
+    double normalizedCurrentAngle = currentAngle;
+    while(normalizedCurrentAngle > 90) {
+      normalizedCurrentAngle -= 90;
+    }
+    double armLength = RobotConfig.Arm.kBaseArmLength + 0;
+    double gravityCompensationFactor = 0.001 * armLength;
+    double feedforward = gravityCompensationFactor * Math.cos(Math.toRadians(normalizedCurrentAngle));
+    if((currentAngle < 90 && currentAngle > 0) || (currentAngle > 270 && currentAngle < 360)) {
+      feedforward *= -1;
     }
 
-    return ((armLength * RobotConfig.Arm.kArmWeight * mortorOhms) / (Kt * gearBox))
-        * -Math.cos(Math.toRadians(currentAngle));
+    //Feedback
+    double feedback = -1 * m_pivotPid.calculate(currentAngle, desiredAngle);
+
+    SmartDashboard.putNumber("Arm Feedforward", feedforward);
+    SmartDashboard.putNumber("Arm Feedback", feedback);
+    double speed = MathUtil.clamp(feedforward + feedback, -1, 1);
+    SmartDashboard.putNumber("Pivot Speed", speed);
+    m_leftPivotMotor.set(speed);
+  }
+
+  /**
+   * Checks if the given angle is in the bounds of the wrist.
+   * 
+   * @param angle the given angle
+   * @return true if the given angle is in the bounds of the wrist.
+   */
+  private boolean isInPivotBounds(double angle) {
+    return (angle > Arm.kMinPivotAngle && angle < Arm.kMaxPivotAngle);
+  }
+
+  public double limitPivotAngle(double angle) {
+    return MathUtil.clamp(angle, Arm.kMinPivotAngle, Arm.kMaxPivotAngle);
   }
 
   // Intake
@@ -208,21 +209,11 @@ public class Arm_Subsystem extends CougarSubsystem {
     m_telescopicMotor.set(extensionSpeed);
   }
 
-  public void move(double absoluteAngle, double intakeSpeed, double armSpeed, double extensionSpeed) {
+  public void move(double absoluteAngle, double intakeSpeed, double pivotAngle, double extensionSpeed) {
     this.m_wristAngle = absoluteAngle;
     this.m_intakeSpeed = intakeSpeed;
-    this.m_pivotAngle = armSpeed;
+    this.m_pivotAngle = pivotAngle;
     this.m_extension = extensionSpeed;
-  }
-
-  /**
-   * Checks if the given angle is in the bounds of the wrist.
-   * 
-   * @param angle the given angle
-   * @return true if the given angle is in the bounds of the wrist.
-   */
-  private boolean isInWristBounds(double angle) {
-    return (angle > Arm.kMinWristAngle && angle < Arm.kMaxWristAngle);
   }
 
   @Override
@@ -235,8 +226,11 @@ public class Arm_Subsystem extends CougarSubsystem {
 
     runIntake(m_intakeSpeed);
 
-    // setPivotSpeed(m_pivotAngle);
-    setAbsolutePivotAngle(200);
+    if(isInPivotBounds(getAbsolutePivotAngle()) || isInPivotBounds(this.m_pivotAngle)) {
+      setAbsolutePivotAngle(this.m_pivotAngle);
+    } else {
+      setAbsolutePivotAngle(getAbsolutePivotAngle());
+    }
 
     extendMotor(m_extension);
 
