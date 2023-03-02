@@ -43,7 +43,6 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
   private boolean reachedTarget = false;
   private XboxController controller;
   private int limelightImportance;
-  public SwerveDrivePoseEstimator swervePoseEstimator;
 
   private Optional<EstimatedRobotPose> photonPose;
   private Transform3d target;
@@ -59,22 +58,24 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
     yController = new PIDController(2,0,0);
     angleController = new PIDController(0.4,0,0 );
 
-    swervePoseEstimator = new SwerveDrivePoseEstimator(SwerveConfig.kDriveKinematics, 
-    m_drivetrain.getGyroscopeRotation(), m_drivetrain.getModulePositions(), new Pose2d(0, 0, new Rotation2d(0)));
-    
-
     limeLight.setPipelineIndex(0);
     // 0: April Tags
     // 1: Reflective Tape
 
-    photonPoseEstimator = new PhotonPoseEstimator(VisionConfig.fieldLayout, PoseStrategy.CLOSEST_TO_LAST_POSE, limeLight,
-        new Transform3d(new Translation3d(0,0,0), new Rotation3d(0, 0, 0)));
+    photonPoseEstimator = new PhotonPoseEstimator(VisionConfig.fieldLayout, PoseStrategy.MULTI_TAG_PNP, limeLight,
+        new Transform3d(new Translation3d(12,8,30), new Rotation3d(0, 0, 0)));
+
+    photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
     photonPose = photonPoseEstimator.update();
   }
 
   public Optional<EstimatedRobotPose> getPhotonPose() {
     return photonPose;
+  }
+
+  public PhotonPoseEstimator getPhotonPoseEstimator() {
+    return photonPoseEstimator;
   }
 
   public Transform3d getTarget(){
@@ -136,15 +137,6 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
 
   @Override
   public void periodic() {
-    // SmartDashboard.putNumber("X val", getLimelightBasedPose().getX());
-    // SmartDashboard.putNumber("Y val", getLimelightBasedPose().getY());
-
-    if(photonPose.isPresent()) {
-      photonPose = photonPoseEstimator.update();
-      double time = photonPose.get().timestampSeconds;
-      swervePoseEstimator.addVisionMeasurement(photonPose.get().estimatedPose.toPose2d(), time - this.timeStamp);
-      this.timeStamp = time;
-    }
     if(limeLight.getLatestResult().hasTargets()){
       target = limeLight.getLatestResult().getBestTarget().getBestCameraToTarget();
       SmartDashboard.putNumber("X Distance", target.getX());
@@ -152,8 +144,9 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
       SmartDashboard.putNumber("Theta of April Tag", target.getRotation().toRotation2d().getDegrees());
     }
 
-
-
+    if(photonPose.isPresent()) {
+      photonPose = photonPoseEstimator.update();
+    }
 
     // if (photonPose.isPresent()) {
     //   photonPose = photonPoseEstimator.update();

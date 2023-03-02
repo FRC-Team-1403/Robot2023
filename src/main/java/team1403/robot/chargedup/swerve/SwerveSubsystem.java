@@ -160,6 +160,10 @@ public class SwerveSubsystem extends CougarSubsystem {
     m_desiredHeading = 0;
   }
 
+  public SwerveDrivePoseEstimator getPoseEstimator() {
+    return m_odometer;
+  }
+
   /**
    * Return the position of the drivetrain.
    *
@@ -297,8 +301,6 @@ public class SwerveSubsystem extends CougarSubsystem {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Gyro Reading", getGyroscopeRotation().getDegrees());
-    m_odometer.update(getGyroscopeRotation(), getModulePositions());
-    SmartDashboard.putString("Odometry", m_odometer.getEstimatedPosition().toString());
 
     m_chassisSpeeds = translationalDriftCorrection(m_chassisSpeeds);
     m_chassisSpeeds = rotationalDriftCorrection(m_chassisSpeeds);

@@ -17,6 +17,7 @@ import team1403.lib.subsystems.BuiltinSubsystem;
 import team1403.lib.util.CougarLogger;
 import team1403.robot.chargedup.cse.CougarScriptObject;
 import team1403.robot.chargedup.cse.CougarScriptReader;
+import team1403.robot.chargedup.photonvision.PhotonVisionDefault;
 import team1403.robot.chargedup.photonvision.PhotonVisionSubsystem;
 import team1403.robot.chargedup.swerve.SwerveCommand;
 import team1403.robot.chargedup.swerve.SwerveDrivePath;
@@ -105,6 +106,10 @@ public class CougarRobotImpl extends CougarRobot {
         () -> -deadband(xboxDriver.getLeftY(), 0.05),
         () -> -deadband(xboxDriver.getRightX(), 0.05),
         () -> xboxDriver.getYButtonReleased())
+    );
+
+    m_visionSubsystem.setDefaultCommand(new PhotonVisionDefault(
+      m_swerveSubsystem, m_visionSubsystem)
     );
 
     new Trigger(() -> xboxDriver.getLeftBumper()).onFalse(
@@ -245,6 +250,5 @@ public class CougarRobotImpl extends CougarRobot {
   // private final Arm m_arm;
   // private boolean m_armOperatorManual = true;
   private final SwerveSubsystem m_swerveSubsystem;
-
 }
 
