@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 /**
  * class ArmCommands is the where the commands for Arm.java is located
  */
-public class ArmCommand extends CommandBase {
+public class ManualArmCommand extends CommandBase {
   private final DoubleSupplier m_armAngleSupplier;
   private final DoubleSupplier m_wristAngleSupplier;
   private final DoubleSupplier m_armExtensionDecreaseSupplier;
@@ -38,7 +38,7 @@ public class ArmCommand extends CommandBase {
    * @param armExtensionDecrease function that determines
     the decrease of arm extension, 0 to 1
    */
-  public ArmCommand(Arm_Subsystem arm, DoubleSupplier armAngle, DoubleSupplier wristAngle,
+  public ManualArmCommand(Arm_Subsystem arm, DoubleSupplier armAngle, DoubleSupplier wristAngle,
   DoubleSupplier armExtensionDecrease, DoubleSupplier armExtensionIncrease,
         BooleanSupplier wheelIntake, BooleanSupplier wheelOuttake) {
     this.m_wheelIntakeSupplier = wheelIntake;
@@ -56,7 +56,7 @@ public class ArmCommand extends CommandBase {
   public void initialize() {
     this.m_pivotAngle = m_arm.getAbsolutePivotAngle();
     this.m_wristAngle = m_arm.getWristAbsoluteAngle();
-    this.m_armExtension = 0;
+    this.m_armExtension = m_arm.getExtensionLength();
     System.out.println("Angle: " + m_wristAngle);
     super.initialize();
   }
@@ -69,20 +69,22 @@ public class ArmCommand extends CommandBase {
     m_pivotAngle += (-1 * m_armAngleSupplier.getAsDouble());
     m_pivotAngle = m_arm.limitPivotAngle(m_pivotAngle);
 
-    if(m_armExtensionDecreaseSupplier.getAsDouble()>0) {
-      m_armExtension = -(m_armExtensionDecreaseSupplier.getAsDouble()/2);
+    if(m_armExtensionDecreaseSupplier.getAsDouble() > 0) {
+      m_armExtension -= m_armExtensionDecreaseSupplier.getAsDouble() / 2;
     } else if(m_armExtensionIncreaseSupplier.getAsDouble() > 0) {
-      m_armExtension = m_armExtensionIncreaseSupplier.getAsDouble()/2;
-    } else {
-      m_armExtension = 0;
+      m_armExtension += m_armExtensionIncreaseSupplier.getAsDouble() / 2;
     }
 
+    m_armExtension = m_arm.limitExtensionLength(m_armExtension);
+
+    SmartDashboard.putNumber("Arm Extension Setpoint", m_armExtension);
+
     if(this.m_wheelIntakeSupplier.getAsBoolean()) {
-      m_arm.move(m_wristAngle, -0.75, m_pivotAngle, m_armExtension);
+      m_arm.moveArm(m_wristAngle, -0.75, m_pivotAngle, m_armExtension);
     } else if(this.m_wheelOuttakeSupplier.getAsBoolean()) {
-      m_arm.move(m_wristAngle, 0.75, m_pivotAngle, m_armExtension);
+      m_arm.moveArm(m_wristAngle, 0.75, m_pivotAngle, m_armExtension);
     }else {
-      m_arm.move(m_wristAngle, 0, m_pivotAngle, m_armExtension);
+      m_arm.moveArm(m_wristAngle, 0, m_pivotAngle, m_armExtension);
     }
 
 

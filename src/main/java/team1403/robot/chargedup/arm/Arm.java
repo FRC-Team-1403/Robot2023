@@ -74,7 +74,7 @@ public class Arm extends CougarSubsystem {
     m_rightArmAngleMotor.follow((AdvancedMotorController) m_leftArmAngleMotor);
 
     m_extensionMotor.getEmbeddedEncoder().setPositionConversionFactor(
-        RobotConfig.Arm.kArmLengthConversionFactor);
+        RobotConfig.Arm.kExtensionConversionFactor);
 
     m_wristAngleMotor.getEmbeddedEncoder().setPositionConversionFactor(
         RobotConfig.Arm.kWristConversionFactor);

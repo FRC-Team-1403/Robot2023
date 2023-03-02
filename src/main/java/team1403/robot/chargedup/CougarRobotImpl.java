@@ -17,7 +17,7 @@ import team1403.robot.chargedup.swerve.SwerveDrivePath;
 import team1403.robot.chargedup.RobotConfig.DriverConfig;
 import team1403.robot.chargedup.RobotConfig.OperatorConfig;
 import team1403.robot.chargedup.arm.Arm;
-import team1403.robot.chargedup.arm.ArmCommand;
+import team1403.robot.chargedup.arm.ManualArmCommand;
 import team1403.robot.chargedup.arm.Arm_Subsystem;
 import team1403.robot.chargedup.swerve.SwerveCommand;
 import team1403.robot.chargedup.swerve.SwerveDrivePath;
@@ -212,7 +212,7 @@ public class CougarRobotImpl extends CougarRobot {
    * @param xboxOperator defines which controller is being used
    */
   private void manualOperatorMode(XboxController xboxOperator) {
-    m_arm.setDefaultCommand(new ArmCommand(m_arm,
+    m_arm.setDefaultCommand(new ManualArmCommand(m_arm,
         () -> -deadband(xboxOperator.getLeftY(), 0.05),
         () -> deadband(xboxOperator.getRightY(), 0.05),
         () -> xboxOperator.getLeftTriggerAxis(),

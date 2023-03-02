@@ -206,6 +206,9 @@ public class RobotConfig {
     public static final int kArmAbsoluteEncoder = 0; ///Analog
 
     public static final int kArmLimitSwitch = 0; //DIO
+
+    public static final int kExtensionMinMagneticSwitch = 2; //DIO
+    public static final int kExtensionMaxMagneticSwitch = 3; //DIO
   }
 
   /**
@@ -268,15 +271,15 @@ public class RobotConfig {
     public static final double kWristConversionFactor = 90.0 / 100;
 
     //Extension
-    public static final double kPArmExtension = 1; //TODO
-    public static final double kIArmExtension = 0; //TODO
-    public static final double kDArmExtension = 0; //TODO
-    public static final double kPhysicalArmMaxExtension = 60.218;
-    public static final double kMinArmExtension = 1; //TODO
-    public static final double kMaxArmExtension = 1; //TODO
-    public static final double kArmLengthConversionFactor = 0.00007055555;  //1 inch / 360 deg
-    public static final double kMaxArmLengthOffset = 1;//TODO
-    public static final double kArmExtensionMaxAmperage = 95; //TODO
+    public static final double kPArmExtension = 0.3;
+    public static final double kIArmExtension = 0;
+    public static final double kDArmExtension = 0; 
+    public static final double kPhysicalArmMaxExtension = 1;
+    public static final double kMinArmExtension = 0; 
+    public static final double kMaxArmExtension = 23.128; 
+    public static final double kExtensionConversionFactor = 1.0/6;  
+    public static final double kMaxArmLengthOffset = 1; //TODO
+    public static final double kArmExtensionMaxAmperage = 20; 
     public static final double maxVerticalAngle = Math.acos(44.3 / 60.218); //TODO
     public static final double angleHittingRobot = 66; //TODO
     public static final double angleHittingGround = 80; //TODO

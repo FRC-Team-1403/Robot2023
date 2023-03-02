@@ -1,6 +1,7 @@
 package team1403.robot.chargedup.arm;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.ControlType;
 import com.revrobotics.MotorFeedbackSensor;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -8,12 +9,15 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxRelativeEncoder.Type;
 
 import edu.wpi.first.wpilibj.AnalogEncoder;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarSubsystem;
 import team1403.lib.device.wpi.CougarSparkMax;
 import team1403.lib.device.wpi.WpiLimitSwitch;
+import team1403.lib.util.ArmState;
 import team1403.lib.util.CougarLogger;
 import team1403.robot.chargedup.RobotConfig.Arm;
 import team1403.robot.chargedup.RobotConfig;
@@ -37,13 +41,16 @@ public class Arm_Subsystem extends CougarSubsystem {
   private final CANSparkMax m_intakeMotor;
 
   // Telescope
-  private final CANSparkMax m_telescopicMotor;
+  private final CANSparkMax m_extensionMotor;
+  private final DigitalInput m_minMagneticSwitch;
+  private final DigitalInput m_maxMagneticSwitch;
+  private double m_extensionLimitSwitchOffset;
 
   // Setpoints
   private double m_wristAngle;
   private double m_pivotAngle;
   private double m_intakeSpeed;
-  private double m_extension;
+  private double m_extensionLength;
 
   public Arm_Subsystem(CougarLibInjectedParameters injectedParameters) {
     super("Arm", injectedParameters);
@@ -58,18 +65,20 @@ public class Arm_Subsystem extends CougarSubsystem {
 
     m_intakeMotor = new CANSparkMax(RobotConfig.CanBus.wheelIntakeMotor, MotorType.kBrushed);
 
-    m_telescopicMotor = new CANSparkMax(RobotConfig.CanBus.telescopicArmMotor, MotorType.kBrushless);
+    m_extensionMotor = new CANSparkMax(RobotConfig.CanBus.telescopicArmMotor, MotorType.kBrushless);
 
     m_maxArmLimitSwitch = new WpiLimitSwitch("maxArmLimitSwitch",
     RobotConfig.RioPorts.kArmLimitSwitch);
 
-    m_intakeSpeed = 0;
     configWristMotor();
     configEncoders();
 
     // TODO, tune feedforward with arm pivot
     // TODO Constraints
     m_pivotPid = new PIDController(0.025, RobotConfig.Arm.kIArmPivot, RobotConfig.Arm.kDArmPivot);
+
+    m_minMagneticSwitch = new DigitalInput(RobotConfig.RioPorts.kExtensionMinMagneticSwitch);
+    m_maxMagneticSwitch = new DigitalInput(RobotConfig.RioPorts.kExtensionMaxMagneticSwitch);
 
   }
 
@@ -86,6 +95,9 @@ public class Arm_Subsystem extends CougarSubsystem {
       m_wristMotor.getEncoder().setPosition(wristAngle);
       m_wristAngle = wristAngle;
     }).start();
+
+    //Telescopic encoders
+    m_extensionMotor.getEncoder().setPositionConversionFactor(RobotConfig.Arm.kExtensionConversionFactor);
 
     // Arm encoders
     m_leftPivotMotor.getEncoder().setPositionConversionFactor(1.53285964552);
@@ -111,8 +123,20 @@ public class Arm_Subsystem extends CougarSubsystem {
     m_leftPivotMotor.setIdleMode(IdleMode.kBrake);
     m_leftPivotMotor.enableVoltageCompensation(12);
     m_leftPivotMotor.setSmartCurrentLimit(25);
-
     m_rightPivotMotor.follow(m_leftPivotMotor, true);
+
+    // Extension
+    SparkMaxPIDController extensionController = m_extensionMotor.getPIDController();
+    m_extensionMotor.setIdleMode(IdleMode.kBrake);
+    m_extensionMotor.enableVoltageCompensation(12);
+    m_extensionMotor.setSmartCurrentLimit(20);
+    m_extensionMotor.setOpenLoopRampRate(0.25);
+
+    extensionController.setP(RobotConfig.Arm.kPArmExtension);
+    extensionController.setI(RobotConfig.Arm.kIArmExtension);
+    extensionController.setD(RobotConfig.Arm.kDArmExtension);
+    extensionController.setFeedbackDevice(m_extensionMotor.getEncoder());
+    extensionController.setPositionPIDWrappingEnabled(false);
   }
 
   // Wrist Methods
@@ -219,15 +243,51 @@ public class Arm_Subsystem extends CougarSubsystem {
   }
 
   // Extension
-  public void extendMotor(double extensionSpeed) {
-    m_telescopicMotor.set(extensionSpeed);
+
+  public double getExtensionLength() {
+    return m_extensionMotor.getEncoder().getPosition();
   }
 
-  public void move(double absoluteAngle, double intakeSpeed, double pivotAngle, double extensionSpeed) {
+  private void setMotorExtensionLength(double extensionLength) {
+    m_extensionMotor.getPIDController().setReference(extensionLength, CANSparkMax.ControlType.kPosition);
+  }
+
+  private boolean isExtensionMinSwitchActive() { 
+    return m_minMagneticSwitch.get();
+  }
+
+  private boolean isExtensionMaxSwitchActive() {
+    return m_maxMagneticSwitch.get();
+  }
+
+  public double limitExtensionLength(double length) {
+    return MathUtil.clamp(length, Arm.kMinArmExtension, Arm.kMaxArmExtension);
+  }
+
+  /**
+   * Checks if the given angle is in the bounds of the wrist.
+   * 
+   * @param angle the given angle
+   * @return true if the given angle is in the bounds of the wrist.
+   */
+  private boolean isInExtensionBounds(double length) {
+    return (length > Arm.kMinArmExtension && length < Arm.kMaxArmExtension);
+  }
+
+  
+
+  public void moveArm(double absoluteAngle, double intakeSpeed, double pivotAngle, double extensionLength) {
     this.m_wristAngle = absoluteAngle;
     this.m_intakeSpeed = intakeSpeed;
     this.m_pivotAngle = pivotAngle;
-    this.m_extension = extensionSpeed;
+    this.m_extensionLength = extensionLength;
+  }
+
+  public void moveArm(ArmState state) {
+    this.m_wristAngle = state.wristAngle;
+    this.m_intakeSpeed = state.intakeSpeed;
+    this.m_pivotAngle = state.armPivot;
+    this.m_extensionLength = state.armLength;
   }
 
   @Override
@@ -248,15 +308,28 @@ public class Arm_Subsystem extends CougarSubsystem {
       setAbsolutePivotAngle(getAbsolutePivotAngle());
     }
 
+    if(isExtensionMinSwitchActive() && m_extensionLimitSwitchOffset == 0) {
+      //Rezero extension
+      m_extensionLimitSwitchOffset = getExtensionLength();
+      m_extensionMotor.getEncoder().setPosition(m_extensionLimitSwitchOffset);
+      
+      //Let it still move while resetting to leave the magnet zone
+      if(isInExtensionBounds(m_extensionLength)) {
+        setMotorExtensionLength(m_extensionLength);
+      } else {
+        setMotorExtensionLength(getExtensionLength());
+      }
 
-
-    extendMotor(m_extension);
-
-    SmartDashboard.putNumber("Wrist Setpoint", m_wristAngle);
-    SmartDashboard.putNumber("Arm Absolute", getAbsolutePivotAngle());
-    SmartDashboard.putNumber("Arm Relative", m_leftPivotMotor.getEncoder().getPosition());
-    SmartDashboard.putBoolean("Limit Switch", isArmSwitchActive());
-
-  }
-
+    } else {
+      if((!isExtensionMinSwitchActive() && !isExtensionMaxSwitchActive()) || isInExtensionBounds(m_extensionLength)) {
+        setMotorExtensionLength(m_extensionLength);
+      } else {
+        setMotorExtensionLength(getExtensionLength());
+      }
+    }
+    SmartDashboard.putBoolean("Extension Switch", isExtensionMinSwitchActive());
+    SmartDashboard.putNumber("Arm Extension", m_extensionMotor.getEncoder().getPosition());
+    SmartDashboard.putNumber("Extension current", m_extensionMotor.getOutputCurrent());
+    SmartDashboard.putBoolean("Extension Max Switch", isExtensionMaxSwitchActive());
+}
 }
