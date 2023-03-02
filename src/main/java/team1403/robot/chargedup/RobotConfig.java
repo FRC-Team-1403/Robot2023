@@ -121,7 +121,7 @@ public class RobotConfig {
         new Rotation3d(0.0, 0.0, Math.PI))),
       new AprilTag(3,new Pose3d(
         Units.inchesToMeters(115.354),
-        Units.inchesToMeters(0), // FIRST's diagram has a typo (it says 147.19)
+        Units.inchesToMeters(2), // FIRST's diagram has a typo (it says 147.19)
         Units.inchesToMeters(16.53),
         new Rotation3d(0.0, 0.0, Math.PI))),
       new AprilTag(4, new Pose3d(

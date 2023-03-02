@@ -300,7 +300,8 @@ public class SwerveSubsystem extends CougarSubsystem {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Gyro Reading", getGyroscopeRotation().getDegrees());
+    m_odometer.update(getGyroscopeRotation(), getModulePositions());
+    SmartDashboard.putString("Swerve Odometry", m_odometer.getEstimatedPosition().toString());
 
     m_chassisSpeeds = translationalDriftCorrection(m_chassisSpeeds);
     m_chassisSpeeds = rotationalDriftCorrection(m_chassisSpeeds);

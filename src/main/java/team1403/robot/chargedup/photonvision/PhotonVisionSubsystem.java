@@ -65,13 +65,11 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
     photonPoseEstimator = new PhotonPoseEstimator(VisionConfig.fieldLayout, PoseStrategy.MULTI_TAG_PNP, limeLight,
         new Transform3d(new Translation3d(12,8,30), new Rotation3d(0, 0, 0)));
 
-    photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-
-    photonPose = photonPoseEstimator.update();
+    photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
   }
 
   public Optional<EstimatedRobotPose> getPhotonPose() {
-    return photonPose;
+    return photonPoseEstimator.update();
   }
 
   public PhotonPoseEstimator getPhotonPoseEstimator() {
@@ -99,17 +97,8 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
       limeLight.setPipelineIndex(1);
     } else {
       limeLight.setPipelineIndex(0);
+      
     }
-  }
-
-  public void moveToTape(double pitch, double yaw, SwerveSubsystem drivetrain, List<PhotonTrackedTarget> targets) {
-    
-    drivetrain.drive(new ChassisSpeeds(xController.calculate(yaw, (targetYaw)*-1), 
-          yController.calculate(pitch, (targetPitch)*-1), 0));
-  }
-
-  public void moveToTag() {
-    m_drivetrain.drive(new ChassisSpeeds(xController.calculate(target.getX(),1) * -1, yController.calculate(target.getY(), -0.5) * -1,0));
   }
 
   public void updatePos(Pose2d pose) {
@@ -132,32 +121,6 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
     if (pose.getY() > 1) {
       limelightImportance += 1;
     }
-
-  }
-
-  @Override
-  public void periodic() {
-    if(limeLight.getLatestResult().hasTargets()){
-      target = limeLight.getLatestResult().getBestTarget().getBestCameraToTarget();
-      SmartDashboard.putNumber("X Distance", target.getX());
-      SmartDashboard.putNumber("Y Distance", target.getY());
-      SmartDashboard.putNumber("Theta of April Tag", target.getRotation().toRotation2d().getDegrees());
-    }
-
-    if(photonPose.isPresent()) {
-      photonPose = photonPoseEstimator.update();
-    }
-
-    // if (photonPose.isPresent()) {
-    //   photonPose = photonPoseEstimator.update();
-    //   swervePoseEstimator.updateWithTime(photonPose.get().timestampSeconds, m_drivetrain.getGyroscopeRotation(), m_drivetrain.getModulePositions());
-    //   SmartDashboard.putString("Odometry", photonPose.get().estimatedPose.toString());
-    //   updatePos(getLimelightBasedPose());
-    // }
-    // if(limeLight.getLatestResult().hasTargets()){
-    //   target = limeLight.getLatestResult().getBestTarget().getBestCameraToTarget();
-    //   SmartDashboard.putNumber("X Distance", );
-    //   SmartDashboard.putNumber("Y Distance", swervePoseEstimator.getEstimatedPosition().getY());
 
   }
 }

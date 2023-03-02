@@ -123,10 +123,6 @@ public class CougarRobotImpl extends CougarRobot {
 
     new Trigger(() -> xboxDriver.getAButton()).onFalse(
       new InstantCommand(() -> m_visionSubsystem.switchPipeline()));
-
-    new Trigger(() -> (xboxDriver.getYButton()) && (m_visionSubsystem.hasTarget())).whileTrue(
-      new RepeatCommand(new InstantCommand(() -> m_visionSubsystem.moveToTag()))
-    );
     
   }
 

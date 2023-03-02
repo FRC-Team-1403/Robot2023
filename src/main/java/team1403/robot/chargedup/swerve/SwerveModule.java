@@ -94,7 +94,7 @@ public class SwerveModule implements Device {
     config.magnetOffsetDegrees = Math.toDegrees(this.m_absoluteEncoderOffset);
     config.sensorDirection = false;
     m_absoluteEncoder.configAllSettings(config, SwerveConfig.kCanTimeoutMs);
-    m_absoluteEncoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 10, 250);
+    m_absoluteEncoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, RobotConfig.SwerveConfig.kStatusFrameGeneralPeriodMs, 250);
 
     // Config drive relative encoder
     double drivePositionConversionFactor = Math.PI * SwerveConfig.kWheelDiameterMeters 
@@ -112,9 +112,9 @@ public class SwerveModule implements Device {
   }
 
   private void initSteerMotor() {
-    m_steerMotor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 100);
-    m_steerMotor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus1, 20);
-    m_steerMotor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 20);
+    m_steerMotor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, RobotConfig.SwerveConfig.kStatusFrameGeneralPeriodMs);
+    m_steerMotor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus1, RobotConfig.SwerveConfig.kStatusFrameGeneralPeriodMs);
+    m_steerMotor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, RobotConfig.SwerveConfig.kStatusFrameGeneralPeriodMs);
     m_steerMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
     m_steerMotor.setInverted(false);
     m_steerMotor.enableVoltageCompensation(12);
@@ -134,11 +134,11 @@ public class SwerveModule implements Device {
     m_driveMotor.setVoltageCompensation(RobotConfig.SwerveConfig.kVoltageSaturation);
     m_driveMotor.setAmpLimit(RobotConfig.SwerveConfig.kCurrentLimit);
     m_driveMotor.getCanSparkMaxApi().setPeriodicFramePeriod(
-        CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 100);
+        CANSparkMaxLowLevel.PeriodicFrame.kStatus0, RobotConfig.SwerveConfig.kStatusFrameGeneralPeriodMs);
     m_driveMotor.getCanSparkMaxApi().setPeriodicFramePeriod(
-        CANSparkMaxLowLevel.PeriodicFrame.kStatus1, 20);
+        CANSparkMaxLowLevel.PeriodicFrame.kStatus1, RobotConfig.SwerveConfig.kStatusFrameGeneralPeriodMs);
     m_driveMotor.getCanSparkMaxApi().setPeriodicFramePeriod(
-        CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 20);
+        CANSparkMaxLowLevel.PeriodicFrame.kStatus2, RobotConfig.SwerveConfig.kStatusFrameGeneralPeriodMs);
   }
 
   /**
