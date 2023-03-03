@@ -4,12 +4,13 @@ package team1403.robot.chargedup.arm;
 import com.revrobotics.SparkMaxRelativeEncoder.Type;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Encoder;
 
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarSubsystem;
 import team1403.lib.device.AdvancedMotorController;
 import team1403.lib.device.wpi.CougarSparkMax;
+import team1403.lib.device.wpi.WpiAnalogDevice;
 import team1403.lib.device.wpi.WpiLimitSwitch;
 import team1403.lib.util.CougarLogger;
 import team1403.robot.chargedup.RobotConfig;
@@ -20,24 +21,23 @@ import team1403.robot.chargedup.RobotConfig;
  * Arm angle, arm extension, and then wrist angle
  */
 public class Arm extends CougarSubsystem {
-  private final CougarSparkMax m_wheelIntakeMotor;
-  private final CougarSparkMax m_telescopicMotor;
+  // private final CougarSparkMax m_wheelIntakeMotor;
+  private final CougarSparkMax m_extensionMotor;
   private final CougarSparkMax m_leftArmAngleMotor;
   private final CougarSparkMax m_rightArmAngleMotor;
   private final CougarSparkMax m_wristAngleMotor;
   private final WpiLimitSwitch m_frontLimitSwitch;
-  private final WpiLimitSwitch m_backLimitSwitch;
+  private final WpiLimitSwitch m_telescopicLimitSwitch;
   private final PIDController m_pidArmAngle;
   private final PIDController m_pidWristAngle;
   private final PIDController m_pidArmLength;
-  private DutyCycleEncoder m_absoluteEncoder;
+  private WpiAnalogDevice m_absoluteArmEncoder;
+  private Encoder m_absoluteWristEncoder;
   private Double m_wheelSpeed;
   private Double m_desiredArmAngle;
   private Double m_desiredWristAngle;
   private Double m_desiredArmExtension;
   
-  // TODO find conversion factor for encoders
-
   /** 
    * Constructor arm defines variables for motors, as well as methods for
    * motor speed, and PID controls.
@@ -48,43 +48,49 @@ public class Arm extends CougarSubsystem {
 
     CougarLogger logger = getLogger(); //after game, to see what robot did
 
-    m_wheelIntakeMotor = CougarSparkMax.makeBrushless("wheelIntake",
-    RobotConfig.CanBus.wheelIntakeMotor, Type.kHallSensor, getLogger());
+    // m_wheelIntakeMotor = CougarSparkMax.makeBrushless("wheelIntake",
+    // RobotConfig.CanBus.wheelIntakeMotor, Type.kHallSensor, getLogger());
        
-    m_telescopicMotor = CougarSparkMax.makeBrushless("telescopic",
+    m_extensionMotor = CougarSparkMax.makeBrushless("telescopic",
     RobotConfig.CanBus.telescopicArmMotor, Type.kHallSensor, getLogger());
 
     m_leftArmAngleMotor = CougarSparkMax.makeBrushless("leftAngledArmMotor",
-        RobotConfig.CanBus.leftAngledArmMotor, null, logger);
+        RobotConfig.CanBus.leftPivotMotor, Type.kHallSensor, logger);
 
     m_rightArmAngleMotor = CougarSparkMax.makeBrushless("rightAngledArmMotor",
-        RobotConfig.CanBus.rightAngledArmMotor, null, logger);
+        RobotConfig.CanBus.rightPivotMotor, Type.kHallSensor, logger);
 
     m_wristAngleMotor = CougarSparkMax.makeBrushless("wristMotor",
-    RobotConfig.CanBus.wristMotor, null, logger);
+    RobotConfig.CanBus.wristMotor, Type.kHallSensor, logger);
 
     m_frontLimitSwitch = new WpiLimitSwitch("frontSwitch",
     RobotConfig.RioPorts.exampleRailForwardLimitSwitch);
 
-    m_backLimitSwitch = new WpiLimitSwitch("backSwitch",
+    m_telescopicLimitSwitch = new WpiLimitSwitch("telescopicLimitSwitch",
     RobotConfig.RioPorts.exampleRailReverseLimitSwitch);
 
     m_rightArmAngleMotor.setInverted(true);
 
     m_rightArmAngleMotor.follow((AdvancedMotorController) m_leftArmAngleMotor);
 
-    m_telescopicMotor.getEmbeddedEncoder().setPositionConversionFactor(
-        RobotConfig.Arm.kArmLengthConversionFactor * RobotConfig.Arm.kAngleToMeters);
+    m_extensionMotor.getEmbeddedEncoder().setPositionConversionFactor(
+        RobotConfig.Arm.kExtensionConversionFactor);
 
-    m_leftArmAngleMotor.getEmbeddedEncoder().setPositionConversionFactor(
-        RobotConfig.Arm.kArmConversionFactor);
-    
     m_wristAngleMotor.getEmbeddedEncoder().setPositionConversionFactor(
         RobotConfig.Arm.kWristConversionFactor);
 
     m_pidArmAngle = new PIDController(0, 0, 0);
     m_pidWristAngle = new PIDController(0, 0, 0);
     m_pidArmLength = new PIDController(0, 0, 0);
+
+    m_leftArmAngleMotor.setPidGains(RobotConfig.Arm.kPArmPivot, RobotConfig.Arm.kIArmPivot,
+        RobotConfig.Arm.kDArmPivot);
+      
+    m_extensionMotor.setPidGains(RobotConfig.Arm.kPArmExtension, RobotConfig.Arm.kIArmExtension,
+        RobotConfig.Arm.kDArmExtension);
+
+    m_wristAngleMotor.setPidGains(RobotConfig.Arm.kPWristMotor, RobotConfig.Arm.kIWristMotor,
+        RobotConfig.Arm.kDWristMotor);
 
     m_desiredArmAngle = getArmAngle();
     m_desiredWristAngle = getWristAngle();
@@ -95,26 +101,43 @@ public class Arm extends CougarSubsystem {
   }
 
   /**
-   * Getter method for absolute encoder.
+   * Getter method for absolute arm encoder.
    *
-   * @return absolute encoder
+   * @return arm absolute encoder
    */
-  public DutyCycleEncoder getDutyCycleEncoder() {
-    return m_absoluteEncoder; 
+  public WpiAnalogDevice getArmEncoder() {
+    return m_absoluteArmEncoder; 
   }
 
+  /**
+   * Getter method for absolute wrist encoder.
+   * 
+   * @return wrist absolute encoder.
+   */
+  public Encoder getWristEncoder() {
+    return m_absoluteWristEncoder;
+  }
 
   public void resetArmAngleEncoder() {
     m_leftArmAngleMotor.getEmbeddedEncoder().setPositionOffset(getArmAngle() - 180);
   }
 
   /**
-   * Getter method for relative encoder,
-   * sets the absolute encoder to relative encoder.
+   * Getter method for relative arm encoder,
+   * sets the absolute wrist encoder to relative arm encoder.
    */
-  public void getRelativeEncoder() {   
+  public void getRelativeArmEncoder() {
     m_leftArmAngleMotor.getEmbeddedEncoder().setPositionOffset(
-        m_absoluteEncoder.getAbsolutePosition());
+        m_absoluteArmEncoder.getAnalogValue());
+  }
+
+  /**
+   * Getter method for relative wrist encoder,
+   * sets the absolute wrist encoder to relative wrist encoder.
+   */
+  public void getRelativeWristEncoder() {
+    m_wristAngleMotor.getEmbeddedEncoder().setPositionOffset(
+        m_absoluteWristEncoder.get());
   }
 
   /**
@@ -175,13 +198,17 @@ public class Arm extends CougarSubsystem {
    */
   private double limitArmAngle(double angle) {
 
-    if (angle > RobotConfig.Arm.kMaxArmRotation) {
-      angle = RobotConfig.Arm.kMaxArmRotation;
-    } else  if (angle < RobotConfig.Arm.kMinArmRotation) {
-      angle = RobotConfig.Arm.kMinArmRotation;
+    if (angle > RobotConfig.Arm.kMaxPivotAngle) {
+      angle = RobotConfig.Arm.kMaxPivotAngle;
+    } else  if (angle < RobotConfig.Arm.kMinPivotAngle) {
+      angle = RobotConfig.Arm.kMinPivotAngle;
     }
 
-      return angle;
+    if (angle > RobotConfig.Arm.maxVerticalAngle) {
+      angle = RobotConfig.Arm.maxVerticalAngle;
+    }
+    
+    return angle;
   }
 
   /**
@@ -202,12 +229,11 @@ public class Arm extends CougarSubsystem {
           RobotConfig.kRobotHeight - RobotConfig.kFrameHeight);
 
     } else if (angle > RobotConfig.Arm.angleHittingRobot && angle 
-                            < RobotConfig.Arm.angleHittingGround) {
+          < RobotConfig.Arm.angleHittingGround) {
       max = maxGroundArmLength(getArmAngle(), getWristAngle(), RobotConfig.kHeightFromGround);
     } else {
       max = RobotConfig.Arm.kPhysicalArmMaxExtension;
     }
-
 
     if (length > max) {
       length = max;
@@ -229,10 +255,10 @@ public class Arm extends CougarSubsystem {
    * @return angle
    */
   private double limitWristAngle(double angle) {
-    if (angle > RobotConfig.Arm.kMaxWristRotation) {
-      angle = RobotConfig.Arm.kMaxWristRotation;
-    } else  if (angle < RobotConfig.Arm.kMinWristRotation) {
-      angle = RobotConfig.Arm.kMinWristRotation;
+    if (angle > RobotConfig.Arm.kMaxWristAngle) {
+      angle = RobotConfig.Arm.kMaxWristAngle;
+    } else  if (angle < RobotConfig.Arm.kMinWristAngle) {
+      angle = RobotConfig.Arm.kMinWristAngle;
     }
 
     return angle;
@@ -248,21 +274,20 @@ public class Arm extends CougarSubsystem {
    * @param speed current wheel speed, between -1 and 1 inclusive
    */
   public void moveArm(double armAngle, double armExtension, double wristAngle, double speed) {
-    //TODO fix this mess.
     m_desiredArmAngle = limitArmAngle(armAngle);
     m_desiredArmExtension = limitArmExtension(getArmAngle(), getArmExtension());
     m_desiredWristAngle = absoluteWristAngle(wristAngle, m_desiredArmAngle, getWristAngle());
     m_desiredWristAngle = limitWristAngle(wristAngle);
   }
 
-  /**
-   * sets the intake motor's speed.
-   *
-   * @param speed speed of motor
-   */
-  public void setWheelSpeed(double speed) {
-    m_wheelIntakeMotor.setSpeed(speed);
-  }
+  // /**
+  //  * sets the intake motor's speed.
+  //  *
+  //  * @param speed speed of motor
+  //  */
+  // public void setWheelSpeed(double speed) {
+  //   m_wheelIntakeMotor.setSpeed(speed);
+  // }
 
   /**
    * Move the arm to the desired angle where 0 is positive x axis
@@ -321,17 +346,17 @@ public class Arm extends CougarSubsystem {
    * @return position of arm extension motor
    */
   public double getArmExtension() {
-    return (m_telescopicMotor.getEmbeddedEncoder().getPositionValue());
+    return (m_extensionMotor.getEmbeddedEncoder().getPositionValue());
   }
 
-  /**
-   * Setter for wheel intake motor speed.
-   *
-   * @param speed speed for motor
-   */
-  public void setWheelIntakeMotorSpeed(double speed) {
-    m_wheelIntakeMotor.setSpeed(speed);
-  }
+  // /**
+  //  * Setter for wheel intake motor speed.
+  //  *
+  //  * @param speed speed for motor
+  //  */
+  // public void setWheelIntakeMotorSpeed(double speed) {
+  //   m_wheelIntakeMotor.setSpeed(speed);
+  // }
 
   /**
    * Setter for arm extension motor speed.
@@ -339,7 +364,7 @@ public class Arm extends CougarSubsystem {
    * @param speed speed for motor
    */
   public void setArmExtensionMotorSpeed(double speed) {
-    m_telescopicMotor.setSpeed(speed);
+    m_extensionMotor.setSpeed(speed);
   }
      
   /**
@@ -364,10 +389,10 @@ public class Arm extends CougarSubsystem {
    * Stops all motors for arm, as well as intake.
    */
   public void stopArm() {
-    m_telescopicMotor.setSpeed(0);
+    m_extensionMotor.setSpeed(0);
     m_leftArmAngleMotor.setSpeed(0);
     m_wristAngleMotor.setSpeed(0);
-    m_wheelIntakeMotor.setSpeed(0);
+    // m_wheelIntakeMotor.setSpeed(0);
   }
      
   /**
@@ -384,8 +409,8 @@ public class Arm extends CougarSubsystem {
    *
    * @return if back limit switch is triggered
    */
-  public boolean isBackSwitchActive() {
-    return m_backLimitSwitch.isTriggered();
+  public boolean isTelescopicSwitchActive() {
+    return m_telescopicLimitSwitch.isTriggered();
   }
 
   /**
@@ -393,8 +418,12 @@ public class Arm extends CougarSubsystem {
    *
    * @return current amps
    */
-  public double getCurrentAmps() {
+  public double getCurrentArmAngleAmps() {
     return m_leftArmAngleMotor.getEmbeddedCurrentSensor().getAmps();
+  }
+
+  public double getCurrentArmExtensionAmps() {
+    return m_extensionMotor.getEmbeddedCurrentSensor().getAmps();
   }
 
   /**
@@ -403,8 +432,8 @@ public class Arm extends CougarSubsystem {
    * @return limit for arm angle
    */
   private boolean isArmAngleWithinBounds() {
-    return getArmAngle() <= RobotConfig.Arm.kMaxArmRotation && getArmAngle()
-      >= RobotConfig.Arm.kMinArmRotation;
+    return getArmAngle() <= RobotConfig.Arm.kMaxPivotAngle && getArmAngle()
+      >= RobotConfig.Arm.kMinPivotAngle;
   }
 
   /**
@@ -423,16 +452,21 @@ public class Arm extends CougarSubsystem {
    * @return limit for wrist angle
    */
   private boolean isWristAngleWithinBounds() {
-    return getWristAngle() <= RobotConfig.Arm.kMaxWristRotation && getWristAngle()
-      >= RobotConfig.Arm.kMinWristRotation;
+    return getWristAngle() <= RobotConfig.Arm.kMaxWristAngle && getWristAngle()
+      >= RobotConfig.Arm.kMinWristAngle;
   }
 
   @Override
   public void periodic() {
-    if (isFrontSwitchActive() || isBackSwitchActive() || !isArmAngleWithinBounds()
-        || getCurrentAmps() <= RobotConfig.Arm.kMaxAmperage) {
+    if (isFrontSwitchActive() || !isArmAngleWithinBounds()
+        || getCurrentArmAngleAmps() <= RobotConfig.Arm.kPivotAngleMaxAmperage
+        || getCurrentArmExtensionAmps() <= RobotConfig.Arm.kArmExtensionMaxAmperage) {
       setArmAngleMotorSpeed(0);
       return;
+    }
+
+    if (isTelescopicSwitchActive()) {
+      setArmExtensionMotorSpeed(0);
     }
 
     if (isWristAngleWithinBounds()) {
@@ -448,6 +482,6 @@ public class Arm extends CougarSubsystem {
     setArmAngle(m_desiredArmAngle);
     setWristAngle(m_desiredWristAngle);
     setArmExtension(m_desiredArmExtension);
-    setWheelSpeed(m_wheelSpeed);
+    // setWheelSpeed(m_wheelSpeed);
   }
 }

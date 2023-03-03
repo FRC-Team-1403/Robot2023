@@ -35,8 +35,8 @@ public class RobotConfig {
   public static final Dimension robotDimensions = new Dimension(0, 0, 0);
 
   public static double kRobotHeight = 32;
-  public static double kHeightFromGround = 33.72326;
-  public static double kGroundToTopOfFrame = 1.72326;
+  public static double kHeightFromGround = 33.465;
+  public static double kGroundToTopOfFrame = 1.465;
   public static double kFrameHeight = 2;
 
   /**
@@ -158,22 +158,22 @@ public class RobotConfig {
    */
   public static class CanBus {
 
-    // Arm Ports
-    public static final int wheelIntakeMotor = 3;
-    public static final int telescopicArmMotor = 4;
-    public static final int leftAngledArmMotor = 5;
-    public static final int rightAngledArmMotor = 6;
-    public static final int wristMotor = 7;
-    public static final int frontArmSwitch = 9;
-    public static final int backArmSwitch = 10;
+    //Arm Ports
+    public static final int wheelIntakeMotor = 5; //Done
+    public static final int telescopicArmMotor = 4; //Done
+    public static final int leftPivotMotor = 2; //Done
+    public static final int rightPivotMotor = 3; //Done
+    public static final int wristMotor = 1; //Done
+    // public static final int frontArmSwitch = 6;
+    // public static final int telescopicSwitch = 7;
 
     // Swerve CanBus ids
     public static final int frontLeftDriveId = 1;
-    public static final int frontLeftSteerId = 15;
+    public static final int frontLeftSteerId = 2;
     public static final int frontLeftEncoderId = 3;
 
     public static final int frontRightDriveId = 8;
-    public static final int frontRightSteerId = 7;
+    public static final int frontRightSteerId = 3;
     public static final int frontRightEncoderId = 1;
 
     public static final int backLeftDriveId = 14;
@@ -199,6 +199,16 @@ public class RobotConfig {
      * This switch is optional. Set to port -1 if it is not available.
      */
     public static final int exampleRailReverseLimitSwitch = 2;
+
+    
+    public static final int kWristAbsoluteEncoder = 1;
+
+    public static final int kArmAbsoluteEncoder = 0; ///Analog
+
+    public static final int kArmLimitSwitch = 0; //DIO
+
+    public static final int kExtensionMinMagneticSwitch = 2; //DIO
+    public static final int kExtensionMaxMagneticSwitch = 3; //DIO
   }
 
   /**
@@ -214,7 +224,7 @@ public class RobotConfig {
     /**
      * The joystick port for the operator's controller.
      */
-    public static final int pilotPort = 1;
+    public static final int pilotPort = 0;
 
     /**
      * Encoder ticks from center still considered close enough to be at center.
@@ -243,39 +253,41 @@ public class RobotConfig {
    */
   public static class Arm {
 
-    public static double angleHittingRobot = 0;
-    public static double angleHittingGround = 0;
+    //Pivot
+    public static final int kPArmPivot = 1;
+    public static final int kIArmPivot = 0;
+    public static final int kDArmPivot = 0;
+    public final static double m_absolutePivotOffset = 64.4245336;
+    public static final double kMaxPivotAngle = 250.273;
+    public static final double kAngleForNoExtension = 250.273;
+    public static final double kMinPivotAngle = 132.211;
+    public static final double kPivotAngleMaxAmperage = 40;
 
-    public static double kPhysicalArmMaxExtension = 60.218;
+    //Wrist
+    public static final double kPWristMotor = 0.95;
+    public static final double kIWristMotor = 0;
+    public static final double kDWristMotor = 90;
+    public static final double kMaxWristAngle = 270; 
+    public static final double kMinWristAngle = 31; 
+    public static final double kWristConversionFactor = 90.0 / 100;
 
-    public static final int kP = 0; // constant for Proportional
-    public static final int kI = 0; // constant for Integral
-    public static final int kD = 0; // constant for Derivative
+    //Extension
+    public static final double kPArmExtension = 0.3;
+    public static final double kIArmExtension = 0;
+    public static final double kDArmExtension = 0; 
+    public static final double kPhysicalArmMaxExtension = 1;
+    public static final double kMinArmExtension = 0; 
+    public static final double kMaxArmExtension = 23.128; 
+    public static final double kExtensionConversionFactor = 1.0/6;  
+    public static final double kMaxArmLengthOffset = 1; //TODO
+    public static final double kArmExtensionMaxAmperage = 20; 
+    public static final double maxVerticalAngle = Math.acos(44.3 / 60.218); //TODO
+    public static final double angleHittingRobot = 66; //TODO
+    public static final double angleHittingGround = 80; //TODO
 
-    public static final double kArmConversionFactor = 1;
-    public static final double kWristConversionFactor = 2;
-    public static final double kArmLengthConversionFactor = 3;
-    public static final double kWheelIntakeConversionFactor = 4;
-
-    public static final double kMaxArmRotation = 270;
-    public static final double kMinArmRotation = 0;
-    public static final double kMaxWristRotation = 90;
-    public static final double kMinWristRotation = 0;
-    public static final double kMinArmExtension = 5;
-    public static final double kMaxArmExtension = 15;
-
-    public static final Dimension wristDimensions = new Dimension(0, 0, 0);
-
-    public static final double kMaxAmperage = 0;
-
-    public static final double kMaxArmLengthOffset = 0;
-    public static final double kAngleToMeters = 0;
-
-    /**
-     * This is the angular threshold to determine at what
-     * point the maximum extenstion of the arm should be
-     * limited by the arm hitting the ground.
-     */
-    public static final double kMaxGroundArmLengthThreshold = 0;
+    //Dimensions
+    public static final double kBaseArmLength = 37;
+    public static final double kArmWeight = 16; //Pounds
+    public static final Dimension wristDimensions = new Dimension(0, 0, 0); //TODO
   }
 }

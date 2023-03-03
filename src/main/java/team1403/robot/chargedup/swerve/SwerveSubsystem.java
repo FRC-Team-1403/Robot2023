@@ -212,6 +212,7 @@ public class SwerveSubsystem extends CougarSubsystem {
    */
   public void drive(ChassisSpeeds chassisSpeeds) {
     m_chassisSpeeds = chassisSpeeds;
+    SmartDashboard.putString("Chassis Speeds", m_chassisSpeeds.toString());
   }
 
   /**

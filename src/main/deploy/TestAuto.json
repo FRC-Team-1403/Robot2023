@@ -27,7 +27,7 @@
                     "y": 6.56
                 }
             ],
-            "EndAngle": 0,
+            "EndAngle": 90,
             "StartAngle": 0
         },
         "CommandName": "SwerveDrivePath"
