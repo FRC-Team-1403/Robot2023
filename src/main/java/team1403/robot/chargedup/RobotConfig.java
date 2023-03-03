@@ -35,8 +35,8 @@ public class RobotConfig {
   public static final Dimension robotDimensions = new Dimension(0, 0, 0);
 
   public static double kRobotHeight = 32;
-  public static double kHeightFromGround = 33.72326;
-  public static double kGroundToTopOfFrame = 1.72326;
+  public static double kHeightFromGround = 33.465;
+  public static double kGroundToTopOfFrame = 1.465;
   public static double kFrameHeight = 2;
 
   /**
@@ -258,8 +258,9 @@ public class RobotConfig {
     public static final int kIArmPivot = 0;
     public static final int kDArmPivot = 0;
     public final static double m_absolutePivotOffset = 64.4245336;
-    public static final double kMaxPivotAngle = 245;
-    public static final double kMinPivotAngle = 145;
+    public static final double kMaxPivotAngle = 250.273;
+    public static final double kAngleForNoExtension = 250.273;
+    public static final double kMinPivotAngle = 132.211;
     public static final double kPivotAngleMaxAmperage = 40;
 
     //Wrist

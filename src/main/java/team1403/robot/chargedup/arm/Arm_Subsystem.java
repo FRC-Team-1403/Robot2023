@@ -308,6 +308,10 @@ public class Arm_Subsystem extends CougarSubsystem {
       setAbsolutePivotAngle(getAbsolutePivotAngle());
     }
 
+    if (getAbsolutePivotAngle() == RobotConfig.Arm.kAngleForNoExtension) {
+      setMotorExtensionLength(0);
+    }
+
     if(isExtensionMinSwitchActive() && m_extensionLimitSwitchOffset == 0) {
       //Rezero extension
       m_extensionLimitSwitchOffset = getExtensionLength();
