@@ -56,9 +56,26 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
 
   @Override
   public void periodic() {
+<<<<<<< Updated upstream
     Optional<EstimatedRobotPose> photonPose = photonPoseEstimator.update();
     if (photonPose.isPresent()) {
       SmartDashboard.putString("Odometry", photonPose.get().estimatedPose.toString());
+=======
+    // SmartDashboard.putNumber("X val", getLimelightBasedPose().getX());
+    // SmartDashboard.putNumber("Y val", getLimelightBasedPose().getY());
+
+    if(photonPose.isPresent()) {
+      photonPose = photonPoseEstimator.update();
+      double time = photonPose.get().timestampSeconds;
+      swervePoseEstimator.addVisionMeasurement(photonPose.get().estimatedPose.toPose2d(), time - this.timeStamp);
+      this.timeStamp = time;
+    }
+    if(limeLight.getLatestResult().hasTargets()){
+      target = limeLight.getLatestResult().getBestTarget().getBestCameraToTarget();
+      SmartDashboard.putNumber("X Distance", target.getX());sdfasfdasdfa
+      SmartDashboard.putNumber("Y Distance", target.getY());
+      SmartDashboard.putNumber("Theta of April Tag", target.getRotation().toRotation2d().getDegrees());
+>>>>>>> Stashed changes
     }
 
     var targets = limeLight.getLatestResult().getTargets();
