@@ -259,10 +259,10 @@ public class RobotConfig {
     public static final int kDArmPivot = 0;
     public final static double m_absolutePivotOffset = 64.4245336;
     public static final double kMaxPivotAngle = 250.273;
-    public static final double kAngleForNoExtension = 234.21935820231695;
+    public static final double kFrameAngle = 234.21935820231695;
     public static final double kMinPivotAngle = 132.211;
     public static final double kPivotAngleMaxAmperage = 40;
-    public static final double kGreatestMaxExtensionAngle = 209.099;
+    public static final double kHorizonAngle = 209.099;
 
     //Wrist
     public static final double kPWristMotor = 0.95;
@@ -278,7 +278,6 @@ public class RobotConfig {
     public static final double kDArmExtension = 0; 
     public static final double kMinArmExtension = 0; 
     public static final double kMaxArmExtension = 23.128; 
-    public static final double kPhysicalArmMaxExtension = 28 + kMaxArmExtension;
     public static final double kExtensionConversionFactor = 1.0/6;  
     public static final double kMaxArmLengthOffset = 1; //TODO
     public static final double kArmExtensionMaxAmperage = 20; 
@@ -287,7 +286,9 @@ public class RobotConfig {
     public static final double angleHittingGround = 80; //TODO
 
     //Dimensions
-    public static final double kBaseArmLength = 37;
+    public static final double kBaseArmLength = 28; //37
+    public static final double kPhysicalArmMaxExtension = kBaseArmLength + kMaxArmExtension;
+
     public static final double kArmWeight = 16; //Pounds
     public static final Dimension wristDimensions = new Dimension(0, 0, 0); //TODO
   }
