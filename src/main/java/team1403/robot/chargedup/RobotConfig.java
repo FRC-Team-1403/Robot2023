@@ -262,6 +262,7 @@ public class RobotConfig {
     public static final double kAngleForNoExtension = 250.273;
     public static final double kMinPivotAngle = 132.211;
     public static final double kPivotAngleMaxAmperage = 40;
+    public static final double kGreatestMaxExtensionAngle = 209.099;
 
     //Wrist
     public static final double kPWristMotor = 0.95;

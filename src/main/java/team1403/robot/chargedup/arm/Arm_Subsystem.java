@@ -274,7 +274,54 @@ public class Arm_Subsystem extends CougarSubsystem {
     return (length > Arm.kMinArmExtension && length < Arm.kMaxArmExtension);
   }
 
-  
+  /**
+   * Calculates the space the wrist takes up vertically.
+   *
+   * @param relativeWristAngle wrist angle relative to itself
+   * @return space wrist takes up vertically
+   */
+  private double wristVerticleOccupation(double relativeWristAngle) {
+    return Math.sin(relativeWristAngle - 180)
+       * RobotConfig.Arm.wristDimensions.getHeight(RobotConfig.Arm.kPhysicalArmMaxExtension);
+  }
+
+  /**
+   * Calculates the theoretical max arm length of the arm given the arm angle.
+   *
+   * @param absoluteArmAngle arm angle relative to ground
+   * @return the theoretical arm length
+   */
+  public double theoreticalArmLength(double absoluteArmAngle, double height) {
+    return height / Math.cos(270 - absoluteArmAngle);
+  }
+
+  /**
+   * This method calculates the maximum arm
+   * length the arm can go to without damaging the robot.
+   *
+   * @pararm absoluteArmAngle arm angle relative to ground
+   * @param relativeWristAngle wrist angle relative to itself
+   * @return the max arm length without hitting ground
+   */
+  public double maxGroundArmLength(double absoluteArmAngle,
+      double relativeWristAngle, double height) {
+    return theoreticalArmLength(absoluteArmAngle, height)
+      - wristVerticleOccupation(relativeWristAngle)
+      - RobotConfig.Arm.kMaxArmLengthOffset;
+  }
+
+  public double dynamicExtensionLengthLimit(double extensionLength) {
+
+    if (getAbsolutePivotAngle() >= RobotConfig.Arm.kAngleForNoExtension) {
+      return 0;
+    }
+
+    if (getAbsolutePivotAngle() > RobotConfig.Arm.kAngleForNoExtension && getAbsolutePivotAngle() < RobotConfig.Arm.kGreatestMaxExtensionAngle) {
+      return maxGroundArmLength(getAbsolutePivotAngle(), m_wristMotor.getEncoder().getPosition(), RobotConfig.kHeightFromGround);
+    }
+
+    return extensionLength;
+  }
 
   public void moveArm(double absoluteAngle, double intakeSpeed, double pivotAngle, double extensionLength) {
     this.m_wristAngle = absoluteAngle;
@@ -308,10 +355,6 @@ public class Arm_Subsystem extends CougarSubsystem {
       setAbsolutePivotAngle(getAbsolutePivotAngle());
     }
 
-    if (getAbsolutePivotAngle() == RobotConfig.Arm.kAngleForNoExtension) {
-      setMotorExtensionLength(0);
-    }
-
     if(isExtensionMinSwitchActive() && m_extensionLimitSwitchOffset == 0) {
       //Rezero extension
       m_extensionLimitSwitchOffset = getExtensionLength();
@@ -319,14 +362,14 @@ public class Arm_Subsystem extends CougarSubsystem {
       
       //Let it still move while resetting to leave the magnet zone
       if(isInExtensionBounds(m_extensionLength)) {
-        setMotorExtensionLength(m_extensionLength);
+        setMotorExtensionLength(dynamicExtensionLengthLimit(m_extensionLength));
       } else {
         setMotorExtensionLength(getExtensionLength());
       }
 
     } else {
       if((!isExtensionMinSwitchActive() && !isExtensionMaxSwitchActive()) || isInExtensionBounds(m_extensionLength)) {
-        setMotorExtensionLength(m_extensionLength);
+        setMotorExtensionLength(dynamicExtensionLengthLimit(m_extensionLength));
       } else {
         setMotorExtensionLength(getExtensionLength());
       }
