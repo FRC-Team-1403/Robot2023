@@ -28,7 +28,7 @@ public class Arm_Subsystem extends CougarSubsystem {
   // Wrist
   private final CougarSparkMax m_wristMotor;
   private final DutyCycleEncoder m_wristAbsoluteEncoder;
-  private double m_absoluteWristOffset = 30;
+  private double m_absoluteWristOffset = 101.28146203203656;
 
   // Arm
   private final CANSparkMax m_leftPivotMotor;
@@ -292,7 +292,7 @@ public class Arm_Subsystem extends CougarSubsystem {
    * @return the theoretical arm length
    */
   public double theoreticalArmLength(double absoluteArmAngle, double height) {
-    return height / Math.cos(270 - absoluteArmAngle);
+    return height / Math.cos(Math.toRadians(270 - absoluteArmAngle));
   }
 
   /**
@@ -305,21 +305,23 @@ public class Arm_Subsystem extends CougarSubsystem {
    */
   public double maxGroundArmLength(double absoluteArmAngle,
       double relativeWristAngle, double height) {
-    return theoreticalArmLength(absoluteArmAngle, height)
-      - wristVerticleOccupation(relativeWristAngle)
-      - RobotConfig.Arm.kMaxArmLengthOffset;
+    return theoreticalArmLength(absoluteArmAngle, height);
+      // - wristVerticleOccupation(relativeWristAngle);
   }
 
   public double dynamicExtensionLengthLimit(double extensionLength) {
 
     if (getAbsolutePivotAngle() >= RobotConfig.Arm.kAngleForNoExtension) {
+      SmartDashboard.putNumber("MaxGroundArmLength", 0);
       return 0;
+    } else if (getAbsolutePivotAngle() < RobotConfig.Arm.kAngleForNoExtension && getAbsolutePivotAngle() > RobotConfig.Arm.kGreatestMaxExtensionAngle) {
+      double maxLength = RobotConfig.Arm.kPhysicalArmMaxExtension - maxGroundArmLength(getAbsolutePivotAngle(), m_wristMotor.getEncoder().getPosition(), RobotConfig.kHeightFromGround);
+      m_extensionLength = MathUtil.clamp(extensionLength, 0, maxLength);
+      SmartDashboard.putNumber("MaxGroundArmLength", m_extensionLength);
+      return m_extensionLength;
     }
 
-    if (getAbsolutePivotAngle() > RobotConfig.Arm.kAngleForNoExtension && getAbsolutePivotAngle() < RobotConfig.Arm.kGreatestMaxExtensionAngle) {
-      return maxGroundArmLength(getAbsolutePivotAngle(), m_wristMotor.getEncoder().getPosition(), RobotConfig.kHeightFromGround);
-    }
-
+    SmartDashboard.putNumber("MaxGroundArmLength", extensionLength);
     return extensionLength;
   }
 
@@ -365,6 +367,7 @@ public class Arm_Subsystem extends CougarSubsystem {
         setMotorExtensionLength(dynamicExtensionLengthLimit(m_extensionLength));
       } else {
         setMotorExtensionLength(getExtensionLength());
+        
       }
 
     } else {
@@ -374,9 +377,8 @@ public class Arm_Subsystem extends CougarSubsystem {
         setMotorExtensionLength(getExtensionLength());
       }
     }
-    SmartDashboard.putBoolean("Extension Switch", isExtensionMinSwitchActive());
-    SmartDashboard.putNumber("Arm Extension", m_extensionMotor.getEncoder().getPosition());
-    SmartDashboard.putNumber("Extension current", m_extensionMotor.getOutputCurrent());
-    SmartDashboard.putBoolean("Extension Max Switch", isExtensionMaxSwitchActive());
-}
+    SmartDashboard.putNumber("Wrist setpoint", m_wristAngle);
+    SmartDashboard.putNumber("Arm Pivot", m_pivotAngle);
+    SmartDashboard.putNumber("Extension Length", m_extensionLength);
+  }
 }

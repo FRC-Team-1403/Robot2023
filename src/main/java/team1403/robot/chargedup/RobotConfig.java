@@ -201,9 +201,9 @@ public class RobotConfig {
     public static final int exampleRailReverseLimitSwitch = 2;
 
     
-    public static final int kWristAbsoluteEncoder = 1;
+    public static final int kWristAbsoluteEncoder = 1; //DIO
 
-    public static final int kArmAbsoluteEncoder = 0; ///Analog
+    public static final int kArmAbsoluteEncoder = 3; ///Analog
 
     public static final int kArmLimitSwitch = 0; //DIO
 
@@ -259,7 +259,7 @@ public class RobotConfig {
     public static final int kDArmPivot = 0;
     public final static double m_absolutePivotOffset = 64.4245336;
     public static final double kMaxPivotAngle = 250.273;
-    public static final double kAngleForNoExtension = 250.273;
+    public static final double kAngleForNoExtension = 234.21935820231695;
     public static final double kMinPivotAngle = 132.211;
     public static final double kPivotAngleMaxAmperage = 40;
     public static final double kGreatestMaxExtensionAngle = 209.099;
@@ -268,21 +268,21 @@ public class RobotConfig {
     public static final double kPWristMotor = 0.95;
     public static final double kIWristMotor = 0;
     public static final double kDWristMotor = 90;
-    public static final double kMaxWristAngle = 270; 
-    public static final double kMinWristAngle = 31; 
+    public static final double kMaxWristAngle = 265;
+    public static final double kMinWristAngle = 55.61740540442264; 
     public static final double kWristConversionFactor = 90.0 / 100;
 
     //Extension
     public static final double kPArmExtension = 0.3;
     public static final double kIArmExtension = 0;
     public static final double kDArmExtension = 0; 
-    public static final double kPhysicalArmMaxExtension = 1;
     public static final double kMinArmExtension = 0; 
     public static final double kMaxArmExtension = 23.128; 
+    public static final double kPhysicalArmMaxExtension = 28 + kMaxArmExtension;
     public static final double kExtensionConversionFactor = 1.0/6;  
     public static final double kMaxArmLengthOffset = 1; //TODO
     public static final double kArmExtensionMaxAmperage = 20; 
-    public static final double maxVerticalAngle = Math.acos(44.3 / 60.218); //TODO
+    public static final double maxVerticalAngle = Math.acos(Math.toRadians(44.3 / 60.218)); //TODO
     public static final double angleHittingRobot = 66; //TODO
     public static final double angleHittingGround = 80; //TODO
 
