@@ -45,13 +45,13 @@ public class SwerveSubsystem extends CougarSubsystem {
 
   /**
    * Creates a new {@link SwerveSubsystem}.
-    Instantiates the 4 {@link SwerveModule}s, 
-   * the {@link SwerveDriveOdometry}, and the {@link NavxAhrs}. 
+   * Instantiates the 4 {@link SwerveModule}s,
+   * the {@link SwerveDriveOdometry}, and the {@link NavxAhrs}.
    * Also sets drivetrain ramp rate,
-    and idle mode to default values.
+   * and idle mode to default values.
    *
    * @param parameters the {@link CougarLibInjectedParameters}
-   used to construct this subsystem
+   *                   used to construct this subsystem
    */
   public SwerveSubsystem(CougarLibInjectedParameters parameters) {
     super("Swerve Subsystem", parameters);
@@ -72,6 +72,9 @@ public class SwerveSubsystem extends CougarSubsystem {
             CanBus.backRightEncoderId, SwerveConfig.backRightEncoderOffset, logger),
     };
 
+    m_odometer = new SwerveDrivePoseEstimator(SwerveConfig.kDriveKinematics, getGyroscopeRotation(),
+        getModulePositions(), new Pose2d(0, 0, new Rotation2d(0)));
+
     addDevice(m_navx2.getName(), m_navx2);
     new Thread(() -> {
       while (m_navx2.isCalibrating()) {
@@ -82,9 +85,7 @@ public class SwerveSubsystem extends CougarSubsystem {
         }
       }
       zeroGyroscope();
-    }).start(); 
-    
-    m_odometer = new SwerveDrivePoseEstimator(SwerveConfig.kDriveKinematics, getGyroscopeRotation() , getModulePositions(), new Pose2d(0, 0, new Rotation2d(0)));
+    }).start();
 
     m_desiredHeading = getGyroscopeRotation().getDegrees();
     SmartDashboard.putNumber("Desired Heading", m_desiredHeading);
@@ -188,7 +189,7 @@ public class SwerveSubsystem extends CougarSubsystem {
   }
 
   public void updateOdometerWithVision(Pose2d pose) {
-    if(pose.getTranslation().getDistance(getPose().getTranslation()) < 1) {
+    if (pose.getTranslation().getDistance(getPose().getTranslation()) < 1) {
       m_odometer.addVisionMeasurement(pose, Timer.getFPGATimestamp());
     }
   }
@@ -250,6 +251,7 @@ public class SwerveSubsystem extends CougarSubsystem {
   public Pose2d getOdometryValue() {
     return m_odometer.getEstimatedPosition();
   }
+
   /**
    * Sets the module speed and heading for all 4 modules.
    *
@@ -260,14 +262,14 @@ public class SwerveSubsystem extends CougarSubsystem {
         states, SwerveConfig.kMaxSpeed);
 
     for (int i = 0; i < m_modules.length; i++) {
-      m_modules[i].set((states[i].speedMetersPerSecond 
-          / SwerveConfig.kMaxSpeed) * m_speedLimiter, 
+      m_modules[i].set((states[i].speedMetersPerSecond
+          / SwerveConfig.kMaxSpeed) * m_speedLimiter,
           states[i].angle.getRadians());
     }
   }
 
   /**
-   * Adds rotational velocity to the chassis speed to compensate for 
+   * Adds rotational velocity to the chassis speed to compensate for
    * unwanted changes in gyroscope heading.
    * 
    * @param chassisSpeeds the given chassisspeeds
@@ -286,35 +288,36 @@ public class SwerveSubsystem extends CougarSubsystem {
         m_chassisSpeeds.omegaRadiansPerSecond += m_calc;
         SmartDashboard.putNumber("Omega Radians Correction", m_chassisSpeeds.omegaRadiansPerSecond);
       }
-      tracef("driftCorrection %f, corrected omegaRadiansPerSecond %f", 
-            m_calc, m_chassisSpeeds.omegaRadiansPerSecond);
+      tracef("driftCorrection %f, corrected omegaRadiansPerSecond %f",
+          m_calc, m_chassisSpeeds.omegaRadiansPerSecond);
     }
     return chassisSpeeds;
   }
 
   /**
-   * Accounts for the drift caused by the first order kinematics 
-   * while doing both translational and rotational movement. 
+   * Accounts for the drift caused by the first order kinematics
+   * while doing both translational and rotational movement.
    * 
-   * <p> Looks forward one control loop to figure out where the robot 
+   * <p>
+   * Looks forward one control loop to figure out where the robot
    * should be given the chassisspeed and backs out a twist command from that.
    * 
    * @param chassisSpeeds the given chassisspeeds
    * @return the corrected chassisspeeds
    */
   private ChassisSpeeds rotationalDriftCorrection(ChassisSpeeds chassisSpeeds) {
-    //Assuming the control loop runs in 20ms
+    // Assuming the control loop runs in 20ms
     final double deltaTime = 0.02;
 
-    //The position of the bot one control loop in the future given the chassisspeed
-    Pose2d robotPoseVel = new Pose2d(chassisSpeeds.vxMetersPerSecond * deltaTime, 
-        chassisSpeeds.vyMetersPerSecond * deltaTime, 
+    // The position of the bot one control loop in the future given the chassisspeed
+    Pose2d robotPoseVel = new Pose2d(chassisSpeeds.vxMetersPerSecond * deltaTime,
+        chassisSpeeds.vyMetersPerSecond * deltaTime,
         new Rotation2d(chassisSpeeds.omegaRadiansPerSecond * deltaTime));
-        
+
     Twist2d twistVel = new Pose2d(0, 0, new Rotation2d()).log(robotPoseVel);
     return new ChassisSpeeds(
-            twistVel.dx / deltaTime, twistVel.dy / deltaTime, 
-            twistVel.dtheta / deltaTime);
+        twistVel.dx / deltaTime, twistVel.dy / deltaTime,
+        twistVel.dtheta / deltaTime);
   }
 
   @Override

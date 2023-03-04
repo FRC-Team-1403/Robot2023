@@ -1,10 +1,10 @@
 package team1403.robot.chargedup;
 
-import java.util.List;
+// import java.util.List;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+// import edu.wpi.first.math.geometry.Pose2d;
+// import edu.wpi.first.math.geometry.Rotation2d;
+// import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,13 +21,17 @@ import team1403.robot.chargedup.photonvision.PhotonVisionSubsystem;
 import team1403.robot.chargedup.swerve.SwerveAutoBalanceYaw;
 import team1403.robot.chargedup.swerve.SwerveCommand;
 import team1403.robot.chargedup.swerve.SwerveDrivePath;
+import team1403.robot.chargedup.swerve.SwerveSubsystem;
 import team1403.robot.chargedup.RobotConfig.DriverConfig;
 import team1403.robot.chargedup.RobotConfig.OperatorConfig;
-import team1403.robot.chargedup.arm.Arm;
-import team1403.robot.chargedup.arm.ArmCommand;
-import team1403.robot.chargedup.swerve.SwerveCommand;
-import team1403.robot.chargedup.swerve.SwerveDrivePath;
-import team1403.robot.chargedup.swerve.SwerveSubsystem;
+import team1403.robot.chargedup.arm.Arm_Subsystem;
+import team1403.robot.chargedup.arm.ManualArmCommand;
+// import team1403.robot.chargedup.cse.CougarScriptObject;
+import team1403.robot.chargedup.cse.CougarScriptReader;
+// import team1403.robot.chargedup.photonvision.PhotonVisionSubsystem;
+// import team1403.robot.chargedup.swerve.SwerveCommand;
+// import team1403.robot.chargedup.swerve.SwerveDrivePath;
+// import team1403.robot.chargedup.swerve.SwerveSubsystem;
 
 /**
  * The heart of the robot.
@@ -56,13 +60,14 @@ public class CougarRobotImpl extends CougarRobot {
 
         
     // m_builtins = new BuiltinSubsystem(parameters, logger);
-    // m_visionSubsystem = new PhotonVisionSubsystem(parameters);
-    // m_arm = new Arm(parameters);
+    m_arm = new Arm_Subsystem(parameters);
     m_swerveSubsystem = new SwerveSubsystem(parameters);
+    // m_visionSubsystem = new PhotonVisionSubsystem(parameters);
 
-    // configureOperatorInterface();
+    configureOperatorInterface();
     configureDriverInterface();
     // registerAutoCommands();
+
   }
 
   @Override
@@ -70,23 +75,6 @@ public class CougarRobotImpl extends CougarRobot {
     return m_reader.importScript("Circle.json");
   } 
   
-
-    /**
-     * Configures the operator commands and their bindings.
-     */
-  //   private void configureOperatorInterface() {
-  //     XboxController xboxOperator = getJoystick("Operator", OperatorConfig.pilotPort);
-
-  //     new Trigger(() -> xboxOperator.getYButton()).onFalse(
-  //         new InstantCommand(() -> switchOperatorMode()));
-    
-  //     if (m_armOperatorManual) {
-  //       manualOperatorMode(xboxOperator);
-  //     } else {
-  //       autoOperatorMode(xboxOperator);
-  //   }
-  // }
-
   /**
    * Configures the driver commands and their bindings.
    */
@@ -122,41 +110,59 @@ public class CougarRobotImpl extends CougarRobot {
       new RepeatCommand(new InstantCommand(() -> m_swerveSubsystem.stop())));
 
     new Trigger(() -> xboxDriver.getAButton()).whileTrue(autoBalanceYaw);
+  }
     
-  }
-
   /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  private void registerAutoCommands() {
-    m_reader = new CougarScriptReader((Pose2d startPose) -> {
-      double feetToMeters = 0.30478512648;
+  * Configures the operator commands and their bindings.
+  */
+  private void configureOperatorInterface() {
+    XboxController xboxOperator = getJoystick("Operator", OperatorConfig.pilotPort);
 
-      Translation2d flippedXandY = new Translation2d(
-          startPose.getY() * feetToMeters, startPose.getX() * feetToMeters);
-
-      Rotation2d theta = new Rotation2d(
-          startPose.getRotation().getDegrees());
-
-      Pose2d transformedStartPose = new Pose2d(flippedXandY, theta);
-      m_swerveSubsystem.setPose(transformedStartPose);
-    });
-
-    m_reader.registerCommand("SwerveDrivePath", (CougarScriptObject p) -> {
-      List<Translation2d> wayPoints = p.getPointList("Waypoints");
-      return new SwerveDrivePath(m_swerveSubsystem,
-          p.getDouble("StartAngle"),
-          p.getDouble("EndAngle"),
-          wayPoints);
-    });
+    // new Trigger(() -> xboxOperator.getYButton()).onFalse(
+    //     new InstantCommand(() -> switchOperatorMode()));
+      
+    if (m_armOperatorManual) {
+      manualOperatorMode(xboxOperator);
+    } 
+    // else {
+    //   autoOperatorMode(xboxOperator);
+    // }
   }
+
+
+
+  // /**
+  //  * Use this to pass the autonomous command to the main {@link Robot} class.
+  //  *
+  //  * @return the command to run in autonomous
+  //  */
+  // private void registerAutoCommands() {
+  //   m_reader = new CougarScriptReader((Pose2d startPose) -> {
+  //     double feetToMeters = 0.30478512648;
+
+  //     Translation2d flippedXandY = new Translation2d(
+  //         startPose.getY() * feetToMeters, startPose.getX() * feetToMeters);
+
+  //     Rotation2d theta = new Rotation2d(
+  //         startPose.getRotation().getDegrees());
+
+  //     Pose2d transformedStartPose = new Pose2d(flippedXandY, theta);
+  //     m_swerveSubsystem.setPose(transformedStartPose);
+  //   });
+
+  //   m_reader.registerCommand("SwerveDrivePath", (CougarScriptObject p) -> {
+  //     List<Translation2d> wayPoints = p.getPointList("Waypoints");
+  //     return new SwerveDrivePath(m_swerveSubsystem,
+  //         p.getDouble("StartAngle"),
+  //         p.getDouble("EndAngle"),
+  //         wayPoints);
+  //   });
+  // }
 
   /**
    * Applies a deadband to the given value.
    *
-   * @param value the value to apply a deadband to
+   * @param value    the value to apply a deadband to
    * @param deadband the deadband to apply to the value
    * @return 0 if the value is < deadband,
    *         or value if value > deadband
@@ -190,8 +196,8 @@ public class CougarRobotImpl extends CougarRobot {
     return new XboxController(port);
   }
 
-  //TODO, figure out actual setpoint values
-  
+  // TODO, figure out actual setpoint values
+
   /**
    * This is the auto mode for operator.
    * Has 5 setpoints, which will each set the arm
@@ -220,16 +226,18 @@ public class CougarRobotImpl extends CougarRobot {
   /**
    * This is the manual mode for operator.
    * Minutely control arm with joysticks
-   * 
+   *
    * @param xboxOperator defines which controller is being used
    */
-  // private void manualOperatorMode(XboxController xboxOperator) {
-  //   m_arm.setDefaultCommand(new ArmCommand(m_arm,
-  //       () -> xboxOperator.getLeftY(),
-  //       () -> xboxOperator.getRightY(),
-  //       () -> xboxOperator.getRightTriggerAxis(),
-  //       () -> xboxOperator.getLeftTriggerAxis()));
-  // }
+  private void manualOperatorMode(XboxController xboxOperator) {
+    m_arm.setDefaultCommand(new ManualArmCommand(m_arm,
+        () -> -deadband(xboxOperator.getLeftY(), 0.05),
+        () -> deadband(xboxOperator.getRightY(), 0.05),
+        () -> xboxOperator.getLeftTriggerAxis(),
+        () -> xboxOperator.getRightTriggerAxis(),
+        () -> xboxOperator.getRightBumper(),
+        () -> xboxOperator.getLeftBumper()));
+  }
 
   /**
    * Switches the operator mode.
@@ -241,8 +249,8 @@ public class CougarRobotImpl extends CougarRobot {
   // private final BuiltinSubsystem m_builtins;
   // private final PhotonVisionSubsystem m_visionSubsystem;
   private CougarScriptReader m_reader;
-  // private final Arm m_arm;
-  // private boolean m_armOperatorManual = true;
+  private final Arm_Subsystem m_arm;
+  private boolean m_armOperatorManual = true;
   private final SwerveSubsystem m_swerveSubsystem;
 }
 
