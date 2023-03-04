@@ -1,32 +1,16 @@
 package team1403.robot.chargedup;
 
-import java.util.List;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarRobot;
 import team1403.lib.subsystems.BuiltinSubsystem;
 import team1403.lib.util.CougarLogger;
-import team1403.robot.chargedup.cse.CougarScriptObject;
-import team1403.robot.chargedup.cse.CougarScriptReader;
 import team1403.robot.chargedup.photonvision.PhotonVisionDefault;
 import team1403.robot.chargedup.photonvision.PhotonVisionSubsystem;
 import team1403.robot.chargedup.swerve.SwerveCommand;
-import team1403.robot.chargedup.swerve.SwerveDrivePath;
-import team1403.robot.chargedup.RobotConfig.DriverConfig;
-import team1403.robot.chargedup.RobotConfig.OperatorConfig;
-import team1403.robot.chargedup.arm.Arm;
-import team1403.robot.chargedup.arm.ArmCommand;
-import team1403.robot.chargedup.swerve.SwerveCommand;
-import team1403.robot.chargedup.swerve.SwerveDrivePath;
 import team1403.robot.chargedup.swerve.SwerveSubsystem;
 
 /**
@@ -57,12 +41,14 @@ public class CougarRobotImpl extends CougarRobot {
         
     m_builtins = new BuiltinSubsystem(parameters, logger);
     m_swerveSubsystem = new SwerveSubsystem(parameters);
-    m_visionSubsystem = new PhotonVisionSubsystem(parameters, m_swerveSubsystem);
+    m_visionSubsystem = new PhotonVisionSubsystem(parameters);
     // m_arm = new Arm(parameters);
     // m_swerveSubsystem = new SwerveSubsystem(parameters);
 
     // configureOperatorInterface();
     configureDriverInterface();
+
+
     // registerAutoCommands();
 
   }
@@ -121,8 +107,8 @@ public class CougarRobotImpl extends CougarRobot {
     new Trigger(() -> xboxDriver.getBButton()).onFalse(
       new InstantCommand(() -> m_swerveSubsystem.zeroGyroscope()));
 
-    new Trigger(() -> xboxDriver.getAButton()).onFalse(
-      new InstantCommand(() -> m_visionSubsystem.switchPipeline()));
+    // new Trigger(() -> xboxDriver.getAButton()).onFalse(
+    //   new InstantCommand(() -> m_visionSubsystem.switchPipeline()));
     
   }
 

@@ -2,7 +2,6 @@ package team1403.robot.chargedup.swerve;
 
 import com.revrobotics.CANSparkMax.IdleMode;
 
-import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -188,8 +187,13 @@ public class SwerveSubsystem extends CougarSubsystem {
     return m_odometer;
   }
 
+  /**
+   * Updating the Odometer with PhotonVision.
+   *
+   * @param pose The Pose2d object needed to update.
+   */
   public void updateOdometerWithVision(Pose2d pose) {
-    if(pose.getTranslation().getDistance(getPose().getTranslation()) < 1) {
+    if (pose.getTranslation().getDistance(getPose().getTranslation()) < 1) {
       m_odometer.addVisionMeasurement(pose, Timer.getFPGATimestamp());
     }
   }
@@ -238,6 +242,7 @@ public class SwerveSubsystem extends CougarSubsystem {
    *
    * @param states an array of states for each module.
    */
+
   public void setModuleStates(SwerveModuleState[] states) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
         states, SwerveConfig.kMaxSpeed);
@@ -252,7 +257,7 @@ public class SwerveSubsystem extends CougarSubsystem {
   /**
    * Adds rotational velocity to the chassis speed to compensate for 
    * unwanted changes in gyroscope heading.
-   * 
+   *
    * @param chassisSpeeds the given chassisspeeds
    * @return the corrected chassisspeeds
    */
@@ -278,10 +283,10 @@ public class SwerveSubsystem extends CougarSubsystem {
   /**
    * Accounts for the drift caused by the first order kinematics 
    * while doing both translational and rotational movement. 
-   * 
-   * <p> Looks forward one control loop to figure out where the robot 
+   *
+   * <p>Looks forward one control loop to figure out where the robot 
    * should be given the chassisspeed and backs out a twist command from that.
-   * 
+   *
    * @param chassisSpeeds the given chassisspeeds
    * @return the corrected chassisspeeds
    */

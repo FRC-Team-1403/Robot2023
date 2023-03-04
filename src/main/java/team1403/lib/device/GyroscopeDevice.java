@@ -1,7 +1,6 @@
 package team1403.lib.device;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 
 /**
  * Interface that represents a gyroscope.

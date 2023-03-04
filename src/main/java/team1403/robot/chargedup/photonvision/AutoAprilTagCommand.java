@@ -10,15 +10,25 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import team1403.robot.chargedup.swerve.SwerveDrivePath;
 import team1403.robot.chargedup.swerve.SwerveSubsystem;
 
+/**
+ * The Autonomous command for April Tag detection.
+ */
 public class AutoAprilTagCommand extends CommandBase {
 
   private final SwerveSubsystem m_drivetrainSubsystem;
   private final PhotonVisionSubsystem m_photonVisionSubsystem;
 
-  private Pose2d lockedOnTarget;
+  private Pose2d m_lockedOnTarget;
   private SwerveDrivePath m_drivePathCommand;
 
-  public AutoAprilTagCommand(SwerveSubsystem drivetrainSubsystem, PhotonVisionSubsystem photonVisionSubsystem) {
+  /**
+   * Constructor for the April Tag command.
+   *
+   * @param drivetrainSubsystem The drivetrain subsystem used by the command.
+   * @param photonVisionSubsystem The photonVision subsystem used by the command.
+   */
+  public AutoAprilTagCommand(SwerveSubsystem drivetrainSubsystem, 
+                            PhotonVisionSubsystem photonVisionSubsystem) {
 
     m_drivetrainSubsystem = drivetrainSubsystem;
     m_photonVisionSubsystem = photonVisionSubsystem;
@@ -35,7 +45,8 @@ public class AutoAprilTagCommand extends CommandBase {
       thetaOfTarget = 179;
     }
 
-    lockedOnTarget = new Pose2d(new Translation2d(xPoseOfTarget, yPoseOfTarget), new Rotation2d(thetaOfTarget));
+    m_lockedOnTarget = new Pose2d(new Translation2d(xPoseOfTarget, yPoseOfTarget), 
+                                  new Rotation2d(thetaOfTarget));
   }
 
   @Override
@@ -43,10 +54,10 @@ public class AutoAprilTagCommand extends CommandBase {
     m_drivePathCommand = new SwerveDrivePath(
         m_drivetrainSubsystem,
         m_drivetrainSubsystem.getGyroscopeRotation().getDegrees(),
-        lockedOnTarget.getRotation().getDegrees(), 
+        m_lockedOnTarget.getRotation().getDegrees(), 
         List.of(
           m_drivetrainSubsystem.getOdometryValue().getTranslation(),
-          lockedOnTarget.getTranslation()));
+          m_lockedOnTarget.getTranslation()));
 
     m_drivePathCommand.schedule();
   }
