@@ -299,17 +299,6 @@ public class Arm_Subsystem extends CougarSubsystem {
   }
 
   /**
-   * Calculates the space the wrist takes up vertically.
-   *
-   * @param relativeWristAngle wrist angle relative to itself
-   * @return space wrist takes up vertically
-   */
-  private double wristVerticleOccupation(double relativeWristAngle) {
-    return Math.sin(relativeWristAngle - 180)
-        * RobotConfig.Arm.wristDimensions.getHeight(RobotConfig.Arm.kPhysicalArmMaxExtension);
-  }
-
-  /**
    * Calculates the theoretical max arm length of the arm given the arm angle.
    *
    * @param absoluteArmAngle arm angle relative to ground
@@ -320,6 +309,12 @@ public class Arm_Subsystem extends CougarSubsystem {
        - RobotConfig.Arm.kExtensionOffset;
   }
 
+  /**
+   * Dynamically limits the extensions of arm so that it doesn't hit the ground.
+   *
+   * @param extensionLength extension length.
+   * @return the arm length.
+   */
   public double dynamicExtensionLimit(double extensionLength) {
 
     if (getAbsolutePivotAngle() >= RobotConfig.Arm.kFrameAngle) {
