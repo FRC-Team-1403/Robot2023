@@ -33,7 +33,6 @@ public class Arm extends CougarSubsystem {
   private final PIDController m_pidArmLength;
   private WpiAnalogDevice m_absoluteArmEncoder;
   private Encoder m_absoluteWristEncoder;
-  private Double m_wheelSpeed;
   private Double m_desiredArmAngle;
   private Double m_desiredWristAngle;
   private Double m_desiredArmExtension;
@@ -111,7 +110,7 @@ public class Arm extends CougarSubsystem {
 
   /**
    * Getter method for absolute wrist encoder.
-   * 
+   *
    * @return wrist absolute encoder.
    */
   public Encoder getWristEncoder() {
@@ -438,7 +437,7 @@ public class Arm extends CougarSubsystem {
 
   /**
    * Getter for limiting the arm extension.
-   * 
+   *
    * @return limit for arm extension
    */
   private boolean isArmExtensionWithinBounds() {
@@ -448,7 +447,7 @@ public class Arm extends CougarSubsystem {
 
   /**
    * Getter for limiting the wrist angle.
-   * 
+   *
    * @return limit for wrist angle
    */
   private boolean isWristAngleWithinBounds() {

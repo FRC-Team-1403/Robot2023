@@ -67,7 +67,8 @@ public class SwerveSubsystem extends CougarSubsystem {
             CanBus.backRightEncoderId, SwerveConfig.backRightEncoderOffset, logger),
     };
 
-    m_odometer = new SwerveDrivePoseEstimator(SwerveConfig.kDriveKinematics, getGyroscopeRotation() , getModulePositions(), new Pose2d(0, 0, new Rotation2d(0)));
+    m_odometer = new SwerveDrivePoseEstimator(SwerveConfig.kDriveKinematics,
+     getGyroscopeRotation(), getModulePositions(), new Pose2d(0, 0, new Rotation2d(0)));
 
     m_navx2 = new NavxAhrs("Gyroscope");
     addDevice(m_navx2.getName(), m_navx2);
@@ -182,8 +183,13 @@ public class SwerveSubsystem extends CougarSubsystem {
     return m_odometer;
   }
 
+  /**
+   * odometry with vision. 
+   *
+   * @param pose pose.
+   */
   public void updateOdometerWithVision(Pose2d pose) {
-    if(pose.getTranslation().getDistance(getPose().getTranslation()) < 1) {
+    if (pose.getTranslation().getDistance(getPose().getTranslation()) < 1) {
       m_odometer.addVisionMeasurement(pose, Timer.getFPGATimestamp());
     }
   }
@@ -231,6 +237,7 @@ public class SwerveSubsystem extends CougarSubsystem {
    *
    * @param states an array of states for each module.
    */
+
   public void setModuleStates(SwerveModuleState[] states) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
         states, SwerveConfig.kMaxSpeed);
@@ -245,7 +252,7 @@ public class SwerveSubsystem extends CougarSubsystem {
   /**
    * Adds rotational velocity to the chassis speed to compensate for 
    * unwanted changes in gyroscope heading.
-   * 
+   *
    * @param chassisSpeeds the given chassisspeeds
    * @return the corrected chassisspeeds
    */
@@ -272,9 +279,9 @@ public class SwerveSubsystem extends CougarSubsystem {
    * Accounts for the drift caused by the first order kinematics 
    * while doing both translational and rotational movement. 
    * 
-   * <p> Looks forward one control loop to figure out where the robot 
+   * <p>Looks forward one control loop to figure out where the robot 
    * should be given the chassisspeed and backs out a twist command from that.
-   * 
+   *
    * @param chassisSpeeds the given chassisspeeds
    * @return the corrected chassisspeeds
    */
@@ -296,7 +303,8 @@ public class SwerveSubsystem extends CougarSubsystem {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Gyro Reading", getGyroscopeRotation().getDegrees());
-    m_odometer.updateWithTime(Timer.getFPGATimestamp(), getGyroscopeRotation(), getModulePositions());
+    m_odometer.updateWithTime(Timer.getFPGATimestamp(), 
+        getGyroscopeRotation(), getModulePositions());
     SmartDashboard.putString("Odometry", m_odometer.getEstimatedPosition().toString());
 
     m_chassisSpeeds = translationalDriftCorrection(m_chassisSpeeds);

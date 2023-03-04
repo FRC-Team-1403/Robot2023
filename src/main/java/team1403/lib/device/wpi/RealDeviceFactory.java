@@ -1,9 +1,6 @@
 package team1403.lib.device.wpi;
 
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.revrobotics.SparkMaxRelativeEncoder.Type;
-
-import edu.wpi.first.networktables.NetworkTableInstance;
 
 import team1403.lib.device.AdvancedMotorController;
 import team1403.lib.device.AnalogDevice;

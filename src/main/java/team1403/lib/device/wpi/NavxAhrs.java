@@ -11,7 +11,7 @@ import team1403.lib.device.GyroscopeDevice;
  * The NavX implementation of the gyroscope device. Assumes the NavX is
  * connected to the MXP port.
  */
-public class NavxAhrs extends AHRS implements GyroscopeDevice{
+public class NavxAhrs extends AHRS implements GyroscopeDevice {
   private final String m_name;
   private final AHRS m_navx;
 

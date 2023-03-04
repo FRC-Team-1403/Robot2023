@@ -1,10 +1,8 @@
 package team1403.lib.util;
 
-
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Objects;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
@@ -20,9 +18,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.util.WPIUtilJNI;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * This class wraps {@link SwerveDriveOdometry Swerve Drive Odometry} to fuse latency-compensated
@@ -159,7 +154,7 @@ public class SwerveDrivePoseEstimator {
     return m_odometry.getPoseMeters();
   }
 
-  public void setPose(Pose2d pose){
+  public void setPose(Pose2d pose) {
     m_odometry.setPoseMeters(pose);
   }
   /**
@@ -182,6 +177,7 @@ public class SwerveDrivePoseEstimator {
    *     you should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source
    *     or sync the epochs.
    */
+  
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
     // Step 0: If this measurement is old enough to be outside the pose buffer's timespan, skip.
     if (m_poseBuffer.getInternalBuffer().lastKey() - kBufferDuration > timestampSeconds) {

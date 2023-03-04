@@ -35,11 +35,10 @@ public class ManualArmCommand extends CommandBase {
    * @param wristAngle function that determines wrist angle, -1 to 1
    * @param armExtensionDecrease function that determines
     the increase of arm extension, 0 to 1
-   * @param armExtensionDecrease function that determines
     the decrease of arm extension, 0 to 1
    */
   public ManualArmCommand(Arm_Subsystem arm, DoubleSupplier armAngle, DoubleSupplier wristAngle,
-  DoubleSupplier armExtensionDecrease, DoubleSupplier armExtensionIncrease,
+      DoubleSupplier armExtensionDecrease, DoubleSupplier armExtensionIncrease,
         BooleanSupplier wheelIntake, BooleanSupplier wheelOuttake) {
     this.m_wheelIntakeSupplier = wheelIntake;
     this.m_arm = arm;
@@ -69,9 +68,9 @@ public class ManualArmCommand extends CommandBase {
     m_pivotAngle += (-1 * m_armAngleSupplier.getAsDouble());
     m_pivotAngle = m_arm.limitPivotAngle(m_pivotAngle);
 
-    if(m_armExtensionDecreaseSupplier.getAsDouble() > 0) {
+    if (m_armExtensionDecreaseSupplier.getAsDouble() > 0) {
       m_armExtension -= m_armExtensionDecreaseSupplier.getAsDouble() / 2;
-    } else if(m_armExtensionIncreaseSupplier.getAsDouble() > 0) {
+    } else if (m_armExtensionIncreaseSupplier.getAsDouble() > 0) {
       m_armExtension += m_armExtensionIncreaseSupplier.getAsDouble() / 2;
     }
 
@@ -79,11 +78,11 @@ public class ManualArmCommand extends CommandBase {
 
     SmartDashboard.putNumber("Arm Extension Setpoint", m_armExtension);
 
-    if(this.m_wheelIntakeSupplier.getAsBoolean()) {
+    if (this.m_wheelIntakeSupplier.getAsBoolean()) {
       m_arm.moveArm(m_wristAngle, -0.75, m_pivotAngle, m_armExtension);
-    } else if(this.m_wheelOuttakeSupplier.getAsBoolean()) {
+    } else if (this.m_wheelOuttakeSupplier.getAsBoolean()) {
       m_arm.moveArm(m_wristAngle, 0.75, m_pivotAngle, m_armExtension);
-    }else {
+    } else {
       m_arm.moveArm(m_wristAngle, 0, m_pivotAngle, m_armExtension);
     }
 

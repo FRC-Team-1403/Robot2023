@@ -5,26 +5,37 @@
 package team1403.robot.chargedup.photonvision;
 
 import java.util.Optional;
-import org.photonvision.EstimatedRobotPose;
-import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonUtils;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarSubsystem;
 import team1403.robot.chargedup.RobotConfig.VisionConfig;
 import team1403.robot.chargedup.swerve.SwerveSubsystem;
 
+import org.photonvision.EstimatedRobotPose;
+import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.PhotonUtils;
+
+/**
+ * creates the photon vision class.
+ */
 public class PhotonVisionSubsystem extends CougarSubsystem {
   private PhotonCamera limeLight;
   private PhotonPoseEstimator photonPoseEstimator;
 
+  /**
+   * Initializes the photon vision subsystem. 
+   *
+   * @param injectedParameters the cougar injected parameters
+   */
   public PhotonVisionSubsystem(CougarLibInjectedParameters injectedParameters) {
     super("Vision Subsystem", injectedParameters);
     // m_drivetrain = drivetrain;
@@ -36,7 +47,8 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
     // 0: April Tags
     // 1: Reflective Tape
 
-    photonPoseEstimator = new PhotonPoseEstimator(VisionConfig.fieldLayout, PoseStrategy.LOWEST_AMBIGUITY, limeLight,
+    photonPoseEstimator = new PhotonPoseEstimator(VisionConfig.fieldLayout,
+    PoseStrategy.LOWEST_AMBIGUITY, limeLight,
         new Transform3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0)));
   }
 
@@ -70,7 +82,8 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
         lowestTargetIndex = i;
       }
 
-      SmartDashboard.putNumber("Reflective Tape Distance", PhotonUtils.calculateDistanceToTargetMeters(0.727, 0.662,
+      SmartDashboard.putNumber("Reflective Tape Distance", 
+          PhotonUtils.calculateDistanceToTargetMeters(0.727, 0.662,
           Math.PI / 60, targets.get(lowestTargetIndex).getPitch()));
     }
   }
