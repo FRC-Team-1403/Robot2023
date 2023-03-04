@@ -67,7 +67,6 @@ public class CougarRobotImpl extends CougarRobot {
     configureOperatorInterface();
     configureDriverInterface();
     // registerAutoCommands();
-
   }
 
   @Override

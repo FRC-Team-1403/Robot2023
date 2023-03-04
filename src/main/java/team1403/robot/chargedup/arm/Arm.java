@@ -63,10 +63,10 @@ public class Arm extends CougarSubsystem {
     RobotConfig.CanBus.wristMotor, Type.kHallSensor, logger);
 
     m_frontLimitSwitch = new WpiLimitSwitch("frontSwitch",
-    RobotConfig.RioPorts.exampleRailForwardLimitSwitch);
+    RobotConfig.RioPorts.kArmLimitSwitch);
 
     m_telescopicLimitSwitch = new WpiLimitSwitch("telescopicLimitSwitch",
-    RobotConfig.RioPorts.exampleRailReverseLimitSwitch);
+    RobotConfig.RioPorts.kArmLimitSwitch);
 
     m_rightArmAngleMotor.setInverted(true);
 

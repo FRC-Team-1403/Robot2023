@@ -61,8 +61,8 @@ public class RobotConfig {
     public static final double kITranslation = 0.0;
     public static final double kDTranslation = 0.5;
 
-    public static final double kTrackWidth = Units.inchesToMeters(21);
-    public static final double kWheelBase = Units.inchesToMeters(25.5);
+    public static final double kTrackWidth = Units.inchesToMeters(17);
+    public static final double kWheelBase = Units.inchesToMeters(17);
 
     public static final SwerveDriveKinematics kDriveKinematics = 
         new SwerveDriveKinematics(
@@ -160,13 +160,11 @@ public class RobotConfig {
   public static class CanBus {
 
     //Arm Ports
-    public static final int wheelIntakeMotor = 5; //Done
-    public static final int telescopicArmMotor = 4; //Done
-    public static final int leftPivotMotor = 2; //Done
-    public static final int rightPivotMotor = 3; //Done
-    public static final int wristMotor = 1; //Done
-    // public static final int frontArmSwitch = 6;
-    // public static final int telescopicSwitch = 7;
+    public static final int wheelIntakeMotor = 5;
+    public static final int telescopicArmMotor = 4;
+    public static final int leftPivotMotor = 2;
+    public static final int rightPivotMotor = 3;
+    public static final int wristMotor = 1;
 
     // Swerve CanBus ids
     public static final int frontLeftDriveId = 1;
@@ -181,7 +179,7 @@ public class RobotConfig {
     public static final int backLeftSteerId = 9;
     public static final int backLeftEncoderId = 2;
 
-    public static final int backRightDriveId = 2;
+    public static final int backRightDriveId = 5;
     public static final int backRightSteerId = 16;
     public static final int backRightEncoderId = 4;
   }
@@ -190,16 +188,6 @@ public class RobotConfig {
    * Ports on the RoboRIO.
    */
   public class RioPorts {
-
-    /**
-     * The rio port that the forward limit switch uses.
-     */
-    public static final int exampleRailForwardLimitSwitch = 1;
-
-    /**
-     * This switch is optional. Set to port -1 if it is not available.
-     */
-    public static final int exampleRailReverseLimitSwitch = 2;
 
     
     public static final int kWristAbsoluteEncoder = 1; //DIO
