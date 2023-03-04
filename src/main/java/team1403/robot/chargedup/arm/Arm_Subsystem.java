@@ -260,7 +260,6 @@ public class Arm_Subsystem extends CougarSubsystem {
     SmartDashboard.putNumber("Arm Feedforward", feedforward);
     SmartDashboard.putNumber("Arm Feedback", feedback);
     double speed = MathUtil.clamp(feedforward + feedback, -1, 1);
-    SmartDashboard.putNumber("Pivot Speed", speed);
     m_leftPivotMotor.set(speed);
   }
 
@@ -427,8 +426,12 @@ public class Arm_Subsystem extends CougarSubsystem {
     }
 
     // Track Values
-    SmartDashboard.putNumber("Wrist setpoint", m_wristAngleSetpoint);
-    SmartDashboard.putNumber("Arm Pivot", m_pivotAngleSetpoint);
-    SmartDashboard.putNumber("Extension Length", m_extensionLengthSetpoint);
+    SmartDashboard.putNumber("Wrist Angle", getWristAbsoluteAngle());
+    SmartDashboard.putNumber("Pivot Angle", getAbsolutePivotAngle());
+    SmartDashboard.putNumber("Extension Length", getExtensionLength());
+
+    SmartDashboard.putNumber("WristSetpoint", getWristAngleSetpoint());
+    SmartDashboard.putNumber("Pivot Setpoint", getPivotAngleSetpoint());
+    SmartDashboard.putNumber("Extension Setpoint", getExtensionLengthSetpoint());
   }
 }

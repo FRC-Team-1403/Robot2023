@@ -78,9 +78,10 @@ public class CougarRobotImpl extends CougarRobot {
       
     if (m_armOperatorManual) {
       manualOperatorMode(xboxOperator);
-    } else {
-      autoOperatorMode(xboxOperator);
-    }
+    } 
+    // else {
+    //   autoOperatorMode(xboxOperator);
+    // }
   }
 
   // /**
@@ -191,18 +192,18 @@ public class CougarRobotImpl extends CougarRobot {
    *
    * @param xboxOperator defines which controller is being used
    */
-  public void autoOperatorMode(XboxController xboxOperator) {
-    new Trigger(() -> xboxOperator.getAButton()).onFalse(
-        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-    new Trigger(() -> xboxOperator.getBButton()).onFalse(
-        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadDown)).onFalse(
-        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadUp)).onFalse(
-        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-    new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadRight)).onFalse(
-        new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-  }
+  // public void autoOperatorMode(XboxController xboxOperator) {
+  //   new Trigger(() -> xboxOperator.getAButton()).onFalse(
+  //       new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  //   new Trigger(() -> xboxOperator.getBButton()).onFalse(
+  //       new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  //   new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadDown)).onFalse(
+  //       new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  //   new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadUp)).onFalse(
+  //       new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  //   new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadRight)).onFalse(
+  //       new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
+  // }
 
   /**
    * This is the manual mode for operator.
