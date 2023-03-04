@@ -111,16 +111,6 @@ public final class CougarSparkMax extends CANSparkMax implements AdvancedMotorCo
   }
 
   @Override
-  public void setInverted(boolean isInverted) {
-    super.setInverted(isInverted);
-  }
-
-  @Override
-  public boolean getInverted() {
-    return super.getInverted();
-  }
-
-  @Override
   public void setPidGains(double p, double i, double d) {
     super.getPIDController().setP(p);
     super.getPIDController().setI(i);
