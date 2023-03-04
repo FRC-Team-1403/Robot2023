@@ -259,7 +259,7 @@ public class RobotConfig {
     public static final int kDArmPivot = 0;
     public final static double m_absolutePivotOffset = 64.4245336;
     public static final double kMaxPivotAngle = 250.273;
-    public static final double kFrameAngle = 234.21935820231695;
+    public static final double kFrameAngle = 229.6427020308589;
     public static final double kMinPivotAngle = 132.211;
     public static final double kPivotAngleMaxAmperage = 40;
     public static final double kHorizonAngle = 209.099;
@@ -286,7 +286,7 @@ public class RobotConfig {
     public static final double angleHittingGround = 80; //TODO
 
     //Dimensions
-    public static final double kBaseArmLength = 28; //37
+    public static final double kBaseArmLength = 31; //37 //28
     public static final double kPhysicalArmMaxExtension = kBaseArmLength + kMaxArmExtension;
 
     public static final double kArmWeight = 16; //Pounds

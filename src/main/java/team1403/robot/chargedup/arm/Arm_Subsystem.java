@@ -292,7 +292,7 @@ public class Arm_Subsystem extends CougarSubsystem {
    * @return the theoretical arm length
    */
   public double theoreticalArmLength(double absoluteArmAngle, double height) {
-    return height / Math.cos(Math.toRadians(270 - absoluteArmAngle));
+    return (height / Math.cos(Math.toRadians(270 - absoluteArmAngle)))  - 8;
   }
 
 
@@ -302,7 +302,6 @@ public class Arm_Subsystem extends CougarSubsystem {
       return 0;
     } else if (getAbsolutePivotAngle() > RobotConfig.Arm.kHorizonAngle && getAbsolutePivotAngle() < RobotConfig.Arm.kFrameAngle) {
       double maxLength = theoreticalArmLength(getAbsolutePivotAngle(), RobotConfig.kHeightFromGround) - RobotConfig.Arm.kBaseArmLength;
-      SmartDashboard.putNumber("Limited length", maxLength);
       return MathUtil.clamp(extensionLength, 0, maxLength);
     }
     return extensionLength;
@@ -345,6 +344,8 @@ public class Arm_Subsystem extends CougarSubsystem {
 
     //Extension
     double limitedExtension = dynamicExtensionLimit(m_extensionLength);
+    SmartDashboard.putNumber("Limited length", limitedExtension);
+
 
     //TODO if condition to change setpoint to limit
     m_extensionLength = limitedExtension;
