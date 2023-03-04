@@ -34,19 +34,11 @@ import team1403.robot.chargedup.swerve.SwerveSubsystem;
 public class PhotonVisionSubsystem extends CougarSubsystem {
   private PhotonCamera limeLight;
   private PhotonPoseEstimator photonPoseEstimator;
-  private double targetYaw;
-  private double targetPitch;
-  private PIDController xController;
-  private PIDController yController;
-  private PIDController angleController;
   private SwerveSubsystem m_drivetrain;
-  private boolean reachedTarget = false;
-  private XboxController controller;
   private int limelightImportance;
 
   private Optional<EstimatedRobotPose> photonPose;
   private Transform3d target;
-  private double timeStamp = 0;
 
   public PhotonVisionSubsystem(CougarLibInjectedParameters injectedParameters, SwerveSubsystem drivetrain) {
     super("Vision Subsystem", injectedParameters);
@@ -54,16 +46,13 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
     PortForwarder.add(5800, "photonvision.local", 5800);
 
     limeLight = new PhotonCamera("OV5647");
-    xController =  new PIDController(2, 0, 0);
-    yController = new PIDController(2,0,0);
-    angleController = new PIDController(0.4,0,0 );
 
     limeLight.setPipelineIndex(0);
     // 0: April Tags
     // 1: Reflective Tape
 
     photonPoseEstimator = new PhotonPoseEstimator(VisionConfig.fieldLayout, PoseStrategy.MULTI_TAG_PNP, limeLight,
-        new Transform3d(new Translation3d(12,8,30), new Rotation3d(0, 0, 0)));
+        new Transform3d(new Translation3d(12,8,30), new Rotation3d(0.0523599, 0, 0)));
 
     photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
   }
