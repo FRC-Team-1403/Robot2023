@@ -17,11 +17,13 @@ import team1403.lib.util.Dimension;
 /**
  * This class holds attributes for the robot configuration.
  *
- * <p>The RobotConfig is broken out into different areas,
+ * <p>
+ * The RobotConfig is broken out into different areas,
  * each of which is captured in a class for that area. Each
  * subsystem has its own independent config.
  *
- * <p>The "electrical" configs are treated separate and independent
+ * <p>
+ * The "electrical" configs are treated separate and independent
  * to make it easier to see how the robot should be wired and see
  * any conflicts since these ports specify their config together.
  */
@@ -104,6 +106,50 @@ public class RobotConfig {
         = new TrapezoidProfile.Constraints(
         kMaxAngularSpeed,
         kMaxAngularAccelerationRadiansPerSecondSquared);
+  }
+
+  public static class VisionConfig {
+    public static AprilTagFieldLayout fieldLayout = new AprilTagFieldLayout(Arrays.asList(
+      new AprilTag(1,   (new Pose3d(
+        Units.inchesToMeters(610.77),
+        Units.inchesToMeters(42.19),
+        Units.inchesToMeters(18.22),
+        new Rotation3d(0.0, 0.0, Math.PI)))),
+      new AprilTag(2, new Pose3d(
+        Units.inchesToMeters(610.77),
+        Units.inchesToMeters(108.19),
+        Units.inchesToMeters(18.22),
+        new Rotation3d(0.0, 0.0, Math.PI))),
+      new AprilTag(3,new Pose3d(
+        Units.inchesToMeters(610.77),
+        Units.inchesToMeters(174.19), // FIRST's diagram has a typo (it says 147.19)
+        Units.inchesToMeters(18.22),
+        new Rotation3d(0.0, 0.0, Math.PI))),
+      new AprilTag(4, new Pose3d(
+        Units.inchesToMeters(636.96),
+        Units.inchesToMeters(265.74),
+        Units.inchesToMeters(27.38),
+        new Rotation3d(0.0, 0.0, Math.PI))), 
+      new AprilTag(5, new Pose3d(
+        Units.inchesToMeters(14.25),
+        Units.inchesToMeters(265.74),
+        Units.inchesToMeters(27.38),
+        new Rotation3d())), 
+      new AprilTag(6, new Pose3d(
+        Units.inchesToMeters(610.77),
+        Units.inchesToMeters(174.19), // FIRST's diagram has a typo (it says 147.19)
+        Units.inchesToMeters(18.22),
+        new Rotation3d(0.0, 0.0, Math.PI))),
+      new AprilTag(7, new Pose3d(
+        Units.inchesToMeters(610.77),
+        Units.inchesToMeters(108.19),
+        Units.inchesToMeters(18.22),
+        new Rotation3d(0.0, 0.0, Math.PI))),  
+      new AprilTag(8, new Pose3d(
+        Units.inchesToMeters(40.45),
+        Units.inchesToMeters(42.19),
+        Units.inchesToMeters(18.22),
+        new Rotation3d()))), Units.inchesToMeters(651.25), Units.inchesToMeters(315.5));
   }
 
   /**

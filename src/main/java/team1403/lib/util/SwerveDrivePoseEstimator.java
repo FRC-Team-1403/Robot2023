@@ -154,7 +154,7 @@ public class SwerveDrivePoseEstimator {
     return m_odometry.getPoseMeters();
   }
 
-  public void setPose(Pose2d pose) {
+  public void setPose(Pose2d pose){
     m_odometry.setPoseMeters(pose);
   }
   /**
@@ -177,7 +177,6 @@ public class SwerveDrivePoseEstimator {
    *     you should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source
    *     or sync the epochs.
    */
-  
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
     // Step 0: If this measurement is old enough to be outside the pose buffer's timespan, skip.
     if (m_poseBuffer.getInternalBuffer().lastKey() - kBufferDuration > timestampSeconds) {
