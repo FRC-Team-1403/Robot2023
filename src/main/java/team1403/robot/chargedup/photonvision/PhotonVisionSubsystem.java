@@ -67,7 +67,7 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
     }
     if(limeLight.getLatestResult().hasTargets()){
       target = limeLight.getLatestResult().getBestTarget().getBestCameraToTarget();
-      SmartDashboard.putNumber("X Distance", target.getX());sdfasfdasdfa
+      SmartDashboard.putNumber("X Distance", target.getX());
       SmartDashboard.putNumber("Y Distance", target.getY());
       SmartDashboard.putNumber("Theta of April Tag", target.getRotation().toRotation2d().getDegrees());
     }

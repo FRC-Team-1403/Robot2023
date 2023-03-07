@@ -1,10 +1,14 @@
 package team1403.robot.chargedup;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+
 public class StateManager {
     public ArmPosition armPosition = ArmPosition.NA;
     public ScoringShelves scoringShelves = ScoringShelves.NA;
     public ScoringNodes scoringNodes = ScoringNodes.NA;
     public ScoringHybrid scoringHybrid = ScoringHybrid.NA;
+    public Alliance alliance;
 
     public double armAngle;
     public double wristAngle;
@@ -65,6 +69,17 @@ public class StateManager {
         NA
     }
 
+    private StateManager() {
+        alliance = DriverStation.getAlliance();
+    }
+
+    public static StateManager getInstance() {
+        if(inst == null) {
+            inst = new StateManager();
+        }
+        return inst;
+    }
+
     public void updateScoringShelf() {
         switch (scoringShelves) {
             case NA: 
@@ -105,4 +120,6 @@ public class StateManager {
             
         }   
     }
+
+    private static StateManager inst = null;
 }
