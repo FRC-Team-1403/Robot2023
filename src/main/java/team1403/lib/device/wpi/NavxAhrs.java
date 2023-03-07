@@ -30,6 +30,10 @@ public class NavxAhrs extends AHRS implements GyroscopeDevice {
     m_navx.reset();
   }
 
+  public float getYaw() {
+    return m_navx.getYaw();
+  }
+
   @Override
   public double getRawAngle() {
     return m_navx.getAngle() - m_navx.getAngleAdjustment();

@@ -5,6 +5,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -31,11 +32,14 @@ public class SwerveSubsystem extends CougarSubsystem {
   private final SwerveModule[] m_modules;
 
   private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds();
+  private SwerveModuleState[] m_states = new SwerveModuleState[4];
   private final SwerveDrivePoseEstimator m_odometer;
 
   private final PIDController m_driftCorrectionPid = new PIDController(0.35, 0, 0);
   private double m_desiredHeading = 0;
   private double m_speedLimiter = 0.6;
+
+  private Translation2d m_offset;
 
   private double m_calc = 0;
 
@@ -52,6 +56,7 @@ public class SwerveSubsystem extends CougarSubsystem {
   public SwerveSubsystem(CougarLibInjectedParameters parameters) {
     super("Swerve Subsystem", parameters);
     CougarLogger logger = getLogger();
+    m_navx2 = new NavxAhrs("Gyroscope");
     m_modules = new SwerveModule[] {
         new SwerveModule("Front Left Module",
             CanBus.frontLeftDriveId, CanBus.frontLeftSteerId,
@@ -70,7 +75,6 @@ public class SwerveSubsystem extends CougarSubsystem {
     m_odometer = new SwerveDrivePoseEstimator(SwerveConfig.kDriveKinematics, getGyroscopeRotation(),
         getModulePositions(), new Pose2d(0, 0, new Rotation2d(0)));
 
-    m_navx2 = new NavxAhrs("Gyroscope");
     addDevice(m_navx2.getName(), m_navx2);
     new Thread(() -> {
       while (m_navx2.isCalibrating()) {
@@ -89,6 +93,8 @@ public class SwerveSubsystem extends CougarSubsystem {
     setRobotRampRate(0.0);
     setRobotIdleMode(IdleMode.kBrake);
 
+    m_offset = new Translation2d();
+    
   }
 
   /**
@@ -206,12 +212,32 @@ public class SwerveSubsystem extends CougarSubsystem {
   }
 
   /**
+   * Gets the roll of the gyro (Y axis of gyro rotation).
+   * 
+   * @return a double representing the roll of robot in degrees
+   */
+  public double getGyroRoll() {
+    return m_navx2.getRoll();
+  }
+
+  /**
+   * Gets the pitch of the gyro (X axis of gyro rotation).
+   * 
+   * @return a double representing the pitch of robot in degrees
+   */
+  public double getGyroPitch() {
+    return m_navx2.getPitch();
+  }
+
+  /**
    * Moves the drivetrain at the given chassis speeds.
    *
    * @param chassisSpeeds the speed to move at
+   * @param offset the swerve module to pivot around
    */
-  public void drive(ChassisSpeeds chassisSpeeds) {
+  public void drive(ChassisSpeeds chassisSpeeds, Translation2d offset) {
     m_chassisSpeeds = chassisSpeeds;
+    m_offset = offset;
   }
 
   /**
@@ -299,13 +325,31 @@ public class SwerveSubsystem extends CougarSubsystem {
     SmartDashboard.putNumber("Gyro Reading", getGyroscopeRotation().getDegrees());
     m_odometer.updateWithTime(Timer.getFPGATimestamp(), getGyroscopeRotation(), getModulePositions());
     SmartDashboard.putString("Odometry", m_odometer.getEstimatedPosition().toString());
+    SmartDashboard.putNumber("Speed", m_speedLimiter);
 
+    SmartDashboard.putNumber("Module Absolute Encoder " + m_modules[0].getName(), 
+        m_modules[0].getAbsoluteAngle());
+    SmartDashboard.putNumber("Module Absolute Encoder " + m_modules[1].getName(), 
+        m_modules[1].getAbsoluteAngle());
+    SmartDashboard.putNumber("Module Absolute Encoder " + m_modules[2].getName(), 
+        m_modules[2].getAbsoluteAngle());
+    SmartDashboard.putNumber("Module Absolute Encoder " + m_modules[3].getName(), 
+        m_modules[3].getAbsoluteAngle());
+
+    SmartDashboard.putNumber("Module Relative Encoder " + m_modules[0].getName(), 
+        m_modules[0].getSteerAngle());
+    SmartDashboard.putNumber("Module Relative Encoder " + m_modules[1].getName(), 
+        m_modules[1].getSteerAngle());
+    SmartDashboard.putNumber("Module Relative Encoder " + m_modules[2].getName(), 
+        m_modules[2].getSteerAngle());
+    SmartDashboard.putNumber("Module Relative Encoder " + m_modules[3].getName(), 
+        m_modules[3].getSteerAngle());
+        
     m_chassisSpeeds = translationalDriftCorrection(m_chassisSpeeds);
     m_chassisSpeeds = rotationalDriftCorrection(m_chassisSpeeds);
 
-    SwerveModuleState[] states = SwerveConfig.kDriveKinematics
-        .toSwerveModuleStates(m_chassisSpeeds);
+    m_states = SwerveConfig.kDriveKinematics.toSwerveModuleStates(m_chassisSpeeds, m_offset);
 
-    setModuleStates(states);
+    setModuleStates(m_states);
   }
 }

@@ -29,10 +29,10 @@ import team1403.lib.util.Dimension;
  */
 public class RobotConfig {
 
-  /**
-   * Variables to used by all subsystems.
-   */
+  //Variables to used by all subsystems.
   public static final Dimension robotDimensions = new Dimension(0, 0, 0);
+  public static final Dimension wristDimensions = new Dimension(0, 0, 0); //TODO
+
 
   public static double kRobotHeight = 32;
   public static double kHeightFromGround = 33.465;
@@ -61,8 +61,8 @@ public class RobotConfig {
     public static final double kITranslation = 0.0;
     public static final double kDTranslation = 0.5;
 
-    public static final double kTrackWidth = Units.inchesToMeters(21);
-    public static final double kWheelBase = Units.inchesToMeters(25.5);
+    public static final double kTrackWidth = Units.inchesToMeters(17.5);
+    public static final double kWheelBase = Units.inchesToMeters(17.5);
 
     public static final SwerveDriveKinematics kDriveKinematics = 
         new SwerveDriveKinematics(
@@ -75,10 +75,10 @@ public class RobotConfig {
             // Back right
             new Translation2d(-kTrackWidth / 2.0, -kWheelBase / 2.0));
 
-    public static final double frontLeftEncoderOffset = -(4.667903537536006 + Math.PI);
-    public static final double frontRightEncoderOffset = -3.109379057044195;
-    public static final double backLeftEncoderOffset = -(4.663301595172349 + Math.PI);
-    public static final double backRightEncoderOffset = -(5.872078456026235 + Math.PI);
+    public static final double frontLeftEncoderOffset = -(4.657165672020807 + Math.PI);
+    public static final double frontRightEncoderOffset = -(3.127786826498822 + (2 * Math.PI));
+    public static final double backLeftEncoderOffset = -(4.680175383839091 + Math.PI);
+    public static final double backRightEncoderOffset = -(2.686000359587758);
 
     public static final double kDriveReduction = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
     public static final double kSteerReduction = (15.0 / 32.0) * (10.0 / 60.0);
@@ -93,11 +93,11 @@ public class RobotConfig {
 
     public static final double kMaxSpeed = 14.5;
 
-    public static final double kMaxAngularSpeed = (kMaxSpeed
-        / Math.hypot(kTrackWidth / 2.0, kWheelBase / 2.0)); // 39.795095397
+    public static final double kMaxAngularSpeed = 50;
+    // (kMaxSpeed / Math.hypot(kTrackWidth / 2.0, kWheelBase / 2.0)); // 39.795095397
 
     public static final double kVoltageSaturation = 12.0;
-    public static final double kCurrentLimit = 20.0;
+    public static final double kCurrentLimit = 40.0;
 
     public static final double kMaxAccelerationMetersPerSecondSquared = 3;
     public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI / 2;
@@ -160,29 +160,27 @@ public class RobotConfig {
   public static class CanBus {
 
     //Arm Ports
-    public static final int wheelIntakeMotor = 5; //Done
-    public static final int telescopicArmMotor = 4; //Done
-    public static final int leftPivotMotor = 2; //Done
-    public static final int rightPivotMotor = 3; //Done
-    public static final int wristMotor = 1; //Done
-    // public static final int frontArmSwitch = 6;
-    // public static final int telescopicSwitch = 7;
+    public static final int wheelIntakeMotor = 5;
+    public static final int telescopicArmMotor = 4;
+    public static final int leftPivotMotor = 2;
+    public static final int rightPivotMotor = 3;
+    public static final int wristMotor = 1;
 
     // Swerve CanBus ids
-    public static final int frontLeftDriveId = 1;
-    public static final int frontLeftSteerId = 2;
+    public static final int frontLeftDriveId = 6;
+    public static final int frontLeftSteerId = 7;
     public static final int frontLeftEncoderId = 3;
 
     public static final int frontRightDriveId = 8;
-    public static final int frontRightSteerId = 3;
+    public static final int frontRightSteerId = 9;
     public static final int frontRightEncoderId = 1;
 
-    public static final int backLeftDriveId = 14;
-    public static final int backLeftSteerId = 9;
+    public static final int backLeftDriveId = 10;
+    public static final int backLeftSteerId = 11;
     public static final int backLeftEncoderId = 2;
 
-    public static final int backRightDriveId = 2;
-    public static final int backRightSteerId = 16;
+    public static final int backRightDriveId = 12;
+    public static final int backRightSteerId = 13;
     public static final int backRightEncoderId = 4;
   }
 
@@ -190,16 +188,6 @@ public class RobotConfig {
    * Ports on the RoboRIO.
    */
   public class RioPorts {
-
-    /**
-     * The rio port that the forward limit switch uses.
-     */
-    public static final int exampleRailForwardLimitSwitch = 1;
-
-    /**
-     * This switch is optional. Set to port -1 if it is not available.
-     */
-    public static final int exampleRailReverseLimitSwitch = 2;
 
     
     public static final int kWristAbsoluteEncoder = 1; //DIO
@@ -278,9 +266,8 @@ public class RobotConfig {
     public static final double kIArmExtension = 0;
     public static final double kDArmExtension = 0; 
     public static final double kMinArmExtension = 0; 
-    public static final double kMaxArmExtension = 23.128; 
+    public static final double kMaxArmExtension = 23.128;  //inches
     public static final double kExtensionConversionFactor = 1.0 / 6;  
-    public static final double kMaxArmLengthOffset = 1; //TODO
     public static final double kArmExtensionMaxAmperage = 20; 
     public static final double maxVerticalAngle = Math.acos(Math.toRadians(44.3 / 60.218)); //TODO
     public static final double angleHittingRobot = 66; //TODO
@@ -288,10 +275,9 @@ public class RobotConfig {
     public static final double kExtensionOffset = 8;
 
     //Dimensions
-    public static final double kBaseArmLength = 31; //37 //28
-    public static final double kPhysicalArmMaxExtension = kBaseArmLength + kMaxArmExtension;
+    public static final double kBaseArmLength = 31; //37 //28 inches
+    public static final double kPhysicalArmMaxExtension = kBaseArmLength + kMaxArmExtension; //inches
 
     public static final double kArmWeight = 16; //Pounds
-    public static final Dimension wristDimensions = new Dimension(0, 0, 0); //TODO
   }
 }

@@ -9,7 +9,6 @@ import java.util.TreeMap;
 import java.util.function.Supplier;
 
 import preview.Robot;
-import preview.Turret;
 import util.Point;
 
 /**
@@ -67,57 +66,6 @@ public class Commands {
 				return output;
 			}
 		});
-		commandMap.put("SetTurretAngle", () -> new RobotCommand("SetTurretAngle", TURRET_COLOR, new NumberField("Angle")) {
-			@Override
-			public Robot applyCommand(Robot initial) {
-				Robot output = initial.getCopy();
-				((Turret) output.getSubsystem("Turret")).setAngle(getNumberFromName("Angle").getValue());
-				return output;
-			}
-		});
-		commandMap.put("DrivePath", ()->new RobotCommand("DrivePath", DRIVE_COLOR, 
-            new NumberField("StartAngle"),
-			new NumberField("EndAngle"), 
-			new ToggleButton("Inverted"),
-            new InteractableList<PointSelect, Point>("Waypoints", "Waypoint", false, PointSelect::new)
-        ) {
-			List<Point> points;
-			@Override
-			@SuppressWarnings("unchecked")
-			public Robot applyCommand(Robot initial) {
-				Robot output = initial.getCopy();
-				List<PointSelect> pointSelections = ((InteractableList<PointSelect, Point>) getInteractable("Waypoints")).getValue();
-				points = new ArrayList<Point>();
-				pointSelections.forEach((PointSelect ps)->points.add(ps.getValue()));
-				if (points.size() > 0) {
-					initial.setPosition(points.get(0));
-					output.setPosition(points.get(points.size()-1));
-				}
-				initial.setAngle(getNumberFromName("StartAngle").getValue());
-				output.setAngle(getNumberFromName("EndAngle").getValue());
-				
-				return output;
-			}
-			@Override
-			public void drawPreview(Graphics g) {
-				super.drawPreview(g);
-				List<Point> scaledPoints = new ArrayList<Point>();
-				for (int i = 0; i < points.size(); i++) {
-					scaledPoints.add(points.get(i).toPixels());
-				}
-				g.setColor(Color.red);
-				for (int i = 0; i < points.size()-1; i++) {
-					scaledPoints.get(i).drawLine(g, scaledPoints.get(i+1));
-				}
-				if (getHovered()) {
-					g.setColor(Color.orange);
-					for (int i = 0; i < scaledPoints.size(); i++) {
-						Point p = scaledPoints.get(i);
-						g.drawString(Integer.toString(i), (int)p.x-3, (int) p.y+3);
-					}
-				}
-			}
-		});
 
 		commandMap.put("SwerveDrivePath", ()->new RobotCommand("SwerveDrivePath", DRIVE_COLOR, 
             new NumberField("StartAngle"),
@@ -159,6 +107,14 @@ public class Commands {
 						g.drawString(Integer.toString(i), (int)p.x-3, (int) p.y+3);
 					}
 				}
+			}
+		});
+
+		commandMap.put("Delay", () -> new RobotCommand("Delay", MISC_COLOR, new NumberField("seconds")) {
+			@Override
+			public Robot applyCommand(Robot initial) {
+				Robot output = initial.getCopy();
+				return output;
 			}
 		});
 	}
