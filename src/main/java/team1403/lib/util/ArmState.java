@@ -1,16 +1,22 @@
 package team1403.lib.util;
 
 import team1403.lib.core.CougarLibInjectedParameters;
-import team1403.robot.chargedup.arm.Arm_Subsystem;
 
-public class ArmState{
+/**
+ * Creates the ArmState class.
+ * 
+ */
+public class ArmState {
   public final double armLength;
   public final double wristAngle;
   public final double armPivot;
   public final double intakeSpeed;
 
+  /**
+   * Initializes the ArmState class.
+   */
   public ArmState(double armLength, double wristAngle, double armPivot,
-    double intakeSpeed, CougarLibInjectedParameters injectedParameters) {
+      double intakeSpeed, CougarLibInjectedParameters injectedParameters) {
     this.armLength = armLength;
     this.wristAngle = wristAngle;
     this.armPivot = armPivot;
@@ -20,8 +26,8 @@ public class ArmState{
 
   @Override
   public String toString() {
-    return "ArmState [armLength=" + armLength + ", wristAngle=" + wristAngle + ", armPivot=" + armPivot
-        + ", intakeSpeed=" + intakeSpeed + "]";
+    return "ArmState [armLength=" + armLength + ", wristAngle=" + wristAngle 
+        + ", armPivot=" + armPivot + ", intakeSpeed=" + intakeSpeed + "]";
   }
 
   @Override
@@ -42,21 +48,28 @@ public class ArmState{
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
+    if (this == obj) {
       return true;
-    if (obj == null)
+    }
+    if (obj == null) {
       return false;
-    if (getClass() != obj.getClass())
+    }
+    if (getClass() != obj.getClass()) {
       return false;
+    }
     ArmState other = (ArmState) obj;
-    if (Double.doubleToLongBits(armLength) != Double.doubleToLongBits(other.armLength))
+    if (Double.doubleToLongBits(armLength) != Double.doubleToLongBits(other.armLength)) {
       return false;
-    if (Double.doubleToLongBits(wristAngle) != Double.doubleToLongBits(other.wristAngle))
+    }
+    if (Double.doubleToLongBits(wristAngle) != Double.doubleToLongBits(other.wristAngle)) {
       return false;
-    if (Double.doubleToLongBits(armPivot) != Double.doubleToLongBits(other.armPivot))
+    }
+    if (Double.doubleToLongBits(armPivot) != Double.doubleToLongBits(other.armPivot)) {
       return false;
-    if (Double.doubleToLongBits(intakeSpeed) != Double.doubleToLongBits(other.intakeSpeed))
+    }
+    if (Double.doubleToLongBits(intakeSpeed) != Double.doubleToLongBits(other.intakeSpeed)) {
       return false;
+    }  
     return true;
   }
 

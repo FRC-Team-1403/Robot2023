@@ -20,11 +20,6 @@ public class ManualArmCommand extends CommandBase {
 
 
   private final Arm_Subsystem m_arm;
-
-  private double m_pivotAngle;
-  private double m_wristAngle;
-  private double m_armExtension;
-
   /**
    * Defines the constructor for ArmCommands,
    * sets the instant class level vaiables,
@@ -35,11 +30,10 @@ public class ManualArmCommand extends CommandBase {
    * @param wristAngle function that determines wrist angle, -1 to 1
    * @param armExtensionDecrease function that determines
     the increase of arm extension, 0 to 1
-   * @param armExtensionDecrease function that determines
     the decrease of arm extension, 0 to 1
    */
   public ManualArmCommand(Arm_Subsystem arm, DoubleSupplier armAngle, DoubleSupplier wristAngle,
-  DoubleSupplier armExtensionDecrease, DoubleSupplier armExtensionIncrease,
+      DoubleSupplier armExtensionDecrease, DoubleSupplier armExtensionIncrease,
         BooleanSupplier wheelIntake, BooleanSupplier wheelOuttake) {
     this.m_wheelIntakeSupplier = wheelIntake;
     this.m_arm = arm;
@@ -53,42 +47,35 @@ public class ManualArmCommand extends CommandBase {
   }
 
   @Override
-  public void initialize() {
-    this.m_pivotAngle = m_arm.getAbsolutePivotAngle();
-    this.m_wristAngle = m_arm.getWristAbsoluteAngle();
-    this.m_armExtension = m_arm.getExtensionLength();
-    System.out.println("Angle: " + m_wristAngle);
-    super.initialize();
-  }
-
-  @Override
   public void execute() {
-    m_wristAngle += m_wristAngleSupplier.getAsDouble() * 4;
-    m_wristAngle = m_arm.limitWristAngle(m_wristAngle);
+    double pivotAngle = m_arm.getPivotAngleSetpoint();
+    double wristAngle = m_arm.getWristAngleSetpoint();
+    double armExtension = m_arm.getExtensionLengthSetpoint();
 
-    m_pivotAngle += (-1 * m_armAngleSupplier.getAsDouble());
-    m_pivotAngle = m_arm.limitPivotAngle(m_pivotAngle);
+    wristAngle += m_wristAngleSupplier.getAsDouble() * 4;
+    wristAngle = m_arm.limitWristAngle(wristAngle);
 
-    if(m_armExtensionDecreaseSupplier.getAsDouble() > 0) {
-      m_armExtension -= m_armExtensionDecreaseSupplier.getAsDouble() / 2;
-    } else if(m_armExtensionIncreaseSupplier.getAsDouble() > 0) {
-      m_armExtension += m_armExtensionIncreaseSupplier.getAsDouble() / 2;
+    pivotAngle += (-1 * m_armAngleSupplier.getAsDouble());
+    pivotAngle = m_arm.limitPivotAngle(pivotAngle);
+
+    if (m_armExtensionDecreaseSupplier.getAsDouble() > 0) {
+      armExtension -= m_armExtensionDecreaseSupplier.getAsDouble() / 2;
+    } else if (m_armExtensionIncreaseSupplier.getAsDouble() > 0) {
+      armExtension += m_armExtensionIncreaseSupplier.getAsDouble() / 2;
     }
 
-    m_armExtension = m_arm.limitExtensionLength(m_armExtension);
+    armExtension = m_arm.limitExtensionLength(armExtension);
 
-    SmartDashboard.putNumber("Arm Extension Setpoint", m_armExtension);
+    SmartDashboard.putNumber("Arm Extension Setpoint", armExtension);
 
-    if(this.m_wheelIntakeSupplier.getAsBoolean()) {
-      m_arm.moveArm(m_wristAngle, -0.75, m_pivotAngle, m_armExtension);
-    } else if(this.m_wheelOuttakeSupplier.getAsBoolean()) {
-      m_arm.moveArm(m_wristAngle, 0.75, m_pivotAngle, m_armExtension);
-    }else {
-      m_arm.moveArm(m_wristAngle, 0, m_pivotAngle, m_armExtension);
+    if (this.m_wheelIntakeSupplier.getAsBoolean()) {
+      m_arm.moveArm(wristAngle, -0.75, pivotAngle, armExtension);
+    } else if (this.m_wheelOuttakeSupplier.getAsBoolean()) {
+      m_arm.moveArm(wristAngle, 0.75, pivotAngle, armExtension);
+    } else {
+      m_arm.moveArm(wristAngle, 0, pivotAngle, armExtension);
     }
 
-
-    
   }
 
 }
