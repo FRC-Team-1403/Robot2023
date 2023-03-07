@@ -53,36 +53,4 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
 
   public void updatePos(Pose2d pose) {
   }
-
-  @Override
-  public void periodic() {
-    // SmartDashboard.putNumber("X val", getLimelightBasedPose().getX());
-    // SmartDashboard.putNumber("Y val", getLimelightBasedPose().getY());
-
-    if(photonPose.isPresent()) {
-      photonPose = photonPoseEstimator.update();
-      double time = photonPose.get().timestampSeconds;
-      swervePoseEstimator.addVisionMeasurement(photonPose.get().estimatedPose.toPose2d(), time - this.timeStamp);
-      this.timeStamp = time;
-    }
-    if(limeLight.getLatestResult().hasTargets()){
-      target = limeLight.getLatestResult().getBestTarget().getBestCameraToTarget();
-      SmartDashboard.putNumber("X Distance", target.getX());
-      SmartDashboard.putNumber("Y Distance", target.getY());
-      SmartDashboard.putNumber("Theta of April Tag", target.getRotation().toRotation2d().getDegrees());
-    }
-
-    var targets = limeLight.getLatestResult().getTargets();
-    if (limeLight.getLatestResult().hasTargets()) {
-    }
-    int lowestTargetIndex = 0;
-    for (int i = 0; i < targets.size(); i++) {
-      if (targets.get(i).getPitch() < targets.get(lowestTargetIndex).getPitch()) {
-        lowestTargetIndex = i;
-      }
-
-      SmartDashboard.putNumber("Reflective Tape Distance", PhotonUtils.calculateDistanceToTargetMeters(0.727, 0.662,
-          Math.PI / 60, targets.get(lowestTargetIndex).getPitch()));
-    }
-  }
 }
