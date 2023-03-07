@@ -13,9 +13,9 @@ import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarSubsystem;
+import team1403.lib.device.AdvancedMotorController.CougarIdleMode;
 import team1403.lib.device.wpi.CougarSparkMax;
 import team1403.lib.device.wpi.WpiLimitSwitch;
 import team1403.lib.util.ArmState;
@@ -138,6 +138,9 @@ public class Arm_Subsystem extends CougarSubsystem {
     m_leftPivotMotor.setSmartCurrentLimit(25);
     m_rightPivotMotor.follow(m_leftPivotMotor, true);
 
+    //intake
+    m_wristMotor.setIdleMode(CougarIdleMode.BRAKE);
+
     // Extension
     final SparkMaxPIDController extensionController = m_extensionMotor.getPIDController();
     m_extensionMotor.setIdleMode(IdleMode.kBrake);
@@ -246,8 +249,9 @@ public class Arm_Subsystem extends CougarSubsystem {
     while (normalizedCurrentAngle > 90) {
       normalizedCurrentAngle -= 90;
     }
-    double armLength = RobotConfig.Arm.kBaseArmLength + 0;
-    double gravityCompensationFactor = 0.001 * armLength;
+    double armLength = RobotConfig.Arm.kBaseArmLength + getExtensionLength();
+    double gravityCompensationFactor = 0.0018
+     * armLength;
     double feedforward = gravityCompensationFactor
         * Math.cos(Math.toRadians(normalizedCurrentAngle));
     if ((currentAngle < 90 && currentAngle > 0) || (currentAngle > 270 && currentAngle < 360)) {
@@ -334,12 +338,16 @@ public class Arm_Subsystem extends CougarSubsystem {
    * @return the arm length.
    */
   public double dynamicExtensionLimit(double extensionLength) {
-    if (getAbsolutePivotAngle() >= RobotConfig.Arm.kFrameAngle) {
+    if (getAbsolutePivotAngle() >= RobotConfig.Arm.kFrameClearanceAngle) {
       return 0;
     } else if (getAbsolutePivotAngle() > RobotConfig.Arm.kHorizonAngle
-        && getAbsolutePivotAngle() < RobotConfig.Arm.kFrameAngle) {
+        && getAbsolutePivotAngle() <= RobotConfig.Arm.kFrameClearanceAngle) {
       double maxLength = theoreticalExtensionLength(
           getAbsolutePivotAngle(), RobotConfig.kHeightFromGround);
+      return MathUtil.clamp(extensionLength, 0, maxLength);
+    } else if (getAbsolutePivotAngle() > RobotConfig.Arm.kHorizonAngle
+          && getAbsolutePivotAngle() <= RobotConfig.Arm.kFrameAngle) {
+      double maxLength = -4 * getAbsolutePivotAngle()  + 897;
       return MathUtil.clamp(extensionLength, 0, maxLength);
     }
     return extensionLength;

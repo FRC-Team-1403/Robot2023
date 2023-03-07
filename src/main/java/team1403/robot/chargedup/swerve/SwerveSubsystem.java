@@ -326,24 +326,6 @@ public class SwerveSubsystem extends CougarSubsystem {
     m_odometer.updateWithTime(Timer.getFPGATimestamp(), getGyroscopeRotation(), getModulePositions());
     SmartDashboard.putString("Odometry", m_odometer.getEstimatedPosition().toString());
     SmartDashboard.putNumber("Speed", m_speedLimiter);
-
-    SmartDashboard.putNumber("Module Absolute Encoder " + m_modules[0].getName(), 
-        m_modules[0].getAbsoluteAngle());
-    SmartDashboard.putNumber("Module Absolute Encoder " + m_modules[1].getName(), 
-        m_modules[1].getAbsoluteAngle());
-    SmartDashboard.putNumber("Module Absolute Encoder " + m_modules[2].getName(), 
-        m_modules[2].getAbsoluteAngle());
-    SmartDashboard.putNumber("Module Absolute Encoder " + m_modules[3].getName(), 
-        m_modules[3].getAbsoluteAngle());
-
-    SmartDashboard.putNumber("Module Relative Encoder " + m_modules[0].getName(), 
-        m_modules[0].getSteerAngle());
-    SmartDashboard.putNumber("Module Relative Encoder " + m_modules[1].getName(), 
-        m_modules[1].getSteerAngle());
-    SmartDashboard.putNumber("Module Relative Encoder " + m_modules[2].getName(), 
-        m_modules[2].getSteerAngle());
-    SmartDashboard.putNumber("Module Relative Encoder " + m_modules[3].getName(), 
-        m_modules[3].getSteerAngle());
         
     m_chassisSpeeds = translationalDriftCorrection(m_chassisSpeeds);
     m_chassisSpeeds = rotationalDriftCorrection(m_chassisSpeeds);
