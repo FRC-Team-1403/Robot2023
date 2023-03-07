@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarRobot;
@@ -150,6 +151,10 @@ public class CougarRobotImpl extends CougarRobot {
           p.getDouble("StartAngle"),
           p.getDouble("EndAngle"),
           wayPoints);
+    });
+
+    m_reader.registerCommand("Delay", (CougarScriptObject p) -> {
+      return new WaitCommand(p.getDouble("seconds"));
     });
   }
 
