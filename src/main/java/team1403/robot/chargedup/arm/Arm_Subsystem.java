@@ -89,7 +89,7 @@ public class Arm_Subsystem extends CougarSubsystem {
     m_maxMagneticSwitch = new DigitalInput(RobotConfig.RioPorts.kExtensionMaxMagneticSwitch);
 
     this.m_pivotAngleSetpoint = getAbsolutePivotAngle();
-    this.m_wristAngleSetpoint = getWristAbsoluteAngle();
+    this.m_wristAngleSetpoint = getAbsoluteWristAngle();
     this.m_extensionLengthSetpoint = getExtensionLength();
 
   }
@@ -103,7 +103,7 @@ public class Arm_Subsystem extends CougarSubsystem {
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
-      double wristAngle = getWristAbsoluteAngle();
+      double wristAngle = getAbsoluteWristAngle();
       m_wristMotor.getEncoder().setPosition(wristAngle);
       m_wristAngleSetpoint = wristAngle;
     }).start();
@@ -175,7 +175,7 @@ public class Arm_Subsystem extends CougarSubsystem {
    *
    * @return The absolute encoder value of the wrist.
    */
-  public double getWristAbsoluteAngle() {
+  public double getAbsoluteWristAngle() {
     double value = (m_wristAbsoluteEncoder.getAbsolutePosition() * 360) + m_absoluteWristOffset;
 
     if (value < 0) {
@@ -374,6 +374,30 @@ public class Arm_Subsystem extends CougarSubsystem {
     this.m_extensionLengthSetpoint = state.armLength;
   }
 
+  /** Returns whether the arm is at the current setpoint.
+   *
+   * @return true if the arm is at the current setpoint.
+   */
+  public boolean isArmAtSetpoint() {
+    double currentPivotAngle = getAbsolutePivotAngle();
+    double currentWristAngle = getAbsoluteWristAngle();
+    double currentExtensionLength = getExtensionLength();
+
+    if(Math.abs(currentPivotAngle - this.m_pivotAngleSetpoint) > 2) {
+      return false;
+    }
+
+    if(Math.abs(currentWristAngle - this.m_wristAngleSetpoint) > 2) {
+      return false;
+    } 
+
+    if(Math.abs(currentExtensionLength - this.m_extensionLengthSetpoint) > 0.5) {
+      return false;
+    }
+
+    return true;
+  }
+
   @Override
   public void periodic() {
     // Wrist
@@ -425,7 +449,7 @@ public class Arm_Subsystem extends CougarSubsystem {
     }
 
     // Track Values
-    SmartDashboard.putNumber("Wrist Angle", getWristAbsoluteAngle());
+    SmartDashboard.putNumber("Wrist Angle", getAbsoluteWristAngle());
     SmartDashboard.putNumber("Pivot Angle", getAbsolutePivotAngle());
     SmartDashboard.putNumber("Extension Length", getExtensionLength());
 
