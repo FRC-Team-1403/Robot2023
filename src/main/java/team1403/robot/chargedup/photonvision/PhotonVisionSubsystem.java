@@ -4,14 +4,18 @@
 
 package team1403.robot.chargedup.photonvision;
 
+import java.io.IOException;
 import java.util.Optional;
 
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.net.PortForwarder;
-
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarSubsystem;
 import team1403.robot.chargedup.RobotConfig.VisionConfig;
@@ -35,9 +39,11 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
    *
    * @param injectedParameters
    * 
+   * @param alliance
+   * 
    */
-  public PhotonVisionSubsystem(CougarLibInjectedParameters injectedParameters) {
-    super("Vision Subsystem", injectedParameters);
+  public PhotonVisionSubsystem(CougarLibInjectedParameters injectedParameter, String alliance) {
+    super("Vision Subsystem", injectedParameter);
     PortForwarder.add(5800, "photonvision.local", 5800);
 
     m_limeLight = new PhotonCamera("OV5647");
@@ -45,12 +51,17 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
     m_limeLight.setPipelineIndex(0);
     // 0: April Tags
     // 1: Reflective Tape
-
+    if (alliance == "R") {
+      VisionConfig.fieldLayout.setOrigin(OriginPosition.kRedAllianceWallRightSide);
+    } else {
+      VisionConfig.fieldLayout.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
+    }
     m_photonPoseEstimator = new PhotonPoseEstimator(VisionConfig.fieldLayout, 
     PoseStrategy.MULTI_TAG_PNP, m_limeLight,
         new Transform3d(new Translation3d(12, 8, 30), new Rotation3d(0.0523599, 0, 0)));
 
     m_photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
+    
   }
 
   /**

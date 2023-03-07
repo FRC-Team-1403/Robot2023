@@ -4,7 +4,9 @@ import java.util.Arrays;
 
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -108,6 +110,24 @@ public class RobotConfig {
   }
 
   public static class VisionConfig {
+    public static String Alliance = "B";
+
+    public static Pose2d[] reflectiveTapeLayout = new Pose2d[]{
+     new Pose2d(new Translation2d(Units.inchesToMeters(20), Units.inchesToMeters(30)), new Rotation2d()),
+     new Pose2d(new Translation2d(Units.inchesToMeters(64), Units.inchesToMeters(30)), new Rotation2d()),
+     new Pose2d(new Translation2d(Units.inchesToMeters(84), Units.inchesToMeters(30)), new Rotation2d()),
+     new Pose2d(new Translation2d(Units.inchesToMeters(124), Units.inchesToMeters(30)), new Rotation2d()),
+     new Pose2d(new Translation2d(Units.inchesToMeters(144), Units.inchesToMeters(30)), new Rotation2d()),
+     new Pose2d(new Translation2d(Units.inchesToMeters(204), Units.inchesToMeters(30)), new Rotation2d()),
+     new Pose2d(new Translation2d(Units.inchesToMeters(20), Units.inchesToMeters(621)), new Rotation2d()),
+     new Pose2d(new Translation2d(Units.inchesToMeters(64), Units.inchesToMeters(621)), new Rotation2d()),
+     new Pose2d(new Translation2d(Units.inchesToMeters(84), Units.inchesToMeters(621)), new Rotation2d()),
+     new Pose2d(new Translation2d(Units.inchesToMeters(124), Units.inchesToMeters(621)), new Rotation2d()),
+     new Pose2d(new Translation2d(Units.inchesToMeters(144), Units.inchesToMeters(621)), new Rotation2d()),
+     new Pose2d(new Translation2d(Units.inchesToMeters(204), Units.inchesToMeters(621)), new Rotation2d())
+  };
+
+
     public static AprilTagFieldLayout fieldLayout = new AprilTagFieldLayout(Arrays.asList(
       new AprilTag(1,   (new Pose3d(
         Units.inchesToMeters(610.77),
@@ -149,6 +169,8 @@ public class RobotConfig {
         Units.inchesToMeters(42.19),
         Units.inchesToMeters(18.22),
         new Rotation3d()))), Units.inchesToMeters(651.25), Units.inchesToMeters(315.5));
+      
+    
   }
 
   /**

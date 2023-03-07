@@ -4,10 +4,12 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarRobot;
 import team1403.lib.subsystems.BuiltinSubsystem;
 import team1403.lib.util.CougarLogger;
+import team1403.robot.chargedup.RobotConfig.VisionConfig;
 import team1403.robot.chargedup.photonvision.PhotonVisionDefault;
 import team1403.robot.chargedup.photonvision.PhotonVisionSubsystem;
 import team1403.robot.chargedup.swerve.SwerveCommand;
@@ -41,7 +43,7 @@ public class CougarRobotImpl extends CougarRobot {
         
     m_builtins = new BuiltinSubsystem(parameters, logger);
     m_swerveSubsystem = new SwerveSubsystem(parameters);
-    m_visionSubsystem = new PhotonVisionSubsystem(parameters);
+    m_visionSubsystem = new PhotonVisionSubsystem(parameters, VisionConfig.Alliance);
     // m_arm = new Arm(parameters);
     // m_swerveSubsystem = new SwerveSubsystem(parameters);
 
