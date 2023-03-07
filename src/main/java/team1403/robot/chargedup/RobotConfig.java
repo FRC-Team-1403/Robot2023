@@ -29,10 +29,10 @@ import team1403.lib.util.Dimension;
  */
 public class RobotConfig {
 
-  /**
-   * Variables to used by all subsystems.
-   */
+  //Variables to used by all subsystems.
   public static final Dimension robotDimensions = new Dimension(0, 0, 0);
+  public static final Dimension wristDimensions = new Dimension(0, 0, 0); //TODO
+
 
   public static double kRobotHeight = 32;
   public static double kHeightFromGround = 33.465;
@@ -266,9 +266,8 @@ public class RobotConfig {
     public static final double kIArmExtension = 0;
     public static final double kDArmExtension = 0; 
     public static final double kMinArmExtension = 0; 
-    public static final double kMaxArmExtension = 23.128; 
+    public static final double kMaxArmExtension = 23.128;  //inches
     public static final double kExtensionConversionFactor = 1.0 / 6;  
-    public static final double kMaxArmLengthOffset = 1; //TODO
     public static final double kArmExtensionMaxAmperage = 20; 
     public static final double maxVerticalAngle = Math.acos(Math.toRadians(44.3 / 60.218)); //TODO
     public static final double angleHittingRobot = 66; //TODO
@@ -276,10 +275,9 @@ public class RobotConfig {
     public static final double kExtensionOffset = 8;
 
     //Dimensions
-    public static final double kBaseArmLength = 31; //37 //28
-    public static final double kPhysicalArmMaxExtension = kBaseArmLength + kMaxArmExtension;
+    public static final double kBaseArmLength = 31; //37 //28 inches
+    public static final double kPhysicalArmMaxExtension = kBaseArmLength + kMaxArmExtension; //inches
 
     public static final double kArmWeight = 16; //Pounds
-    public static final Dimension wristDimensions = new Dimension(0, 0, 0); //TODO
   }
 }

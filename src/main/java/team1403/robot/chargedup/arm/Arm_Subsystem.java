@@ -334,7 +334,6 @@ public class Arm_Subsystem extends CougarSubsystem {
    * @return the arm length.
    */
   public double dynamicExtensionLimit(double extensionLength) {
-
     if (getAbsolutePivotAngle() >= RobotConfig.Arm.kFrameAngle) {
       return 0;
     } else if (getAbsolutePivotAngle() > RobotConfig.Arm.kHorizonAngle
@@ -363,7 +362,7 @@ public class Arm_Subsystem extends CougarSubsystem {
   }
 
   /**
-   * sets arm values based off of the ArmState class.
+   * Sets arm values based off of the ArmState class.
    *
    * @param state ArmState class.
    */
