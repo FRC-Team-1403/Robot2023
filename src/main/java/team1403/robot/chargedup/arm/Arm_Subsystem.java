@@ -88,7 +88,7 @@ public class Arm_Subsystem extends CougarSubsystem {
     m_maxMagneticSwitch = new DigitalInput(RobotConfig.RioPorts.kExtensionMaxMagneticSwitch);
 
     this.m_pivotAngleSetpoint = getAbsolutePivotAngle();
-    this.m_wristAngleSetpoint = getAbsoluteWristAngle();
+    this.m_wristAngleSetpoint = getRelativeWristAngle();
     this.m_extensionLengthSetpoint = getExtensionLength();
 
   }
@@ -102,7 +102,7 @@ public class Arm_Subsystem extends CougarSubsystem {
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
-      double wristAngle = getAbsoluteWristAngle();
+      double wristAngle = getRelativeWristAngle();
       m_wristMotor.getEncoder().setPosition(wristAngle);
       m_wristAngleSetpoint = wristAngle;
     }).start();
@@ -177,7 +177,7 @@ public class Arm_Subsystem extends CougarSubsystem {
    *
    * @return The absolute encoder value of the wrist.
    */
-  public double getAbsoluteWristAngle() {
+  public double getRelativeWristAngle() {
     double value = (m_wristAbsoluteEncoder.getAbsolutePosition() * 360) + m_absoluteWristOffset;
 
     if (value < 0) {
@@ -355,14 +355,14 @@ public class Arm_Subsystem extends CougarSubsystem {
   /**
    * Sets values that the arm uses.
    *
-   * @param absoluteAngle   the wrist absolute angle.
+   * @param wristAngle   the wrist absolute angle.
    * @param intakeSpeed     intake speed.
    * @param pivotAngle      the pivot angle.
    * @param extensionLength the extension length.
    */
-  public void moveArm(double absoluteAngle, double intakeSpeed,
+  public void moveArm(double wristAngle, double intakeSpeed,
       double pivotAngle, double extensionLength) {
-    this.m_wristAngleSetpoint = absoluteAngle;
+    this.m_wristAngleSetpoint = wristAngle;
     this.m_intakeSpeedSetpoint = intakeSpeed;
     this.m_pivotAngleSetpoint = pivotAngle;
     this.m_extensionLengthSetpoint = extensionLength;
@@ -384,9 +384,9 @@ public class Arm_Subsystem extends CougarSubsystem {
    *
    * @return true if the arm is at the current setpoint.
    */
-  public boolean isArmAtSetpoint() {
+  public boolean isAtSetpoint() {
     double currentPivotAngle = getAbsolutePivotAngle();
-    double currentWristAngle = getAbsoluteWristAngle();
+    double currentWristAngle = getRelativeWristAngle();
     double currentExtensionLength = getExtensionLength();
 
     if(Math.abs(currentPivotAngle - this.m_pivotAngleSetpoint) > 2) {
@@ -455,7 +455,7 @@ public class Arm_Subsystem extends CougarSubsystem {
     }
 
     // Track Values
-    SmartDashboard.putNumber("Wrist Angle", getAbsoluteWristAngle());
+    SmartDashboard.putNumber("Wrist Angle", getRelativeWristAngle());
     SmartDashboard.putNumber("Pivot Angle", getAbsolutePivotAngle());
     SmartDashboard.putNumber("Extension Length", getExtensionLength());
 

@@ -23,11 +23,12 @@ public class SetpointArmCommand extends CommandBase {
   
   @Override
   public void execute() {
+
     m_arm.moveArm(m_state);
   }
 
   @Override
   public boolean isFinished() {
-    return m_arm.isArmAtSetpoint();
+    return m_arm.isAtSetpoint();
   }
 }
