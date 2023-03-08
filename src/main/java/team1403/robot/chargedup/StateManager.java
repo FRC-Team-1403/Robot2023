@@ -2,124 +2,84 @@ package team1403.robot.chargedup;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import team1403.robot.chargedup.arm.ArmStateGroup;
 
 public class StateManager {
-    public ArmPosition armPosition = ArmPosition.NA;
-    public ScoringShelves scoringShelves = ScoringShelves.NA;
-    public ScoringNodes scoringNodes = ScoringNodes.NA;
-    public ScoringHybrid scoringHybrid = ScoringHybrid.NA;
-    public Alliance alliance;
 
-    public double armAngle;
-    public double wristAngle;
-    public double armExtension; 
+  private Alliance alliance;
 
-    public GamePiece gamePiece = GamePiece.NA;
+  private ArmStateGroup currentArmGroup;
+  private ArmStateGroup cubeGroup;
+  private ArmStateGroup coneUprightGroup;
+  private ArmStateGroup coneTowardsGroup;
+  private ArmStateGroup coneAwayGroup;
 
-    public enum ArmPosition {
-        LOW,
-        MID,
-        HIGH,
-        SHELF,
-        FLOOR,
-        NA
+  private GamePiece gamePiece = GamePiece.NA;
+
+  public enum GamePiece {
+    CUBE,
+    CONE_SIDEWAYS,
+    CONE_AWAY,
+    CONE_UPRIGHT,
+    CONE_TOWARDS,
+    NA
+  }
+
+  private static StateManager instance = null;
+
+  private StateManager() {
+    alliance = DriverStation.getAlliance();
+  }
+
+  public static StateManager getInstance() {
+    if (instance == null) {
+      instance = new StateManager();
     }
-    
-    public enum GamePiece {
-        CUBE,
-        CONESIDEWAYS,
-        CONEAWAY,
-        CONEUPRIGHT,
-        CONETOWARDS,
-        NA
-    }
+    return instance;
+  }
 
-    public enum ScoringShelves {
-        SHELF1,
-        SHELF2,
-        SHELF3,
-        SHELF4,
-        SHELF5,
-        SHELF6,
-        NA
+  public void updateState(GamePiece newGamePiece, Runnable switchPipeline) {
+    switchPipeline.run();
+    this.gamePiece = newGamePiece;
+    switch (newGamePiece) {
+      case CUBE: {
+        currentArmGroup = cubeGroup;
+        break;
+      }
+       case CONE_UPRIGHT: {
+        currentArmGroup = coneUprightGroup;
+        break;
+       }
+       case CONE_AWAY: {
+        currentArmGroup = coneAwayGroup;
+        break;
+       }
+       case CONE_TOWARDS: {
+        currentArmGroup = coneTowardsGroup;
+        break;
+       }
+       case CONE_SIDEWAYS: {
+        SmartDashboard.putString("Operator Message", "Sideways cone found. Cannot intake.");
+        break;
+       }
+       case NA: {
+        SmartDashboard.putString("Operator Message", "No game piece found.");
+        break;
+       }
     }
+  }
 
-    public enum ScoringNodes {
-        NODE1,
-        NODE2,
-        NODE3,
-        NODE4,
-        NODE5,
-        NODE6,
-        NODE7,
-        NODE8,
-        NA
-    }
+  public Alliance getAlliance() {
+    return alliance;
+  }
 
-    public enum ScoringHybrid {
-        HYBRID1,
-        HYBRID2,
-        HYBRID3,
-        HYBRID4,
-        HYBRID5,
-        HYBRID6,
-        HYBRID7,
-        HYBRID8,
-        HYBRID9,
-        NA
-    }
+  public ArmStateGroup getCurrentArmGroup() {
+    return currentArmGroup;
+  }
 
-    private StateManager() {
-        alliance = DriverStation.getAlliance();
-    }
+  public GamePiece getGamePiece() {
+    return gamePiece;
+  }
 
-    public static StateManager getInstance() {
-        if(inst == null) {
-            inst = new StateManager();
-        }
-        return inst;
-    }
-
-    public void updateScoringShelf() {
-        switch (scoringShelves) {
-            case NA: 
-                armAngle = 0;
-                wristAngle = 0;
-                armExtension = 0;
-                break;
-            case SHELF1:
-                armAngle = 1;
-                wristAngle = 1;
-                armExtension = 1;
-                break;
-            case SHELF2:
-                armAngle = 2;
-                wristAngle = 2;
-                armExtension = 2;
-                break;
-            case SHELF3:
-                armAngle = 3;
-                wristAngle = 3;
-                armExtension = 3;
-                break;
-            case SHELF4:
-                armAngle = 4;
-                wristAngle = 4;
-                armExtension = 4;
-                break;
-            case SHELF5:
-                armAngle = 5;
-                wristAngle = 5;
-                armExtension = 5;
-                break;
-            case SHELF6:
-                armAngle = 6;
-                wristAngle = 6;
-                armExtension = 6;
-                break;           
-            
-        }   
-    }
-
-    private static StateManager inst = null;
 }
