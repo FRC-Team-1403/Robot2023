@@ -28,15 +28,17 @@ public class StateManager {
 
   private static StateManager instance = null;
 
-  private StateManager() {
-    alliance = DriverStation.getAlliance();
-  }
+  private StateManager() {}
 
   public static StateManager getInstance() {
     if (instance == null) {
       instance = new StateManager();
     }
     return instance;
+  }
+
+  public void init() {
+    alliance = DriverStation.getAlliance();
   }
 
   public void updateState(GamePiece newGamePiece, Runnable switchPipeline) {
