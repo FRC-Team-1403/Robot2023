@@ -53,25 +53,4 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
 
   public void updatePos(Pose2d pose) {
   }
-
-  @Override
-  public void periodic() {
-    Optional<EstimatedRobotPose> photonPose = photonPoseEstimator.update();
-    if (photonPose.isPresent()) {
-      SmartDashboard.putString("Odometry", photonPose.get().estimatedPose.toString());
-    }
-
-    var targets = limeLight.getLatestResult().getTargets();
-    if (limeLight.getLatestResult().hasTargets()) {
-    }
-    int lowestTargetIndex = 0;
-    for (int i = 0; i < targets.size(); i++) {
-      if (targets.get(i).getPitch() < targets.get(lowestTargetIndex).getPitch()) {
-        lowestTargetIndex = i;
-      }
-
-      SmartDashboard.putNumber("Reflective Tape Distance", PhotonUtils.calculateDistanceToTargetMeters(0.727, 0.662,
-          Math.PI / 60, targets.get(lowestTargetIndex).getPitch()));
-    }
-  }
 }

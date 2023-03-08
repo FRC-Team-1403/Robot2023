@@ -2,17 +2,9 @@ package team1403.robot.chargedup;
 
 import java.util.List;
 
-import com.revrobotics.CANSparkMax.IdleMode;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-
-// import java.util.List;
-
-// import edu.wpi.first.math.geometry.Pose2d;
-// import edu.wpi.first.math.geometry.Rotation2d;
-// import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,33 +14,26 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarRobot;
-import team1403.lib.subsystems.BuiltinSubsystem;
 import team1403.lib.util.CougarLogger;
 import team1403.robot.chargedup.cse.CougarScriptObject;
 import team1403.robot.chargedup.cse.CougarScriptReader;
-import team1403.robot.chargedup.photonvision.PhotonVisionSubsystem;
 import team1403.robot.chargedup.swerve.SwerveAutoBalanceYaw;
 import team1403.robot.chargedup.swerve.SwerveCommand;
 import team1403.robot.chargedup.swerve.SwerveDrivePath;
 import team1403.robot.chargedup.swerve.SwerveSubsystem;
-import team1403.robot.chargedup.RobotConfig.DriverConfig;
 import team1403.robot.chargedup.RobotConfig.OperatorConfig;
 import team1403.robot.chargedup.arm.Arm_Subsystem;
 import team1403.robot.chargedup.arm.ManualArmCommand;
-// import team1403.robot.chargedup.cse.CougarScriptObject;
-import team1403.robot.chargedup.cse.CougarScriptReader;
-// import team1403.robot.chargedup.photonvision.PhotonVisionSubsystem;
-// import team1403.robot.chargedup.swerve.SwerveCommand;
-// import team1403.robot.chargedup.swerve.SwerveDrivePath;
-// import team1403.robot.chargedup.swerve.SwerveSubsystem;
 
 /**
  * The heart of the robot.
  *
- * <p>The bulk of the robot will be implemented through various subsystems.
+ * <p>
+ * The bulk of the robot will be implemented through various subsystems.
  * This class creates those subsystems and configures their behaviors.
  *
- * <p>This class has little to do with the runtime operation. It acts more as
+ * <p>
+ * This class has little to do with the runtime operation. It acts more as
  * a factory to create the subsystems and write them together and to external
  * controls (both human and software). Once that has happened, the controls
  * take over and issue commands that interact with the subsystem to actually
@@ -106,8 +91,8 @@ public class CougarRobotImpl extends CougarRobot {
         () -> xboxDriver.getLeftTriggerAxis())
     );
 
-    new Trigger(() -> xboxDriver.getLeftBumper()).onFalse(
-        new InstantCommand(() -> m_swerveSubsystem.decreaseSpeed(0.2)));
+  //   new Trigger(() -> xboxDriver.getRightBumper()).onFalse(
+  //       new InstantCommand(() -> m_swerveSubsystem.increaseSpeed(0.2)));
 
     new Trigger(() -> xboxDriver.getRightBumper()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.increaseSpeed(0.2)));
@@ -139,38 +124,37 @@ public class CougarRobotImpl extends CougarRobot {
   }
 
 
+  /**
+   * Use this to pass the autonomous command to the main {@link Robot} class.
+   *
+   * @return the command to run in autonomous
+   */
+  // private void registerAutoCommands() {
+  //   m_reader = new CougarScriptReader((Pose2d startPose) -> {
+  //     double feetToMeters = 0.30478512648;
 
-  // /**
-  //  * Use this to pass the autonomous command to the main {@link Robot} class.
-  //  *
-  //  * @return the command to run in autonomous
-  //  */
-  private void registerAutoCommands() {
-    m_reader = new CougarScriptReader((Pose2d startPose) -> {
-      double feetToMeters = 0.30478512648;
+  //     Translation2d flippedXandY = new Translation2d(
+  //         startPose.getY() * feetToMeters, startPose.getX() * feetToMeters);
 
-      Translation2d flippedXandY = new Translation2d(
-          startPose.getY() * feetToMeters, startPose.getX() * feetToMeters);
+  //     Rotation2d theta = new Rotation2d(
+  //         startPose.getRotation().getDegrees());
 
-      Rotation2d theta = new Rotation2d(
-          startPose.getRotation().getDegrees());
+  //     Pose2d transformedStartPose = new Pose2d(flippedXandY, theta);
+  //     m_swerveSubsystem.setPose(transformedStartPose);
+  //   });
 
-      Pose2d transformedStartPose = new Pose2d(flippedXandY, theta);
-      m_swerveSubsystem.setPose(transformedStartPose);
-    });
+  //   m_reader.registerCommand("SwerveDrivePath", (CougarScriptObject p) -> {
+  //     List<Translation2d> wayPoints = p.getPointList("Waypoints");
+  //     return new SwerveDrivePath(m_swerveSubsystem,
+  //         p.getDouble("StartAngle"),
+  //         p.getDouble("EndAngle"),
+  //         wayPoints);
+  //   });
 
-    m_reader.registerCommand("SwerveDrivePath", (CougarScriptObject p) -> {
-      List<Translation2d> wayPoints = p.getPointList("Waypoints");
-      return new SwerveDrivePath(m_swerveSubsystem,
-          p.getDouble("StartAngle"),
-          p.getDouble("EndAngle"),
-          wayPoints);
-    });
-
-    m_reader.registerCommand("Delay", (CougarScriptObject p) -> {
-      return new WaitCommand(p.getDouble("seconds"));
-    });
-  }
+  //   m_reader.registerCommand("Delay", (CougarScriptObject p) -> {
+  //     return new WaitCommand(p.getDouble("seconds"));
+  //   });
+  // }
 
   /**
    * Applies a deadband to the given value.
