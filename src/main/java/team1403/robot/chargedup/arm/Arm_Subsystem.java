@@ -18,7 +18,6 @@ import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarSubsystem;
 import team1403.lib.device.wpi.CougarSparkMax;
 import team1403.lib.device.wpi.WpiLimitSwitch;
-import team1403.lib.util.ArmState;
 import team1403.lib.util.CougarLogger;
 import team1403.robot.chargedup.RobotConfig;
 import team1403.robot.chargedup.RobotConfig.Arm;

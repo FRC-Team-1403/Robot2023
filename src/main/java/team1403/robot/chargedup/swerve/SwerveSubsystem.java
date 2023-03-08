@@ -238,6 +238,7 @@ public class SwerveSubsystem extends CougarSubsystem {
   public void drive(ChassisSpeeds chassisSpeeds, Translation2d offset) {
     m_chassisSpeeds = chassisSpeeds;
     m_offset = offset;
+    SmartDashboard.putString("Chassis Speeds", m_chassisSpeeds.toString());
   }
 
   /**
