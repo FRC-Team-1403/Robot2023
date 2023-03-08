@@ -9,12 +9,12 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class SetpointArmCommand extends CommandBase {
   private final ArmState m_state;
 
-  private final Arm_Subsystem m_arm;
+  private final ArmSubsystem m_arm;
   
   /**
    * Initializes the class.
    */
-  public SetpointArmCommand(Arm_Subsystem arm, ArmState state) {
+  public SetpointArmCommand(ArmSubsystem arm, ArmState state) {
     this.m_arm = arm;
     this.m_state = state;
 
@@ -22,8 +22,7 @@ public class SetpointArmCommand extends CommandBase {
   }
   
   @Override
-  public void execute() {
-
+  public void initialize() {
     m_arm.moveArm(m_state);
   }
 

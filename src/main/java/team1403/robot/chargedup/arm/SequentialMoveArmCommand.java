@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
  * Moves the arm to a given position while avoiding any obstancles.
  */
 public class SequentialMoveArmCommand extends CommandBase{
-  private final Arm_Subsystem m_arm;
+  private final ArmSubsystem m_arm;
 
   private double m_intialPivotAngle;
   private double m_intialExtensionLength;
@@ -16,7 +16,7 @@ public class SequentialMoveArmCommand extends CommandBase{
   private final ArmState m_endState;
 
 
-  SequentialMoveArmCommand(ArmState endState, Arm_Subsystem arm) {
+  public SequentialMoveArmCommand(ArmSubsystem arm, ArmState endState) {
     this.m_endState = endState;
     m_arm = arm;
   }

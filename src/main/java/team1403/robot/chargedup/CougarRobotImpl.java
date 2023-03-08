@@ -24,7 +24,7 @@ import team1403.robot.chargedup.swerve.SwerveCommand;
 import team1403.robot.chargedup.swerve.SwerveDrivePath;
 import team1403.robot.chargedup.swerve.SwerveSubsystem;
 import team1403.robot.chargedup.RobotConfig.OperatorConfig;
-import team1403.robot.chargedup.arm.Arm_Subsystem;
+import team1403.robot.chargedup.arm.ArmSubsystem;
 import team1403.robot.chargedup.arm.ManualArmCommand;
 
 /**
@@ -56,7 +56,7 @@ public class CougarRobotImpl extends CougarRobot {
 
         
     // m_builtins = new BuiltinSubsystem(parameters, logger);
-    m_arm = new Arm_Subsystem(parameters);
+    m_arm = new ArmSubsystem(parameters);
     m_swerveSubsystem = new SwerveSubsystem(parameters);
     // m_visionSubsystem = new PhotonVisionSubsystem(parameters);
 
@@ -253,7 +253,7 @@ public class CougarRobotImpl extends CougarRobot {
   // private final BuiltinSubsystem m_builtins;
   // private final PhotonVisionSubsystem m_visionSubsystem;
   private CougarScriptReader m_reader;
-  private final Arm_Subsystem m_arm;
+  private final ArmSubsystem m_arm;
   private boolean m_armOperatorManual = true;
   private final SwerveSubsystem m_swerveSubsystem;
 }

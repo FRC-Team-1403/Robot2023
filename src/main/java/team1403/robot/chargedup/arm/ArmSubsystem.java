@@ -26,7 +26,7 @@ import team1403.robot.chargedup.RobotConfig.Arm;
  * Class creating the arm subsystem.
  * 
  */
-public class Arm_Subsystem extends CougarSubsystem {
+public class ArmSubsystem extends CougarSubsystem {
   // Wrist
   private final CougarSparkMax m_wristMotor;
   private final DutyCycleEncoder m_wristAbsoluteEncoder;
@@ -59,7 +59,7 @@ public class Arm_Subsystem extends CougarSubsystem {
    *
    * @param injectedParameters Cougar injected parameters.
    */
-  public Arm_Subsystem(CougarLibInjectedParameters injectedParameters) {
+  public ArmSubsystem(CougarLibInjectedParameters injectedParameters) {
     super("Arm", injectedParameters);
     CougarLogger logger = getLogger();
 
