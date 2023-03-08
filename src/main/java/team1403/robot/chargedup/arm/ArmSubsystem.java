@@ -30,7 +30,6 @@ public class ArmSubsystem extends CougarSubsystem {
   // Wrist
   private final CougarSparkMax m_wristMotor;
   private final DutyCycleEncoder m_wristAbsoluteEncoder;
-  private double m_absoluteWristOffset = 101.28146203203656;
 
   // Arm
   private final CANSparkMax m_leftPivotMotor;
@@ -177,8 +176,8 @@ public class ArmSubsystem extends CougarSubsystem {
    *
    * @return The absolute encoder value of the wrist.
    */
-  public double getRelativeWristAngle() {
-    double value = (m_wristAbsoluteEncoder.getAbsolutePosition() * 360) + m_absoluteWristOffset;
+  public double getAbsoluteWristAngle() {
+    double value = (m_wristAbsoluteEncoder.getAbsolutePosition() * 360) + RobotConfig.Arm.kAbsoluteWristOffset;
 
     if (value < 0) {
       value += 360;
@@ -344,9 +343,9 @@ public class ArmSubsystem extends CougarSubsystem {
       double maxLength = theoreticalExtensionLength(
           getAbsolutePivotAngle(), RobotConfig.kHeightFromGround);
       return MathUtil.clamp(extensionLength, 0, maxLength);
-    } else if (getAbsolutePivotAngle() > RobotConfig.Arm.kHorizonAngle
+    } else if (getAbsolutePivotAngle() > RobotConfig.Arm.kFrameClearanceAngle
           && getAbsolutePivotAngle() <= RobotConfig.Arm.kFrameAngle) {
-      double maxLength = -4 * getAbsolutePivotAngle()  + 897;
+      double maxLength = -(8.355/4) * (getAbsolutePivotAngle()-229)  ;
       return MathUtil.clamp(extensionLength, 0, maxLength);
     }
     return extensionLength;
@@ -407,12 +406,12 @@ public class ArmSubsystem extends CougarSubsystem {
   @Override
   public void periodic() {
     // Wrist
-    if (isInWristBounds(m_wristMotor.getEncoder().getPosition())
-        || isInWristBounds(this.m_wristAngleSetpoint)) {
+    // if (isInWristBounds(m_wristMotor.getEncoder().getPosition())
+    //     || isInWristBounds(this.m_wristAngleSetpoint)) {
       setAbsoluteWristAngle(this.m_wristAngleSetpoint);
-    } else {
-      setAbsoluteWristAngle(m_wristMotor.getEncoder().getPosition());
-    }
+    // } else {
+    //   setAbsoluteWristAngle(m_wristMotor.getEncoder().getPosition());
+    // }
 
     // Intake
     runIntake(m_intakeSpeedSetpoint);
@@ -462,5 +461,6 @@ public class ArmSubsystem extends CougarSubsystem {
     SmartDashboard.putNumber("WristSetpoint", getWristAngleSetpoint());
     SmartDashboard.putNumber("Pivot Setpoint", getPivotAngleSetpoint());
     SmartDashboard.putNumber("Extension Setpoint", getExtensionLengthSetpoint());
+    SmartDashboard.putNumber("RAW VALUE", m_wristAbsoluteEncoder.getAbsolutePosition());
   }
 }

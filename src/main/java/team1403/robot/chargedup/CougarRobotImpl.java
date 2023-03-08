@@ -98,8 +98,8 @@ public class CougarRobotImpl extends CougarRobot {
         () -> xboxDriver.getLeftTriggerAxis())
     );
 
-  //   new Trigger(() -> xboxDriver.getRightBumper()).onFalse(
-  //       new InstantCommand(() -> m_swerveSubsystem.increaseSpeed(0.2)));
+    new Trigger(() -> xboxDriver.getLeftBumper()).onFalse(
+        new InstantCommand(() -> m_swerveSubsystem.decreaseSpeed(0.2)));
 
     new Trigger(() -> xboxDriver.getRightBumper()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.increaseSpeed(0.2)));
