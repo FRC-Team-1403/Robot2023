@@ -91,7 +91,7 @@ public class SwerveSubsystem extends CougarSubsystem {
     SmartDashboard.putNumber("Desired Heading", m_desiredHeading);
 
     setRobotRampRate(0.0);
-    setRobotIdleMode(IdleMode.kBrake);
+    setRobotIdleMode(IdleMode.kCoast);
 
     m_offset = new Translation2d();
     
