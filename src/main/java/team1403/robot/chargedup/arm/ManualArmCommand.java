@@ -69,9 +69,9 @@ public class ManualArmCommand extends CommandBase {
     SmartDashboard.putNumber("Arm Extension Setpoint", armExtension);
 
     if (this.m_wheelIntakeSupplier.getAsBoolean()) {
-      m_arm.moveArm(wristAngle, -0.75, pivotAngle, armExtension);
+      m_arm.moveArm(wristAngle, -1, pivotAngle, armExtension);
     } else if (this.m_wheelOuttakeSupplier.getAsBoolean()) {
-      m_arm.moveArm(wristAngle, 0.75, pivotAngle, armExtension);
+      m_arm.moveArm(wristAngle, 1, pivotAngle, armExtension);
     } else {
       m_arm.moveArm(wristAngle, 0, pivotAngle, armExtension);
     }

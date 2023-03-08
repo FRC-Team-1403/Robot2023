@@ -2,6 +2,8 @@ package team1403.robot.chargedup;
 
 import java.util.List;
 
+import com.revrobotics.CANSparkMax.IdleMode;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -65,8 +67,14 @@ public class CougarRobotImpl extends CougarRobot {
 
   @Override
   public Command getAutonomousCommand() {
+    m_swerveSubsystem.setRobotIdleMode(IdleMode.kBrake);
     return m_reader.importScript("Circle.json");
   } 
+
+  @Override
+  public void teleopInit() {
+    m_swerveSubsystem.setRobotIdleMode(IdleMode.kCoast);
+  }
   
   /**
    * Configures the driver commands and their bindings.
@@ -90,8 +98,8 @@ public class CougarRobotImpl extends CougarRobot {
         () -> xboxDriver.getLeftTriggerAxis())
     );
 
-  //   new Trigger(() -> xboxDriver.getRightBumper()).onFalse(
-  //       new InstantCommand(() -> m_swerveSubsystem.increaseSpeed(0.2)));
+    new Trigger(() -> xboxDriver.getLeftBumper()).onFalse(
+        new InstantCommand(() -> m_swerveSubsystem.decreaseSpeed(0.2)));
 
     new Trigger(() -> xboxDriver.getRightBumper()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.increaseSpeed(0.2)));

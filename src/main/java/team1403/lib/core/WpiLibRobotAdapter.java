@@ -161,6 +161,7 @@ public class WpiLibRobotAdapter<T extends CougarRobot> extends TimedRobot {
       m_logger.debugf("Cancelling autonomous command when entering teleop.");
       m_autonomousCommand.cancel();
     }
+    m_cougarRobot.teleopInit();
     m_cougarRobot.changeMode(CougarRobot.Mode.TELEOP);
   }
 
