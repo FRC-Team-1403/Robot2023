@@ -259,9 +259,9 @@ public class RobotConfig {
     public static final double kIWristMotor = 0;
     public static final double kDWristMotor = 90;
     public static final double kMaxWristAngle = 265;
-    public static final double kMinWristAngle = 55.61740540442264; 
+    public static final double kMinWristAngle = 20.21221400530536; 
     public static final double kWristConversionFactor = 90.0 / 100;
-    public static final double kAbsoluteWristOffset = 78.98266997456675;
+    public static final double kAbsoluteWristOffset = 78.98266997456675+20.21221400530536;
 
     //Extension
     public static final double kPArmExtension = 0.3;
