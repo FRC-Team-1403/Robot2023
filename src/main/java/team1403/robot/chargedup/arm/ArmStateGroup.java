@@ -1,6 +1,6 @@
-package team1403.lib.util;
+package team1403.robot.chargedup.arm;
 
-public class ArmGroup {
+public class ArmStateGroup {
     private ArmState floorIntakeState;
     private ArmState doubleShelfIntakeState;
     private ArmState singleShelfIntakeState;
@@ -9,7 +9,7 @@ public class ArmGroup {
     private ArmState lowNodeState;
     public static ArmState tuck = new ArmState(0, 0, 0, 0, null); //random values for now
 
-    public ArmGroup(ArmState floor, ArmState doubleShelf, ArmState singleShelf, ArmState highNode, ArmState middleNode, ArmState lowNode) {
+    public ArmStateGroup(ArmState floor, ArmState doubleShelf, ArmState singleShelf, ArmState highNode, ArmState middleNode, ArmState lowNode) {
         this.floorIntakeState = floor;
         this.doubleShelfIntakeState = doubleShelf;
         this.singleShelfIntakeState = singleShelf;

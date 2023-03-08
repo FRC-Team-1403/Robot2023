@@ -2,7 +2,6 @@ package team1403.robot.chargedup.arm;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-import team1403.lib.util.ArmState;
 
 /**
  * Creates the arm set point class.

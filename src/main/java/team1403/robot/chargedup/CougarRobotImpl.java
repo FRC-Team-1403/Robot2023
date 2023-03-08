@@ -131,17 +131,6 @@ public class CougarRobotImpl extends CougarRobot {
     // }
   }
 
-
-
-  // /**
-  //  * Use this to pass the autonomous command to the main {@link Robot} class.
-  //  *
-  //  * @return the command to run in autonomous
-  //  */
-  private void registerAutoCommands() {
-    m_reader = new CougarScriptReader((Pose2d startPose) -> {
-      double feetToMeters = 0.30478512648;
-
   // }
 
   // /**
@@ -156,18 +145,18 @@ public class CougarRobotImpl extends CougarRobot {
   //     Translation2d flippedXandY = new Translation2d(
   //         startPose.getY() * feetToMeters, startPose.getX() * feetToMeters);
 
-    m_reader.registerCommand("SwerveDrivePath", (CougarScriptObject p) -> {
-      List<Translation2d> wayPoints = p.getPointList("Waypoints");
-      return new SwerveDrivePath(m_swerveSubsystem,
-          p.getDouble("StartAngle"),
-          p.getDouble("EndAngle"),
-          wayPoints);
-    });
+    // m_reader.registerCommand("SwerveDrivePath", (CougarScriptObject p) -> {
+    //   List<Translation2d> wayPoints = p.getPointList("Waypoints");
+    //   return new SwerveDrivePath(m_swerveSubsystem,
+    //       p.getDouble("StartAngle"),
+    //       p.getDouble("EndAngle"),
+    //       wayPoints);
+    // });
 
-    m_reader.registerCommand("Delay", (CougarScriptObject p) -> {
-      return new WaitCommand(p.getDouble("seconds"));
-    });
-  }
+    // m_reader.registerCommand("Delay", (CougarScriptObject p) -> {
+    //   return new WaitCommand(p.getDouble("seconds"));
+    // });
+  // }
 
   /**
    * Applies a deadband to the given value.
