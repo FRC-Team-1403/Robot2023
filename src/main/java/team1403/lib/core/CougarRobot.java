@@ -98,6 +98,13 @@ public class CougarRobot {
   }
 
   /**
+   * Adds functionality to the teleop init method found in WpiLibRobotAdapter
+   */
+  public void teleopInit() {
+    
+  }
+
+  /**
    * Returns the current operating mode.
    *
    * @return The current operating mode.

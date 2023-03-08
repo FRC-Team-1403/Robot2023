@@ -2,6 +2,8 @@ package team1403.robot.chargedup;
 
 import java.util.List;
 
+import com.revrobotics.CANSparkMax.IdleMode;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -68,6 +70,11 @@ public class CougarRobotImpl extends CougarRobot {
     m_swerveSubsystem.setRobotIdleMode(IdleMode.kBrake);
     return m_reader.importScript("Circle.json");
   } 
+
+  @Override
+  public void teleopInit() {
+    m_swerveSubsystem.setRobotIdleMode(IdleMode.kCoast);
+  }
   
   /**
    * Configures the driver commands and their bindings.
