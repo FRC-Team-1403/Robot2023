@@ -124,9 +124,9 @@ public class ArmSubsystem extends CougarSubsystem {
     m_wristMotor.setSmartCurrentLimit(20);
     m_wristMotor.setRampRate(0.25);
 
-    wristController.setP(Arm.kPWristMotor);
+    wristController.setP(0.05);
     wristController.setI(Arm.kIWristMotor);
-    wristController.setD(Arm.kDWristMotor);
+    wristController.setD(0);
     wristController.setFeedbackDevice((MotorFeedbackSensor) m_wristMotor.getEncoder());
     wristController.setPositionPIDWrappingEnabled(false);
 
@@ -229,7 +229,7 @@ public class ArmSubsystem extends CougarSubsystem {
    * @return The encoder value of the pivot encoder.
    */
   public double getAbsolutePivotAngle() {
-    double value = (m_armAbsoluteEncoder.getAbsolutePosition() * 360) + 38.1111122229;
+    double value = (m_armAbsoluteEncoder.getAbsolutePosition() * 360) + RobotConfig.Arm.kAbsolutePivotOffset;
 
     if (value < 0) {
       value += 360;
@@ -248,8 +248,7 @@ public class ArmSubsystem extends CougarSubsystem {
       normalizedCurrentAngle -= 90;
     }
     double armLength = RobotConfig.Arm.kBaseArmLength + getExtensionLength();
-    double gravityCompensationFactor = 0.0018
-     * armLength;
+    double gravityCompensationFactor = 0.0015 * armLength;
     double feedforward = gravityCompensationFactor
         * Math.cos(Math.toRadians(normalizedCurrentAngle));
     if ((currentAngle < 90 && currentAngle > 0) || (currentAngle > 270 && currentAngle < 360)) {
@@ -276,7 +275,7 @@ public class ArmSubsystem extends CougarSubsystem {
    * @return true if the given angle is in the bounds of the wrist.
    */
   private boolean isInPivotBounds(double angle) {
-    return (angle > Arm.kMinPivotAngle && angle < Arm.kMaxPivotAngle);
+    return (angle >= Arm.kMinPivotAngle && angle <= Arm.kMaxPivotAngle);
   }
 
   public double limitPivotAngle(double angle) {
@@ -467,5 +466,23 @@ public class ArmSubsystem extends CougarSubsystem {
     SmartDashboard.putNumber("Extension Setpoint", getExtensionLengthSetpoint());
     SmartDashboard.putBoolean("minExtension", isExtensionMinSwitchActive());
     SmartDashboard.putNumber("RAW VALUE", m_wristAbsoluteEncoder.getAbsolutePosition());
+    SmartDashboard.putBoolean("Arm Switch??", isArmSwitchActive());
+  }
+
+  public CougarSparkMax getWristMotor() {
+    return m_wristMotor;
+  }
+
+  public CANSparkMax getLeftPivotMotor() {
+    return m_leftPivotMotor;
+  }
+
+
+  public CANSparkMax getIntakeMotor() {
+    return m_intakeMotor;
+  }
+
+  public CANSparkMax getExtensionMotor() {
+    return m_extensionMotor;
   }
 }

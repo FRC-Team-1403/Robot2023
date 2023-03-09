@@ -24,8 +24,10 @@ import team1403.robot.chargedup.swerve.SwerveCommand;
 import team1403.robot.chargedup.swerve.SwerveDrivePath;
 import team1403.robot.chargedup.swerve.SwerveSubsystem;
 import team1403.robot.chargedup.RobotConfig.OperatorConfig;
+import team1403.robot.chargedup.arm.ArmStateGroup;
 import team1403.robot.chargedup.arm.ArmSubsystem;
 import team1403.robot.chargedup.arm.ManualArmCommand;
+import team1403.robot.chargedup.arm.SetpointArmCommand;
 
 /**
  * The heart of the robot.
@@ -103,6 +105,7 @@ public class CougarRobotImpl extends CougarRobot {
 
     new Trigger(() -> xboxDriver.getRightBumper()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.increaseSpeed(0.2)));
+
 
     new Trigger(() -> xboxDriver.getBButton()).onFalse(
       new InstantCommand(() -> m_swerveSubsystem.zeroGyroscope()));
@@ -241,6 +244,10 @@ public class CougarRobotImpl extends CougarRobot {
         () -> xboxOperator.getRightTriggerAxis(),
         () -> xboxOperator.getRightBumper(),
         () -> xboxOperator.getLeftBumper()));
+    new Trigger(()->xboxOperator.getPOV() == 180).onFalse(
+        new SetpointArmCommand(m_arm, ArmStateGroup.getTuck()));
+    new Trigger(()->xboxOperator.getPOV() == 0).onFalse(
+        new SetpointArmCommand(m_arm, ArmStateGroup.getHighNodeState()));
   }
 
   /**

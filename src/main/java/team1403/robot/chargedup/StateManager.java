@@ -3,6 +3,7 @@ package team1403.robot.chargedup;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import team1403.robot.chargedup.arm.ArmState;
 import team1403.robot.chargedup.arm.ArmStateGroup;
 
 public class StateManager {
@@ -27,8 +28,14 @@ public class StateManager {
   }
 
   private static StateManager instance = null;
-
-  private StateManager() {}
+//Pivot 150.28003026
+//Wrist 246.78781366
+//Length 22.987735748
+  private StateManager() {
+    ArmState floorIntake = new ArmState(0.047618567943573, 133.59195783979897, 231.71438088502362, 1);
+    ArmState highConeNode = new ArmState(22.987735748, 246.78781366, 150.28003026, 0);
+    currentArmGroup = new ArmStateGroup(floorIntake, null, null, highConeNode, null, null);
+  }
 
   public static StateManager getInstance() {
     if (instance == null) {

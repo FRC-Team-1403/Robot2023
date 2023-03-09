@@ -16,7 +16,7 @@ public class ArmState {
    * Initializes the ArmState class.
    */
   public ArmState(double armLength, double wristAngle, double armPivot,
-      double intakeSpeed, CougarLibInjectedParameters injectedParameters) {
+      double intakeSpeed) {
     this.armLength = armLength;
     this.wristAngle = wristAngle;
     this.armPivot = armPivot;
