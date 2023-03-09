@@ -1,6 +1,5 @@
 package team1403.lib.device;
 
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.revrobotics.SparkMaxRelativeEncoder;
 
 import team1403.lib.util.CougarLogger;
