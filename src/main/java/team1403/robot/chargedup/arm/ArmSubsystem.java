@@ -203,7 +203,7 @@ public class ArmSubsystem extends CougarSubsystem {
   }
 
   public double dynamicWristLimit(double angle) {
-    if(angle >= RobotConfig.Arm.kFrameAngle) {
+    if(getAbsolutePivotAngle() >= RobotConfig.Arm.kFrameAngle) {
       return getRelativeWristAngle();
     }
     return angle;
@@ -228,6 +228,20 @@ public class ArmSubsystem extends CougarSubsystem {
    */
   public boolean isArmSwitchActive() {
     return m_maxArmLimitSwitch.isTriggered();
+  }
+
+  /**
+   * Rezeros the pivot encoder. Only use when the pivot limit switch is active.
+   * Accounts for any belt skipping.
+   */
+  private void rezeroPivot() {
+    double currentAngle = getAbsolutePivotAngle();
+    double offset = currentAngle - RobotConfig.Arm.kMaxPivotAngle;
+    if(currentAngle > RobotConfig.Arm.kMaxPivotAngle) {
+      RobotConfig.Arm.kMaxPivotAngle -= offset;
+    } else {
+      RobotConfig.Arm.kMaxPivotAngle += offset;
+    }
   }
 
   /**
@@ -428,6 +442,10 @@ public class ArmSubsystem extends CougarSubsystem {
     runIntake(m_intakeSpeedSetpoint);
 
     // Pivot
+    if(isArmSwitchActive()) {
+      rezeroPivot();
+    }
+    
     if ((isInPivotBounds(getAbsolutePivotAngle()) && !isArmSwitchActive())
         || isInPivotBounds(this.m_pivotAngleSetpoint)) {
       setAbsolutePivotAngle(this.m_pivotAngleSetpoint);
