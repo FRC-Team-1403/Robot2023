@@ -118,9 +118,9 @@ public class SwerveModule implements Device {
     m_steerMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
     m_steerMotor.setInverted(false);
     m_steerMotor.enableVoltageCompensation(12);
-    m_steerMotor.setSmartCurrentLimit(20);
+    m_steerMotor.setSmartCurrentLimit(40);
 
-    m_steerPidController.setP(SwerveConfig.kPTurning);
+    m_steerPidController.setP(0.3);
     m_steerPidController.setI(SwerveConfig.kITurning);
     m_steerPidController.setD(SwerveConfig.kDTurning);
     m_steerPidController.setFeedbackDevice((MotorFeedbackSensor) m_steerRelativeEncoder);
