@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import team1403.lib.util.BaseTimer;
 import team1403.lib.util.Clock;
 import team1403.lib.util.CougarLogger;
+import team1403.robot.chargedup.StateManager;
 
 
 /**
@@ -138,6 +139,7 @@ public class WpiLibRobotAdapter<T extends CougarRobot> extends TimedRobot {
     m_logger.tracef("autonomousInit");
     m_cougarRobot.changeMode(CougarRobot.Mode.AUTONOMOUS);
     m_autonomousCommand = m_cougarRobot.getAutonomousCommand();
+    StateManager.getInstance().init();
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
@@ -159,6 +161,7 @@ public class WpiLibRobotAdapter<T extends CougarRobot> extends TimedRobot {
       m_logger.debugf("Cancelling autonomous command when entering teleop.");
       m_autonomousCommand.cancel();
     }
+    m_cougarRobot.teleopInit();
     m_cougarRobot.changeMode(CougarRobot.Mode.TELEOP);
   }
 
