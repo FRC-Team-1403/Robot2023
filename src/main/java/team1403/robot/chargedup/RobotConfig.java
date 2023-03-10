@@ -13,26 +13,22 @@ import edu.wpi.first.math.util.Units;
 
 import team1403.lib.util.Dimension;
 
-
 /**
  * This class holds attributes for the robot configuration.
  *
- * <p>
- * The RobotConfig is broken out into different areas,
+ * <p>The RobotConfig is broken out into different areas,
  * each of which is captured in a class for that area. Each
  * subsystem has its own independent config.
  *
- * <p>
- * The "electrical" configs are treated separate and independent
+ * <p>The "electrical" configs are treated separate and independent
  * to make it easier to see how the robot should be wired and see
  * any conflicts since these ports specify their config together.
  */
 public class RobotConfig {
 
-  //Variables to used by all subsystems.
+  // Variables to used by all subsystems.
   public static final Dimension robotDimensions = new Dimension(0, 0, 0);
-  public static final Dimension wristDimensions = new Dimension(0, 0, 0); //TODO
-
+  public static final Dimension wristDimensions = new Dimension(0, 0, 0); // TODO
 
   public static double kRobotHeight = 32;
   public static double kHeightFromGround = 33.465;
@@ -64,16 +60,15 @@ public class RobotConfig {
     public static final double kTrackWidth = Units.inchesToMeters(17.5);
     public static final double kWheelBase = Units.inchesToMeters(17.5);
 
-    public static final SwerveDriveKinematics kDriveKinematics = 
-        new SwerveDriveKinematics(
-            // Front left
-            new Translation2d(kTrackWidth / 2.0, kWheelBase / 2.0),
-            // Front right
-            new Translation2d(kTrackWidth / 2.0, -kWheelBase / 2.0),
-            // Back left
-            new Translation2d(-kTrackWidth / 2.0, kWheelBase / 2.0),
-            // Back right
-            new Translation2d(-kTrackWidth / 2.0, -kWheelBase / 2.0));
+    public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
+        // Front left
+        new Translation2d(kTrackWidth / 2.0, kWheelBase / 2.0),
+        // Front right
+        new Translation2d(kTrackWidth / 2.0, -kWheelBase / 2.0),
+        // Back left
+        new Translation2d(-kTrackWidth / 2.0, kWheelBase / 2.0),
+        // Back right
+        new Translation2d(-kTrackWidth / 2.0, -kWheelBase / 2.0));
 
     public static final double frontLeftEncoderOffset = -(4.657165672020807 + Math.PI);
     public static final double frontRightEncoderOffset = -(3.127786826498822 + (2 * Math.PI));
@@ -94,7 +89,8 @@ public class RobotConfig {
     public static final double kMaxSpeed = 14.5;
 
     public static final double kMaxAngularSpeed = 50;
-    // (kMaxSpeed / Math.hypot(kTrackWidth / 2.0, kWheelBase / 2.0)); // 39.795095397
+    // (kMaxSpeed / Math.hypot(kTrackWidth / 2.0, kWheelBase / 2.0)); //
+    // 39.795095397
 
     public static final double kVoltageSaturation = 12.0;
     public static final double kCurrentLimit = 40.0;
@@ -102,54 +98,55 @@ public class RobotConfig {
     public static final double kMaxAccelerationMetersPerSecondSquared = 3;
     public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI / 2;
 
-    public static final TrapezoidProfile.Constraints kThetaControllerConstraints
-        = new TrapezoidProfile.Constraints(
+    public static final TrapezoidProfile.Constraints kThetaControllerConstraints = 
+        new TrapezoidProfile.Constraints(
         kMaxAngularSpeed,
         kMaxAngularAccelerationRadiansPerSecondSquared);
   }
 
   public static class VisionConfig {
     public static AprilTagFieldLayout fieldLayout = new AprilTagFieldLayout(Arrays.asList(
-      new AprilTag(1,   (new Pose3d(
-        Units.inchesToMeters(610.77),
-        Units.inchesToMeters(42.19),
-        Units.inchesToMeters(18.22),
-        new Rotation3d(0.0, 0.0, Math.PI)))),
-      new AprilTag(2, new Pose3d(
-        Units.inchesToMeters(610.77),
-        Units.inchesToMeters(108.19),
-        Units.inchesToMeters(18.22),
-        new Rotation3d(0.0, 0.0, Math.PI))),
-      new AprilTag(3,new Pose3d(
-        Units.inchesToMeters(0),
-        Units.inchesToMeters(0), // FIRST's diagram has a typo (it says 147.19)
-        Units.inchesToMeters(18.22),
-        new Rotation3d(0.0, 0.0, Math.PI))),
-      new AprilTag(4, new Pose3d(
-        Units.inchesToMeters(636.96),
-        Units.inchesToMeters(265.74),
-        Units.inchesToMeters(27.38),
-        new Rotation3d(0.0, 0.0, Math.PI))), 
-      new AprilTag(5, new Pose3d(
-        Units.inchesToMeters(14.25),
-        Units.inchesToMeters(265.74),
-        Units.inchesToMeters(27.38),
-        new Rotation3d())), 
-      new AprilTag(6, new Pose3d(
-        Units.inchesToMeters(8),
-        Units.inchesToMeters(0), // FIRST's diagram has a typo (it says 147.19)
-        Units.inchesToMeters(18.22),
-        new Rotation3d(0.0, 0.0, Math.PI))),
-      new AprilTag(7, new Pose3d(
-        Units.inchesToMeters(610.77),
-        Units.inchesToMeters(108.19),
-        Units.inchesToMeters(18.22),
-        new Rotation3d(0.0, 0.0, Math.PI))),  
-      new AprilTag(8, new Pose3d(
-        Units.inchesToMeters(40.45),
-        Units.inchesToMeters(42.19),
-        Units.inchesToMeters(18.22),
-        new Rotation3d()))), Units.inchesToMeters(651.25), Units.inchesToMeters(315.5));
+        new AprilTag(1, (new Pose3d(
+            Units.inchesToMeters(610.77),
+            Units.inchesToMeters(42.19),
+            Units.inchesToMeters(18.22),
+            new Rotation3d(0.0, 0.0, Math.PI)))),
+        new AprilTag(2, new Pose3d(
+            Units.inchesToMeters(610.77),
+            Units.inchesToMeters(108.19),
+            Units.inchesToMeters(18.22),
+            new Rotation3d(0.0, 0.0, Math.PI))),
+        new AprilTag(3, new Pose3d(
+            Units.inchesToMeters(0),
+            Units.inchesToMeters(0), // FIRST's diagram has a typo (it says 147.19)
+            Units.inchesToMeters(18.22),
+            new Rotation3d(0.0, 0.0, Math.PI))),
+        new AprilTag(4, new Pose3d(
+            Units.inchesToMeters(636.96),
+            Units.inchesToMeters(265.74),
+            Units.inchesToMeters(27.38),
+            new Rotation3d(0.0, 0.0, Math.PI))),
+        new AprilTag(5, new Pose3d(
+            Units.inchesToMeters(14.25),
+            Units.inchesToMeters(265.74),
+            Units.inchesToMeters(27.38),
+            new Rotation3d())),
+        new AprilTag(6, new Pose3d(
+            Units.inchesToMeters(8),
+            Units.inchesToMeters(0), // FIRST's diagram has a typo (it says 147.19)
+            Units.inchesToMeters(18.22),
+            new Rotation3d(0.0, 0.0, Math.PI))),
+        new AprilTag(7, new Pose3d(
+            Units.inchesToMeters(610.77),
+            Units.inchesToMeters(108.19),
+            Units.inchesToMeters(18.22),
+            new Rotation3d(0.0, 0.0, Math.PI))),
+        new AprilTag(8, new Pose3d(
+            Units.inchesToMeters(40.45),
+            Units.inchesToMeters(42.19),
+            Units.inchesToMeters(18.22),
+            new Rotation3d()))),
+        Units.inchesToMeters(651.25), Units.inchesToMeters(315.5));
   }
 
   /**
@@ -159,7 +156,7 @@ public class RobotConfig {
    */
   public static class CanBus {
 
-    //Arm Ports
+    // Arm Ports
     public static final int wheelIntakeMotor = 5;
     public static final int telescopicArmMotor = 4;
     public static final int leftPivotMotor = 2;
@@ -189,15 +186,14 @@ public class RobotConfig {
    */
   public class RioPorts {
 
-    
-    public static final int kWristAbsoluteEncoder = 1; //DIO
+    public static final int kWristAbsoluteEncoder = 1; // DIO
 
-    public static final int kArmAbsoluteEncoder = 3; ///Analog
+    public static final int kArmAbsoluteEncoder = 3; /// Analog
 
-    public static final int kArmLimitSwitch = 0; //DIO
+    public static final int kArmLimitSwitch = 0; // DIO
 
-    public static final int kExtensionMinMagneticSwitch = 2; //DIO
-    public static final int kExtensionMaxMagneticSwitch = 3; //DIO
+    public static final int kExtensionMinMagneticSwitch = 2; // DIO
+    public static final int kExtensionMaxMagneticSwitch = 3; // DIO
   }
 
   /**
@@ -242,7 +238,7 @@ public class RobotConfig {
    */
   public static class Arm {
 
-    //Pivot
+    // Pivot
     public static final int kPArmPivot = 1;
     public static final int kIArmPivot = 0;
     public static final int kDArmPivot = 0;
@@ -254,32 +250,32 @@ public class RobotConfig {
     public static final double kPivotAngleMaxAmperage = 40;
     public static final double kHorizonAngle = 210;
 
-    //Wrist
+    // Wrist
     public static final double kPWristMotor = 0.95;
     public static final double kIWristMotor = 0;
     public static final double kDWristMotor = 90;
     public static final double kMaxWristAngle = 265;
-    public static final double kMinWristAngle = 55.61740540442264; 
+    public static final double kMinWristAngle = 55.61740540442264;
     public static final double kWristConversionFactor = 90.0 / 100;
     public static final double kAbsoluteWristOffset = 78.98266997456675;
 
-    //Extension
+    // Extension
     public static final double kPArmExtension = 0.3;
     public static final double kIArmExtension = 0;
-    public static final double kDArmExtension = 0; 
-    public static final double kMinArmExtension = 0; 
-    public static final double kMaxArmExtension = 23.128;  //inches
-    public static final double kExtensionConversionFactor = 1.0 / 6;  
-    public static final double kArmExtensionMaxAmperage = 20; 
-    public static final double maxVerticalAngle = Math.acos(Math.toRadians(44.3 / 60.218)); //TODO
-    public static final double angleHittingRobot = 66; //TODO
-    public static final double angleHittingGround = 80; //TODO
+    public static final double kDArmExtension = 0;
+    public static final double kMinArmExtension = 0;
+    public static final double kMaxArmExtension = 23.128; // inches
+    public static final double kExtensionConversionFactor = 1.0 / 6;
+    public static final double kArmExtensionMaxAmperage = 20;
+    public static final double maxVerticalAngle = Math.acos(Math.toRadians(44.3 / 60.218)); // TODO
+    public static final double angleHittingRobot = 66; // TODO
+    public static final double angleHittingGround = 80; // TODO
     public static final double kExtensionOffset = 8;
 
-    //Dimensions
-    public static final double kBaseArmLength = 31; //37 //28 inches
-    public static final double kPhysicalArmMaxExtension = kBaseArmLength + kMaxArmExtension; //inches
+    // Dimensions
+    public static final double kBaseArmLength = 31; // 37 //28 inches
+    public static final double kPhysicalArmMaxExtension = kBaseArmLength + kMaxArmExtension; // inches
 
-    public static final double kArmWeight = 16; //Pounds
+    public static final double kArmWeight = 16; // Pounds
   }
 }
