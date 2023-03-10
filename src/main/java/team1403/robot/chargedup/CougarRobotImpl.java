@@ -50,7 +50,9 @@ public class CougarRobotImpl extends CougarRobot {
     // m_builtins = new BuiltinSubsystem(parameters, logger);
     m_arm = new Arm_Subsystem(parameters);
     m_swerveSubsystem = new SwerveSubsystem(parameters);
-    m_visionSubsystem = new PhotonVisionSubsystem(parameters);
+    m_visionSubsystem = new PhotonVisionSubsystem(parameters, VisionConfig.Alliance);
+    // m_arm = new Arm(parameters);
+    // m_swerveSubsystem = new SwerveSubsystem(parameters);
 
     // configureOperatorInterface();
     configureDriverInterface();
