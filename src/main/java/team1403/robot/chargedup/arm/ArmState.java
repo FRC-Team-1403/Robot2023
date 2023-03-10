@@ -1,7 +1,5 @@
 package team1403.robot.chargedup.arm;
 
-import team1403.lib.core.CougarLibInjectedParameters;
-
 /**
  * Creates the ArmState class.
  * 

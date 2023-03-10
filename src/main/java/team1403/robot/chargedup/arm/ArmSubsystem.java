@@ -202,6 +202,13 @@ public class ArmSubsystem extends CougarSubsystem {
     return MathUtil.clamp(angle, Arm.kMinWristAngle, Arm.kMaxWristAngle);
   }
 
+  public double dynamicWristLimit(double angle) {
+    if(angle >= RobotConfig.Arm.kFrameAngle) {
+      return getRelativeWristAngle();
+    }
+    return angle;
+  }
+
   /**
    * Checks if the given angle is in the bounds of the wrist.
    *
@@ -409,6 +416,7 @@ public class ArmSubsystem extends CougarSubsystem {
   @Override
   public void periodic() {
     // Wrist
+    this.m_wristAngleSetpoint = dynamicWristLimit(this.m_wristAngleSetpoint);
     if (isInWristBounds(m_wristMotor.getEncoder().getPosition())
         || isInWristBounds(this.m_wristAngleSetpoint)) {
       setAbsoluteWristAngle(this.m_wristAngleSetpoint);
@@ -433,7 +441,6 @@ public class ArmSubsystem extends CougarSubsystem {
     double limitedExtension = dynamicExtensionLimit(m_extensionLengthSetpoint);
     SmartDashboard.putNumber("Limited length", limitedExtension);
 
-    // TODO if condition to change setpoint to limit
     m_extensionLengthSetpoint = limitedExtension;
 
     if (isExtensionMinSwitchActive() && m_extensionLimitSwitchOffset == 0) {

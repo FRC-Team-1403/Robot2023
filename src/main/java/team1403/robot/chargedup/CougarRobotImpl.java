@@ -247,7 +247,7 @@ public class CougarRobotImpl extends CougarRobot {
     new Trigger(()->xboxOperator.getPOV() == 180).onFalse(
         new SetpointArmCommand(m_arm, ArmStateGroup.getTuck()));
     new Trigger(()->xboxOperator.getPOV() == 0).onFalse(
-        new SetpointArmCommand(m_arm, ArmStateGroup.getHighNodeState()));
+        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState()));
   }
 
   /**

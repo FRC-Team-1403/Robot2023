@@ -4,7 +4,7 @@ public class ArmStateGroup {
     private ArmState floorIntakeState;
     private ArmState doubleShelfIntakeState;
     private ArmState singleShelfIntakeState;
-    private static ArmState highNodeState = new ArmState(22.987735748, 246.78781366, 150.28003026, 0);
+    private ArmState highNodeState;
     private ArmState middleNodeState;
     private ArmState lowNodeState;
     public static ArmState tuck = new ArmState(0, 22.5, 250.273, 0); //random values for now
@@ -13,7 +13,7 @@ public class ArmStateGroup {
         this.floorIntakeState = floor;
         this.doubleShelfIntakeState = doubleShelf;
         this.singleShelfIntakeState = singleShelf;
-        // this.highNodeState = highNode;
+        this.highNodeState = highNode;
         this.middleNodeState = middleNode;
         this.lowNodeState = lowNode;
     }
@@ -30,7 +30,7 @@ public class ArmStateGroup {
         return singleShelfIntakeState;
     }
 
-    public static ArmState getHighNodeState() {
+    public ArmState getHighNodeState() {
         return highNodeState;
     }
 
