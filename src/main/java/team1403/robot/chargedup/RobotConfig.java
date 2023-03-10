@@ -106,24 +106,36 @@ public class RobotConfig {
         kMaxAngularAccelerationRadiansPerSecondSquared);
   }
 
+  /**
+   * Constants that deal with vision.
+   */
   public static class VisionConfig {
-    public static String Alliance = "B";
-
-    public static Pose2d[] reflectiveTapeLayout = new Pose2d[]{
-     new Pose2d(new Translation2d(Units.inchesToMeters(20), Units.inchesToMeters(30)), new Rotation2d()),
-     new Pose2d(new Translation2d(Units.inchesToMeters(64), Units.inchesToMeters(30)), new Rotation2d()),
-     new Pose2d(new Translation2d(Units.inchesToMeters(84), Units.inchesToMeters(30)), new Rotation2d()),
-     new Pose2d(new Translation2d(Units.inchesToMeters(124), Units.inchesToMeters(30)), new Rotation2d()),
-     new Pose2d(new Translation2d(Units.inchesToMeters(144), Units.inchesToMeters(30)), new Rotation2d()),
-     new Pose2d(new Translation2d(Units.inchesToMeters(204), Units.inchesToMeters(30)), new Rotation2d()),
-     new Pose2d(new Translation2d(Units.inchesToMeters(20), Units.inchesToMeters(621)), new Rotation2d()),
-     new Pose2d(new Translation2d(Units.inchesToMeters(64), Units.inchesToMeters(621)), new Rotation2d()),
-     new Pose2d(new Translation2d(Units.inchesToMeters(84), Units.inchesToMeters(621)), new Rotation2d()),
-     new Pose2d(new Translation2d(Units.inchesToMeters(124), Units.inchesToMeters(621)), new Rotation2d()),
-     new Pose2d(new Translation2d(Units.inchesToMeters(144), Units.inchesToMeters(621)), new Rotation2d()),
-     new Pose2d(new Translation2d(Units.inchesToMeters(204), Units.inchesToMeters(621)), new Rotation2d())
-  };
-
+    public static final Pose2d[] reflectiveTapeLayout = new Pose2d[] {
+        new Pose2d(new Translation2d(Units.inchesToMeters(20), 
+        Units.inchesToMeters(30)), new Rotation2d()),
+        new Pose2d(new Translation2d(Units.inchesToMeters(64), 
+        Units.inchesToMeters(30)), new Rotation2d()),
+        new Pose2d(new Translation2d(Units.inchesToMeters(84), 
+        Units.inchesToMeters(30)), new Rotation2d()),
+        new Pose2d(new Translation2d(Units.inchesToMeters(124), 
+        Units.inchesToMeters(30)), new Rotation2d()),
+        new Pose2d(new Translation2d(Units.inchesToMeters(144), 
+        Units.inchesToMeters(30)), new Rotation2d()),
+        new Pose2d(new Translation2d(Units.inchesToMeters(204), 
+        Units.inchesToMeters(30)), new Rotation2d()),
+        new Pose2d(new Translation2d(Units.inchesToMeters(20), 
+        Units.inchesToMeters(621)), new Rotation2d()),
+        new Pose2d(new Translation2d(Units.inchesToMeters(64), 
+        Units.inchesToMeters(621)), new Rotation2d()),
+        new Pose2d(new Translation2d(Units.inchesToMeters(84), 
+        Units.inchesToMeters(621)), new Rotation2d()),
+        new Pose2d(new Translation2d(Units.inchesToMeters(124), 
+        Units.inchesToMeters(621)), new Rotation2d()),
+        new Pose2d(new Translation2d(Units.inchesToMeters(144), 
+        Units.inchesToMeters(621)), new Rotation2d()),
+        new Pose2d(new Translation2d(Units.inchesToMeters(204), 
+        Units.inchesToMeters(621)), new Rotation2d())
+    };
 
     public static AprilTagFieldLayout fieldLayout = new AprilTagFieldLayout(Arrays.asList(
         new AprilTag(1, (new Pose3d(
@@ -294,7 +306,8 @@ public class RobotConfig {
 
     // Dimensions
     public static final double kBaseArmLength = 31; // 37 //28 inches
-    public static final double kPhysicalArmMaxExtension = kBaseArmLength + kMaxArmExtension; // inches
+    public static final double kPhysicalArmMaxExtension = 
+        kBaseArmLength + kMaxArmExtension; // inches
 
     public static final double kArmWeight = 16; // Pounds
   }

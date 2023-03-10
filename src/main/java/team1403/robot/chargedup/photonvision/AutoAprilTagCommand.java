@@ -11,8 +11,9 @@ import team1403.robot.chargedup.swerve.SwerveDrivePath;
 import team1403.robot.chargedup.swerve.SwerveSubsystem;
 
 /**
- * The Autonomous command for April Tag detection.
+ * Automatically aligns the robot to the nearest April Tag in the limelight's field of view.
  */
+@SuppressWarnings("checkstyle:LocalVariableNameCheck")
 public class AutoAprilTagCommand extends CommandBase {
 
   private final SwerveSubsystem m_drivetrainSubsystem;
@@ -32,14 +33,18 @@ public class AutoAprilTagCommand extends CommandBase {
 
     m_drivetrainSubsystem = drivetrainSubsystem;
     m_photonVisionSubsystem = photonVisionSubsystem;
+  }
 
+  @Override
+  public void initialize() {
     double xPoseOfTarget = m_photonVisionSubsystem.getTarget().getX();
     double yPoseOfTarget = m_photonVisionSubsystem.getTarget().getY();
 
     double swerveSubsystemRotation = m_drivetrainSubsystem.getGyroscopeRotation().getDegrees();
     double thetaOfTarget;
 
-    if ((-3.14 / 2.0 < swerveSubsystemRotation) && (swerveSubsystemRotation < 3.14 / 2.0)) {
+    //Find the rotation needed to align to the april tag
+    if ((-90 < swerveSubsystemRotation) && (swerveSubsystemRotation < 90)) {
       thetaOfTarget = 1;
     } else {
       thetaOfTarget = 179;
@@ -47,10 +52,8 @@ public class AutoAprilTagCommand extends CommandBase {
 
     m_lockedOnTarget = new Pose2d(new Translation2d(xPoseOfTarget, yPoseOfTarget), 
                                   new Rotation2d(thetaOfTarget));
-  }
 
-  @Override
-  public void initialize() {
+
     m_drivePathCommand = new SwerveDrivePath(
         m_drivetrainSubsystem,
         m_drivetrainSubsystem.getGyroscopeRotation().getDegrees(),

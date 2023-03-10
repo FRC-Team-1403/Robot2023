@@ -50,7 +50,7 @@ public class CougarRobotImpl extends CougarRobot {
     // m_builtins = new BuiltinSubsystem(parameters, logger);
     m_arm = new Arm_Subsystem(parameters);
     m_swerveSubsystem = new SwerveSubsystem(parameters);
-    m_visionSubsystem = new PhotonVisionSubsystem(parameters, VisionConfig.Alliance);
+    m_visionSubsystem = new PhotonVisionSubsystem(parameters);
     // m_arm = new Arm(parameters);
     // m_swerveSubsystem = new SwerveSubsystem(parameters);
 
@@ -73,6 +73,7 @@ public class CougarRobotImpl extends CougarRobot {
   /**
    * Configures the driver commands and their bindings.
    */
+  @SuppressWarnings("checkstyle:VariableDeclarationUsageDistanceCheck")
   private void configureDriverInterface() {
     XboxController xboxDriver = getJoystick("Driver", RobotConfig.DriverConfig.pilotPort);
     SwerveAutoBalanceYaw autoBalanceYaw = new SwerveAutoBalanceYaw(m_swerveSubsystem);

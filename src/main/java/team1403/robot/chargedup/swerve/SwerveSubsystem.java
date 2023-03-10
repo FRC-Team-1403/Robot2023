@@ -2,6 +2,7 @@ package team1403.robot.chargedup.swerve;
 
 import com.revrobotics.CANSparkMax.IdleMode;
 
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -86,7 +87,9 @@ public class SwerveSubsystem extends CougarSubsystem {
     }).start(); 
 
     m_odometer = new SwerveDrivePoseEstimator(SwerveConfig.kDriveKinematics, 
-        getGyroscopeRotation(), getModulePositions(), new Pose2d(0, 0, new Rotation2d(0)));
+        getGyroscopeRotation(), getModulePositions(), new Pose2d(0, 0, new Rotation2d(0)),
+        VecBuilder.fill(0.1, 0.1, 0.1),
+        VecBuilder.fill(0.9, 0.9, 0.9));
     m_odometer.setPose(new Pose2d(Units.inchesToMeters(29.5), 0, getGyroscopeRotation()));
     m_desiredHeading = getGyroscopeRotation().getDegrees();
     SmartDashboard.putNumber("Desired Heading", m_desiredHeading);
