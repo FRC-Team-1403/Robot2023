@@ -15,42 +15,46 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.net.PortForwarder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.networktables.BooleanSubscriber;
+import edu.wpi.first.networktables.IntegerSubscriber;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarSubsystem;
+import team1403.robot.chargedup.StateManager;
 import team1403.robot.chargedup.RobotConfig.VisionConfig;
-import team1403.robot.chargedup.swerve.SwerveSubsystem;
+import team1403.robot.chargedup.StateManager.GamePiece;
 
 public class PhotonVisionSubsystem extends CougarSubsystem {
   private PhotonCamera limeLight;
   private PhotonPoseEstimator photonPoseEstimator;
 
+  private final IntegerSubscriber m_coneOrientationSubsriber;
+  private final BooleanSubscriber m_conePresentSubscriber;
+
+
   public PhotonVisionSubsystem(CougarLibInjectedParameters injectedParameters) {
     super("Vision Subsystem", injectedParameters);
-    // m_drivetrain = drivetrain;
+    // Photonvision
     PortForwarder.add(5800, "photonvision.local", 5800);
-
     limeLight = new PhotonCamera("OV5647");
-
-    limeLight.setPipelineIndex(0);
     // 0: April Tags
     // 1: Reflective Tape
-
+    limeLight.setPipelineIndex(0);
     photonPoseEstimator = new PhotonPoseEstimator(VisionConfig.fieldLayout, PoseStrategy.LOWEST_AMBIGUITY, limeLight,
         new Transform3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0)));
+
+    //Cone detection
+    NetworkTableInstance instance = NetworkTableInstance.getDefault();
+    NetworkTable coneTable = instance.getTable("conetable");
+    m_coneOrientationSubsriber = coneTable.getIntegerTopic("Cone Orientation").subscribe(-1);
+    m_conePresentSubscriber = coneTable.getBooleanTopic("presentCone").subscribe(false);
   }
 
-  public void SwitchPipeline() {
-    if (limeLight.getPipelineIndex() == 0) {
-      limeLight.setPipelineIndex(1);
-    } else {
-      limeLight.setPipelineIndex(0);
-    }
-  }
-
-  public void moveToTape(double pitch, double yaw, SwerveSubsystem drivetrain) {
-  }
-
-  public void updatePos(Pose2d pose) {
+  @Override
+  public void periodic() {
+    int coneOrientation = (int) m_coneOrientationSubsriber.get();
+    StateManager.getInstance().updateState(GamePiece.fromInt(coneOrientation));
+    super.periodic();
   }
 }

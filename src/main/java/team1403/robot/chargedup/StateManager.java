@@ -23,7 +23,12 @@ public class StateManager {
     CONE_AWAY,
     CONE_UPRIGHT,
     CONE_TOWARDS,
-    NA
+    NA;
+    static final GamePiece[] values = GamePiece.values();
+
+    public static GamePiece fromInt(int value) {
+      return values[value];
+    }
   }
 
   private static StateManager instance = null;
@@ -41,8 +46,7 @@ public class StateManager {
     alliance = DriverStation.getAlliance();
   }
 
-  public void updateState(GamePiece newGamePiece, Runnable switchPipeline) {
-    switchPipeline.run();
+  public void updateState(GamePiece newGamePiece) {
     this.gamePiece = newGamePiece;
     switch (newGamePiece) {
       case CUBE: {
