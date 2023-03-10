@@ -30,7 +30,6 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
   private PhotonPoseEstimator photonPoseEstimator;
 
   private final IntegerSubscriber m_coneOrientationSubsriber;
-  private final BooleanSubscriber m_conePresentSubscriber;
 
 
   public PhotonVisionSubsystem(CougarLibInjectedParameters injectedParameters) {
@@ -47,8 +46,7 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
     //Cone detection
     NetworkTableInstance instance = NetworkTableInstance.getDefault();
     NetworkTable coneTable = instance.getTable("conetable");
-    m_coneOrientationSubsriber = coneTable.getIntegerTopic("Cone Orientation").subscribe(-1);
-    m_conePresentSubscriber = coneTable.getBooleanTopic("presentCone").subscribe(false);
+    m_coneOrientationSubsriber = coneTable.getIntegerTopic("rotcone").subscribe(-1);
   }
 
   @Override

@@ -15,19 +15,33 @@ public class StateManager {
   private ArmStateGroup coneTowardsGroup;
   private ArmStateGroup coneAwayGroup;
 
-  private GamePiece gamePiece = GamePiece.NA;
+  private GamePiece gamePiece = GamePiece.NONE;
 
   public enum GamePiece {
     CUBE,
-    CONE_SIDEWAYS,
-    CONE_AWAY,
     CONE_UPRIGHT,
+    CONE_AWAY, 
+    CONE_SIDEWAYS, 
     CONE_TOWARDS,
-    NA;
+    NONE;
+
     static final GamePiece[] values = GamePiece.values();
 
     public static GamePiece fromInt(int value) {
-      return values[value];
+      switch(value) {
+        case 4: // a cube has 4 sides :p
+          return CUBE;
+        case 117: // 'u'
+          return CONE_UPRIGHT;
+        case 115: // 's'
+          return CONE_SIDEWAYS;
+        case 104: // 'h'
+          return CONE_TOWARDS;
+        case 97:  // 'a'
+          return CONE_AWAY;
+        default: // nothing's there :O
+          return NONE;
+      }
     }
   }
 
@@ -69,7 +83,7 @@ public class StateManager {
         SmartDashboard.putString("Operator Message", "Sideways cone found. Cannot intake.");
         break;
        }
-       case NA: {
+       case NONE: {
         SmartDashboard.putString("Operator Message", "No game piece found.");
         break;
        }
