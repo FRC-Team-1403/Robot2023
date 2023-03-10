@@ -1,40 +1,34 @@
 package team1403.robot.chargedup;
 
-import java.util.List;
-
 import com.revrobotics.CANSparkMax.IdleMode;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarRobot;
 import team1403.lib.util.CougarLogger;
-import team1403.robot.chargedup.cse.CougarScriptObject;
-import team1403.robot.chargedup.cse.CougarScriptReader;
-import team1403.robot.chargedup.swerve.SwerveAutoBalanceYaw;
-import team1403.robot.chargedup.swerve.SwerveCommand;
-import team1403.robot.chargedup.swerve.SwerveDrivePath;
-import team1403.robot.chargedup.swerve.SwerveSubsystem;
 import team1403.robot.chargedup.RobotConfig.OperatorConfig;
 import team1403.robot.chargedup.arm.Arm_Subsystem;
 import team1403.robot.chargedup.arm.ManualArmCommand;
+import team1403.robot.chargedup.cse.CougarScriptReader;
+import team1403.robot.chargedup.photonvision.PhotonVisionDefault;
+import team1403.robot.chargedup.photonvision.PhotonVisionSubsystem;
+import team1403.robot.chargedup.swerve.SwerveAutoBalanceYaw;
+import team1403.robot.chargedup.swerve.SwerveCommand;
+import team1403.robot.chargedup.swerve.SwerveSubsystem;
 
 /**
  * The heart of the robot.
  *
- * <p>
- * The bulk of the robot will be implemented through various subsystems.
+ * <p>The bulk of the robot will be implemented through various subsystems.
  * This class creates those subsystems and configures their behaviors.
  *
- * <p>
- * This class has little to do with the runtime operation. It acts more as
+ * <p>This class has little to do with the runtime operation. It acts more as
  * a factory to create the subsystems and write them together and to external
  * controls (both human and software). Once that has happened, the controls
  * take over and issue commands that interact with the subsystem to actually
@@ -46,7 +40,6 @@ public class CougarRobotImpl extends CougarRobot {
    * Constructor.
    *
    * @param parameters Standard framework injected parameters.
-   * @param config Our robot's custom configuration values.
    */
   public CougarRobotImpl(CougarLibInjectedParameters parameters) {
     super(parameters);
@@ -57,7 +50,7 @@ public class CougarRobotImpl extends CougarRobot {
     // m_builtins = new BuiltinSubsystem(parameters, logger);
     m_arm = new Arm_Subsystem(parameters);
     m_swerveSubsystem = new SwerveSubsystem(parameters);
-    // m_visionSubsystem = new PhotonVisionSubsystem(parameters);
+    m_visionSubsystem = new PhotonVisionSubsystem(parameters);
 
     // configureOperatorInterface();
     configureDriverInterface();
@@ -98,7 +91,7 @@ public class CougarRobotImpl extends CougarRobot {
     );
 
     m_visionSubsystem.setDefaultCommand(new PhotonVisionDefault(
-      m_swerveSubsystem, m_visionSubsystem)
+        m_swerveSubsystem, m_visionSubsystem)
     );
 
     new Trigger(() -> xboxDriver.getLeftBumper()).onFalse(
