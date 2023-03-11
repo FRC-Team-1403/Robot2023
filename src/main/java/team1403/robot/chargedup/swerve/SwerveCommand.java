@@ -103,7 +103,7 @@ public class SwerveCommand extends CommandBase {
         * SwerveConfig.kMaxSpeed;
     double horizontal = m_horizontalTranslationLimiter.calculate(m_horizontalTranslationSupplier.getAsDouble())
         * SwerveConfig.kMaxSpeed;
-    double angular = m_rotationalLimiter.calculate(m_rotationSupplier.getAsDouble()) * SwerveConfig.kMaxAngularSpeed;
+    double angular = squareNum(m_rotationSupplier.getAsDouble()) * SwerveConfig.kMaxAngularSpeed;
     Translation2d offset = new Translation2d();
     double robotAngleinDegrees = m_drivetrainSubsystem.getGyroscopeRotation().getDegrees();
 

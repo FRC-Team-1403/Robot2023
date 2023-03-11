@@ -126,7 +126,7 @@ public class Commands {
 			}
 		});
 
-		commandMap.put("High Node", () -> new RobotCommand("High Cube Node", MISC_COLOR) {
+		commandMap.put("High Node", () -> new RobotCommand("High Node", MISC_COLOR) {
 			@Override
 			public Robot applyCommand(Robot initial) {
 				Robot output = initial.getCopy();
@@ -134,7 +134,7 @@ public class Commands {
 			}
 		});
 
-		commandMap.put("Middle Node", () -> new RobotCommand("Middle Cube Node", MISC_COLOR) {
+		commandMap.put("Middle Node", () -> new RobotCommand("Middle Node", MISC_COLOR) {
 			@Override
 			public Robot applyCommand(Robot initial) {
 				Robot output = initial.getCopy();
@@ -142,7 +142,7 @@ public class Commands {
 			}
 		});
 
-		commandMap.put("Low Node", () -> new RobotCommand("Low Cube Node", MISC_COLOR) {
+		commandMap.put("Low Node", () -> new RobotCommand("Low Node", MISC_COLOR) {
 			@Override
 			public Robot applyCommand(Robot initial) {
 				Robot output = initial.getCopy();
@@ -150,7 +150,15 @@ public class Commands {
 			}
 		});
 
-		commandMap.put("Intake", () -> new RobotCommand("Cone Upright Intake", MISC_COLOR) {
+		commandMap.put("Floor Pickup", () -> new RobotCommand("Floor Pickup", MISC_COLOR) {
+			@Override
+			public Robot applyCommand(Robot initial) {
+				Robot output = initial.getCopy();
+				return output;
+			}
+		});
+
+		commandMap.put("Run Intake", () -> new RobotCommand("Run Intake", MISC_COLOR, new NumberField("Intake Speed")) {
 			@Override
 			public Robot applyCommand(Robot initial) {
 				Robot output = initial.getCopy();

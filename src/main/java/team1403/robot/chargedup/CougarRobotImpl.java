@@ -19,15 +19,19 @@ import team1403.lib.core.CougarRobot;
 import team1403.lib.util.CougarLogger;
 import team1403.robot.chargedup.cse.CougarScriptObject;
 import team1403.robot.chargedup.cse.CougarScriptReader;
+import team1403.robot.chargedup.photonvision.PhotonVisionSubsystem;
 import team1403.robot.chargedup.swerve.SwerveAutoBalanceYaw;
 import team1403.robot.chargedup.swerve.SwerveCommand;
 import team1403.robot.chargedup.swerve.SwerveDrivePath;
 import team1403.robot.chargedup.swerve.SwerveSubsystem;
 import team1403.robot.chargedup.RobotConfig.OperatorConfig;
+import team1403.robot.chargedup.arm.ArmState;
 import team1403.robot.chargedup.arm.ArmStateGroup;
 import team1403.robot.chargedup.arm.ArmSubsystem;
 import team1403.robot.chargedup.arm.ManualArmCommand;
+import team1403.robot.chargedup.arm.SequentialMoveArmCommand;
 import team1403.robot.chargedup.arm.SetpointArmCommand;
+import team1403.robot.chargedup.auto.RunIntake;
 
 /**
  * The heart of the robot.
@@ -60,17 +64,17 @@ public class CougarRobotImpl extends CougarRobot {
     // m_builtins = new BuiltinSubsystem(parameters, logger);
     m_arm = new ArmSubsystem(parameters);
     m_swerveSubsystem = new SwerveSubsystem(parameters);
-    // m_visionSubsystem = new PhotonVisionSubsystem(parameters);
+    m_visionSubsystem = new PhotonVisionSubsystem(parameters);
 
     configureOperatorInterface();
     configureDriverInterface();
-    // registerAutoCommands();
+    registerAutoCommands();
   }
 
   @Override
   public Command getAutonomousCommand() {
     m_swerveSubsystem.setRobotIdleMode(IdleMode.kBrake);
-    return m_reader.importScript("Circle.json");
+    return m_reader.importScript("Grid2Mobility.json");
   } 
 
   @Override
@@ -144,7 +148,7 @@ public class CougarRobotImpl extends CougarRobot {
       double feetToMeters = 0.30478512648;
 
       Translation2d flippedXandY = new Translation2d(
-          startPose.getY() * feetToMeters, startPose.getX() * feetToMeters);
+        startPose.getX() * feetToMeters, startPose.getY() * feetToMeters);
 
       Rotation2d theta = new Rotation2d(
           startPose.getRotation().getDegrees());
@@ -155,10 +159,18 @@ public class CougarRobotImpl extends CougarRobot {
 
     m_reader.registerCommand("SwerveDrivePath", (CougarScriptObject p) -> {
       List<Translation2d> wayPoints = p.getPointList("Waypoints");
+
+      wayPoints = List.of(
+        new Translation2d(1.7272, 5.9436),
+        new Translation2d(2.7272, 6.9436),
+        new Translation2d(2.7272, 7.9436)
+      );
+
       return new SwerveDrivePath(m_swerveSubsystem,
-          p.getDouble("StartAngle"),
-          p.getDouble("EndAngle"),
-          wayPoints);
+          0,
+          0,
+          wayPoints
+          );
     });
 
     m_reader.registerCommand("Delay", (CougarScriptObject p) -> {
@@ -181,8 +193,12 @@ public class CougarRobotImpl extends CougarRobot {
       return new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getLowNodeState());
     });
 
-    m_reader.registerCommand("Intake", (CougarScriptObject p) -> {
+    m_reader.registerCommand("Floor Pickup", (CougarScriptObject p) -> {
       return new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState());
+    });
+
+    m_reader.registerCommand("Run Intake", (CougarScriptObject p) -> {
+      return new RunIntake(m_arm, p.getDouble("Intake Speed"));
     });
   }
 
@@ -200,7 +216,7 @@ public class CougarRobotImpl extends CougarRobot {
     if (Math.abs(value) > deadband) {
       if (value > 0.0) {
         return (value - deadband) / (1.0 - deadband);
-      } else {
+      } else { 
         return (value + deadband) / (1.0 - deadband);
       }
     } else {
@@ -278,6 +294,8 @@ public class CougarRobotImpl extends CougarRobot {
         new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getLowNodeState()));
     new Trigger(() -> xboxOperator.getBButton()).onFalse(
       new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getSingleShelfIntakeState()));
+    new Trigger(() -> xboxOperator.getYButton()).onFalse(
+      new SequentialMoveArmCommand(m_arm, new ArmState(0, 246.78781366, 150.28003026, 0)));
   }
 
   /**
@@ -288,7 +306,7 @@ public class CougarRobotImpl extends CougarRobot {
   // }
 
   // private final BuiltinSubsystem m_builtins;
-  // private final PhotonVisionSubsystem m_visionSubsystem;
+  private final PhotonVisionSubsystem m_visionSubsystem;
   private CougarScriptReader m_reader;
   private final ArmSubsystem m_arm;
   private boolean m_armOperatorManual = true;

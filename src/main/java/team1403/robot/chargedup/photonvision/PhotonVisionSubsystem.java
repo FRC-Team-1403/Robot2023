@@ -19,6 +19,7 @@ import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.IntegerSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarSubsystem;
 import team1403.robot.chargedup.StateManager;
@@ -53,6 +54,7 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
   public void periodic() {
     int coneOrientation = (int) m_coneOrientationSubsriber.get();
     StateManager.getInstance().updateState(GamePiece.fromInt(coneOrientation));
+    SmartDashboard.putString("Game Piece", StateManager.getInstance().getGamePiece().name());
     super.periodic();
   }
 }

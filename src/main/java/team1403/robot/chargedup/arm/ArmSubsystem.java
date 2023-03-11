@@ -45,7 +45,7 @@ public class ArmSubsystem extends CougarSubsystem {
   private final CANSparkMax m_extensionMotor;
   private final DigitalInput m_minMagneticSwitch;
   private final DigitalInput m_maxMagneticSwitch;
-  private double m_extensionLimitSwitchOffset;
+  private boolean m_extensionLimitSwitchReset = false;
 
   // Setpoints
   private double m_wristAngleSetpoint;
@@ -376,10 +376,10 @@ public class ArmSubsystem extends CougarSubsystem {
    */
   public void moveArm(double wristAngle, double intakeSpeed,
       double pivotAngle, double extensionLength) {
-    this.m_wristAngleSetpoint = wristAngle;
+    this.m_wristAngleSetpoint = limitWristAngle(wristAngle);
     this.m_intakeSpeedSetpoint = intakeSpeed;
-    this.m_pivotAngleSetpoint = pivotAngle;
-    this.m_extensionLengthSetpoint = extensionLength;
+    this.m_pivotAngleSetpoint = limitPivotAngle(pivotAngle);
+    this.m_extensionLengthSetpoint = limitExtensionLength(extensionLength);
   }
 
   /**
@@ -388,10 +388,10 @@ public class ArmSubsystem extends CougarSubsystem {
    * @param state ArmState class.
    */
   public void moveArm(ArmState state) {
-    this.m_wristAngleSetpoint = state.wristAngle;
+    this.m_wristAngleSetpoint = limitWristAngle(state.wristAngle);
     this.m_intakeSpeedSetpoint = state.intakeSpeed;
-    this.m_pivotAngleSetpoint = state.armPivot;
-    this.m_extensionLengthSetpoint = state.armLength;
+    this.m_pivotAngleSetpoint = limitPivotAngle(state.armPivot);
+    this.m_extensionLengthSetpoint = limitExtensionLength(state.armLength);
   }
 
   /** Returns whether the arm is at the current setpoint.
@@ -403,15 +403,15 @@ public class ArmSubsystem extends CougarSubsystem {
     double currentWristAngle = getAbsoluteWristAngle();
     double currentExtensionLength = getExtensionLength();
 
-    if(Math.abs(currentPivotAngle - this.m_pivotAngleSetpoint) > 2) {
+    if(Math.abs(currentPivotAngle - this.m_pivotAngleSetpoint) > 5) {
       return false;
     }
 
-    if(Math.abs(currentWristAngle - this.m_wristAngleSetpoint) > 2) {
+    if(Math.abs(currentWristAngle - this.m_wristAngleSetpoint) > 5) {
       return false;
     } 
 
-    if(Math.abs(currentExtensionLength - this.m_extensionLengthSetpoint) > 0.5) {
+    if(Math.abs(currentExtensionLength - this.m_extensionLengthSetpoint) > 2) {
       return false;
     }
 
@@ -453,19 +453,17 @@ public class ArmSubsystem extends CougarSubsystem {
     double limitedExtension = dynamicExtensionLimit(m_extensionLengthSetpoint);
     SmartDashboard.putNumber("Limited length", limitedExtension);
 
-    // m_extensionLengthSetpoint = limitedExtension;
-
-    if (isExtensionMinSwitchActive() && m_extensionLimitSwitchOffset == 0) {
+    if (isExtensionMinSwitchActive() && !m_extensionLimitSwitchReset) {
       // Rezero extension
-      m_extensionLimitSwitchOffset = getExtensionLength();
-      m_extensionMotor.getEncoder().setPosition(m_extensionLimitSwitchOffset);
+      m_extensionLimitSwitchReset = true;
+      m_extensionMotor.getEncoder().setPosition(0);
 
       // Let it still move while resetting to leave the magnet zone
-      if (isInExtensionBounds(limitedExtension)) {
-        setMotorExtensionLength(dynamicExtensionLimit(limitedExtension));
-      } else {
-        setMotorExtensionLength(getExtensionLength());
-      }
+      // if (isInExtensionBounds(limitedExtension)) {
+      //   setMotorExtensionLength(dynamicExtensionLimit(limitedExtension));
+      // } else {
+      //   setMotorExtensionLength(getExtensionLength());
+      // }
     } else {
       if ((!isExtensionMinSwitchActive() && !isExtensionMaxSwitchActive())
           || isInExtensionBounds(limitedExtension)) {
@@ -484,6 +482,8 @@ public class ArmSubsystem extends CougarSubsystem {
     SmartDashboard.putNumber("Pivot Setpoint", getPivotAngleSetpoint());
     SmartDashboard.putNumber("Extension Setpoint", getExtensionLengthSetpoint());
     SmartDashboard.putBoolean("minExtension", isExtensionMinSwitchActive());
+    SmartDashboard.putBoolean("Max Extension", isExtensionMaxSwitchActive());
+
     SmartDashboard.putNumber("RAW VALUE", m_wristAbsoluteEncoder.getAbsolutePosition());
     SmartDashboard.putBoolean("Arm Switch??", isArmSwitchActive());
   }

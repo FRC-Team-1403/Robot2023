@@ -61,7 +61,7 @@ public class StateManager {
         ArmStateConfig.singleSubstationIntake, ArmStateConfig.coneTowardsHighConeNode, 
         ArmStateConfig.coneTowardsMiddleNode, ArmStateConfig.coneTowardsLowNode);
 
-    m_currentArmGroup = m_coneUprightGroup;
+    m_currentArmGroup = m_coneTowardsGroup;
   }
   public static StateManager getInstance() {
     if (instance == null) {

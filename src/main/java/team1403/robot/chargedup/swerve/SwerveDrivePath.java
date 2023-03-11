@@ -63,8 +63,8 @@ public class SwerveDrivePath extends CommandBase {
     wayPoints.remove(wayPoints.size() - 1);
 
     m_trajectoryConfig = new TrajectoryConfig(
-        SwerveConfig.kMaxSpeed / 4,
-        SwerveConfig.kMaxAccelerationMetersPerSecondSquared)
+        SwerveConfig.kMaxSpeed / 10,
+        0.5)
         .setKinematics(SwerveConfig.kDriveKinematics);
 
     m_verticalTranslationController = new PIDController(SwerveConfig.kPTranslation, 

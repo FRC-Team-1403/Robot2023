@@ -73,7 +73,7 @@ public class SwerveSubsystem extends CougarSubsystem {
     };
 
     m_odometer = new SwerveDrivePoseEstimator(SwerveConfig.kDriveKinematics, getGyroscopeRotation(),
-        getModulePositions(), new Pose2d(0, 0, new Rotation2d(0)));
+        getModulePositions(), new Pose2d(1.7272, 5.9436, new Rotation2d(0)));
 
     addDevice(m_navx2.getName(), m_navx2);
     new Thread(() -> {
@@ -333,7 +333,6 @@ public class SwerveSubsystem extends CougarSubsystem {
     SmartDashboard.putNumber("Front Right Absolute Encoder",  m_modules[1].getAbsoluteAngle());
     SmartDashboard.putNumber("Back Left Absolute Encoder",  m_modules[2].getAbsoluteAngle());
     SmartDashboard.putNumber("Back Right Absolute Encoder",  m_modules[3].getAbsoluteAngle());
-
 
     m_states = SwerveConfig.kDriveKinematics.toSwerveModuleStates(m_chassisSpeeds, m_offset);
 
