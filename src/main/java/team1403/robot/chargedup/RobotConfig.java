@@ -75,10 +75,10 @@ public class RobotConfig {
             // Back right
             new Translation2d(-kTrackWidth / 2.0, -kWheelBase / 2.0));
 
-    public static final double frontLeftEncoderOffset = -(4.657165672020807 + Math.PI);
-    public static final double frontRightEncoderOffset = -(3.127786826498822 + (2 * Math.PI));
-    public static final double backLeftEncoderOffset = -(4.680175383839091 + Math.PI);
-    public static final double backRightEncoderOffset = -(2.686000359587758);
+    public static final double frontLeftEncoderOffset = -(4.669437518323892 - Math.PI);
+    public static final double frontRightEncoderOffset = -(0.009203884727314 + Math.PI);
+    public static final double backLeftEncoderOffset = -(4.680175383839091 - Math.PI);
+    public static final double backRightEncoderOffset = -(5.776971647177325 - Math.PI);
 
     public static final double kDriveReduction = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
     public static final double kSteerReduction = (15.0 / 32.0) * (10.0 / 60.0);
@@ -246,10 +246,10 @@ public class RobotConfig {
     public static final int kPArmPivot = 1;
     public static final int kIArmPivot = 0;
     public static final int kDArmPivot = 0;
-    public static final double kAbsolutePivotOffset = 54.14769413383904;
+    public static final double kAbsolutePivotOffset = 180-85.2492019663337;
     public static double kMaxPivotAngle = 249.84208720995503;
-    public static final double kFrameAngle = 229.6427020308589;
-    public static final double kFrameClearanceAngle = 234.5;
+    public static final double kFrameAngle = 242.71777151085703;
+    public static final double kFrameClearanceAngle = 234.5; //cone angle
     public static final double kMinPivotAngle = 132.211;
     public static final double kPivotAngleMaxAmperage = 40;
     public static final double kHorizonAngle = 210;
@@ -259,9 +259,9 @@ public class RobotConfig {
     public static final double kIWristMotor = 0;
     public static final double kDWristMotor = 90;
     public static final double kMaxWristAngle = 265;
-    public static final double kMinWristAngle = 20.21221400530536; 
+    public static final double kMinWristAngle = 29.196293229907326; 
     public static final double kWristConversionFactor = 90.0 / 100;
-    public static final double kAbsoluteWristOffset = 78.98266997456675+20.21221400530536;
+    public static final double kAbsoluteWristOffset = 180-74.7792558694814;
 
     //Extension
     public static final double kPArmExtension = 0.3;

@@ -87,7 +87,7 @@ public class ArmSubsystem extends CougarSubsystem {
     m_maxMagneticSwitch = new DigitalInput(RobotConfig.RioPorts.kExtensionMaxMagneticSwitch);
 
     this.m_pivotAngleSetpoint = getAbsolutePivotAngle();
-    this.m_wristAngleSetpoint = getRelativeWristAngle();
+    this.m_wristAngleSetpoint = getAbsoluteWristAngle();
     this.m_extensionLengthSetpoint = getExtensionLength();
 
   }
@@ -101,7 +101,7 @@ public class ArmSubsystem extends CougarSubsystem {
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
-      double wristAngle = getRelativeWristAngle();
+      double wristAngle = getAbsoluteWristAngle();
       m_wristMotor.getEncoder().setPosition(wristAngle);
       m_wristAngleSetpoint = wristAngle;
     }).start();
@@ -176,7 +176,7 @@ public class ArmSubsystem extends CougarSubsystem {
    *
    * @return The absolute encoder value of the wrist.
    */
-  public double getRelativeWristAngle() {
+  public double getAbsoluteWristAngle() {
     double value = (m_wristAbsoluteEncoder.getAbsolutePosition() * 360) + RobotConfig.Arm.kAbsoluteWristOffset;
 
     if (value < 0) {
@@ -200,13 +200,6 @@ public class ArmSubsystem extends CougarSubsystem {
 
   public double limitWristAngle(double angle) {
     return MathUtil.clamp(angle, Arm.kMinWristAngle, Arm.kMaxWristAngle);
-  }
-
-  public double dynamicWristLimit(double angle) {
-    if(getAbsolutePivotAngle() >= RobotConfig.Arm.kFrameAngle) {
-      return getRelativeWristAngle();
-    }
-    return angle;
   }
 
   /**
@@ -236,11 +229,9 @@ public class ArmSubsystem extends CougarSubsystem {
    */
   private void rezeroPivot() {
     double currentAngle = getAbsolutePivotAngle();
-    double offset = currentAngle - RobotConfig.Arm.kMaxPivotAngle;
-    if(currentAngle > RobotConfig.Arm.kMaxPivotAngle) {
-      RobotConfig.Arm.kMaxPivotAngle -= offset;
-    } else {
-      RobotConfig.Arm.kMaxPivotAngle += offset;
+    if(Math.abs(currentAngle - RobotConfig.Arm.kMaxPivotAngle) > 1) {
+      double offset = currentAngle - RobotConfig.Arm.kMaxPivotAngle;
+    RobotConfig.Arm.kMaxPivotAngle -= (offset);
     }
   }
 
@@ -409,7 +400,7 @@ public class ArmSubsystem extends CougarSubsystem {
    */
   public boolean isAtSetpoint() {
     double currentPivotAngle = getAbsolutePivotAngle();
-    double currentWristAngle = getRelativeWristAngle();
+    double currentWristAngle = getAbsoluteWristAngle();
     double currentExtensionLength = getExtensionLength();
 
     if(Math.abs(currentPivotAngle - this.m_pivotAngleSetpoint) > 2) {
@@ -430,21 +421,24 @@ public class ArmSubsystem extends CougarSubsystem {
   @Override
   public void periodic() {
     // Wrist
-    this.m_wristAngleSetpoint = dynamicWristLimit(this.m_wristAngleSetpoint);
-    if (isInWristBounds(m_wristMotor.getEncoder().getPosition())
+    if(getAbsolutePivotAngle() < RobotConfig.Arm.kFrameAngle ) {
+      if (isInWristBounds(m_wristMotor.getEncoder().getPosition())
         || isInWristBounds(this.m_wristAngleSetpoint)) {
       setAbsoluteWristAngle(this.m_wristAngleSetpoint);
-    } else {
-      setAbsoluteWristAngle(m_wristMotor.getEncoder().getPosition());
+      } else if (m_wristMotor.getOutputCurrent() > 25) {
+        setAbsoluteWristAngle(m_wristMotor.getEncoder().getPosition());
+      } else {
+        setAbsoluteWristAngle(m_wristMotor.getEncoder().getPosition());
+      } 
     }
-
+    
     // Intake
     runIntake(m_intakeSpeedSetpoint);
 
     // Pivot
-    if(isArmSwitchActive()) {
-      rezeroPivot();
-    }
+    // if(isArmSwitchActive()) {
+    //   rezeroPivot();
+    // }
     
     if ((isInPivotBounds(getAbsolutePivotAngle()) && !isArmSwitchActive())
         || isInPivotBounds(this.m_pivotAngleSetpoint)) {
@@ -459,7 +453,7 @@ public class ArmSubsystem extends CougarSubsystem {
     double limitedExtension = dynamicExtensionLimit(m_extensionLengthSetpoint);
     SmartDashboard.putNumber("Limited length", limitedExtension);
 
-    m_extensionLengthSetpoint = limitedExtension;
+    // m_extensionLengthSetpoint = limitedExtension;
 
     if (isExtensionMinSwitchActive() && m_extensionLimitSwitchOffset == 0) {
       // Rezero extension
@@ -482,7 +476,7 @@ public class ArmSubsystem extends CougarSubsystem {
     }
 
     // Track Values
-    SmartDashboard.putNumber("Wrist Angle", getRelativeWristAngle());
+    SmartDashboard.putNumber("Wrist Angle", getAbsoluteWristAngle());
     SmartDashboard.putNumber("Pivot Angle", getAbsolutePivotAngle());
     SmartDashboard.putNumber("Extension Length", getExtensionLength());
 

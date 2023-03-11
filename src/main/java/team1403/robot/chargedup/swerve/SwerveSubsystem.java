@@ -88,7 +88,6 @@ public class SwerveSubsystem extends CougarSubsystem {
     }).start();
 
     m_desiredHeading = getGyroscopeRotation().getDegrees();
-    SmartDashboard.putNumber("Desired Heading", m_desiredHeading);
 
     setRobotRampRate(0.0);
     setRobotIdleMode(IdleMode.kCoast);
@@ -284,10 +283,8 @@ public class SwerveSubsystem extends CougarSubsystem {
     } else if (translationalVelocity > 1) {
       m_calc = m_driftCorrectionPid.calculate(getGyroscopeRotation().getDegrees(),
           m_desiredHeading);
-      SmartDashboard.putNumber("Calc Drift Correction", m_calc);
       if (Math.abs(m_calc) >= 0.55) {
         m_chassisSpeeds.omegaRadiansPerSecond += m_calc;
-        SmartDashboard.putNumber("Omega Radians Correction", m_chassisSpeeds.omegaRadiansPerSecond);
       }
       tracef("driftCorrection %f, corrected omegaRadiansPerSecond %f",
           m_calc, m_chassisSpeeds.omegaRadiansPerSecond);
@@ -330,6 +327,13 @@ public class SwerveSubsystem extends CougarSubsystem {
         
     m_chassisSpeeds = translationalDriftCorrection(m_chassisSpeeds);
     m_chassisSpeeds = rotationalDriftCorrection(m_chassisSpeeds);
+
+
+    SmartDashboard.putNumber("Front Left Absolute Encoder",  m_modules[0].getAbsoluteAngle());
+    SmartDashboard.putNumber("Front Right Absolute Encoder",  m_modules[1].getAbsoluteAngle());
+    SmartDashboard.putNumber("Back Left Absolute Encoder",  m_modules[2].getAbsoluteAngle());
+    SmartDashboard.putNumber("Back Right Absolute Encoder",  m_modules[3].getAbsoluteAngle());
+
 
     m_states = SwerveConfig.kDriveKinematics.toSwerveModuleStates(m_chassisSpeeds, m_offset);
 

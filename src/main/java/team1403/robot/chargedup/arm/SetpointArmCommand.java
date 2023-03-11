@@ -29,7 +29,7 @@ public class SetpointArmCommand extends CommandBase {
   @Override
   public void initialize() {
     this.m_pivotProfile = new TrapezoidProfile(
-      new TrapezoidProfile.Constraints(360, 165), //360, 165
+      new TrapezoidProfile.Constraints(360, 165), //high --> 360, 165 //slow --> 20, 10
       new TrapezoidProfile.State(m_state.armPivot, 1),
       new TrapezoidProfile.State(m_arm.getAbsolutePivotAngle(), 0));
     this.m_startTime = Timer.getFPGATimestamp();

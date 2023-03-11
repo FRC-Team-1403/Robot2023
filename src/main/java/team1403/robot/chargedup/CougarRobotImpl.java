@@ -248,6 +248,14 @@ public class CougarRobotImpl extends CougarRobot {
         new SetpointArmCommand(m_arm, ArmStateGroup.getTuck()));
     new Trigger(()->xboxOperator.getPOV() == 0).onFalse(
         new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState()));
+    new Trigger(()-> xboxOperator.getAButton()).onFalse(
+      new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState()));
+    new Trigger(()-> xboxOperator.getPOV() == 90).onFalse(
+      new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState()));
+    new Trigger(()-> xboxOperator.getPOV() == 270).onFalse(
+        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getLowNodeState()));
+    new Trigger(() -> xboxOperator.getBButton()).onFalse(
+      new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getSingleShelfIntakeState()));
   }
 
   /**

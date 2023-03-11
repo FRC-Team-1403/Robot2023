@@ -25,7 +25,7 @@ public class SequentialMoveArmCommand extends CommandBase{
   public void initialize() {
     this.m_intialPivotAngle = m_arm.getPivotAngleSetpoint();
     this.m_intialExtensionLength = m_arm.getExtensionLengthSetpoint();
-    this.m_initialWristAngle = m_arm.getRelativeWristAngle();
+    this.m_initialWristAngle = m_arm.getAbsoluteWristAngle();
     this.m_initialIntakeSpeed = m_arm.getIntakeSpeedSetpoint();
     super.initialize();
   }
