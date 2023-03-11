@@ -12,6 +12,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
 import team1403.lib.util.Dimension;
+import team1403.robot.chargedup.arm.ArmState;
 
 
 /**
@@ -281,5 +282,17 @@ public class RobotConfig {
     public static final double kPhysicalArmMaxExtension = kBaseArmLength + kMaxArmExtension; //inches
 
     public static final double kArmWeight = 16; //Pounds
+  }
+
+  public static class ArmStateConfig {
+    public static final ArmState coneTowardsFloorIntake = new ArmState(0.039682067930698, 140.0363630009091, 240.55448872511047, 0);
+    public static final ArmState coneTowardsHighConeNode = new ArmState(22.987735748, 246.78781366, 150.28003026, 0);
+    public static final ArmState coneTowardsMiddleNode = new ArmState(8.345230102539062, 264, 149.45086251051157, 0);
+    public static final ArmState singleSubstationIntake = new ArmState(0, 51.3175107829, 241.777313195, 0);
+    public static final ArmState coneTowardsLowNode = new ArmState(0, 80.18787350469682, 245.42271036546947, 0);
+
+    public static final ArmState cubeFloorIntake = new ArmState(4.055530548095703, 124.90037862250946, 230.28624941341906, 0);
+    public static final ArmState cubeHighNode = new ArmState(16.6710987091, 177.965261949, 169.356773014, 0);
+    public static final ArmState cubeMiddleNode = new ArmState(0.05158682167, 177.61028394, 181.482400676, 0);
   }
 }

@@ -247,15 +247,15 @@ public class CougarRobotImpl extends CougarRobot {
     new Trigger(()->xboxOperator.getPOV() == 180).onFalse(
         new SetpointArmCommand(m_arm, ArmStateGroup.getTuck()));
     new Trigger(()->xboxOperator.getPOV() == 0).onFalse(
-        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState()));
+        new SetpointArmCommand(m_arm, StateManager.getInstance().getM_currentArmGroup().getHighNodeState()));
     new Trigger(()-> xboxOperator.getAButton()).onFalse(
-      new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState()));
+      new SetpointArmCommand(m_arm, StateManager.getInstance().getM_currentArmGroup().getFloorIntakeState()));
     new Trigger(()-> xboxOperator.getPOV() == 90).onFalse(
-      new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState()));
+      new SetpointArmCommand(m_arm, StateManager.getInstance().getM_currentArmGroup().getMiddleNodeState()));
     new Trigger(()-> xboxOperator.getPOV() == 270).onFalse(
-        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getLowNodeState()));
+        new SetpointArmCommand(m_arm, StateManager.getInstance().getM_currentArmGroup().getLowNodeState()));
     new Trigger(() -> xboxOperator.getBButton()).onFalse(
-      new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getSingleShelfIntakeState()));
+      new SetpointArmCommand(m_arm, StateManager.getInstance().getM_currentArmGroup().getSingleShelfIntakeState()));
   }
 
   /**
