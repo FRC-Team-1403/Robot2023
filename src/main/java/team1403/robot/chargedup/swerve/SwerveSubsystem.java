@@ -2,6 +2,7 @@ package team1403.robot.chargedup.swerve;
 
 import com.revrobotics.CANSparkMax.IdleMode;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -37,7 +38,7 @@ public class SwerveSubsystem extends CougarSubsystem {
 
   private final PIDController m_driftCorrectionPid = new PIDController(0.35, 0, 0);
   private double m_desiredHeading = 0;
-  private double m_speedLimiter = 0.6;
+  private double m_speedLimiter = 0.4;
 
   private Translation2d m_offset;
 
@@ -114,6 +115,10 @@ public class SwerveSubsystem extends CougarSubsystem {
   public void decreaseSpeed(double amt) {
     tracef("decreasedSpeed %f", amt);
     m_speedLimiter = Math.max(0, m_speedLimiter - amt);
+  }
+
+  public void setSpeedLimiter(double amt) {
+    m_speedLimiter = MathUtil.clamp(amt, 0, 1);
   }
 
   /**

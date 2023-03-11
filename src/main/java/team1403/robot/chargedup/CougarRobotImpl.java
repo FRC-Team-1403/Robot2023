@@ -104,12 +104,11 @@ public class CougarRobotImpl extends CougarRobot {
         () -> xboxDriver.getLeftTriggerAxis())
     );
 
+    new Trigger(() -> xboxDriver.getLeftBumper()).onTrue(
+      new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.2)));
+    
     new Trigger(() -> xboxDriver.getLeftBumper()).onFalse(
-        new InstantCommand(() -> m_swerveSubsystem.decreaseSpeed(0.2)));
-
-    new Trigger(() -> xboxDriver.getRightBumper()).onFalse(
-        new InstantCommand(() -> m_swerveSubsystem.increaseSpeed(0.2)));
-
+      new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.4)));
 
     new Trigger(() -> xboxDriver.getBButton()).onFalse(
       new InstantCommand(() -> m_swerveSubsystem.zeroGyroscope()));
@@ -159,13 +158,6 @@ public class CougarRobotImpl extends CougarRobot {
 
     m_reader.registerCommand("SwerveDrivePath", (CougarScriptObject p) -> {
       List<Translation2d> wayPoints = p.getPointList("Waypoints");
-
-      wayPoints = List.of(
-        new Translation2d(1.7272, 5.9436),
-        new Translation2d(2.7272, 6.9436),
-        new Translation2d(2.7272, 7.9436)
-      );
-
       return new SwerveDrivePath(m_swerveSubsystem,
           0,
           0,
@@ -178,23 +170,23 @@ public class CougarRobotImpl extends CougarRobot {
     });
 
     m_reader.registerCommand("Tuck", (CougarScriptObject p) -> {
-      return new SetpointArmCommand(m_arm, ArmStateGroup.getTuck());
+      return new SequentialMoveArmCommand(m_arm, ArmStateGroup.getTuck());
     });
 
     m_reader.registerCommand("High Node", (CougarScriptObject p) -> {
-      return new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState());
+      return new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState());
     });
 
     m_reader.registerCommand("Middle Node", (CougarScriptObject p) -> {
-      return new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState());
+      return new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState());
     });
 
     m_reader.registerCommand("Low Node", (CougarScriptObject p) -> {
-      return new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getLowNodeState());
+      return new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getLowNodeState());
     });
 
     m_reader.registerCommand("Floor Pickup", (CougarScriptObject p) -> {
-      return new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState());
+      return new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState());
     });
 
     m_reader.registerCommand("Run Intake", (CougarScriptObject p) -> {

@@ -4,18 +4,14 @@
 
 package team1403.robot.chargedup.photonvision;
 
-import java.util.Optional;
-import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonUtils;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import edu.wpi.first.math.geometry.Pose2d;
+
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.net.PortForwarder;
-import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.IntegerSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -31,7 +27,6 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
   private PhotonPoseEstimator photonPoseEstimator;
 
   private final IntegerSubscriber m_coneOrientationSubsriber;
-
 
   public PhotonVisionSubsystem(CougarLibInjectedParameters injectedParameters) {
     super("Vision Subsystem", injectedParameters);

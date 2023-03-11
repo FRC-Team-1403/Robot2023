@@ -2,7 +2,6 @@ package team1403.robot.chargedup.arm;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /**
@@ -65,7 +64,6 @@ public class SequentialMoveArmCommand extends CommandBase{
     } else {
       m_arm.moveArm(this.armStates[currentState]);
     }
-
 
     if(m_arm.isAtSetpoint()) {
       System.out.println("____________________________Changing_______________");
