@@ -294,5 +294,7 @@ public class RobotConfig {
     public static final ArmState cubeFloorIntake = new ArmState(4.055530548095703, 124.90037862250946, 230.28624941341906, 0);
     public static final ArmState cubeHighNode = new ArmState(16.6710987091, 177.965261949, 169.356773014, 0);
     public static final ArmState cubeMiddleNode = new ArmState(0.05158682167, 177.61028394, 181.482400676, 0);
+
+    public static final ArmState coneUprightIntake = new ArmState(0, 207.099432677, 205.208496037, 0);
   }
 }

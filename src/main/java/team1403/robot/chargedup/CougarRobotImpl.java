@@ -139,32 +139,54 @@ public class CougarRobotImpl extends CougarRobot {
    *
    * @return the command to run in autonomous
    */
-  // private void registerAutoCommands() {
-  //   m_reader = new CougarScriptReader((Pose2d startPose) -> {
-  //     double feetToMeters = 0.30478512648;
+  private void registerAutoCommands() {
+    m_reader = new CougarScriptReader((Pose2d startPose) -> {
+      double feetToMeters = 0.30478512648;
 
-  //     Translation2d flippedXandY = new Translation2d(
-  //         startPose.getY() * feetToMeters, startPose.getX() * feetToMeters);
+      Translation2d flippedXandY = new Translation2d(
+          startPose.getY() * feetToMeters, startPose.getX() * feetToMeters);
 
-  //     Rotation2d theta = new Rotation2d(
-  //         startPose.getRotation().getDegrees());
+      Rotation2d theta = new Rotation2d(
+          startPose.getRotation().getDegrees());
 
-  //     Pose2d transformedStartPose = new Pose2d(flippedXandY, theta);
-  //     m_swerveSubsystem.setPose(transformedStartPose);
-  //   });
+      Pose2d transformedStartPose = new Pose2d(flippedXandY, theta);
+      m_swerveSubsystem.setPose(transformedStartPose);
+    });
 
-  //   m_reader.registerCommand("SwerveDrivePath", (CougarScriptObject p) -> {
-  //     List<Translation2d> wayPoints = p.getPointList("Waypoints");
-  //     return new SwerveDrivePath(m_swerveSubsystem,
-  //         p.getDouble("StartAngle"),
-  //         p.getDouble("EndAngle"),
-  //         wayPoints);
-  //   });
+    m_reader.registerCommand("SwerveDrivePath", (CougarScriptObject p) -> {
+      List<Translation2d> wayPoints = p.getPointList("Waypoints");
+      return new SwerveDrivePath(m_swerveSubsystem,
+          p.getDouble("StartAngle"),
+          p.getDouble("EndAngle"),
+          wayPoints);
+    });
 
-  //   m_reader.registerCommand("Delay", (CougarScriptObject p) -> {
-  //     return new WaitCommand(p.getDouble("seconds"));
-  //   });
-  // }
+    m_reader.registerCommand("Delay", (CougarScriptObject p) -> {
+      return new WaitCommand(p.getDouble("seconds"));
+    });
+
+    m_reader.registerCommand("Tuck", (CougarScriptObject p) -> {
+      return new SetpointArmCommand(m_arm, ArmStateGroup.getTuck());
+    });
+
+    m_reader.registerCommand("High Node", (CougarScriptObject p) -> {
+      return new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState());
+    });
+
+    m_reader.registerCommand("Middle Node", (CougarScriptObject p) -> {
+      return new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState());
+    });
+
+    m_reader.registerCommand("Low Node", (CougarScriptObject p) -> {
+      return new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getLowNodeState());
+    });
+
+    m_reader.registerCommand("Intake", (CougarScriptObject p) -> {
+      return new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState());
+    });
+  }
+
+  
 
   /**
    * Applies a deadband to the given value.
@@ -247,15 +269,15 @@ public class CougarRobotImpl extends CougarRobot {
     new Trigger(()->xboxOperator.getPOV() == 180).onFalse(
         new SetpointArmCommand(m_arm, ArmStateGroup.getTuck()));
     new Trigger(()->xboxOperator.getPOV() == 0).onFalse(
-        new SetpointArmCommand(m_arm, StateManager.getInstance().getM_currentArmGroup().getHighNodeState()));
+        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState()));
     new Trigger(()-> xboxOperator.getAButton()).onFalse(
-      new SetpointArmCommand(m_arm, StateManager.getInstance().getM_currentArmGroup().getFloorIntakeState()));
+      new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState()));
     new Trigger(()-> xboxOperator.getPOV() == 90).onFalse(
-      new SetpointArmCommand(m_arm, StateManager.getInstance().getM_currentArmGroup().getMiddleNodeState()));
+      new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState()));
     new Trigger(()-> xboxOperator.getPOV() == 270).onFalse(
-        new SetpointArmCommand(m_arm, StateManager.getInstance().getM_currentArmGroup().getLowNodeState()));
+        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getLowNodeState()));
     new Trigger(() -> xboxOperator.getBButton()).onFalse(
-      new SetpointArmCommand(m_arm, StateManager.getInstance().getM_currentArmGroup().getSingleShelfIntakeState()));
+      new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getSingleShelfIntakeState()));
   }
 
   /**

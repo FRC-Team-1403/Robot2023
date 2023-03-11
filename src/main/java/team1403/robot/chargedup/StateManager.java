@@ -38,11 +38,11 @@ public class StateManager {
         ArmStateConfig.singleSubstationIntake, ArmStateConfig.cubeHighNode, 
         ArmStateConfig.cubeMiddleNode, ArmStateGroup.tuck);
 
-    m_coneUprightGroup = new ArmStateGroup(null, null, 
+    m_coneUprightGroup = new ArmStateGroup(ArmStateConfig.coneUprightIntake, null, 
         ArmStateConfig.singleSubstationIntake, ArmStateConfig.coneTowardsHighConeNode, 
         ArmStateConfig.coneTowardsMiddleNode, ArmStateConfig.coneTowardsLowNode);
 
-    m_currentArmGroup = m_cubeGroup;
+    m_currentArmGroup = m_coneUprightGroup;
   }
   public static StateManager getInstance() {
     if (instance == null) {
@@ -90,7 +90,7 @@ public class StateManager {
     return m_alliance;
   }
 
-  public ArmStateGroup getM_currentArmGroup() {
+  public ArmStateGroup getCurrentArmGroup() {
     return m_currentArmGroup;
   }
 
