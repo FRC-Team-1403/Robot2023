@@ -39,15 +39,15 @@ public class SequentialMoveArmCommand extends CommandBase{
     this.m_intialExtensionLength = m_arm.getExtensionLengthSetpoint();
     this.m_initialWristAngle = m_arm.getAbsoluteWristAngle();
     this.m_initialIntakeSpeed = m_arm.getIntakeSpeedSetpoint();
-
     
     this.m_pivotProfile = new TrapezoidProfile(
-      new TrapezoidProfile.Constraints(360, 165), //high --> 360, 165 //slow --> 20, 10
+      new TrapezoidProfile.Constraints(20, 10), //high --> 360, 165 //slow --> 20, 10
       new TrapezoidProfile.State(m_endState.armPivot, 1),
-      new TrapezoidProfile.State(m_arm.getAbsolutePivotAngle(), 0));
+      new TrapezoidProfile.State(m_intialPivotAngle, 0));
+
     this.m_startTime = Timer.getFPGATimestamp();
 
-    this.armStates[0] = new ArmState(m_initialWristAngle, m_initialIntakeSpeed, m_endState.armPivot, m_intialExtensionLength);
+    this.armStates[0] = new ArmState(m_intialExtensionLength , m_initialWristAngle, m_endState.armPivot, m_initialIntakeSpeed);
     this.armStates[1] = this.m_endState;
     System.out.println("End arm state: " + armStates[1]);
 
@@ -57,10 +57,16 @@ public class SequentialMoveArmCommand extends CommandBase{
 
   @Override
   public void execute() {
-    m_arm.moveArm(this.armStates[currentState]);
-    SmartDashboard.putBoolean("Is at setpoint", m_arm.isAtSetpoint());
-    System.out.println("");
-    SmartDashboard.putNumber("Current State", currentState);
+    if(currentState == 0) {
+      double deltaT = Timer.getFPGATimestamp() - m_startTime;
+      double pivotPosition = m_pivotProfile.calculate(deltaT).position;
+      ArmState state = new ArmState(this.armStates[currentState].armLength, this.armStates[currentState].wristAngle, pivotPosition, this.armStates[currentState].intakeSpeed);
+      m_arm.moveArm(state);
+    } else {
+      m_arm.moveArm(this.armStates[currentState]);
+    }
+
+
     if(m_arm.isAtSetpoint()) {
       System.out.println("____________________________Changing_______________");
       currentState++;
