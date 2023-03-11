@@ -228,7 +228,6 @@ public class SwerveModule implements Device {
 
     // Angle to be changed is now in radians
     double referenceAngleRadians = steerAngle;
-    SmartDashboard.putNumber("Target Angle", Math.toDegrees(referenceAngleRadians));
 
     double currentAngleRadians = m_steerMotor.getEncoder().getPosition();
 

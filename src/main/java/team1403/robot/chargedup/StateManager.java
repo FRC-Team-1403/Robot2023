@@ -3,17 +3,18 @@ package team1403.robot.chargedup;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import team1403.robot.chargedup.RobotConfig.ArmStateConfig;
 import team1403.robot.chargedup.arm.ArmStateGroup;
 
 public class StateManager {
 
-  private Alliance alliance;
+  private Alliance m_alliance;
 
-  private ArmStateGroup currentArmGroup;
-  private ArmStateGroup cubeGroup;
-  private ArmStateGroup coneUprightGroup;
-  private ArmStateGroup coneTowardsGroup;
-  private ArmStateGroup coneAwayGroup;
+  private ArmStateGroup m_currentArmGroup;
+  private ArmStateGroup m_cubeGroup;
+  private ArmStateGroup m_coneUprightGroup;
+  private ArmStateGroup m_coneTowardsGroup;
+  private ArmStateGroup m_coneAwayGroup;
 
   private GamePiece gamePiece = GamePiece.NA;
 
@@ -28,8 +29,21 @@ public class StateManager {
 
   private static StateManager instance = null;
 
-  private StateManager() {}
+  private StateManager() {
+    m_coneTowardsGroup = new ArmStateGroup(ArmStateConfig.coneTowardsFloorIntake, null, 
+        ArmStateConfig.singleSubstationIntake, ArmStateConfig.coneTowardsHighConeNode, 
+        ArmStateConfig.coneTowardsMiddleNode, ArmStateConfig.coneTowardsLowNode);
 
+    m_cubeGroup = new ArmStateGroup(ArmStateConfig.cubeFloorIntake, null, 
+        ArmStateConfig.singleSubstationIntake, ArmStateConfig.cubeHighNode, 
+        ArmStateConfig.cubeMiddleNode, ArmStateGroup.tuck);
+
+    m_coneUprightGroup = new ArmStateGroup(ArmStateConfig.coneUprightIntake, null, 
+        ArmStateConfig.singleSubstationIntake, ArmStateConfig.coneTowardsHighConeNode, 
+        ArmStateConfig.coneTowardsMiddleNode, ArmStateConfig.coneTowardsLowNode);
+
+    m_currentArmGroup = m_coneUprightGroup;
+  }
   public static StateManager getInstance() {
     if (instance == null) {
       instance = new StateManager();
@@ -38,7 +52,7 @@ public class StateManager {
   }
 
   public void init() {
-    alliance = DriverStation.getAlliance();
+    m_alliance = DriverStation.getAlliance();
   }
 
   public void updateState(GamePiece newGamePiece, Runnable switchPipeline) {
@@ -46,19 +60,19 @@ public class StateManager {
     this.gamePiece = newGamePiece;
     switch (newGamePiece) {
       case CUBE: {
-        currentArmGroup = cubeGroup;
+        m_currentArmGroup = m_cubeGroup;
         break;
       }
        case CONE_UPRIGHT: {
-        currentArmGroup = coneUprightGroup;
+        m_currentArmGroup = m_coneUprightGroup;
         break;
        }
        case CONE_AWAY: {
-        currentArmGroup = coneAwayGroup;
+        m_currentArmGroup = m_coneAwayGroup;
         break;
        }
        case CONE_TOWARDS: {
-        currentArmGroup = coneTowardsGroup;
+        m_currentArmGroup = m_coneTowardsGroup;
         break;
        }
        case CONE_SIDEWAYS: {
@@ -72,12 +86,12 @@ public class StateManager {
     }
   }
 
-  public Alliance getAlliance() {
-    return alliance;
+  public Alliance getM_alliance() {
+    return m_alliance;
   }
 
   public ArmStateGroup getCurrentArmGroup() {
-    return currentArmGroup;
+    return m_currentArmGroup;
   }
 
   public GamePiece getGamePiece() {

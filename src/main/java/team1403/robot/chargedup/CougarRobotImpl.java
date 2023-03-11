@@ -24,8 +24,10 @@ import team1403.robot.chargedup.swerve.SwerveCommand;
 import team1403.robot.chargedup.swerve.SwerveDrivePath;
 import team1403.robot.chargedup.swerve.SwerveSubsystem;
 import team1403.robot.chargedup.RobotConfig.OperatorConfig;
-import team1403.robot.chargedup.arm.Arm_Subsystem;
+import team1403.robot.chargedup.arm.ArmStateGroup;
+import team1403.robot.chargedup.arm.ArmSubsystem;
 import team1403.robot.chargedup.arm.ManualArmCommand;
+import team1403.robot.chargedup.arm.SetpointArmCommand;
 
 /**
  * The heart of the robot.
@@ -56,7 +58,7 @@ public class CougarRobotImpl extends CougarRobot {
 
         
     // m_builtins = new BuiltinSubsystem(parameters, logger);
-    m_arm = new Arm_Subsystem(parameters);
+    m_arm = new ArmSubsystem(parameters);
     m_swerveSubsystem = new SwerveSubsystem(parameters);
     // m_visionSubsystem = new PhotonVisionSubsystem(parameters);
 
@@ -104,6 +106,7 @@ public class CougarRobotImpl extends CougarRobot {
     new Trigger(() -> xboxDriver.getRightBumper()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.increaseSpeed(0.2)));
 
+
     new Trigger(() -> xboxDriver.getBButton()).onFalse(
       new InstantCommand(() -> m_swerveSubsystem.zeroGyroscope()));
 
@@ -136,32 +139,54 @@ public class CougarRobotImpl extends CougarRobot {
    *
    * @return the command to run in autonomous
    */
-  // private void registerAutoCommands() {
-  //   m_reader = new CougarScriptReader((Pose2d startPose) -> {
-  //     double feetToMeters = 0.30478512648;
+  private void registerAutoCommands() {
+    m_reader = new CougarScriptReader((Pose2d startPose) -> {
+      double feetToMeters = 0.30478512648;
 
-  //     Translation2d flippedXandY = new Translation2d(
-  //         startPose.getY() * feetToMeters, startPose.getX() * feetToMeters);
+      Translation2d flippedXandY = new Translation2d(
+          startPose.getY() * feetToMeters, startPose.getX() * feetToMeters);
 
-  //     Rotation2d theta = new Rotation2d(
-  //         startPose.getRotation().getDegrees());
+      Rotation2d theta = new Rotation2d(
+          startPose.getRotation().getDegrees());
 
-  //     Pose2d transformedStartPose = new Pose2d(flippedXandY, theta);
-  //     m_swerveSubsystem.setPose(transformedStartPose);
-  //   });
+      Pose2d transformedStartPose = new Pose2d(flippedXandY, theta);
+      m_swerveSubsystem.setPose(transformedStartPose);
+    });
 
-  //   m_reader.registerCommand("SwerveDrivePath", (CougarScriptObject p) -> {
-  //     List<Translation2d> wayPoints = p.getPointList("Waypoints");
-  //     return new SwerveDrivePath(m_swerveSubsystem,
-  //         p.getDouble("StartAngle"),
-  //         p.getDouble("EndAngle"),
-  //         wayPoints);
-  //   });
+    m_reader.registerCommand("SwerveDrivePath", (CougarScriptObject p) -> {
+      List<Translation2d> wayPoints = p.getPointList("Waypoints");
+      return new SwerveDrivePath(m_swerveSubsystem,
+          p.getDouble("StartAngle"),
+          p.getDouble("EndAngle"),
+          wayPoints);
+    });
 
-  //   m_reader.registerCommand("Delay", (CougarScriptObject p) -> {
-  //     return new WaitCommand(p.getDouble("seconds"));
-  //   });
-  // }
+    m_reader.registerCommand("Delay", (CougarScriptObject p) -> {
+      return new WaitCommand(p.getDouble("seconds"));
+    });
+
+    m_reader.registerCommand("Tuck", (CougarScriptObject p) -> {
+      return new SetpointArmCommand(m_arm, ArmStateGroup.getTuck());
+    });
+
+    m_reader.registerCommand("High Node", (CougarScriptObject p) -> {
+      return new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState());
+    });
+
+    m_reader.registerCommand("Middle Node", (CougarScriptObject p) -> {
+      return new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState());
+    });
+
+    m_reader.registerCommand("Low Node", (CougarScriptObject p) -> {
+      return new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getLowNodeState());
+    });
+
+    m_reader.registerCommand("Intake", (CougarScriptObject p) -> {
+      return new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState());
+    });
+  }
+
+  
 
   /**
    * Applies a deadband to the given value.
@@ -241,6 +266,18 @@ public class CougarRobotImpl extends CougarRobot {
         () -> xboxOperator.getRightTriggerAxis(),
         () -> xboxOperator.getRightBumper(),
         () -> xboxOperator.getLeftBumper()));
+    new Trigger(()->xboxOperator.getPOV() == 180).onFalse(
+        new SetpointArmCommand(m_arm, ArmStateGroup.getTuck()));
+    new Trigger(()->xboxOperator.getPOV() == 0).onFalse(
+        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState()));
+    new Trigger(()-> xboxOperator.getAButton()).onFalse(
+      new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState()));
+    new Trigger(()-> xboxOperator.getPOV() == 90).onFalse(
+      new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState()));
+    new Trigger(()-> xboxOperator.getPOV() == 270).onFalse(
+        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getLowNodeState()));
+    new Trigger(() -> xboxOperator.getBButton()).onFalse(
+      new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getSingleShelfIntakeState()));
   }
 
   /**
@@ -253,7 +290,7 @@ public class CougarRobotImpl extends CougarRobot {
   // private final BuiltinSubsystem m_builtins;
   // private final PhotonVisionSubsystem m_visionSubsystem;
   private CougarScriptReader m_reader;
-  private final Arm_Subsystem m_arm;
+  private final ArmSubsystem m_arm;
   private boolean m_armOperatorManual = true;
   private final SwerveSubsystem m_swerveSubsystem;
 }

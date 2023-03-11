@@ -117,5 +117,45 @@ public class Commands {
 				return output;
 			}
 		});
+		
+		commandMap.put("Tuck", () -> new RobotCommand("Tuck", MISC_COLOR) {
+			@Override
+			public Robot applyCommand(Robot initial) {
+				Robot output = initial.getCopy();
+				return output;
+			}
+		});
+
+		commandMap.put("High Node", () -> new RobotCommand("High Cube Node", MISC_COLOR) {
+			@Override
+			public Robot applyCommand(Robot initial) {
+				Robot output = initial.getCopy();
+				return output;
+			}
+		});
+
+		commandMap.put("Middle Node", () -> new RobotCommand("Middle Cube Node", MISC_COLOR) {
+			@Override
+			public Robot applyCommand(Robot initial) {
+				Robot output = initial.getCopy();
+				return output;
+			}
+		});
+
+		commandMap.put("Low Node", () -> new RobotCommand("Low Cube Node", MISC_COLOR) {
+			@Override
+			public Robot applyCommand(Robot initial) {
+				Robot output = initial.getCopy();
+				return output;
+			}
+		});
+
+		commandMap.put("Intake", () -> new RobotCommand("Cone Upright Intake", MISC_COLOR) {
+			@Override
+			public Robot applyCommand(Robot initial) {
+				Robot output = initial.getCopy();
+				return output;
+			}
+		});
 	}
 }

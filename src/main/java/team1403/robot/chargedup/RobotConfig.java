@@ -12,6 +12,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
 import team1403.lib.util.Dimension;
+import team1403.robot.chargedup.arm.ArmState;
 
 
 /**
@@ -75,10 +76,10 @@ public class RobotConfig {
             // Back right
             new Translation2d(-kTrackWidth / 2.0, -kWheelBase / 2.0));
 
-    public static final double frontLeftEncoderOffset = -(4.657165672020807 + Math.PI);
-    public static final double frontRightEncoderOffset = -(3.127786826498822 + (2 * Math.PI));
-    public static final double backLeftEncoderOffset = -(4.680175383839091 + Math.PI);
-    public static final double backRightEncoderOffset = -(2.686000359587758);
+    public static final double frontLeftEncoderOffset = -(4.669437518323892 - Math.PI);
+    public static final double frontRightEncoderOffset = -(0.009203884727314 + Math.PI);
+    public static final double backLeftEncoderOffset = -(4.680175383839091 - Math.PI);
+    public static final double backRightEncoderOffset = -(5.776971647177325 - Math.PI);
 
     public static final double kDriveReduction = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
     public static final double kSteerReduction = (15.0 / 32.0) * (10.0 / 60.0);
@@ -246,10 +247,10 @@ public class RobotConfig {
     public static final int kPArmPivot = 1;
     public static final int kIArmPivot = 0;
     public static final int kDArmPivot = 0;
-    public static final double m_absolutePivotOffset = 64.4245336;
-    public static final double kMaxPivotAngle = 250.273;
-    public static final double kFrameAngle = 229.6427020308589;
-    public static final double kFrameClearanceAngle = 225;
+    public static final double kAbsolutePivotOffset = 180-85.2492019663337;
+    public static double kMaxPivotAngle = 249.84208720995503;
+    public static final double kFrameAngle = 242.71777151085703;
+    public static final double kFrameClearanceAngle = 234.5; //cone angle
     public static final double kMinPivotAngle = 132.211;
     public static final double kPivotAngleMaxAmperage = 40;
     public static final double kHorizonAngle = 210;
@@ -259,9 +260,9 @@ public class RobotConfig {
     public static final double kIWristMotor = 0;
     public static final double kDWristMotor = 90;
     public static final double kMaxWristAngle = 265;
-    public static final double kMinWristAngle = 55.61740540442264; 
+    public static final double kMinWristAngle = 29.196293229907326; 
     public static final double kWristConversionFactor = 90.0 / 100;
-    public static final double kAbsoluteWristOffset = 78.98266997456675;
+    public static final double kAbsoluteWristOffset = 180-74.7792558694814;
 
     //Extension
     public static final double kPArmExtension = 0.3;
@@ -281,5 +282,19 @@ public class RobotConfig {
     public static final double kPhysicalArmMaxExtension = kBaseArmLength + kMaxArmExtension; //inches
 
     public static final double kArmWeight = 16; //Pounds
+  }
+
+  public static class ArmStateConfig {
+    public static final ArmState coneTowardsFloorIntake = new ArmState(0.039682067930698, 140.0363630009091, 240.55448872511047, 0);
+    public static final ArmState coneTowardsHighConeNode = new ArmState(22.987735748, 246.78781366, 150.28003026, 0);
+    public static final ArmState coneTowardsMiddleNode = new ArmState(8.345230102539062, 264, 149.45086251051157, 0);
+    public static final ArmState singleSubstationIntake = new ArmState(0, 51.3175107829, 241.777313195, 0);
+    public static final ArmState coneTowardsLowNode = new ArmState(0, 80.18787350469682, 245.42271036546947, 0);
+
+    public static final ArmState cubeFloorIntake = new ArmState(4.055530548095703, 124.90037862250946, 230.28624941341906, 0);
+    public static final ArmState cubeHighNode = new ArmState(16.6710987091, 177.965261949, 169.356773014, 0);
+    public static final ArmState cubeMiddleNode = new ArmState(0.05158682167, 177.61028394, 181.482400676, 0);
+
+    public static final ArmState coneUprightIntake = new ArmState(0, 207.099432677, 205.208496037, 0);
   }
 }
