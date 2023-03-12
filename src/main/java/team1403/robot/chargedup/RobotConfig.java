@@ -277,6 +277,11 @@ public class RobotConfig {
     public static final double angleHittingGround = 80; //TODO
     public static final double kExtensionOffset = 6;
 
+    //Intake
+    public static final double kPIntake = 0;
+    public static final double kIIntake = 0;
+    public static final double kDIntake = 0;
+
     //Dimensions
     public static final double kBaseArmLength = 31; //37 //28 inches
     public static final double kPhysicalArmMaxExtension = kBaseArmLength + kMaxArmExtension; //inches

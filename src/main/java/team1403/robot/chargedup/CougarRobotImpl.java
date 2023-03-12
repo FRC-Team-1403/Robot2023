@@ -29,9 +29,9 @@ import team1403.robot.chargedup.arm.ArmState;
 import team1403.robot.chargedup.arm.ArmStateGroup;
 import team1403.robot.chargedup.arm.ArmSubsystem;
 import team1403.robot.chargedup.arm.ManualArmCommand;
+import team1403.robot.chargedup.arm.RunIntake;
 import team1403.robot.chargedup.arm.SequentialMoveArmCommand;
 import team1403.robot.chargedup.arm.SetpointArmCommand;
-import team1403.robot.chargedup.auto.RunIntake;
 
 /**
  * The heart of the robot.

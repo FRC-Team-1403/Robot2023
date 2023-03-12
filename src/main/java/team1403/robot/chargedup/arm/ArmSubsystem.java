@@ -52,6 +52,7 @@ public class ArmSubsystem extends CougarSubsystem {
   private double m_pivotAngleSetpoint;
   private double m_intakeSpeedSetpoint;
   private double m_extensionLengthSetpoint;
+  private double m_intakePosition;
 
   /**
    * Initializing the arn subsystem.
@@ -137,7 +138,14 @@ public class ArmSubsystem extends CougarSubsystem {
     m_rightPivotMotor.follow(m_leftPivotMotor, true);
 
     //intake
-    m_wristMotor.setIdleMode(CougarIdleMode.BRAKE);
+    final SparkMaxPIDController intakeMotorController = m_intakeMotor.getPIDController();
+    m_intakeMotor.setIdleMode(IdleMode.kBrake);
+    m_intakeMotor.enableVoltageCompensation(12);
+    m_intakeMotor.setSmartCurrentLimit(20);
+
+    intakeMotorController.setP(RobotConfig.Arm.kPIntake);
+    intakeMotorController.setI(RobotConfig.Arm.kIIntake);
+    intakeMotorController.setD(RobotConfig.Arm.kDIntake);
 
     // Extension
     final SparkMaxPIDController extensionController = m_extensionMotor.getPIDController();
@@ -297,7 +305,12 @@ public class ArmSubsystem extends CougarSubsystem {
   // Intake
 
   public void runIntake(double intakeSpeed) {
-    m_intakeMotor.set(m_intakeSpeedSetpoint);
+    if(intakeSpeed == 0) {
+      m_intakePosition = m_intakeMotor.getEncoder().getPosition();
+      m_intakeMotor.getPIDController().setReference(m_intakePosition, CANSparkMax.ControlType.kPosition);
+    } else {
+      m_intakeMotor.set(m_intakeSpeedSetpoint);
+    }
   }
 
   // Extension

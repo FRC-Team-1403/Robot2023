@@ -1,9 +1,7 @@
-package team1403.robot.chargedup.auto;
+package team1403.robot.chargedup.arm;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import team1403.robot.chargedup.arm.ArmState;
-import team1403.robot.chargedup.arm.ArmSubsystem;
 
 public class RunIntake extends CommandBase{
   private double m_intialPivotAngle;
