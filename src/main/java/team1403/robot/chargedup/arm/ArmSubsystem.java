@@ -239,7 +239,7 @@ public class ArmSubsystem extends CougarSubsystem {
   }
 
   /**
-   * Returns the position of pivot in degrees as specified by the absoltue encoder.
+   * Returns the position of pivot in degrees as specified by the absolute encoder.
    *
    * @return The angle of the pivot in degrees.
    */

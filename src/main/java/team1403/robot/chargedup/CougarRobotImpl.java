@@ -110,6 +110,7 @@ public class CougarRobotImpl extends CougarRobot {
     new Trigger(() -> xboxDriver.getLeftBumper()).onFalse(
       new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.4)));
 
+
     new Trigger(() -> xboxDriver.getBButton()).onFalse(
       new InstantCommand(() -> m_swerveSubsystem.zeroGyroscope()));
 
@@ -147,7 +148,7 @@ public class CougarRobotImpl extends CougarRobot {
       double feetToMeters = 0.30478512648;
 
       Translation2d flippedXandY = new Translation2d(
-        startPose.getX() * feetToMeters, startPose.getY() * feetToMeters);
+          startPose.getY() * feetToMeters, startPose.getX() * feetToMeters);
 
       Rotation2d theta = new Rotation2d(
           startPose.getRotation().getDegrees());
@@ -159,10 +160,9 @@ public class CougarRobotImpl extends CougarRobot {
     m_reader.registerCommand("SwerveDrivePath", (CougarScriptObject p) -> {
       List<Translation2d> wayPoints = p.getPointList("Waypoints");
       return new SwerveDrivePath(m_swerveSubsystem,
-          0,
-          0,
-          wayPoints
-          );
+          p.getDouble("StartAngle"),
+          p.getDouble("EndAngle"),
+          wayPoints);
     });
 
     m_reader.registerCommand("Delay", (CougarScriptObject p) -> {
