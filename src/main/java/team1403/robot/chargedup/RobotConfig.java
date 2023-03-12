@@ -44,7 +44,7 @@ public class RobotConfig {
    * Swerve Constants.
    * 
    */
-  public static class SwerveConfig {
+  public static class Swerve {
     public static final int kEncoderResetIterations = 500;
     public static final double kEncoderResetMaxAngularVelocity = Math.toRadians(0.5);
     public static final int kStatusFrameGeneralPeriodMs = 250;
@@ -85,10 +85,10 @@ public class RobotConfig {
     public static final double kSteerReduction = (15.0 / 32.0) * (10.0 / 60.0);
 
     public static final double kSteerRelativeEncoderPositionConversionFactor = 2.0 * Math.PI
-        * SwerveConfig.kSteerReduction;
+        * Swerve.kSteerReduction;
 
     public static final double kSteerRelativeEncoderVelocityConversionFactor = 2.0 * Math.PI
-        * SwerveConfig.kSteerReduction / 60.0;
+        * Swerve.kSteerReduction / 60.0;
 
     public static final double kWheelDiameterMeters = Units.inchesToMeters(4);
 
@@ -109,7 +109,7 @@ public class RobotConfig {
         kMaxAngularAccelerationRadiansPerSecondSquared);
   }
 
-  public static class VisionConfig {
+  public static class Vision {
     public static AprilTagFieldLayout fieldLayout = new AprilTagFieldLayout(Arrays.asList(
       new AprilTag(1,   (new Pose3d(
         Units.inchesToMeters(610.77),
@@ -188,7 +188,7 @@ public class RobotConfig {
   /**
    * Ports on the RoboRIO.
    */
-  public class RioPorts {
+  public static class RioPorts {
 
     
     public static final int kWristAbsoluteEncoder = 1; //DIO
@@ -204,7 +204,7 @@ public class RobotConfig {
   /**
    * Config parameters for tuning the operator interface.
    */
-  public class OperatorConfig {
+  public static class Operator {
 
     public static final int dPadUp = 0;
     public static final int dPadRight = 1;
@@ -225,7 +225,7 @@ public class RobotConfig {
   /**
    * Config parameters for tuning the operator interface.
    */
-  public class DriverConfig {
+  public static class Driver {
 
     /**
      * The joystick port for the operator's controller.
@@ -289,7 +289,7 @@ public class RobotConfig {
     public static final double kArmWeight = 16; //Pounds
   }
 
-  public static class ArmStateConfig {
+  public static class ArmStates {
     public static final ArmState coneTowardsFloorIntake = new ArmState(5.3888425827, 155.782799394, 232.060091132, 0); //0.039682067930698, 140.0363630009091, 240.55448872511047
     public static final ArmState coneTowardsHighConeNode = new ArmState(22.987735748, 246.78781366, 150.28003026, 0);
     public static final ArmState coneTowardsMiddleNode = new ArmState(8.345230102539062, 264, 149.45086251051157, 0);

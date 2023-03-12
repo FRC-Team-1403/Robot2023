@@ -3,7 +3,7 @@ package team1403.robot.chargedup;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import team1403.robot.chargedup.RobotConfig.ArmStateConfig;
+import team1403.robot.chargedup.RobotConfig.ArmStates;
 import team1403.robot.chargedup.arm.ArmStateGroup;
 
 public class StateManager {
@@ -49,17 +49,17 @@ public class StateManager {
   private static StateManager instance = null;
 
   private StateManager() {
-    m_coneTowardsGroup = new ArmStateGroup(ArmStateConfig.coneTowardsFloorIntake, null, 
-        ArmStateConfig.singleSubstationIntake, ArmStateConfig.coneTowardsHighConeNode, 
-        ArmStateConfig.coneTowardsMiddleNode, ArmStateConfig.coneTowardsLowNode);
+    m_coneTowardsGroup = new ArmStateGroup(ArmStates.coneTowardsFloorIntake, null, 
+        ArmStates.singleSubstationIntake, ArmStates.coneTowardsHighConeNode, 
+        ArmStates.coneTowardsMiddleNode, ArmStates.coneTowardsLowNode);
 
-    m_cubeGroup = new ArmStateGroup(ArmStateConfig.cubeFloorIntake, null, 
-        ArmStateConfig.singleSubstationIntake, ArmStateConfig.cubeHighNode, 
-        ArmStateConfig.cubeMiddleNode, ArmStateGroup.tuck);
+    m_cubeGroup = new ArmStateGroup(ArmStates.cubeFloorIntake, null, 
+        ArmStates.singleSubstationIntake, ArmStates.cubeHighNode, 
+        ArmStates.cubeMiddleNode, ArmStateGroup.tuck);
 
-    m_coneUprightGroup = new ArmStateGroup(ArmStateConfig.coneUprightIntake, null, 
-        ArmStateConfig.singleSubstationIntake, ArmStateConfig.coneTowardsHighConeNode, 
-        ArmStateConfig.coneTowardsMiddleNode, ArmStateConfig.coneTowardsLowNode);
+    m_coneUprightGroup = new ArmStateGroup(ArmStates.coneUprightIntake, null, 
+        ArmStates.singleSubstationIntake, ArmStates.coneTowardsHighConeNode, 
+        ArmStates.coneTowardsMiddleNode, ArmStates.coneTowardsLowNode);
 
     m_currentArmGroup = m_coneTowardsGroup;
   }

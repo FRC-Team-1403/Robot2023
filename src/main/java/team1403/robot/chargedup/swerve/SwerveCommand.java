@@ -9,7 +9,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import team1403.robot.chargedup.RobotConfig;
-import team1403.robot.chargedup.RobotConfig.SwerveConfig;
+import team1403.robot.chargedup.RobotConfig.Swerve;
 
 /**
  * The default command for the swerve drivetrain subsystem.
@@ -71,20 +71,20 @@ public class SwerveCommand extends CommandBase {
     m_isFieldRelative = true;
 
     frontRight = new Translation2d(
-        RobotConfig.SwerveConfig.kTrackWidth / 2.0,
-        -RobotConfig.SwerveConfig.kWheelBase / 2.0);
+        RobotConfig.Swerve.kTrackWidth / 2.0,
+        -RobotConfig.Swerve.kWheelBase / 2.0);
 
     frontLeft = new Translation2d(
-        RobotConfig.SwerveConfig.kTrackWidth / 2.0,
-        RobotConfig.SwerveConfig.kWheelBase / 2.0);
+        RobotConfig.Swerve.kTrackWidth / 2.0,
+        RobotConfig.Swerve.kWheelBase / 2.0);
 
     backRight = new Translation2d(
-        -RobotConfig.SwerveConfig.kTrackWidth / 2.0,
-        -RobotConfig.SwerveConfig.kWheelBase / 2.0);
+        -RobotConfig.Swerve.kTrackWidth / 2.0,
+        -RobotConfig.Swerve.kWheelBase / 2.0);
 
     backLeft = new Translation2d(
-        -RobotConfig.SwerveConfig.kTrackWidth / 2.0,
-        RobotConfig.SwerveConfig.kWheelBase / 2.0);
+        -RobotConfig.Swerve.kTrackWidth / 2.0,
+        RobotConfig.Swerve.kWheelBase / 2.0);
 
     m_verticalTranslationLimiter = new SlewRateLimiter(7, -7, 0);
     m_horizontalTranslationLimiter = new SlewRateLimiter(7, -7, 0);
@@ -100,10 +100,10 @@ public class SwerveCommand extends CommandBase {
     }
     ChassisSpeeds chassisSpeeds = new ChassisSpeeds();
     double vertical = m_verticalTranslationLimiter.calculate(m_verticalTranslationSupplier.getAsDouble())
-        * SwerveConfig.kMaxSpeed;
+        * Swerve.kMaxSpeed;
     double horizontal = m_horizontalTranslationLimiter.calculate(m_horizontalTranslationSupplier.getAsDouble())
-        * SwerveConfig.kMaxSpeed;
-    double angular = squareNum(m_rotationSupplier.getAsDouble()) * SwerveConfig.kMaxAngularSpeed;
+        * Swerve.kMaxSpeed;
+    double angular = squareNum(m_rotationSupplier.getAsDouble()) * Swerve.kMaxAngularSpeed;
     Translation2d offset = new Translation2d();
     double robotAngleinDegrees = m_drivetrainSubsystem.getGyroscopeRotation().getDegrees();
 

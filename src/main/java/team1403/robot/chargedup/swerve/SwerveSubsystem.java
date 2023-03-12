@@ -22,7 +22,7 @@ import team1403.lib.util.CougarLogger;
 import team1403.lib.util.SwerveDriveOdometry;
 import team1403.lib.util.SwerveDrivePoseEstimator;
 import team1403.robot.chargedup.RobotConfig.CanBus;
-import team1403.robot.chargedup.RobotConfig.SwerveConfig;
+import team1403.robot.chargedup.RobotConfig.Swerve;
 
 /**
  * The drivetrain of the robot. Consists of for swerve modules and the
@@ -61,19 +61,19 @@ public class SwerveSubsystem extends CougarSubsystem {
     m_modules = new SwerveModule[] {
         new SwerveModule("Front Left Module",
             CanBus.frontLeftDriveId, CanBus.frontLeftSteerId,
-            CanBus.frontLeftEncoderId, SwerveConfig.frontLeftEncoderOffset, logger),
+            CanBus.frontLeftEncoderId, Swerve.frontLeftEncoderOffset, logger),
         new SwerveModule("Front Right Module",
             CanBus.frontRightDriveId, CanBus.frontRightSteerId,
-            CanBus.frontRightEncoderId, SwerveConfig.frontRightEncoderOffset, logger),
+            CanBus.frontRightEncoderId, Swerve.frontRightEncoderOffset, logger),
         new SwerveModule("Back Left Module",
             CanBus.backLeftDriveId, CanBus.backLeftSteerId,
-            CanBus.backLeftEncoderId, SwerveConfig.backLeftEncoderOffset, logger),
+            CanBus.backLeftEncoderId, Swerve.backLeftEncoderOffset, logger),
         new SwerveModule("Back Right Module",
             CanBus.backRightDriveId, CanBus.backRightSteerId,
-            CanBus.backRightEncoderId, SwerveConfig.backRightEncoderOffset, logger),
+            CanBus.backRightEncoderId, Swerve.backRightEncoderOffset, logger),
     };
 
-    m_odometer = new SwerveDrivePoseEstimator(SwerveConfig.kDriveKinematics, getGyroscopeRotation(),
+    m_odometer = new SwerveDrivePoseEstimator(Swerve.kDriveKinematics, getGyroscopeRotation(),
         getModulePositions(), new Pose2d(1.7272, 5.9436, new Rotation2d(0)));
 
     addDevice(m_navx2.getName(), m_navx2);
@@ -264,11 +264,11 @@ public class SwerveSubsystem extends CougarSubsystem {
    */
   public void setModuleStates(SwerveModuleState[] states) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        states, SwerveConfig.kMaxSpeed);
+        states, Swerve.kMaxSpeed);
 
     for (int i = 0; i < m_modules.length; i++) {
       m_modules[i].set((states[i].speedMetersPerSecond
-          / SwerveConfig.kMaxSpeed) * m_speedLimiter,
+          / Swerve.kMaxSpeed) * m_speedLimiter,
           states[i].angle.getRadians());
     }
   }
@@ -339,7 +339,7 @@ public class SwerveSubsystem extends CougarSubsystem {
     SmartDashboard.putNumber("Back Left Absolute Encoder",  m_modules[2].getAbsoluteAngle());
     SmartDashboard.putNumber("Back Right Absolute Encoder",  m_modules[3].getAbsoluteAngle());
 
-    m_states = SwerveConfig.kDriveKinematics.toSwerveModuleStates(m_chassisSpeeds, m_offset);
+    m_states = Swerve.kDriveKinematics.toSwerveModuleStates(m_chassisSpeeds, m_offset);
 
     setModuleStates(m_states);
   }

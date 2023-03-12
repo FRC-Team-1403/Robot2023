@@ -22,7 +22,7 @@ import team1403.lib.device.Encoder;
 import team1403.lib.device.wpi.CougarSparkMax;
 import team1403.lib.util.CougarLogger;
 import team1403.robot.chargedup.RobotConfig;
-import team1403.robot.chargedup.RobotConfig.SwerveConfig;
+import team1403.robot.chargedup.RobotConfig.Swerve;
 
 /**
  * Represents a swerve module. Consists of a drive motor, steer motor, 
@@ -93,21 +93,21 @@ public class SwerveModule implements Device {
     config.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
     config.magnetOffsetDegrees = Math.toDegrees(this.m_absoluteEncoderOffset);
     config.sensorDirection = false;
-    m_absoluteEncoder.configAllSettings(config, SwerveConfig.kCanTimeoutMs);
+    m_absoluteEncoder.configAllSettings(config, Swerve.kCanTimeoutMs);
     m_absoluteEncoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 10, 250);
 
     // Config drive relative encoder
-    double drivePositionConversionFactor = Math.PI * SwerveConfig.kWheelDiameterMeters 
-          * SwerveConfig.kDriveReduction;
+    double drivePositionConversionFactor = Math.PI * Swerve.kWheelDiameterMeters 
+          * Swerve.kDriveReduction;
     m_driveRelativeEncoder.setPositionConversionFactor(drivePositionConversionFactor);
     // Set velocity in terms of seconds
     m_driveRelativeEncoder.setVelocityConversionFactor(drivePositionConversionFactor / 60.0);
 
     //Config steer relative encoder
     m_steerRelativeEncoder.setPositionConversionFactor(
-        SwerveConfig.kSteerRelativeEncoderPositionConversionFactor);
+        Swerve.kSteerRelativeEncoderPositionConversionFactor);
     m_steerRelativeEncoder.setVelocityConversionFactor(
-        SwerveConfig.kSteerRelativeEncoderVelocityConversionFactor);
+        Swerve.kSteerRelativeEncoderVelocityConversionFactor);
     m_steerRelativeEncoder.setPosition(getAbsoluteAngle());
   }
 
@@ -121,8 +121,8 @@ public class SwerveModule implements Device {
     m_steerMotor.setSmartCurrentLimit(40);
 
     m_steerPidController.setP(0.3);
-    m_steerPidController.setI(SwerveConfig.kITurning);
-    m_steerPidController.setD(SwerveConfig.kDTurning);
+    m_steerPidController.setI(Swerve.kITurning);
+    m_steerPidController.setD(Swerve.kDTurning);
     m_steerPidController.setFeedbackDevice((MotorFeedbackSensor) m_steerRelativeEncoder);
     m_steerPidController.setPositionPIDWrappingMaxInput(180);
     m_steerPidController.setPositionPIDWrappingMinInput(-180);
@@ -131,8 +131,8 @@ public class SwerveModule implements Device {
 
   public void initDriveMotor() {
     m_driveMotor.setInverted(true);
-    m_driveMotor.setVoltageCompensation(RobotConfig.SwerveConfig.kVoltageSaturation);
-    m_driveMotor.setAmpLimit(RobotConfig.SwerveConfig.kCurrentLimit);
+    m_driveMotor.setVoltageCompensation(RobotConfig.Swerve.kVoltageSaturation);
+    m_driveMotor.setAmpLimit(RobotConfig.Swerve.kCurrentLimit);
     m_driveMotor.getCanSparkMaxApi().setPeriodicFramePeriod(
         CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 100);
     m_driveMotor.getCanSparkMaxApi().setPeriodicFramePeriod(
@@ -237,8 +237,8 @@ public class SwerveModule implements Device {
     // end up getting a good reading. If we reset periodically this won't matter
     // anymore.
     if (m_steerMotor.getEncoder().getVelocity() 
-            < SwerveConfig.kEncoderResetMaxAngularVelocity) {
-      if (++m_absoluteEncoderResetIterations >= SwerveConfig.kEncoderResetIterations) {
+            < Swerve.kEncoderResetMaxAngularVelocity) {
+      if (++m_absoluteEncoderResetIterations >= Swerve.kEncoderResetIterations) {
         m_logger.tracef("Resetting steer relative encoder. Reset iteration %f", 
             m_absoluteEncoderResetIterations);
         m_absoluteEncoderResetIterations = 0;

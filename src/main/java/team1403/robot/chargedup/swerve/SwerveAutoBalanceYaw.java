@@ -24,7 +24,7 @@ public class SwerveAutoBalanceYaw extends CommandBase {
         m_drivetrainSubsystem = drivetrainSubsystem;
         m_xPIDController = new ProfiledPIDController(
             0.5, 
-            RobotConfig.SwerveConfig.kITranslation, 
+            RobotConfig.Swerve.kITranslation, 
             0,
             new TrapezoidProfile.Constraints(200, 200));
         m_drivetrainSubsystem.resetOdometry();

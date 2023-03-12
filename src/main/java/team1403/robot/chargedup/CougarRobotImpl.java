@@ -24,7 +24,7 @@ import team1403.robot.chargedup.swerve.SwerveAutoBalanceYaw;
 import team1403.robot.chargedup.swerve.SwerveCommand;
 import team1403.robot.chargedup.swerve.SwerveDrivePath;
 import team1403.robot.chargedup.swerve.SwerveSubsystem;
-import team1403.robot.chargedup.RobotConfig.OperatorConfig;
+import team1403.robot.chargedup.RobotConfig.Operator;
 import team1403.robot.chargedup.arm.ArmState;
 import team1403.robot.chargedup.arm.ArmStateGroup;
 import team1403.robot.chargedup.arm.ArmSubsystem;
@@ -86,7 +86,7 @@ public class CougarRobotImpl extends CougarRobot {
    * Configures the driver commands and their bindings.
    */
   private void configureDriverInterface() {
-    XboxController xboxDriver = getJoystick("Driver", RobotConfig.DriverConfig.pilotPort);
+    XboxController xboxDriver = getJoystick("Driver", RobotConfig.Driver.pilotPort);
     SwerveAutoBalanceYaw autoBalanceYaw = new SwerveAutoBalanceYaw(m_swerveSubsystem);
 
     // The controls are for field-oriented driving:
@@ -123,7 +123,7 @@ public class CougarRobotImpl extends CougarRobot {
   * Configures the operator commands and their bindings.
   */
   private void configureOperatorInterface() {
-    XboxController xboxOperator = getJoystick("Operator", OperatorConfig.pilotPort);
+    XboxController xboxOperator = getJoystick("Operator", Operator.pilotPort);
 
     // new Trigger(() -> xboxOperator.getYButton()).onFalse(
     //     new InstantCommand(() -> switchOperatorMode()));

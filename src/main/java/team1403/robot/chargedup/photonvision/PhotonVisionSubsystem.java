@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarSubsystem;
 import team1403.robot.chargedup.StateManager;
-import team1403.robot.chargedup.RobotConfig.VisionConfig;
+import team1403.robot.chargedup.RobotConfig.Vision;
 import team1403.robot.chargedup.StateManager.GamePiece;
 
 public class PhotonVisionSubsystem extends CougarSubsystem {
@@ -36,7 +36,7 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
     // 0: April Tags
     // 1: Reflective Tape
     limeLight.setPipelineIndex(0);
-    photonPoseEstimator = new PhotonPoseEstimator(VisionConfig.fieldLayout, PoseStrategy.LOWEST_AMBIGUITY, limeLight,
+    photonPoseEstimator = new PhotonPoseEstimator(Vision.fieldLayout, PoseStrategy.LOWEST_AMBIGUITY, limeLight,
         new Transform3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0)));
 
     //Cone detection

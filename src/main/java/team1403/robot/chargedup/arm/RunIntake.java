@@ -3,6 +3,9 @@ package team1403.robot.chargedup.arm;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
+/**
+ * Runs the intake while perserving the rest of the arm subsystem's setpoints.
+ */
 public class RunIntake extends CommandBase{
   private double m_intialPivotAngle;
   private double m_intialExtensionLength;
