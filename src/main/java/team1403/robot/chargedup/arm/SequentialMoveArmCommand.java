@@ -16,20 +16,18 @@ public class SequentialMoveArmCommand extends CommandBase{
   private double m_initialIntakeSpeed;
 
   private final ArmState m_endState;
+  private ArmState m_firstState;
 
   private TrapezoidProfile m_pivotProfile;
 
   private double m_startTime;
 
-  private int currentState;
-  private ArmState[] armStates = new ArmState[2];
+  private boolean m_isFinished = false;
 
 
   public SequentialMoveArmCommand(ArmSubsystem arm, ArmState endState) {
     this.m_endState = endState;
     this.m_arm = arm;
-    this.currentState = 0;
-
   }
 
   @Override
@@ -46,9 +44,7 @@ public class SequentialMoveArmCommand extends CommandBase{
 
     this.m_startTime = Timer.getFPGATimestamp();
 
-    this.armStates[0] = new ArmState(m_intialExtensionLength , m_initialWristAngle, m_endState.armPivot, m_initialIntakeSpeed);
-    this.armStates[1] = this.m_endState;
-    System.out.println("End arm state: " + armStates[1]);
+    this.m_firstState = new ArmState(m_intialExtensionLength , m_initialWristAngle, m_endState.armPivot, m_initialIntakeSpeed);
 
     super.initialize();
   }
@@ -56,25 +52,20 @@ public class SequentialMoveArmCommand extends CommandBase{
 
   @Override
   public void execute() {
-    if(currentState == 0) {
-      double deltaT = Timer.getFPGATimestamp() - m_startTime;
+    double deltaT = Timer.getFPGATimestamp() - m_startTime;
+    if(!m_pivotProfile.isFinished(deltaT)) {
       double pivotPosition = m_pivotProfile.calculate(deltaT).position;
-      ArmState state = new ArmState(this.armStates[currentState].armLength, this.armStates[currentState].wristAngle, pivotPosition, this.armStates[currentState].intakeSpeed);
-      m_arm.moveArm(state);
+      m_arm.moveArm(this.m_firstState.wristAngle, this.m_firstState.intakeSpeed, pivotPosition, this.m_firstState.armLength);
     } else {
-      m_arm.moveArm(this.armStates[currentState]);
-    }
-
-    if(m_arm.isAtSetpoint()) {
-      System.out.println("____________________________Changing_______________");
-      currentState++;
+      m_arm.moveArm(this.m_endState);
+      m_isFinished = true;
     }
     super.execute();
   }
 
   @Override
   public boolean isFinished() {
-    return currentState == 2;
+    return m_isFinished;
   }
   
 }
