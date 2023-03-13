@@ -247,7 +247,7 @@ public class RobotConfig {
     public static final int kPArmPivot = 1;
     public static final int kIArmPivot = 0;
     public static final int kDArmPivot = 0;
-    public static final double kAbsolutePivotOffset = 180-85.2492019663337;
+    public static double kAbsolutePivotOffset = 180-85.2492019663337;
     public static double kMaxPivotAngle = 249.84208720995503;
     public static final double kFrameAngle = 242.71777151085703;
     public static final double kFrameClearanceAngle = 234.5; //cone angle
