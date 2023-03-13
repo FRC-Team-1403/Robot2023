@@ -48,7 +48,7 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
   @Override
   public void periodic() {
     int coneOrientation = (int) m_coneOrientationSubsriber.get();
-    StateManager.getInstance().updateState(GamePiece.fromInt(coneOrientation));
+    StateManager.getInstance().updateArmState(GamePiece.fromInt(coneOrientation));
     SmartDashboard.putString("Game Piece", StateManager.getInstance().getGamePiece().name());
     super.periodic();
   }

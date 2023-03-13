@@ -25,6 +25,7 @@ import team1403.robot.chargedup.swerve.SwerveCommand;
 import team1403.robot.chargedup.swerve.SwerveDrivePath;
 import team1403.robot.chargedup.swerve.SwerveSubsystem;
 import team1403.robot.chargedup.RobotConfig.Operator;
+import team1403.robot.chargedup.StateManager.LED;
 import team1403.robot.chargedup.arm.ArmState;
 import team1403.robot.chargedup.arm.ArmStateGroup;
 import team1403.robot.chargedup.arm.ArmSubsystem;
@@ -65,6 +66,7 @@ public class CougarRobotImpl extends CougarRobot {
     m_arm = new ArmSubsystem(parameters);
     m_swerveSubsystem = new SwerveSubsystem(parameters);
     m_visionSubsystem = new PhotonVisionSubsystem(parameters);
+    m_lightSubsystem = new LightSubsystem(parameters);
 
     configureOperatorInterface();
     configureDriverInterface();
@@ -288,6 +290,12 @@ public class CougarRobotImpl extends CougarRobot {
       new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getSingleShelfIntakeState()));
     new Trigger(() -> xboxOperator.getYButton()).onFalse(
       new SequentialMoveArmCommand(m_arm, new ArmState(0, 246.78781366, 150.28003026, 0)));
+
+    //lights
+    new Trigger(() -> xboxOperator.getRightBumper()).onTrue(
+      new InstantCommand(() -> StateManager.getInstance().updateLEDState(LED.YELLOW)));
+    new Trigger(() -> xboxOperator.getLeftBumper()).onTrue(
+      new InstantCommand(() -> StateManager.getInstance().updateLEDState(LED.PURPLE)));
   }
 
   /**
@@ -303,5 +311,6 @@ public class CougarRobotImpl extends CougarRobot {
   private final ArmSubsystem m_arm;
   private boolean m_armOperatorManual = true;
   private final SwerveSubsystem m_swerveSubsystem;
+  private final LightSubsystem m_lightSubsystem;
 }
 

@@ -17,6 +17,7 @@ public class StateManager {
   private ArmStateGroup m_coneAwayGroup;
 
   private GamePiece gamePiece = GamePiece.NONE;
+  private LED led = LED.NONE;
 
   public enum GamePiece {
     CUBE,
@@ -44,6 +45,14 @@ public class StateManager {
           return NONE;
       }
     }
+  }
+
+  public enum LED {
+    PURPLE,
+    YELLOW,
+    MONTY,
+    RAINBOW,
+    NONE;
   }
 
   private static StateManager instance = null;
@@ -74,7 +83,7 @@ public class StateManager {
     m_alliance = DriverStation.getAlliance();
   }
 
-  public void updateState(GamePiece newGamePiece) {
+  public void updateArmState(GamePiece newGamePiece) {
     this.gamePiece = newGamePiece;
     switch (newGamePiece) {
       case CUBE: {
@@ -104,7 +113,15 @@ public class StateManager {
     }
   }
 
-  public Alliance getM_alliance() {
+  public void updateLEDState(LED newLEDState) {
+    this.led = newLEDState;
+  }
+
+  public LED getLEDState() {
+    return led;
+  }
+
+  public Alliance getalliance() {
     return m_alliance;
   }
 
