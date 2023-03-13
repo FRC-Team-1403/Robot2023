@@ -16,7 +16,7 @@ public class ParallelCommand extends CommandBase {
   public ParallelCommand(ArrayList<Command> commandsToRun, ArrayList<Command> endCommands) {
     this.m_commandsToRun = commandsToRun;
     this.m_endCommands = endCommands;
-  }
+  } 
 
   @Override
   public void initialize() {

@@ -152,6 +152,8 @@ public class ArmSubsystem extends CougarSubsystem {
     intakeMotorController.setP(RobotConfig.Arm.kPIntake);
     intakeMotorController.setI(RobotConfig.Arm.kIIntake);
     intakeMotorController.setD(RobotConfig.Arm.kDIntake);
+    intakeMotorController.setFeedbackDevice(m_intakeMotor.getAlternateEncoder(1024));
+    intakeMotorController.setPositionPIDWrappingEnabled(false);
 
     // Extension
     final SparkMaxPIDController extensionController = m_extensionMotor.getPIDController();
@@ -231,11 +233,8 @@ public class ArmSubsystem extends CougarSubsystem {
    * Accounts for any belt skipping.
    */
   private void rezeroPivot() {
-    double currentAngle = getAbsolutePivotAngle();
-    if(Math.abs(currentAngle - RobotConfig.Arm.kMaxPivotAngle) > 1) {
-      double offset = currentAngle - RobotConfig.Arm.kMaxPivotAngle;
-    RobotConfig.Arm.kMaxPivotAngle -= (offset);
-    }
+    double difference = RobotConfig.Arm.kMaxPivotAngle - getAbsolutePivotAngle();
+    RobotConfig.Arm.kAbsolutePivotOffset += difference;
   }
 
   /**
@@ -314,7 +313,7 @@ public class ArmSubsystem extends CougarSubsystem {
    */
   public void runIntake(double intakeSpeed) {
     if(intakeSpeed == 0) {
-      m_intakePosition = m_intakeMotor.getEncoder().getPosition();
+      m_intakePosition = m_intakeMotor.getAlternateEncoder(1024).getPosition();
       m_intakeMotor.getPIDController().setReference(m_intakePosition, CANSparkMax.ControlType.kPosition);
     } else {
       m_intakeMotor.set(m_intakeSpeedSetpoint);
@@ -480,9 +479,9 @@ public class ArmSubsystem extends CougarSubsystem {
     runIntake(m_intakeSpeedSetpoint);
 
     // Pivot
-    // if(isArmSwitchActive()) {
-    //   rezeroPivot();
-    // }
+    if(isArmSwitchActive()) {
+      rezeroPivot();
+    }
     
     if ((isInPivotBounds(getAbsolutePivotAngle()) && !isArmSwitchActive())
         || isInPivotBounds(this.m_pivotAngleSetpoint)) {
