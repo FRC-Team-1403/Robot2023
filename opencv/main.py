@@ -2,15 +2,18 @@ import cv2
 import time
 import numpy as np
 import ntcore as nt
+from cscore import CameraServer
 import os
 
 
 inst = nt.NetworkTableInstance.getDefault()
 
 table = inst.getTable("conetable")
-xPub = table.getDoubleTopic("xcone").publish()
-conePub = table.getBooleanTopic("presentcone").publish()
+#xPub = table.getDoubleTopic("xcone").publish()
+#conePub = table.getBooleanTopic("presentcone").publish()
 coneRotationPub = table.getIntegerTopic("rotcone").publish()
+
+vidServer = CameraServer.putVideo("cone_video", 400, 300);
 
 resize_size = 30
 label_txt = np.empty((1, 1)).astype('float32')
@@ -23,7 +26,8 @@ if(os.path.exists("label.txt")):
     label_txt = np.loadtxt("label.txt", np.float32).reshape((feature_txt.shape[0], 1))
 knn.train(feature_txt, cv2.ml.ROW_SAMPLE, label_txt)
 
-vid = cv2.VideoCapture(2, cv2.CAP_V4L2)
+vid = cv2.VideoCapture(0, cv2.CAP_V4L2)
+
 vid.set(cv2.CAP_PROP_FRAME_WIDTH, 400)
 vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 300)
 
@@ -83,7 +87,7 @@ if (recal):
     cv2.createTrackbar('low V', 'controls', V_low, 255, callback)
     cv2.createTrackbar('high V', 'controls', V_high, 255, callback)
 
-min_cone_area = 1000
+min_cone_area = 700
 
 # cone_vert_mask = cv2.imread("cone_upward.png")
 # cone_vert_mask = cv2.cvtColor(cone_vert_mask, cv2.COLOR_BGR2GRAY)
@@ -104,7 +108,7 @@ while True:
 
     #new_img_gray = cv2.Canny(new_img, 100, 200)
     #print(new_img_gray.shape)
-    new_img_gray = cv2.cvtColor(new_img_gray, cv2.COLOR_BGR2GRAY)
+    new_img_gray = cv2.cvtColor(new_img, cv2.COLOR_BGR2GRAY)
 
     mask = np.zeros(new_img_gray.shape[:2], dtype=new_img_gray.dtype)
     # new_img_gray2 = cv2.adaptiveThreshold(new_img_gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 11, 2)
@@ -115,8 +119,12 @@ while True:
 
     for cont in contours2:
         x, y, w, h = cv2.boundingRect(cont)
-        if (w / h >= 0.5 and w / h <= 1.8 and w*h >= min_cone_area):
-            contours.append(cont)
+        if (w / h >= 0.5 and w / h <= 1.8):
+            area = cv2.contourArea(cont)
+            if(area >= min_cone_area):
+                approx = cv2.approxPolyDP(cont, 0.06 * cv2.arcLength(cont, True), True)
+                if(len(approx) >= 3 and len(approx) <= 4):
+                    contours.append(cont)
 
     if (len(contours) > 0):
         cont = max(contours, key=cv2.contourArea)
@@ -129,7 +137,6 @@ while True:
 
         cv2.drawContours(mask, [cont], -1, 255, -1)
         mask = mask[y: y + h, x: x + w]
-        xPub.set(float(x) / float(mask.shape[1]))
         # hull2 = cv2.convexHull(cont, returnPoints = False)
         # if(len(hull) > 0):
         # defects = cv2.convexityDefects(cont, hull2)
@@ -169,18 +176,25 @@ while True:
             if (int(result) == 104):
                 cv2.putText(frame, 'Head on Cone', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
                         cv2.LINE_AA)
+            if (int(result) == 97):
+                cv2.putText(frame, 'Away Cone', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, 
+                        cv2.LINE_AA)
 
             coneRotationPub.set(int(result))
         
         #print(dists[0][0] >= min_dist)
-        conePub.set(dists[0][0] <= min_dist)
+        #conePub.set(dists[0][0] <= min_dist)
+        if(dists[0][0] > min_dist):
+            coneRotationPub.set(-1)
+
         if(debug_msg):
             print(mask.shape)
     else:
-        conePub.set(False)
+        coneRotationPub.set(-1)
 
     cv2.putText(frame, str(int(1 / (time.process_time() - start))) + " FPS" , (50,200), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2, cv2.LINE_AA)
     cv2.imshow('frame', frame)
+    vidServer.putFrame(frame)
 
     if(debug_pic):
         cv2.imshow('new_img_gray', new_img_gray)
