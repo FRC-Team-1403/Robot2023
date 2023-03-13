@@ -51,7 +51,7 @@ def label_img(frame):
     cv2.imshow("looks good?", frame)
     key = chr(cv2.waitKey(0)).lower()
     cv2.destroyWindow("looks good?")
-    if (key == 'u' or key == 's' or key == 'h' or h == 'a'):
+    if (key == 'u' or key == 's' or key == 'h' or key == 'a'):
         arr = frame.reshape(1, resize_size ** 2)
         return np.array([[ord(key)]], dtype=np.float32), arr
     else:
