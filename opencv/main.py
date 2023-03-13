@@ -26,21 +26,21 @@ if(os.path.exists("label.txt")):
     label_txt = np.loadtxt("label.txt", np.float32).reshape((feature_txt.shape[0], 1))
 knn.train(feature_txt, cv2.ml.ROW_SAMPLE, label_txt)
 
-vid = cv2.VideoCapture(0, cv2.CAP_V4L2)
+vid = cv2.VideoCapture(2, cv2.CAP_V4L2)
 
 vid.set(cv2.CAP_PROP_FRAME_WIDTH, 400)
 vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 300)
 
 
-H_low = 9
-H_high = 52
+H_low = 14
+H_high = 48
 S_low = 100
 S_high = 255
-V_low = 165
+V_low = 145
 V_high = 255
 
 debug_msg = True
-debug_pic = True
+debug_pic = False
 
 if(debug_msg):
     print(np.array([[ord('c')]], dtype=np.float32).shape)
@@ -69,7 +69,7 @@ def callback(x):
     V_high = cv2.getTrackbarPos('high V', 'controls')
 
 
-recal = True
+recal = False
 
 # create a seperate window named 'controls' for trackbar
 
@@ -109,8 +109,6 @@ while True:
     #new_img_gray = cv2.Canny(new_img, 100, 200)
     #print(new_img_gray.shape)
     new_img_gray = cv2.cvtColor(new_img, cv2.COLOR_BGR2GRAY)
-
-    mask = np.zeros(new_img_gray.shape[:2], dtype=new_img_gray.dtype)
     # new_img_gray2 = cv2.adaptiveThreshold(new_img_gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 11, 2)
     # new_img_gray = cv2.Canny(new_img_gray, 100,200)
     (contours2, _) = cv2.findContours(new_img_gray, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -127,68 +125,70 @@ while True:
                     contours.append(cont)
 
     if (len(contours) > 0):
-        cont = max(contours, key=cv2.contourArea)
-        cv2.drawContours(frame, [cont], -1, 255, -1)
-        x, y, w, h = cv2.boundingRect(cont)
-        if(debug_pic):
-            cone = frame[y: y + h, x: x + w]
+        for cont in contours:
+            cv2.drawContours(frame, [cont], -1, 255, -1)
+            x, y, w, h = cv2.boundingRect(cont)
+            if(debug_pic):
+                cone = frame[y: y + h, x: x + w]
 
-        hull = cv2.convexHull(cont)
+            #hull = cv2.convexHull(cont)
+            mask = np.zeros(new_img_gray.shape[:2], dtype=new_img_gray.dtype)
+            cv2.drawContours(mask, [cont], -1, 255, -1)
+            mask = mask[y: y + h, x: x + w]
+            # hull2 = cv2.convexHull(cont, returnPoints = False)
+            # if(len(hull) > 0):
+            # defects = cv2.convexityDefects(cont, hull2)
+            # for i in range(defects.shape[0]):
+            # s, e, f, d = defects[i, 0]
+            # start = tuple(cont[s][0])
+            # end = tuple(cont[e][0])
+            # far = tuple(cont[f][0])
+            # cv2.line(frame, start, end, [0, 255, 0], 2)
+            # cv2.circle(frame, far, 5, [0, 0, 255], -1)
 
-        cv2.drawContours(mask, [cont], -1, 255, -1)
-        mask = mask[y: y + h, x: x + w]
-        # hull2 = cv2.convexHull(cont, returnPoints = False)
-        # if(len(hull) > 0):
-        # defects = cv2.convexityDefects(cont, hull2)
-        # for i in range(defects.shape[0]):
-        # s, e, f, d = defects[i, 0]
-        # start = tuple(cont[s][0])
-        # end = tuple(cont[e][0])
-        # far = tuple(cont[f][0])
-        # cv2.line(frame, start, end, [0, 255, 0], 2)
-        # cv2.circle(frame, far, 5, [0, 0, 255], -1)
+            #cv2.drawContours(frame, [hull], -1, (0, 255, 0))
 
-        cv2.drawContours(frame, [hull], -1, (0, 255, 0))
+            # print(w / h)
 
-        # print(w / h)
+            mask = cv2.resize(mask, (resize_size, resize_size))
+            #print("failed")
 
-        mask = cv2.resize(mask, (resize_size, resize_size))
+            resized_mask = mask.copy()
 
-        resized_mask = mask.copy()
+            resized_mask = resized_mask.reshape((1, resize_size ** 2)).astype(np.float32)
 
-        resized_mask = resized_mask.reshape((1, resize_size ** 2)).astype(np.float32)
+            _, result, nears, dists = knn.findNearest(resized_mask, 5)
 
-        _, result, nears, dists = knn.findNearest(resized_mask, 5)
+            min_dist = 5000000
 
-        min_dist = 5000000
+            if (dists[0][0] <= min_dist):
+                if(debug_msg):
+                    print("result: " + str(int(result)))
+                    print("score: " + str(dists[0][0]))
 
-        if (dists[0][0] <= min_dist):
-            if(debug_msg):
-                print("result: " + str(int(result)))
-                print("score: " + str(dists[0][0]))
-
-            if (int(result) == 117):
-                cv2.putText(frame, 'Upward Cone', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
+                if (int(result) == 117):
+                    cv2.putText(frame, 'Upward Cone', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
                         cv2.LINE_AA)
-            if (int(result) == 115):
-             cv2.putText(frame, 'Sideways Cone', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
+                if (int(result) == 115):
+                    cv2.putText(frame, 'Sideways Cone', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
                         cv2.LINE_AA)
-            if (int(result) == 104):
-                cv2.putText(frame, 'Head on Cone', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
+                if (int(result) == 104):
+                    cv2.putText(frame, 'Head on Cone', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
                         cv2.LINE_AA)
-            if (int(result) == 97):
-                cv2.putText(frame, 'Away Cone', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, 
+                if (int(result) == 97):
+                    cv2.putText(frame, 'Away Cone', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, 
                         cv2.LINE_AA)
 
-            coneRotationPub.set(int(result))
+                coneRotationPub.set(int(result))
+                break
         
-        #print(dists[0][0] >= min_dist)
-        #conePub.set(dists[0][0] <= min_dist)
-        if(dists[0][0] > min_dist):
-            coneRotationPub.set(-1)
+            #print(dists[0][0] >= min_dist)
+            #conePub.set(dists[0][0] <= min_dist)
+            if(dists[0][0] > min_dist):
+                coneRotationPub.set(-1)
 
-        if(debug_msg):
-            print(mask.shape)
+            if(debug_msg):
+                print(mask.shape)
     else:
         coneRotationPub.set(-1)
 
