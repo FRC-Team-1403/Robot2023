@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import team1403.lib.core.CougarLibInjectedParameters;
@@ -25,6 +26,7 @@ import team1403.robot.chargedup.swerve.SwerveCommand;
 import team1403.robot.chargedup.swerve.SwerveDrivePath;
 import team1403.robot.chargedup.swerve.SwerveSubsystem;
 import team1403.robot.chargedup.RobotConfig.Operator;
+import team1403.robot.chargedup.StateManager.GamePiece;
 import team1403.robot.chargedup.StateManager.LED;
 import team1403.robot.chargedup.arm.ArmState;
 import team1403.robot.chargedup.arm.ArmStateGroup;
@@ -287,6 +289,16 @@ public class CougarRobotImpl extends CougarRobot {
         new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getSingleShelfIntakeState()));
     new Trigger(() -> xboxOperator.getYButton()).onFalse(
         new SequentialMoveArmCommand(m_arm, new ArmState(0, 246.78781366, 150.28003026, 0)));
+
+    new Trigger(() -> xboxOperator.getXButton()).onFalse(
+      new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_UPRIGHT)));
+    new Trigger(() -> xboxOperator.getXButton()).onFalse(
+      new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState()));
+    
+      // new Trigger(() -> xboxOperator.getYButton()).onFalse(
+      //   new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)));
+      // new Trigger(() -> xboxOperator.getYButton()).onFalse(
+      //   new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState()));
 
     // lights
     new Trigger(() -> xboxOperator.getStartButton()).onTrue(
