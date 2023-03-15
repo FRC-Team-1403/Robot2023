@@ -15,13 +15,16 @@ public class SetpointArmCommand extends CommandBase {
   private final ArmSubsystem m_arm;
 
   private double m_startTime;
+
+  private boolean m_ignoreLimit;
   
   /**
    * Initializes the class.
    */
-  public SetpointArmCommand(ArmSubsystem arm, ArmState state) {
+  public SetpointArmCommand(ArmSubsystem arm, ArmState state, boolean ignoreLimit) {
     this.m_arm = arm;
     this.m_state = state;
+    this.m_ignoreLimit = ignoreLimit;
 
     addRequirements(arm);
   }
@@ -40,12 +43,14 @@ public class SetpointArmCommand extends CommandBase {
     double deltaT = Timer.getFPGATimestamp() - m_startTime;
     double pivotPosition = m_pivotProfile.calculate(deltaT).position;
     SmartDashboard.putNumber("Pivot Auto Setpoint", pivotPosition);
+    m_arm.ignoreExtensionLimit(m_ignoreLimit);
     m_arm.moveArm(m_state.wristAngle, m_state.intakeSpeed, pivotPosition, m_state.armLength);
     super.execute();
   }
 
   @Override
   public boolean isFinished() {
+    m_arm.ignoreExtensionLimit(false);
     return m_pivotProfile.isFinished(Timer.getFPGATimestamp() - m_startTime);
   }
 }

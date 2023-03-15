@@ -203,13 +203,14 @@ public class SwerveControllerCommand extends CommandBase {
     m_subsystem.drive(targetChassisSpeeds, new Translation2d());
   }
 
-  //   @Override
-  //   public void end(boolean interrupted) {
-  //     m_timer.stop();
-  //   }
+    @Override
+    public void end(boolean interrupted) {
+      m_timer.stop();
+      m_subsystem.stop();
+    }
 
-  //   @Override
-  //   public boolean isFinished() {
-  //     return m_timer.hasElapsed(m_trajectory.getTotalTimeSeconds());
-  //   }
+    @Override
+    public boolean isFinished() {
+      return m_timer.hasElapsed(m_trajectory.getTotalTimeSeconds());
+    }
 }

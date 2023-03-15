@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -20,7 +21,6 @@ import team1403.lib.core.CougarRobot;
 import team1403.lib.util.CougarLogger;
 import team1403.robot.chargedup.cse.CougarScriptObject;
 import team1403.robot.chargedup.cse.CougarScriptReader;
-import team1403.robot.chargedup.photonvision.PhotonVisionSubsystem;
 import team1403.robot.chargedup.swerve.SwerveAutoBalanceYaw;
 import team1403.robot.chargedup.swerve.SwerveCommand;
 import team1403.robot.chargedup.swerve.SwerveDrivePath;
@@ -28,7 +28,6 @@ import team1403.robot.chargedup.swerve.SwerveSubsystem;
 import team1403.robot.chargedup.RobotConfig.Operator;
 import team1403.robot.chargedup.StateManager.GamePiece;
 import team1403.robot.chargedup.StateManager.LED;
-import team1403.robot.chargedup.arm.ArmState;
 import team1403.robot.chargedup.arm.ArmStateGroup;
 import team1403.robot.chargedup.arm.ArmSubsystem;
 import team1403.robot.chargedup.arm.ManualArmCommand;
@@ -66,29 +65,30 @@ public class CougarRobotImpl extends CougarRobot {
     // m_builtins = new BuiltinSubsystem(parameters, logger);
     m_arm = new ArmSubsystem(parameters);
     m_swerveSubsystem = new SwerveSubsystem(parameters);
-    m_visionSubsystem = new PhotonVisionSubsystem(parameters);
-    m_lightSubsystem = new LightSubsystem(parameters);
+    // m_visionSubsystem = new PhotonVisionSubsystem(parameters);
+    // m_lightSubsystem = new LightSubsystem(parameters);
 
-    configureOperatorInterface();
-    configureDriverInterface();
     registerAutoCommands();
   }
 
   @Override
   public Command getAutonomousCommand() {
-    m_swerveSubsystem.setRobotIdleMode(IdleMode.kBrake);
-    return m_reader.importScript("Grid2Mobility.json");
+    CommandScheduler.getInstance().removeDefaultCommand(m_swerveSubsystem);
+    CommandScheduler.getInstance().removeDefaultCommand(m_arm);
+    return AutoManager.getInstance().getMiddleGridCommand(m_swerveSubsystem, m_arm);
   }
 
   @Override
   public void teleopInit() {
-    m_swerveSubsystem.setRobotIdleMode(IdleMode.kCoast);
+    configureOperatorInterface();
+    configureDriverInterface();
+    m_swerveSubsystem.setRobotIdleMode(IdleMode.kBrake);
   }
 
   /**
    * Configures the driver commands and their bindings.
    */
-  private void configureDriverInterface() {
+  public void configureDriverInterface() {
     XboxController xboxDriver = getJoystick("Driver", RobotConfig.Driver.pilotPort);
     SwerveAutoBalanceYaw autoBalanceYaw = new SwerveAutoBalanceYaw(m_swerveSubsystem);
 
@@ -102,40 +102,98 @@ public class CougarRobotImpl extends CougarRobot {
         () -> -deadband(xboxDriver.getLeftX(), 0.05),
         () -> -deadband(xboxDriver.getLeftY(), 0.05),
         () -> -deadband(xboxDriver.getRightX(), 0.05),
-        () -> xboxDriver.getYButtonReleased(),
-        () -> xboxDriver.getRightTriggerAxis(),
-        () -> xboxDriver.getLeftTriggerAxis()));
+        () -> xboxDriver.getYButtonReleased()));
 
     new Trigger(() -> xboxDriver.getLeftBumper()).onTrue(
         new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.2)));
 
     new Trigger(() -> xboxDriver.getLeftBumper()).onFalse(
-        new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.4)));
+        new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.6)));
+
+    new Trigger(() -> xboxDriver.getLeftTriggerAxis() >= 0.08).onTrue(
+        new InstantCommand(() -> m_swerveSubsystem.setPivotAroundOneWheel(false)))
+        .onFalse(new InstantCommand(() -> m_swerveSubsystem.setMiddlePivot()));
+
+    new Trigger(() -> xboxDriver.getRightTriggerAxis() >= 0.08).onTrue(
+        new InstantCommand(() -> m_swerveSubsystem.setPivotAroundOneWheel(true)))
+        .onFalse(new InstantCommand(() -> m_swerveSubsystem.setMiddlePivot()));
 
     new Trigger(() -> xboxDriver.getBButton()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.zeroGyroscope()));
 
-    new Trigger(() -> xboxDriver.getXButton()).whileTrue(
-        new RepeatCommand(new InstantCommand(() -> m_swerveSubsystem.stop())));
-
     new Trigger(() -> xboxDriver.getAButton()).whileTrue(autoBalanceYaw);
+
+    new Trigger(() -> xboxDriver.getXButton()).onTrue (new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(true)));
+    new Trigger(() -> xboxDriver.getXButton()).onFalse(new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(false)));
   }
 
   /**
    * Configures the operator commands and their bindings.
    */
-  private void configureOperatorInterface() {
+  public void configureOperatorInterface() {
     XboxController xboxOperator = getJoystick("Operator", Operator.pilotPort);
 
-    // new Trigger(() -> xboxOperator.getYButton()).onFalse(
-    // new InstantCommand(() -> switchOperatorMode()));
+    m_arm.setDefaultCommand(new ManualArmCommand(m_arm,
+        () -> -deadband(xboxOperator.getLeftY(), 0.05),
+        () -> deadband(xboxOperator.getRightY(), 0.05),
+        () -> xboxOperator.getLeftTriggerAxis(),
+        () -> xboxOperator.getRightTriggerAxis(),
+        () -> xboxOperator.getRightBumper(),
+        () -> xboxOperator.getLeftBumper()));
 
-    if (m_armOperatorManual) {
-      manualOperatorMode(xboxOperator);
-    }
-    // else {
-    // autoOperatorMode(xboxOperator);
-    // }
+    new Trigger(() -> xboxOperator.getPOV() == 180).onFalse(
+        new SetpointArmCommand(m_arm, ArmStateGroup.getTuck(), false));
+    new Trigger(() -> xboxOperator.getPOV() == 0).onFalse(
+        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false));
+    new Trigger(() -> xboxOperator.getPOV() == 90).onFalse(
+        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState(), false));
+    new Trigger(() -> xboxOperator.getPOV() == 270).onFalse(
+        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getLowNodeState(), false));
+    new Trigger(() -> xboxOperator.getBButton()).onFalse(
+        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getSingleShelfIntakeState(),
+            false));
+
+    // Intake tipped towards cone
+    new Trigger(() -> xboxOperator.getAButton()).onFalse(
+      new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_TOWARDS)) 
+    );
+
+    new Trigger(() -> xboxOperator.getAButton()).onFalse(
+        new SequentialCommandGroup(
+            new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_TOWARDS)),
+            new InstantCommand(() -> System.out.println(StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState())),
+            new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
+                true)));
+
+    // Intake upright cone
+    new Trigger(() -> xboxOperator.getXButton()).onFalse(
+      new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_UPRIGHT)) 
+    );
+
+    new Trigger(() -> xboxOperator.getXButton()).onFalse(
+        new SequentialCommandGroup(
+            new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_UPRIGHT)),
+            new InstantCommand(() -> System.out.println(StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState())),
+            new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
+                true)));
+
+    // Intake cube
+    new Trigger(() -> xboxOperator.getYButton()).onFalse(
+      new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)) 
+    );
+
+    new Trigger(() -> xboxOperator.getYButton()).onFalse(
+        new SequentialCommandGroup(
+            new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)),
+            new InstantCommand(() -> System.out.println(StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState())),
+            new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
+                true)));
+
+    // lights
+    // new Trigger(() -> xboxOperator.getStartButton()).onTrue(
+    //     new InstantCommand(() -> StateManager.getInstance().updateLEDState(LED.YELLOW)));
+    // new Trigger(() -> xboxOperator.getBackButton()).onTrue(
+    //     new InstantCommand(() -> StateManager.getInstance().updateLEDState(LED.PURPLE)));
   }
 
   /**
@@ -170,23 +228,27 @@ public class CougarRobotImpl extends CougarRobot {
     });
 
     m_reader.registerCommand("Tuck", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, ArmStateGroup.getTuck());
+      return new SequentialMoveArmCommand(m_arm, ArmStateGroup.getTuck(), false);
     });
 
     m_reader.registerCommand("High Node", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState());
+      return new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState(),
+          false);
     });
 
     m_reader.registerCommand("Middle Node", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState());
+      return new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState(),
+          false);
     });
 
     m_reader.registerCommand("Low Node", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getLowNodeState());
+      return new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getLowNodeState(),
+          false);
     });
 
     m_reader.registerCommand("Floor Pickup", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState());
+      return new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
+          true);
     });
 
     m_reader.registerCommand("Run Intake", (CougarScriptObject p) -> {
@@ -231,94 +293,10 @@ public class CougarRobotImpl extends CougarRobot {
     return new XboxController(port);
   }
 
-  // TODO, figure out actual setpoint values
-
-  /**
-   * This is the auto mode for operator.
-   * Has 5 setpoints, which will each set the arm
-   * in different positions
-   * A Button -> Ground
-   * B Button -> Shelf
-   * Dpad down Button -> Tuck
-   * DPad Up -> High
-   * DPad Right -> Mid
-   *
-   * @param xboxOperator defines which controller is being used
-   */
-  // public void autoOperatorMode(XboxController xboxOperator) {
-  // new Trigger(() -> xboxOperator.getAButton()).onFalse(
-  // new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-  // new Trigger(() -> xboxOperator.getBButton()).onFalse(
-  // new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-  // new Trigger(() ->
-  // xboxOperator.getRawButton(OperatorConfig.dPadDown)).onFalse(
-  // new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-  // new Trigger(() -> xboxOperator.getRawButton(OperatorConfig.dPadUp)).onFalse(
-  // new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-  // new Trigger(() ->
-  // xboxOperator.getRawButton(OperatorConfig.dPadRight)).onFalse(
-  // new InstantCommand(() -> m_arm.moveArm(0, 0, 0, 0)));
-  // }
-
-  /**
-   * This is the manual mode for operator.
-   * Minutely control arm with joysticks
-   *
-   * @param xboxOperator defines which controller is being used
-   */
-  private void manualOperatorMode(XboxController xboxOperator) {
-    m_arm.setDefaultCommand(new ManualArmCommand(m_arm,
-        () -> -deadband(xboxOperator.getLeftY(), 0.05),
-        () -> deadband(xboxOperator.getRightY(), 0.05),
-        () -> xboxOperator.getLeftTriggerAxis(),
-        () -> xboxOperator.getRightTriggerAxis(),
-        () -> xboxOperator.getRightBumper(),
-        () -> xboxOperator.getLeftBumper()));
-    new Trigger(() -> xboxOperator.getPOV() == 180).onFalse(
-        new SetpointArmCommand(m_arm, ArmStateGroup.getTuck()));
-    new Trigger(() -> xboxOperator.getPOV() == 0).onFalse(
-        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState()));
-    new Trigger(() -> xboxOperator.getPOV() == 90).onFalse(
-        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState()));
-    new Trigger(() -> xboxOperator.getPOV() == 270).onFalse(
-        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getLowNodeState()));
-
-    new Trigger(() -> xboxOperator.getAButton()).onFalse(
-        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState()));
-    new Trigger(() -> xboxOperator.getBButton()).onFalse(
-        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getSingleShelfIntakeState()));
-    new Trigger(() -> xboxOperator.getYButton()).onFalse(
-        new SequentialMoveArmCommand(m_arm, new ArmState(0, 246.78781366, 150.28003026, 0)));
-
-    new Trigger(() -> xboxOperator.getXButton()).onFalse(
-      new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_UPRIGHT)));
-    new Trigger(() -> xboxOperator.getXButton()).onFalse(
-      new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState()));
-    
-      // new Trigger(() -> xboxOperator.getYButton()).onFalse(
-      //   new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)));
-      // new Trigger(() -> xboxOperator.getYButton()).onFalse(
-      //   new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState()));
-
-    // lights
-    new Trigger(() -> xboxOperator.getStartButton()).onTrue(
-        new InstantCommand(() -> StateManager.getInstance().updateLEDState(LED.YELLOW)));
-    new Trigger(() -> xboxOperator.getBackButton()).onTrue(
-        new InstantCommand(() -> StateManager.getInstance().updateLEDState(LED.PURPLE)));
-  }
-
-  /**
-   * Switches the operator mode.
-   */
-  // public void switchOperatorMode() {
-  // m_armOperatorManual = !m_armOperatorManual;
-  // }
-
   // private final BuiltinSubsystem m_builtins;
-  private final PhotonVisionSubsystem m_visionSubsystem;
+  // private final PhotonVisionSubsystem m_visionSubsystem;
   private CougarScriptReader m_reader;
   private final ArmSubsystem m_arm;
-  private boolean m_armOperatorManual = true;
   private final SwerveSubsystem m_swerveSubsystem;
-  private final LightSubsystem m_lightSubsystem;
+  // private final LightSubsystem m_lightSubsystem;
 }

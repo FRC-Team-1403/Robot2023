@@ -23,9 +23,6 @@ public class SwerveCommand extends CommandBase {
   private final BooleanSupplier m_fieldRelativeSupplier;
   private boolean m_isFieldRelative;
 
-  private final DoubleSupplier m_rightPivotSupplier;
-  private final DoubleSupplier m_leftPivotSupplier;
-
   private Translation2d frontRight;
   private Translation2d frontLeft;
   private Translation2d backRight;
@@ -57,17 +54,12 @@ public class SwerveCommand extends CommandBase {
       DoubleSupplier horizontalTranslationSupplier,
       DoubleSupplier verticalTranslationSupplier,
       DoubleSupplier rotationSupplier,
-      BooleanSupplier fieldRelativeSupplier,
-      DoubleSupplier rightPivotSupplier,
-      DoubleSupplier leftPivotSupplier) {
+      BooleanSupplier fieldRelativeSupplier) {
     this.m_drivetrainSubsystem = drivetrain;
     this.m_verticalTranslationSupplier = verticalTranslationSupplier;
     this.m_horizontalTranslationSupplier = horizontalTranslationSupplier;
     this.m_rotationSupplier = rotationSupplier;
     this.m_fieldRelativeSupplier = fieldRelativeSupplier;
-
-    this.m_rightPivotSupplier = rightPivotSupplier;
-    this.m_leftPivotSupplier = leftPivotSupplier;
     m_isFieldRelative = true;
 
     frontRight = new Translation2d(
@@ -86,8 +78,8 @@ public class SwerveCommand extends CommandBase {
         -RobotConfig.Swerve.kTrackWidth / 2.0,
         RobotConfig.Swerve.kWheelBase / 2.0);
 
-    m_verticalTranslationLimiter = new SlewRateLimiter(7, -7, 0);
-    m_horizontalTranslationLimiter = new SlewRateLimiter(7, -7, 0);
+    m_verticalTranslationLimiter = new SlewRateLimiter(8, -8, 0);
+    m_horizontalTranslationLimiter = new SlewRateLimiter(8, -8, 0);
     m_rotationalLimiter = new SlewRateLimiter(5, -5, 0);
 
     addRequirements(m_drivetrainSubsystem);
@@ -114,94 +106,8 @@ public class SwerveCommand extends CommandBase {
       chassisSpeeds = new ChassisSpeeds(vertical, horizontal, angular);
     }
 
-    offset = pivotAroundOneWheel(vertical, robotAngleinDegrees);
-
     m_drivetrainSubsystem.drive(chassisSpeeds, offset);
     SmartDashboard.putBoolean("isFieldRelative", m_isFieldRelative);
-  }
-
-  private Translation2d pivotAroundOneWheel(double vertical, double robotAngleinDegrees) {
-    if (m_rightPivotSupplier.getAsDouble() > 0.08) {
-      if ((45.0 <= robotAngleinDegrees) && (robotAngleinDegrees < -45.0)
-          || (315.0 <= robotAngleinDegrees) && (robotAngleinDegrees < -315.0)) {
-        if (vertical >= 0.0) {
-          // Pivots around front right wheel
-          return frontRight;
-        } else {
-          // Pivot around back right wheel
-          return backRight;
-        }
-      } else if ((-135.0 < robotAngleinDegrees) && (robotAngleinDegrees <= -45.0)
-          || (225.0 < robotAngleinDegrees) && (robotAngleinDegrees <= 315.0)) {
-        if (vertical >= 0.0) {
-          // Pivot around back right wheel
-          return backRight;
-        } else {
-          // Pivot around back left wheel
-          return backLeft;
-        }
-      } else if ((-225.0 <= robotAngleinDegrees) && (robotAngleinDegrees < -135.0)
-          || (135.0 <= robotAngleinDegrees) && (robotAngleinDegrees < 225.0)) {
-        if (vertical >= 0.0) {
-          // Pivot around back left wheel
-          return backLeft;
-        } else {
-          // Pivot around front left wheel
-          return frontLeft;
-        }
-      } else if ((-315.0 <= robotAngleinDegrees) && (robotAngleinDegrees < -225.0)
-          || (45.0 <= robotAngleinDegrees) && (robotAngleinDegrees < 135.0)) {
-        if (vertical >= 0.0) {
-          // Pivot around front left wheel
-          return frontLeft;
-        } else {
-          // Pivot around front right wheel
-          return frontRight;
-        }
-      }
-    }
-
-    if (m_leftPivotSupplier.getAsDouble() > 0.08) {
-      if ((45.0 <= robotAngleinDegrees) && (robotAngleinDegrees < -45.0)
-          || (315.0 <= robotAngleinDegrees) && (robotAngleinDegrees < -315.0)) {
-        if (vertical >= 0.0) {
-          // Pivots around front left wheel
-          return frontLeft;
-        } else {
-          // Pivot around back left wheel
-          return backLeft;
-        }
-      } else if ((-135.0 < robotAngleinDegrees) && (robotAngleinDegrees <= -45.0)
-          || (225.0 < robotAngleinDegrees) && (robotAngleinDegrees <= 315.0)) {
-        if (vertical >= 0.0) {
-          // Pivot around back left wheel
-          return backLeft;
-        } else {
-          // Pivot around back right wheel
-          return backRight;
-        }
-      } else if ((-225.0 <= robotAngleinDegrees) && (robotAngleinDegrees < -135.0)
-          || (135.0 <= robotAngleinDegrees) && (robotAngleinDegrees < 225.0)) {
-        if (vertical >= 0.0) {
-          // Pivot around back right wheel
-          return backRight;
-        } else {
-          // Pivot around front right wheel
-          return frontRight;
-        }
-      } else if ((-315.0 <= robotAngleinDegrees) && (robotAngleinDegrees < -225.0)
-          || (45.0 <= robotAngleinDegrees) && (robotAngleinDegrees < 135.0)) {
-        if (vertical >= 0.0) {
-          // Pivot around front right wheel
-          return frontRight;
-        } else {
-          // Pivot around front left wheel
-          return frontLeft;
-        }
-      }
-    }
-
-    return new Translation2d();
   }
 
   private double squareNum(double num) {

@@ -23,7 +23,7 @@ public class RunIntake extends CommandBase{
   }
 
   @Override
-  public void initialize() {  
+  public void initialize() {
     this.m_intialPivotAngle = m_arm.getPivotAngleSetpoint();
     this.m_intialExtensionLength = m_arm.getExtensionLengthSetpoint();
     this.m_initialWristAngle = m_arm.getAbsoluteWristAngle();
@@ -35,7 +35,12 @@ public class RunIntake extends CommandBase{
 
   @Override
   public boolean isFinished() {
-      return (Timer.getFPGATimestamp() - startTime) >= 0.5;
+    System.out.println(Timer.getFPGATimestamp() - startTime);
+    return (Timer.getFPGATimestamp() - startTime) >= 0.5;
   }
 
+  @Override
+  public void end(boolean interrupted) {
+    m_arm.moveArm(new ArmState(m_intialExtensionLength, m_initialWristAngle, m_intialPivotAngle, 0));
+  }
 }
