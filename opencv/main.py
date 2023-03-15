@@ -8,6 +8,9 @@ import os
 
 inst = nt.NetworkTableInstance.getDefault()
 
+inst.setServerTeam(1403)
+inst.startClient4("raspberrypi")
+
 table = inst.getTable("conetable")
 #xPub = table.getDoubleTopic("xcone").publish()
 #conePub = table.getBooleanTopic("presentcone").publish()
@@ -98,7 +101,8 @@ while True:
     _, frame = vid.read()
 
     #frame = cv2.bilateralFilter(frame, 3, 21, 31)
-    frame = cv2.GaussianBlur(frame, (3,3), 0)
+    #frame = cv2.GaussianBlur(frame, (3,3), 0)
+    frame = cv2.medianBlur(frame, 5)
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
     hsv_low = np.array([H_low, S_low, V_low])
