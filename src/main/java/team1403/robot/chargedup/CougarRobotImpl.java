@@ -72,7 +72,7 @@ public class CougarRobotImpl extends CougarRobot {
 
   @Override
   public Command getAutonomousCommand() {
-    return AutoManager.getInstance().getSideGridCommand(m_swerveSubsystem, m_arm);
+    return AutoManager.getInstance().getAlternateSideGridCommand(m_swerveSubsystem, m_arm);
   }
 
   @Override
