@@ -71,7 +71,9 @@ public class StateManager {
         ArmStates.coneTowardsMiddleNode, ArmStates.coneTowardsLowNode);
 
     m_currentArmGroup = m_coneTowardsGroup;
+    System.out.println("SDFDSFDSF");
   }
+
   public static StateManager getInstance() {
     if (instance == null) {
       instance = new StateManager();
@@ -85,31 +87,12 @@ public class StateManager {
 
   public void updateArmState(GamePiece newGamePiece) {
     this.gamePiece = newGamePiece;
-    switch (newGamePiece) {
-      case CUBE: {
-        m_currentArmGroup = m_cubeGroup;
-        break;
-      }
-       case CONE_UPRIGHT: {
-        m_currentArmGroup = m_coneUprightGroup;
-        break;
-       }
-       case CONE_AWAY: {
-        m_currentArmGroup = m_coneAwayGroup;
-        break;
-       }
-       case CONE_TOWARDS: {
-        m_currentArmGroup = m_coneTowardsGroup;
-        break;
-       }
-       case CONE_SIDEWAYS: {
-        SmartDashboard.putString("Operator Message", "Sideways cone found. Cannot intake.");
-        break;
-       }
-       case NONE: {
-        SmartDashboard.putString("Operator Message", "No game piece found.");
-        break;
-       }
+    if (gamePiece.equals(GamePiece.CUBE)) {
+      m_currentArmGroup = m_cubeGroup;
+    } else if (gamePiece.equals(GamePiece.CONE_UPRIGHT)) {
+      m_currentArmGroup = m_coneUprightGroup;
+    } else if (gamePiece.equals(GamePiece.CONE_TOWARDS)) {
+      m_currentArmGroup = m_coneTowardsGroup;
     }
   }
 

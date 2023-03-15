@@ -46,6 +46,13 @@ public class ArmStateGroup {
         return tuck;
     }
 
+    @Override
+    public String toString() {
+        return "ArmStateGroup [floorIntakeState=" + floorIntakeState + ", doubleShelfIntakeState="
+                + doubleShelfIntakeState + ", singleShelfIntakeState=" + singleShelfIntakeState + ", highNodeState="
+                + highNodeState + ", middleNodeState=" + middleNodeState + ", lowNodeState=" + lowNodeState + "]";
+    }
+
 
 }
 

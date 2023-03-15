@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -72,7 +73,9 @@ public class CougarRobotImpl extends CougarRobot {
 
   @Override
   public Command getAutonomousCommand() {
-    return AutoManager.getInstance().getAlternateSideGridCommand(m_swerveSubsystem, m_arm);
+    CommandScheduler.getInstance().removeDefaultCommand(m_swerveSubsystem);
+    CommandScheduler.getInstance().removeDefaultCommand(m_arm);
+    return AutoManager.getInstance().getMiddleGridCommand(m_swerveSubsystem, m_arm);
   }
 
   @Override
@@ -118,12 +121,9 @@ public class CougarRobotImpl extends CougarRobot {
     new Trigger(() -> xboxDriver.getBButton()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.zeroGyroscope()));
 
-    new Trigger(() -> xboxDriver.getXButton()).whileTrue(
-        new RepeatCommand(new InstantCommand(() -> m_swerveSubsystem.stop())));
-
     new Trigger(() -> xboxDriver.getAButton()).whileTrue(autoBalanceYaw);
 
-    new Trigger(() -> xboxDriver.getXButton()).onTrue(new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(true)));
+    new Trigger(() -> xboxDriver.getXButton()).onTrue (new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(true)));
     new Trigger(() -> xboxDriver.getXButton()).onFalse(new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(false)));
   }
 
@@ -155,30 +155,45 @@ public class CougarRobotImpl extends CougarRobot {
 
     // Intake tipped towards cone
     new Trigger(() -> xboxOperator.getAButton()).onFalse(
+      new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_TOWARDS)) 
+    );
+
+    new Trigger(() -> xboxOperator.getAButton()).onFalse(
         new SequentialCommandGroup(
             new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_TOWARDS)),
+            new InstantCommand(() -> System.out.println(StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState())),
             new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
                 true)));
 
     // Intake upright cone
     new Trigger(() -> xboxOperator.getXButton()).onFalse(
+      new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_UPRIGHT)) 
+    );
+
+    new Trigger(() -> xboxOperator.getXButton()).onFalse(
         new SequentialCommandGroup(
             new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_UPRIGHT)),
+            new InstantCommand(() -> System.out.println(StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState())),
             new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
                 true)));
 
     // Intake cube
     new Trigger(() -> xboxOperator.getYButton()).onFalse(
+      new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)) 
+    );
+
+    new Trigger(() -> xboxOperator.getYButton()).onFalse(
         new SequentialCommandGroup(
             new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)),
+            new InstantCommand(() -> System.out.println(StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState())),
             new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
                 true)));
 
     // lights
-    new Trigger(() -> xboxOperator.getStartButton()).onTrue(
-        new InstantCommand(() -> StateManager.getInstance().updateLEDState(LED.YELLOW)));
-    new Trigger(() -> xboxOperator.getBackButton()).onTrue(
-        new InstantCommand(() -> StateManager.getInstance().updateLEDState(LED.PURPLE)));
+    // new Trigger(() -> xboxOperator.getStartButton()).onTrue(
+    //     new InstantCommand(() -> StateManager.getInstance().updateLEDState(LED.YELLOW)));
+    // new Trigger(() -> xboxOperator.getBackButton()).onTrue(
+    //     new InstantCommand(() -> StateManager.getInstance().updateLEDState(LED.PURPLE)));
   }
 
   /**

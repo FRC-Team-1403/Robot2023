@@ -53,7 +53,7 @@ public class SwerveSubsystem extends CougarSubsystem {
       -RobotConfig.Swerve.kTrackWidth / 2.0,
       RobotConfig.Swerve.kWheelBase / 2.0);
 
-  private final PIDController m_driftCorrectionPid = new PIDController(0.35, 0, 0);
+  private final PIDController m_driftCorrectionPid = new PIDController(0.37, 0, 0);
   private double m_desiredHeading = 0;
   private double m_speedLimiter = 0.6;
 
@@ -407,13 +407,13 @@ public class SwerveSubsystem extends CougarSubsystem {
   private void xMode() {
     SwerveModuleState[] states = {
         // Front Left
-        new SwerveModuleState(0, Rotation2d.fromDegrees(315)),
-        // Front Right
         new SwerveModuleState(0, Rotation2d.fromDegrees(225)),
+        // Front Right
+        new SwerveModuleState(0, Rotation2d.fromDegrees(315)),
         // Back left
-        new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+        new SwerveModuleState(0, Rotation2d.fromDegrees(135)),
         // Back Right
-        new SwerveModuleState(0, Rotation2d.fromDegrees(135))
+        new SwerveModuleState(0, Rotation2d.fromDegrees(45))
     };
     setModuleStates(states);
   }

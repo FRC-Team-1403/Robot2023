@@ -15,7 +15,7 @@ public class NavxAhrs extends AHRS implements GyroscopeDevice {
 
   public NavxAhrs(String name) {
     this.m_name = name;
-    this.m_navx = new AHRS(edu.wpi.first.wpilibj.SerialPort.Port.kUSB1);
+    this.m_navx = new AHRS(edu.wpi.first.wpilibj.SerialPort.Port.kMXP);
   }
 
   @Override

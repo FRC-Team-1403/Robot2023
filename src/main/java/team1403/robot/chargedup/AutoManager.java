@@ -14,9 +14,14 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import team1403.robot.chargedup.arm.ArmStateGroup;
 import team1403.robot.chargedup.arm.ArmSubsystem;
 import team1403.robot.chargedup.arm.RunIntake;
+import team1403.robot.chargedup.arm.SequentialMoveArmCommand;
+import team1403.robot.chargedup.arm.SetpointArmCommand;
 import team1403.robot.chargedup.swerve.SwerveControllerCommand;
 import team1403.robot.chargedup.swerve.SwerveSubsystem;
 import team1403.robot.chargedup.swerve.TimedDrive;
@@ -118,11 +123,25 @@ public class AutoManager {
   public Command getAlternateSideGridCommand(SwerveSubsystem swerve, ArmSubsystem arm) {
     swerve.setSpeedLimiter(1);
     return new SequentialCommandGroup(
-      // new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
+      new SequentialMoveArmCommand(arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
       new RunIntake(arm, 1),
-      new TimedDrive(swerve, 0.5, new ChassisSpeeds(2, 0, 0)),
-      // new SetpointArmCommand(m_arm, ArmStateGroup.getTuck(), false),
-      new TimedDrive(swerve, 1, new ChassisSpeeds(2, 0, 0))
+      new TimedDrive(swerve, 1, new ChassisSpeeds(-2, 0, 0)),
+      new ParallelCommandGroup(
+        new SetpointArmCommand(arm, ArmStateGroup.getTuck(), false),
+        new TimedDrive(swerve,4.7, new ChassisSpeeds(-3.5, -0.54, 0.15))
+      )
       );
+  }
+
+  public Command getMiddleGridCommand(SwerveSubsystem swerve, ArmSubsystem arm) {
+  swerve.setSpeedLimiter(1);
+  return new SequentialCommandGroup(
+      new SequentialMoveArmCommand(arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
+      new RunIntake(arm, 1),
+      new TimedDrive(swerve, 1, new ChassisSpeeds(-2, -0.5, 0.2)),
+      new SetpointArmCommand(arm, ArmStateGroup.getTuck(), false),
+      new TimedDrive(swerve, 2.5, new ChassisSpeeds(-4.5, 0.1, 0)),
+      new InstantCommand(() -> swerve.setXModeEnabled(true))
+  );
   }
 }

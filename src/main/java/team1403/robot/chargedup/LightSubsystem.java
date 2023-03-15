@@ -150,6 +150,6 @@ public class LightSubsystem extends CougarSubsystem {
 
   @Override
   public void periodic() {
-    setLEDColor(StateManager.getInstance().getLEDState());
+    // setLEDColor(StateManager.getInstance().getLEDState());
   }
 }

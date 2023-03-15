@@ -78,8 +78,8 @@ public class SwerveCommand extends CommandBase {
         -RobotConfig.Swerve.kTrackWidth / 2.0,
         RobotConfig.Swerve.kWheelBase / 2.0);
 
-    m_verticalTranslationLimiter = new SlewRateLimiter(7, -7, 0);
-    m_horizontalTranslationLimiter = new SlewRateLimiter(7, -7, 0);
+    m_verticalTranslationLimiter = new SlewRateLimiter(8, -8, 0);
+    m_horizontalTranslationLimiter = new SlewRateLimiter(8, -8, 0);
     m_rotationalLimiter = new SlewRateLimiter(5, -5, 0);
 
     addRequirements(m_drivetrainSubsystem);
