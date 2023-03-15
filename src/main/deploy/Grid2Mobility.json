@@ -1,9 +1,9 @@
 [
     {
         "Parameters": {
-            "x": 5.67,
+            "x": 0,
             "angle": 0,
-            "y": 6.5
+            "y": 0
         },
         "CommandName": "SetStartPosition"
     },
@@ -11,16 +11,16 @@
         "Parameters": {
             "Waypoints": [
                 {
-                    "x": 5.67,
-                    "y": 6.5
+                    "x": 0,
+                    "y": 0
                 },
                 {
-                    "x": 2.15,
-                    "y": 6.58
+                    "x": 0,
+                    "y": -3.28
                 },
                 {
-                    "x": 2.29,
-                    "y": 12.16
+                    "x": 0,
+                    "y": -6.56
                 }
             ],
             "EndAngle": 0,

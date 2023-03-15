@@ -4,9 +4,14 @@ import java.util.List;
 
 import com.revrobotics.CANSparkMax.IdleMode;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -23,6 +28,7 @@ import team1403.robot.chargedup.cse.CougarScriptReader;
 import team1403.robot.chargedup.photonvision.PhotonVisionSubsystem;
 import team1403.robot.chargedup.swerve.SwerveAutoBalanceYaw;
 import team1403.robot.chargedup.swerve.SwerveCommand;
+import team1403.robot.chargedup.swerve.SwerveControllerCommand;
 import team1403.robot.chargedup.swerve.SwerveDrivePath;
 import team1403.robot.chargedup.swerve.SwerveSubsystem;
 import team1403.robot.chargedup.RobotConfig.Operator;
@@ -67,28 +73,101 @@ public class CougarRobotImpl extends CougarRobot {
     m_arm = new ArmSubsystem(parameters);
     m_swerveSubsystem = new SwerveSubsystem(parameters);
     m_visionSubsystem = new PhotonVisionSubsystem(parameters);
-    m_lightSubsystem = new LightSubsystem(parameters);
+    // m_lightSubsystem = new LightSubsystem(parameters);
 
-    configureOperatorInterface();
-    configureDriverInterface();
     registerAutoCommands();
   }
 
   @Override
   public Command getAutonomousCommand() {
+    m_swerveSubsystem.zeroGyroscope();
+    m_swerveSubsystem.setGyroscopeOffset(199);
+
     m_swerveSubsystem.setRobotIdleMode(IdleMode.kBrake);
-    return m_reader.importScript("Grid2Mobility.json");
+    TrajectoryConfig trajectoryConfig = new TrajectoryConfig(
+      RobotConfig.Swerve.kMaxSpeed,
+      3)
+      .setKinematics(RobotConfig.Swerve.kDriveKinematics);
+
+    // 2. Generate trajectory
+    Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
+        new Pose2d(0, 0, m_swerveSubsystem.getGyroscopeRotation()),
+        List.of(
+            new Translation2d(0.2, 0),
+            new Translation2d(0.4, 0),
+            new Translation2d(0.6, 0),
+            new Translation2d(0.8, 0),
+            new Translation2d(0.9, 0)),
+        new Pose2d(1, 0, Rotation2d.fromDegrees(179)),
+        trajectoryConfig);
+
+    Trajectory trajectoryTwo = TrajectoryGenerator.generateTrajectory(
+      new Pose2d(1, 0, m_swerveSubsystem.getGyroscopeRotation()),
+      List.of(
+          new Translation2d(1.5, 0),
+          new Translation2d(2, 0),
+          new Translation2d(2.5, 0),
+          new Translation2d(3, 0)),
+      new Pose2d(3.5, 0, Rotation2d.fromDegrees(179)),
+      trajectoryConfig);
+
+    // 3. Define PID controllers for tracking trajectory
+    PIDController xController = new PIDController(
+      RobotConfig.Swerve.kPTranslation, 
+      RobotConfig.Swerve.kITranslation, 
+      RobotConfig.Swerve.kDTranslation);
+
+    PIDController yController = new PIDController(
+      RobotConfig.Swerve.kPTranslation, 
+      RobotConfig.Swerve.kITranslation, 
+      RobotConfig.Swerve.kDTranslation);
+
+    ProfiledPIDController thetaController = new ProfiledPIDController(
+      0, 
+      RobotConfig.Swerve.kIAutoTurning, 
+      RobotConfig.Swerve.kDAutoTurning, 
+      RobotConfig.Swerve.kThetaControllerConstraints);
+
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+
+    SwerveControllerCommand swerveControllerCommandOne = new SwerveControllerCommand(
+        trajectory,
+        m_swerveSubsystem::getPose,
+        xController,
+        yController,
+        thetaController,
+        m_swerveSubsystem);
+
+    SwerveControllerCommand swerveControllerCommandTwo = new SwerveControllerCommand(
+      trajectoryTwo,
+      m_swerveSubsystem::getPose,
+      xController,
+      yController,
+      thetaController,
+      m_swerveSubsystem);
+  
+    // return swerveControllerCommand;
+
+    return new SequentialCommandGroup(
+      // new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
+      new RunIntake(m_arm, 1),
+      swerveControllerCommandOne,
+      // new SetpointArmCommand(m_arm, ArmStateGroup.getTuck(), false),
+      swerveControllerCommandTwo
+      );
   }
 
   @Override
   public void teleopInit() {
-    m_swerveSubsystem.setRobotIdleMode(IdleMode.kCoast);
+    configureOperatorInterface();
+    configureDriverInterface();
+    m_swerveSubsystem.setRobotIdleMode(IdleMode.kBrake);
   }
 
   /**
    * Configures the driver commands and their bindings.
    */
-  private void configureDriverInterface() {
+  public void configureDriverInterface() {
     XboxController xboxDriver = getJoystick("Driver", RobotConfig.Driver.pilotPort);
     SwerveAutoBalanceYaw autoBalanceYaw = new SwerveAutoBalanceYaw(m_swerveSubsystem);
 
@@ -102,15 +181,21 @@ public class CougarRobotImpl extends CougarRobot {
         () -> -deadband(xboxDriver.getLeftX(), 0.05),
         () -> -deadband(xboxDriver.getLeftY(), 0.05),
         () -> -deadband(xboxDriver.getRightX(), 0.05),
-        () -> xboxDriver.getYButtonReleased(),
-        () -> xboxDriver.getRightTriggerAxis(),
-        () -> xboxDriver.getLeftTriggerAxis()));
+        () -> xboxDriver.getYButtonReleased()));
 
     new Trigger(() -> xboxDriver.getLeftBumper()).onTrue(
         new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.2)));
 
     new Trigger(() -> xboxDriver.getLeftBumper()).onFalse(
-        new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.4)));
+        new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.6)));
+
+    new Trigger(() -> xboxDriver.getLeftTriggerAxis() >= 0.08).onTrue(
+      new InstantCommand(() -> m_swerveSubsystem.setPivotAroundOneWheel(false)))
+      .onFalse(new InstantCommand(() -> m_swerveSubsystem.setMiddlePivot()));   
+  
+    new Trigger(() -> xboxDriver.getRightTriggerAxis() >= 0.08).onTrue(
+      new InstantCommand(() -> m_swerveSubsystem.setPivotAroundOneWheel(true)))
+      .onFalse(new InstantCommand(() -> m_swerveSubsystem.setMiddlePivot()));   
 
     new Trigger(() -> xboxDriver.getBButton()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.zeroGyroscope()));
@@ -124,7 +209,7 @@ public class CougarRobotImpl extends CougarRobot {
   /**
    * Configures the operator commands and their bindings.
    */
-  private void configureOperatorInterface() {
+  public void configureOperatorInterface() {
     XboxController xboxOperator = getJoystick("Operator", Operator.pilotPort);
 
     // new Trigger(() -> xboxOperator.getYButton()).onFalse(
@@ -170,23 +255,23 @@ public class CougarRobotImpl extends CougarRobot {
     });
 
     m_reader.registerCommand("Tuck", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, ArmStateGroup.getTuck());
+      return new SequentialMoveArmCommand(m_arm, ArmStateGroup.getTuck(), false);
     });
 
     m_reader.registerCommand("High Node", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState());
+      return new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false);
     });
 
     m_reader.registerCommand("Middle Node", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState());
+      return new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState(), false);
     });
 
     m_reader.registerCommand("Low Node", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getLowNodeState());
+      return new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getLowNodeState(), false);
     });
 
     m_reader.registerCommand("Floor Pickup", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState());
+      return new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(), true);
     });
 
     m_reader.registerCommand("Run Intake", (CougarScriptObject p) -> {
@@ -275,30 +360,28 @@ public class CougarRobotImpl extends CougarRobot {
         () -> xboxOperator.getRightBumper(),
         () -> xboxOperator.getLeftBumper()));
     new Trigger(() -> xboxOperator.getPOV() == 180).onFalse(
-        new SetpointArmCommand(m_arm, ArmStateGroup.getTuck()));
+        new SetpointArmCommand(m_arm, ArmStateGroup.getTuck(), false));
     new Trigger(() -> xboxOperator.getPOV() == 0).onFalse(
-        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState()));
+        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false));
     new Trigger(() -> xboxOperator.getPOV() == 90).onFalse(
-        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState()));
+        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState(), false));
     new Trigger(() -> xboxOperator.getPOV() == 270).onFalse(
-        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getLowNodeState()));
+        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getLowNodeState(), false));
 
     new Trigger(() -> xboxOperator.getAButton()).onFalse(
-        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState()));
+        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(), true));
     new Trigger(() -> xboxOperator.getBButton()).onFalse(
-        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getSingleShelfIntakeState()));
-    new Trigger(() -> xboxOperator.getYButton()).onFalse(
-        new SequentialMoveArmCommand(m_arm, new ArmState(0, 246.78781366, 150.28003026, 0)));
+        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getSingleShelfIntakeState(), false));
 
     new Trigger(() -> xboxOperator.getXButton()).onFalse(
       new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_UPRIGHT)));
     new Trigger(() -> xboxOperator.getXButton()).onFalse(
-      new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState()));
+      new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(), true));
     
-      // new Trigger(() -> xboxOperator.getYButton()).onFalse(
-      //   new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)));
-      // new Trigger(() -> xboxOperator.getYButton()).onFalse(
-      //   new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState()));
+      new Trigger(() -> xboxOperator.getYButton()).onFalse(
+        new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)));
+      new Trigger(() -> xboxOperator.getYButton()).onFalse(
+        new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(), true));
 
     // lights
     new Trigger(() -> xboxOperator.getStartButton()).onTrue(
@@ -320,5 +403,5 @@ public class CougarRobotImpl extends CougarRobot {
   private final ArmSubsystem m_arm;
   private boolean m_armOperatorManual = true;
   private final SwerveSubsystem m_swerveSubsystem;
-  private final LightSubsystem m_lightSubsystem;
+  // private final LightSubsystem m_lightSubsystem;
 }

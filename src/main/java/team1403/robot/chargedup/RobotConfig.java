@@ -262,7 +262,7 @@ public class RobotConfig {
     public static final double kMaxWristAngle = 265;
     public static final double kMinWristAngle = 29.196293229907326; 
     public static final double kWristConversionFactor = 90.0 / 100;
-    public static final double kAbsoluteWristOffset = 180-74.7792558694814;
+    public static final double kAbsoluteWristOffset = 180-142.28614255715357;
 
     //Extension
     public static final double kPArmExtension = 0.3;
@@ -275,7 +275,7 @@ public class RobotConfig {
     public static final double maxVerticalAngle = Math.acos(Math.toRadians(44.3 / 60.218)); //TODO
     public static final double angleHittingRobot = 66; //TODO
     public static final double angleHittingGround = 80; //TODO
-    public static final double kExtensionOffset = 6;
+    public static final double kExtensionOffset = 0;
 
     //Intake
     public static final double kPIntake = 0;
@@ -290,7 +290,7 @@ public class RobotConfig {
   }
 
   public static class ArmStates {
-    public static final ArmState coneTowardsFloorIntake = new ArmState(5.3888425827, 155.782799394, 232.060091132, 0); //0.039682067930698, 140.0363630009091, 240.55448872511047
+    public static final ArmState coneTowardsFloorIntake = new ArmState(1.48413276672, 141.024500025, 242.8243863, 0); //0.039682067930698, 140.0363630009091, 240.55448872511047
     public static final ArmState coneTowardsHighConeNode = new ArmState(22.987735748, 246.78781366, 150.28003026, 0);
     public static final ArmState coneTowardsMiddleNode = new ArmState(8.345230102539062, 264, 149.45086251051157, 0);
     public static final ArmState singleSubstationIntake = new ArmState(0, 51.3175107829, 241.777313195, 0);

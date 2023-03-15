@@ -48,6 +48,7 @@ public class ManualArmCommand extends CommandBase {
 
   @Override
   public void execute() {
+    m_arm.ignoreExtensionLimit(true);
     double pivotAngle = m_arm.getPivotAngleSetpoint();
     double wristAngle = m_arm.getWristAngleSetpoint();
     double armExtension = m_arm.getExtensionLengthSetpoint();

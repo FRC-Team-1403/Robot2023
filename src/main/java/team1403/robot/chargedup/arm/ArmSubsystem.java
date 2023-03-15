@@ -46,6 +46,7 @@ public class ArmSubsystem extends CougarSubsystem {
   private final DigitalInput m_minMagneticSwitch;
   private final DigitalInput m_maxMagneticSwitch;
   private boolean m_extensionLimitSwitchReset = false;
+  private boolean m_ignoreExtensionLimit = false;
 
   // Setpoints
   private double m_wristAngleSetpoint;
@@ -407,6 +408,11 @@ public class ArmSubsystem extends CougarSubsystem {
     return extensionLength;
   }
 
+
+  public void ignoreExtensionLimit(boolean ignore) {
+    m_ignoreExtensionLimit = ignore;
+  }
+
   //--------------------------- General methods ---------------------------
 
   /**
@@ -479,9 +485,9 @@ public class ArmSubsystem extends CougarSubsystem {
     runIntake(m_intakeSpeedSetpoint);
 
     // Pivot
-    if(isArmSwitchActive()) {
-      rezeroPivot();
-    }
+    // if(isArmSwitchActive()) {
+    //   rezeroPivot();
+    // }
     
     if ((isInPivotBounds(getAbsolutePivotAngle()) && !isArmSwitchActive())
         || isInPivotBounds(this.m_pivotAngleSetpoint)) {
@@ -493,7 +499,11 @@ public class ArmSubsystem extends CougarSubsystem {
     }
 
     // Extension
-    double limitedExtension = dynamicExtensionLimit(m_extensionLengthSetpoint);
+    double limitedExtension = m_extensionLengthSetpoint;
+    if(!m_ignoreExtensionLimit) {
+      limitedExtension = dynamicExtensionLimit(m_extensionLengthSetpoint);
+    }
+    
     SmartDashboard.putNumber("Limited length", limitedExtension);
 
     if (isExtensionMinSwitchActive() && !m_extensionLimitSwitchReset) {
@@ -503,7 +513,7 @@ public class ArmSubsystem extends CougarSubsystem {
     } else {
       if ((!isExtensionMinSwitchActive() && !isExtensionMaxSwitchActive())
           || isInExtensionBounds(limitedExtension)) {
-        setMotorExtensionLength(dynamicExtensionLimit(limitedExtension));
+        setMotorExtensionLength(limitedExtension);
       } else {
         setMotorExtensionLength(getExtensionLength());
       }

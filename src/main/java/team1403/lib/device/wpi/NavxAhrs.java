@@ -3,8 +3,6 @@ package team1403.lib.device.wpi;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.SPI;
-
 import team1403.lib.device.GyroscopeDevice;
 
 /**
@@ -17,14 +15,14 @@ public class NavxAhrs extends AHRS implements GyroscopeDevice {
 
   public NavxAhrs(String name) {
     this.m_name = name;
-    this.m_navx = new AHRS(SPI.Port.kMXP);
+    this.m_navx = new AHRS(edu.wpi.first.wpilibj.SerialPort.Port.kUSB1);
   }
 
   @Override
   public String getName() { 
     return m_name;
   }
-
+  
   @Override
   public void reset() {
     m_navx.reset();

@@ -112,7 +112,7 @@ public class SwerveDrivePath extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    m_drivetrain.setSpeedLimiter(0.4);
+    m_drivetrain.setSpeedLimiter(0.6);
     m_drivetrain.stop();
   }
 }
