@@ -105,8 +105,6 @@ public class AutoManager {
       thetaController,
       swerve);
   
-    // return swerveControllerCommand;
-
     return new SequentialCommandGroup(
       // new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
       new RunIntake(arm, 1),

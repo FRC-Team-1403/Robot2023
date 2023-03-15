@@ -26,6 +26,12 @@ public class TimedDrive extends CommandBase{
     m_swerve.drive(m_chassisSpeeds, new Translation2d());
   }
 
+
+  @Override
+  public void end(boolean interrupted) {
+    m_swerve.stop();
+  }
+
   @Override
   public boolean isFinished() {
     return Timer.getFPGATimestamp() - m_startTime >= m_duration;
