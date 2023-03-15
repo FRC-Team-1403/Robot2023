@@ -10,12 +10,12 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
  */
 public class TimedDrive extends CommandBase{
   private double m_startTime;
-  private final double m_length;
+  private final double m_duration;
   private final ChassisSpeeds m_chassisSpeeds;
   private final SwerveSubsystem m_swerve;
 
-  public TimedDrive(SwerveSubsystem swerve, double length, ChassisSpeeds chassisSpeeds) {
-    this.m_length = length;
+  public TimedDrive(SwerveSubsystem swerve, double duration, ChassisSpeeds chassisSpeeds) {
+    this.m_duration = duration;
     this.m_chassisSpeeds = chassisSpeeds;
     this.m_swerve = swerve;
   }
@@ -28,7 +28,7 @@ public class TimedDrive extends CommandBase{
 
   @Override
   public boolean isFinished() {
-    return Timer.getFPGATimestamp() - m_startTime >= m_length;
+    return Timer.getFPGATimestamp() - m_startTime >= m_duration;
   }
 
 }
