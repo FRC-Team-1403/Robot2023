@@ -130,6 +130,10 @@ public class CougarRobotImpl extends CougarRobot {
         new RepeatCommand(new InstantCommand(() -> m_swerveSubsystem.stop())));
 
     new Trigger(() -> xboxDriver.getAButton()).whileTrue(autoBalanceYaw);
+
+    new Trigger(() -> xboxDriver.getXButton()).onTrue(new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(true)));
+
+    new Trigger(() -> xboxDriver.getXButton()).onFalse(new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(false)));
   }
 
   /**
