@@ -247,7 +247,7 @@ public class RobotConfig {
     public static final int kPArmPivot = 1;
     public static final int kIArmPivot = 0;
     public static final int kDArmPivot = 0;
-    public static double kAbsolutePivotOffset = 180-35.2492019663337;
+    public static double kAbsolutePivotOffset = 180-27.2492019663337;
     public static double kMaxPivotAngle = 249.84208720995503;
     public static final double kFrameAngle = 242.71777151085703;
     public static final double kFrameClearanceAngle = 234.5; //cone angle
@@ -275,7 +275,7 @@ public class RobotConfig {
     public static final double maxVerticalAngle = Math.acos(Math.toRadians(44.3 / 60.218)); //TODO
     public static final double angleHittingRobot = 66; //TODO
     public static final double angleHittingGround = 80; //TODO
-    public static final double kExtensionOffset = 0;
+    public static final double kExtensionOffset = 1;
 
     //Intake
     public static final double kPIntake = 0;
@@ -290,16 +290,16 @@ public class RobotConfig {
   }
 
   public static class ArmStates {
-    public static final ArmState coneTowardsFloorIntake = new ArmState(1.48413276672, 141.024500025, 242.8243863, 0); //0.039682067930698, 140.0363630009091, 240.55448872511047
+    public static final ArmState coneTowardsFloorIntake = new ArmState(2.00726276672, 141.346825025, 241.74272039269, 0); //0.039682067930698, 140.0363630009091, 240.55448872511047
     public static final ArmState coneTowardsHighConeNode = new ArmState(22.987735748, 246.78781366, 150.28003026, 0);
     public static final ArmState coneTowardsMiddleNode = new ArmState(8.345230102539062, 264, 149.45086251051157, 0);
     public static final ArmState singleSubstationIntake = new ArmState(0, 51.3175107829, 241.777313195, 0);
     public static final ArmState coneTowardsLowNode = new ArmState(0, 80.18787350469682, 245.42271036546947, 0);
     
-    public static final ArmState cubeFloorIntake = new ArmState(4.055530548095703, 124.90037862250946, 230.28624941341906, 0);
+    public static final ArmState cubeFloorIntake = new ArmState(3.6968396620, 115.37985604, 237.75822122060124, 0);
     public static final ArmState cubeHighNode = new ArmState(16.6710987091, 177.965261949, 169.356773014, 0);
     public static final ArmState cubeMiddleNode = new ArmState(0.05158682167, 177.61028394, 181.482400676, 0);
 
-    public static final ArmState coneUprightIntake = new ArmState(0, 207.099432677, 205.208496037, 0);
+    public static final ArmState coneUprightIntake = new ArmState(0, 222.432458051, 205.82528059, 0);
   }
 }

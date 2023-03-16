@@ -128,7 +128,7 @@ public class AutoManager {
       new TimedDrive(swerve, 1, new ChassisSpeeds(-2, 0, 0)),
       new ParallelCommandGroup(
         new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false),
-        new TimedDrive(swerve,4.7, new ChassisSpeeds(-3.5, -0.54, 0.15))
+        new TimedDrive(swerve,6.5, new ChassisSpeeds(-2, 0, 0))
       )
       );
   }

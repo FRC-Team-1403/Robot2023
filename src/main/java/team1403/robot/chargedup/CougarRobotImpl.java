@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.revrobotics.CANSparkMax.IdleMode;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -68,7 +69,6 @@ public class CougarRobotImpl extends CougarRobot {
     m_swerveSubsystem = new SwerveSubsystem(parameters);
     // m_visionSubsystem = new PhotonVisionSubsystem(parameters);
     // m_lightSubsystem = new LightSubsystem(parameters);
-
     registerAutoCommands();
   }
 
@@ -76,7 +76,7 @@ public class CougarRobotImpl extends CougarRobot {
   public Command getAutonomousCommand() {
     CommandScheduler.getInstance().removeDefaultCommand(m_swerveSubsystem);
     CommandScheduler.getInstance().removeDefaultCommand(m_arm);
-    return AutoManager.getInstance().getMiddleGridCommand(m_swerveSubsystem, m_arm);
+    return AutoManager.getInstance().getAlternateSideGridCommand(m_swerveSubsystem, m_arm);
   }
 
   @Override
