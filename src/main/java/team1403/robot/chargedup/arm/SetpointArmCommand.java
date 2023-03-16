@@ -1,5 +1,7 @@
 package team1403.robot.chargedup.arm;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -10,20 +12,22 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
  * Creates the arm set point class.
  */
 public class SetpointArmCommand extends CommandBase {
-  private final ArmState m_state;
+  private ArmState m_state;
   private TrapezoidProfile m_pivotProfile;
   private final ArmSubsystem m_arm;
 
   private double m_startTime;
+
+  private final Supplier<ArmState> m_armStateSupplier;
 
   private boolean m_ignoreLimit;
   
   /**
    * Initializes the class.
    */
-  public SetpointArmCommand(ArmSubsystem arm, ArmState state, boolean ignoreLimit) {
+  public SetpointArmCommand(ArmSubsystem arm, Supplier<ArmState> armStateSupplier, boolean ignoreLimit) {
     this.m_arm = arm;
-    this.m_state = state;
+    this.m_armStateSupplier = armStateSupplier;
     this.m_ignoreLimit = ignoreLimit;
 
     addRequirements(arm);
@@ -31,7 +35,8 @@ public class SetpointArmCommand extends CommandBase {
   
   @Override
   public void initialize() {
-    this.m_pivotProfile = new TrapezoidProfile(
+    m_state = m_armStateSupplier.get();
+    m_pivotProfile = new TrapezoidProfile(
       new TrapezoidProfile.Constraints(360, 165), //high --> 360, 165 //slow --> 20, 10
       new TrapezoidProfile.State(m_state.armPivot, 1),
       new TrapezoidProfile.State(m_arm.getAbsolutePivotAngle(), 0));

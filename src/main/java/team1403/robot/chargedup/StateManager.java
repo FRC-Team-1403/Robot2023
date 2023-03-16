@@ -21,6 +21,10 @@ public class StateManager {
   private int coneAwayCounter = 1;
   private int gamePieceCounter = 1;
 
+  private int m_armGroupUsed = 0;
+
+  private int counter = 0;
+
   private GamePiece gamePiece = GamePiece.NONE;
   private LED led = LED.NONE;
 
@@ -60,7 +64,7 @@ public class StateManager {
     NONE;
   }
 
-  private static StateManager instance = null;
+  private static StateManager instance = new StateManager();
 
   private StateManager() {
     m_coneTowardsGroup = new ArmStateGroup(ArmStates.coneTowardsFloorIntake, null, 
@@ -76,13 +80,9 @@ public class StateManager {
         ArmStates.coneTowardsMiddleNode, ArmStates.coneTowardsLowNode);
 
     m_currentArmGroup = m_coneTowardsGroup;
-    System.out.println("SDFDSFDSF");
   }
 
   public static StateManager getInstance() {
-    if (instance == null) {
-      instance = new StateManager();
-    }
     return instance;
   }
 
@@ -98,17 +98,22 @@ public class StateManager {
     gamePieceCounter++;
     if (newGamePiece == GamePiece.CONE_UPRIGHT) {
       m_currentArmGroup = m_coneUprightGroup;
+      m_armGroupUsed = 0;
       SmartDashboard.putNumber("Cone Upright Counter", coneAwayCounter);
       coneAwayCounter++;
     } else if (newGamePiece == GamePiece.CUBE) {
       m_currentArmGroup = m_cubeGroup;
+      m_armGroupUsed = 1;
       SmartDashboard.putNumber("Cube Counter", cubeCounter);
       cubeCounter++;
     } else if (newGamePiece == GamePiece.CONE_TOWARDS) {
       m_currentArmGroup = m_coneTowardsGroup;
+      m_armGroupUsed = 2;
       SmartDashboard.putNumber("Cone Towards Counter", coneTowardsCounter);
       coneTowardsCounter++;
     }
+
+    SmartDashboard.putString("Changed Group", m_currentArmGroup.getHighNodeState().toString());
   }
 
   public void updateLEDState(LED newLEDState) {
@@ -124,9 +129,17 @@ public class StateManager {
   }
 
   public ArmStateGroup getCurrentArmGroup() {
-    SmartDashboard.putNumber("Expected Arm Group", 
-      m_currentArmGroup.getHighNodeState().armLength);
-    return m_currentArmGroup;
+    SmartDashboard.putNumber("m_armGroupUsed", m_armGroupUsed);
+    SmartDashboard.putString("Expected group", m_currentArmGroup.getHighNodeState().toString());
+    counter++;
+    SmartDashboard.putNumber("Counter", counter);
+    if (m_armGroupUsed == 0) {
+      return m_coneUprightGroup;
+    } else if (m_armGroupUsed == 1) {
+      return m_cubeGroup;
+    } else {
+      return m_coneTowardsGroup;
+    }
   }
 
   public GamePiece getGamePiece() {

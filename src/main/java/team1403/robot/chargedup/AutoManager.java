@@ -127,7 +127,7 @@ public class AutoManager {
       new RunIntake(arm, 1),
       new TimedDrive(swerve, 1, new ChassisSpeeds(-2, 0, 0)),
       new ParallelCommandGroup(
-        new SetpointArmCommand(arm, ArmStateGroup.getTuck(), false),
+        new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false),
         new TimedDrive(swerve,4.7, new ChassisSpeeds(-3.5, -0.54, 0.15))
       )
       );
@@ -139,7 +139,7 @@ public class AutoManager {
       new SequentialMoveArmCommand(arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
       new RunIntake(arm, 1),
       new TimedDrive(swerve, 1, new ChassisSpeeds(-2, -0.5, 0.2)),
-      new SetpointArmCommand(arm, ArmStateGroup.getTuck(), false),
+      new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false),
       new TimedDrive(swerve, 2.5, new ChassisSpeeds(-4.5, 0.1, 0)),
       new InstantCommand(() -> swerve.setXModeEnabled(true))
   );
