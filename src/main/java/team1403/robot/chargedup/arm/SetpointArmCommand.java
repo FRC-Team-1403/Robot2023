@@ -45,6 +45,7 @@ public class SetpointArmCommand extends CommandBase {
     SmartDashboard.putNumber("Pivot Auto Setpoint", pivotPosition);
     m_arm.ignoreExtensionLimit(m_ignoreLimit);
     m_arm.moveArm(m_state.wristAngle, m_state.intakeSpeed, pivotPosition, m_state.armLength);
+    SmartDashboard.putNumber("Actual Arm Length", m_state.armLength);
     super.execute();
   }
 

@@ -16,6 +16,11 @@ public class StateManager {
   private ArmStateGroup m_coneTowardsGroup;
   private ArmStateGroup m_coneAwayGroup;
 
+  private int cubeCounter = 1;
+  private int coneTowardsCounter = 1;
+  private int coneAwayCounter = 1;
+  private int gamePieceCounter = 1;
+
   private GamePiece gamePiece = GamePiece.NONE;
   private LED led = LED.NONE;
 
@@ -86,13 +91,23 @@ public class StateManager {
   }
 
   public void updateArmState(GamePiece newGamePiece) {
-    this.gamePiece = newGamePiece;
-    if (gamePiece.equals(GamePiece.CUBE)) {
-      m_currentArmGroup = m_cubeGroup;
-    } else if (gamePiece.equals(GamePiece.CONE_UPRIGHT)) {
+    gamePiece = newGamePiece;
+    SmartDashboard.putString("Game Piece", newGamePiece.toString());
+    SmartDashboard.putNumber("Game Piece Counter", gamePieceCounter);
+    System.out.println(gamePieceCounter);
+    gamePieceCounter++;
+    if (newGamePiece == GamePiece.CONE_UPRIGHT) {
       m_currentArmGroup = m_coneUprightGroup;
-    } else if (gamePiece.equals(GamePiece.CONE_TOWARDS)) {
+      SmartDashboard.putNumber("Cone Upright Counter", coneAwayCounter);
+      coneAwayCounter++;
+    } else if (newGamePiece == GamePiece.CUBE) {
+      m_currentArmGroup = m_cubeGroup;
+      SmartDashboard.putNumber("Cube Counter", cubeCounter);
+      cubeCounter++;
+    } else if (newGamePiece == GamePiece.CONE_TOWARDS) {
       m_currentArmGroup = m_coneTowardsGroup;
+      SmartDashboard.putNumber("Cone Towards Counter", coneTowardsCounter);
+      coneTowardsCounter++;
     }
   }
 
@@ -109,6 +124,8 @@ public class StateManager {
   }
 
   public ArmStateGroup getCurrentArmGroup() {
+    SmartDashboard.putNumber("Expected Arm Group", 
+      m_currentArmGroup.getHighNodeState().armLength);
     return m_currentArmGroup;
   }
 

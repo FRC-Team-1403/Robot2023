@@ -34,6 +34,7 @@ import team1403.robot.chargedup.arm.ManualArmCommand;
 import team1403.robot.chargedup.arm.RunIntake;
 import team1403.robot.chargedup.arm.SequentialMoveArmCommand;
 import team1403.robot.chargedup.arm.SetpointArmCommand;
+import team1403.robot.chargedup.arm.UpdateArmState;
 
 /**
  * The heart of the robot.
@@ -140,6 +141,36 @@ public class CougarRobotImpl extends CougarRobot {
         () -> xboxOperator.getRightTriggerAxis(),
         () -> xboxOperator.getRightBumper(),
         () -> xboxOperator.getLeftBumper()));
+    
+    // Intake tipped towards cone
+    // new Trigger(() -> xboxOperator.getAButton()).onFalse(
+    //     new SequentialCommandGroup(
+    //         new UpdateArmState(GamePiece.CONE_TOWARDS),
+    //         new InstantCommand(() -> System.out.println(StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState())),
+    //         new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
+    //             true)));
+    new Trigger(() -> xboxOperator.getAButton()).onFalse(
+            new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_TOWARDS))
+            .andThen(
+            new SetpointArmCommand(m_arm, 
+            StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
+            true)));
+
+    // Intake upright cone
+    new Trigger(() -> xboxOperator.getXButton()).onFalse(
+      new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_UPRIGHT))
+            .andThen(
+            new SetpointArmCommand(m_arm, 
+            StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
+            true)));
+
+    // Intake cube
+    new Trigger(() -> xboxOperator.getYButton()).onFalse(
+      new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE))
+            .andThen(
+            new SetpointArmCommand(m_arm, 
+            StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
+            true)));
 
     new Trigger(() -> xboxOperator.getPOV() == 180).onFalse(
         new SetpointArmCommand(m_arm, ArmStateGroup.getTuck(), false));
@@ -152,42 +183,6 @@ public class CougarRobotImpl extends CougarRobot {
     new Trigger(() -> xboxOperator.getBButton()).onFalse(
         new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getSingleShelfIntakeState(),
             false));
-
-    // Intake tipped towards cone
-    new Trigger(() -> xboxOperator.getAButton()).onFalse(
-      new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_TOWARDS)) 
-    );
-
-    new Trigger(() -> xboxOperator.getAButton()).onFalse(
-        new SequentialCommandGroup(
-            new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_TOWARDS)),
-            new InstantCommand(() -> System.out.println(StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState())),
-            new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
-                true)));
-
-    // Intake upright cone
-    new Trigger(() -> xboxOperator.getXButton()).onFalse(
-      new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_UPRIGHT)) 
-    );
-
-    new Trigger(() -> xboxOperator.getXButton()).onFalse(
-        new SequentialCommandGroup(
-            new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_UPRIGHT)),
-            new InstantCommand(() -> System.out.println(StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState())),
-            new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
-                true)));
-
-    // Intake cube
-    new Trigger(() -> xboxOperator.getYButton()).onFalse(
-      new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)) 
-    );
-
-    new Trigger(() -> xboxOperator.getYButton()).onFalse(
-        new SequentialCommandGroup(
-            new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)),
-            new InstantCommand(() -> System.out.println(StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState())),
-            new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
-                true)));
 
     // lights
     // new Trigger(() -> xboxOperator.getStartButton()).onTrue(
