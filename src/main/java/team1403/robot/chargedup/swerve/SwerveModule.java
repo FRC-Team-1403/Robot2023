@@ -297,8 +297,6 @@ public class SwerveModule implements Device {
    *
    */
   public void set(double driveMetersPerSecond, double steerAngle) {
-    SmartDashboard.putString(getName() + " state",
-        "Speed: " + driveMetersPerSecond + " | Angle: " + steerAngle);
     // Set driveMotor according to percentage output
     this.m_driveMotor.set(convertDriveMetersPerSecond(driveMetersPerSecond, steerAngle));
 

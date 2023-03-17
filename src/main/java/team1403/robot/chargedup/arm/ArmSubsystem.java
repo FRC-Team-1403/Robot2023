@@ -547,11 +547,10 @@ public class ArmSubsystem extends CougarSubsystem {
     SmartDashboard.putNumber("WristSetpoint", getWristAngleSetpoint());
     SmartDashboard.putNumber("Pivot Setpoint", getPivotAngleSetpoint());
     SmartDashboard.putNumber("Extension Setpoint", getExtensionLengthSetpoint());
-    SmartDashboard.putBoolean("minExtension", isExtensionMinSwitchActive());
+    SmartDashboard.putBoolean("Min Extension", isExtensionMinSwitchActive());
     SmartDashboard.putBoolean("Max Extension", isExtensionMaxSwitchActive());
 
-    SmartDashboard.putNumber("RAW VALUE", m_wristAbsoluteEncoder.getAbsolutePosition());
-    SmartDashboard.putBoolean("Arm Switch??", isArmSwitchActive());
+    SmartDashboard.putBoolean("Arm Switch", isArmSwitchActive());
   }
 
   /**
