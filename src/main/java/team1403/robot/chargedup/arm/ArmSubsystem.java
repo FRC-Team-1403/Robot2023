@@ -46,7 +46,6 @@ public class ArmSubsystem extends CougarSubsystem {
   private final CANSparkMax m_extensionMotor;
   private final DigitalInput m_minMagneticSwitch;
   private final DigitalInput m_maxMagneticSwitch;
-  private boolean m_extensionLimitSwitchReset = false;
   private boolean m_ignoreExtensionLimit = false;
 
   // Setpoints
@@ -526,10 +525,12 @@ public class ArmSubsystem extends CougarSubsystem {
 
     SmartDashboard.putNumber("Limited length", limitedExtension);
 
-    if (isExtensionMinSwitchActive() && !m_extensionLimitSwitchReset) {
-      // Rezero extension
-      m_extensionLimitSwitchReset = true;
-      m_extensionMotor.getEncoder().setPosition(0);
+    if (isExtensionMinSwitchActive()) {
+      // Rezero extension at min value
+      m_extensionMotor.getEncoder().setPosition(RobotConfig.Arm.kMinArmExtension);
+    } else if (isExtensionMaxSwitchActive()) {
+      // Rezero extension at max value
+      m_extensionMotor.getEncoder().setPosition(RobotConfig.Arm.kMaxArmExtension);
     } else {
       if ((!isExtensionMinSwitchActive() && !isExtensionMaxSwitchActive())
           || isInExtensionBounds(limitedExtension)) {
