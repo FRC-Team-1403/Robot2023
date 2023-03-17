@@ -19,13 +19,13 @@ public class SwerveAutoBalance extends CommandBase {
     public SwerveAutoBalance(SwerveSubsystem drivetrainSubsystem) {
         m_drivetrainSubsystem = drivetrainSubsystem;
         m_xPIDController = new PIDController(
-            RobotConfig.SwerveConfig.kPTranslation, 
-            RobotConfig.SwerveConfig.kITranslation, 
-            RobotConfig.SwerveConfig.kDTranslation);
+            RobotConfig.Swerve.kPTranslation, 
+            RobotConfig.Swerve.kITranslation, 
+            RobotConfig.Swerve.kDTranslation);
         m_yPIDController = new PIDController(
-            RobotConfig.SwerveConfig.kPTranslation, 
-            RobotConfig.SwerveConfig.kITranslation, 
-            RobotConfig.SwerveConfig.kDTranslation);
+            RobotConfig.Swerve.kPTranslation, 
+            RobotConfig.Swerve.kITranslation, 
+            RobotConfig.Swerve.kDTranslation);
     }
 
     @Override

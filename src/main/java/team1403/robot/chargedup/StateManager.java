@@ -3,7 +3,7 @@ package team1403.robot.chargedup;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import team1403.robot.chargedup.RobotConfig.ArmStateConfig;
+import team1403.robot.chargedup.RobotConfig.ArmStates;
 import team1403.robot.chargedup.arm.ArmStateGroup;
 
 public class StateManager {
@@ -16,38 +16,73 @@ public class StateManager {
   private ArmStateGroup m_coneTowardsGroup;
   private ArmStateGroup m_coneAwayGroup;
 
-  private GamePiece gamePiece = GamePiece.NA;
+  private int cubeCounter = 1;
+  private int coneTowardsCounter = 1;
+  private int coneAwayCounter = 1;
+  private int gamePieceCounter = 1;
+
+  private int m_armGroupUsed = 0;
+
+  private int counter = 0;
+
+  private GamePiece gamePiece = GamePiece.NONE;
+  private LED led = LED.NONE;
 
   public enum GamePiece {
     CUBE,
-    CONE_SIDEWAYS,
-    CONE_AWAY,
     CONE_UPRIGHT,
+    CONE_AWAY, 
+    CONE_SIDEWAYS, 
     CONE_TOWARDS,
-    NA
+    NONE;
+
+    static final GamePiece[] values = GamePiece.values();
+
+    public static GamePiece fromInt(int value) {
+      switch(value) {
+        case 4: // a cube has 4 sides :p
+          return CUBE;
+        case 117: // 'u'
+          return CONE_UPRIGHT;
+        case 115: // 's'
+          return CONE_SIDEWAYS;
+        case 104: // 'h'
+          return CONE_TOWARDS;
+        case 97:  // 'a'
+          return CONE_AWAY;
+        default: // nothing's there :O
+          return NONE;
+      }
+    }
   }
 
-  private static StateManager instance = null;
+  public enum LED {
+    PURPLE,
+    YELLOW,
+    MONTY,
+    RAINBOW,
+    NONE;
+  }
+
+  private static StateManager instance = new StateManager();
 
   private StateManager() {
-    m_coneTowardsGroup = new ArmStateGroup(ArmStateConfig.coneTowardsFloorIntake, null, 
-        ArmStateConfig.singleSubstationIntake, ArmStateConfig.coneTowardsHighConeNode, 
-        ArmStateConfig.coneTowardsMiddleNode, ArmStateConfig.coneTowardsLowNode);
+    m_coneTowardsGroup = new ArmStateGroup(ArmStates.coneTowardsFloorIntake, null, 
+        ArmStates.singleSubstationIntake, ArmStates.coneTowardsHighConeNode, 
+        ArmStates.coneTowardsMiddleNode, ArmStates.coneTowardsLowNode);
 
-    m_cubeGroup = new ArmStateGroup(ArmStateConfig.cubeFloorIntake, null, 
-        ArmStateConfig.singleSubstationIntake, ArmStateConfig.cubeHighNode, 
-        ArmStateConfig.cubeMiddleNode, ArmStateGroup.tuck);
+    m_cubeGroup = new ArmStateGroup(ArmStates.cubeFloorIntake, null, 
+        ArmStates.singleSubstationIntake, ArmStates.cubeHighNode, 
+        ArmStates.cubeMiddleNode, ArmStateGroup.tuck);
 
-    m_coneUprightGroup = new ArmStateGroup(ArmStateConfig.coneUprightIntake, null, 
-        ArmStateConfig.singleSubstationIntake, ArmStateConfig.coneTowardsHighConeNode, 
-        ArmStateConfig.coneTowardsMiddleNode, ArmStateConfig.coneTowardsLowNode);
+    m_coneUprightGroup = new ArmStateGroup(ArmStates.coneUprightIntake, null, 
+        ArmStates.singleSubstationIntake, ArmStates.coneTowardsHighConeNode, 
+        ArmStates.coneTowardsMiddleNode, ArmStates.coneTowardsLowNode);
 
-    m_currentArmGroup = m_coneUprightGroup;
+    m_currentArmGroup = m_coneTowardsGroup;
   }
+
   public static StateManager getInstance() {
-    if (instance == null) {
-      instance = new StateManager();
-    }
     return instance;
   }
 
@@ -55,43 +90,56 @@ public class StateManager {
     m_alliance = DriverStation.getAlliance();
   }
 
-  public void updateState(GamePiece newGamePiece, Runnable switchPipeline) {
-    switchPipeline.run();
-    this.gamePiece = newGamePiece;
-    switch (newGamePiece) {
-      case CUBE: {
-        m_currentArmGroup = m_cubeGroup;
-        break;
-      }
-       case CONE_UPRIGHT: {
-        m_currentArmGroup = m_coneUprightGroup;
-        break;
-       }
-       case CONE_AWAY: {
-        m_currentArmGroup = m_coneAwayGroup;
-        break;
-       }
-       case CONE_TOWARDS: {
-        m_currentArmGroup = m_coneTowardsGroup;
-        break;
-       }
-       case CONE_SIDEWAYS: {
-        SmartDashboard.putString("Operator Message", "Sideways cone found. Cannot intake.");
-        break;
-       }
-       case NA: {
-        SmartDashboard.putString("Operator Message", "No game piece found.");
-        break;
-       }
+  public void updateArmState(GamePiece newGamePiece) {
+    gamePiece = newGamePiece;
+    SmartDashboard.putString("Game Piece", newGamePiece.toString());
+    SmartDashboard.putNumber("Game Piece Counter", gamePieceCounter);
+    System.out.println(gamePieceCounter);
+    gamePieceCounter++;
+    if (newGamePiece == GamePiece.CONE_UPRIGHT) {
+      m_currentArmGroup = m_coneUprightGroup;
+      m_armGroupUsed = 0;
+      SmartDashboard.putNumber("Cone Upright Counter", coneAwayCounter);
+      coneAwayCounter++;
+    } else if (newGamePiece == GamePiece.CUBE) {
+      m_currentArmGroup = m_cubeGroup;
+      m_armGroupUsed = 1;
+      SmartDashboard.putNumber("Cube Counter", cubeCounter);
+      cubeCounter++;
+    } else if (newGamePiece == GamePiece.CONE_TOWARDS) {
+      m_currentArmGroup = m_coneTowardsGroup;
+      m_armGroupUsed = 2;
+      SmartDashboard.putNumber("Cone Towards Counter", coneTowardsCounter);
+      coneTowardsCounter++;
     }
+
+    SmartDashboard.putString("Changed Group", m_currentArmGroup.getHighNodeState().toString());
   }
 
-  public Alliance getM_alliance() {
+  public void updateLEDState(LED newLEDState) {
+    this.led = newLEDState;
+  }
+
+  public LED getLEDState() {
+    return led;
+  }
+
+  public Alliance getalliance() {
     return m_alliance;
   }
 
   public ArmStateGroup getCurrentArmGroup() {
-    return m_currentArmGroup;
+    SmartDashboard.putNumber("m_armGroupUsed", m_armGroupUsed);
+    SmartDashboard.putString("Expected group", m_currentArmGroup.getHighNodeState().toString());
+    counter++;
+    SmartDashboard.putNumber("Counter", counter);
+    if (m_armGroupUsed == 0) {
+      return m_coneUprightGroup;
+    } else if (m_armGroupUsed == 1) {
+      return m_cubeGroup;
+    } else {
+      return m_coneTowardsGroup;
+    }
   }
 
   public GamePiece getGamePiece() {

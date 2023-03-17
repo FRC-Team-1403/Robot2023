@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarSubsystem;
-import team1403.lib.device.AdvancedMotorController.CougarIdleMode;
 import team1403.lib.device.wpi.CougarSparkMax;
 import team1403.lib.device.wpi.WpiLimitSwitch;
 import team1403.lib.util.CougarLogger;
@@ -23,7 +22,9 @@ import team1403.robot.chargedup.RobotConfig;
 import team1403.robot.chargedup.RobotConfig.Arm;
 
 /**
- * Class creating the arm subsystem.
+ * Class creating the arm subsystem. The subsystem takes care of moving the arm
+ * to a specified position.
+ * The specified position can be changed via the moveArm() method.
  * 
  */
 public class ArmSubsystem extends CougarSubsystem {
@@ -45,13 +46,15 @@ public class ArmSubsystem extends CougarSubsystem {
   private final CANSparkMax m_extensionMotor;
   private final DigitalInput m_minMagneticSwitch;
   private final DigitalInput m_maxMagneticSwitch;
-  private double m_extensionLimitSwitchOffset;
+  private boolean m_extensionLimitSwitchReset = false;
+  private boolean m_ignoreExtensionLimit = false;
 
   // Setpoints
   private double m_wristAngleSetpoint;
   private double m_pivotAngleSetpoint;
   private double m_intakeSpeedSetpoint;
   private double m_extensionLengthSetpoint;
+  private double m_intakePosition;
 
   /**
    * Initializing the arn subsystem.
@@ -80,8 +83,6 @@ public class ArmSubsystem extends CougarSubsystem {
     configWristMotor();
     configEncoders();
 
-    // TODO, tune feedforward with arm pivot
-    // TODO Constraints
     m_pivotPid = new PIDController(0.025, RobotConfig.Arm.kIArmPivot, RobotConfig.Arm.kDArmPivot);
     m_minMagneticSwitch = new DigitalInput(RobotConfig.RioPorts.kExtensionMinMagneticSwitch);
     m_maxMagneticSwitch = new DigitalInput(RobotConfig.RioPorts.kExtensionMaxMagneticSwitch);
@@ -92,6 +93,11 @@ public class ArmSubsystem extends CougarSubsystem {
 
   }
 
+  // --------------------------- Setup methods ---------------------------
+
+  /**
+   * Configures all the encoders associated with the susbystem.
+   */
   private void configEncoders() {
     // Wrist encoders
     m_wristMotor.getEncoder().setPositionConversionFactor(RobotConfig.Arm.kWristConversionFactor);
@@ -115,6 +121,9 @@ public class ArmSubsystem extends CougarSubsystem {
     m_leftPivotMotor.getEncoder().setPosition(getAbsolutePivotAngle());
   }
 
+  /**
+   * Configures all the motors associated with the subsystem.
+   */
   private void configWristMotor() {
     // Wrist
     final SparkMaxPIDController wristController = m_wristMotor.getPIDController();
@@ -136,8 +145,17 @@ public class ArmSubsystem extends CougarSubsystem {
     m_leftPivotMotor.setSmartCurrentLimit(25);
     m_rightPivotMotor.follow(m_leftPivotMotor, true);
 
-    //intake
-    m_wristMotor.setIdleMode(CougarIdleMode.BRAKE);
+    // intake
+    final SparkMaxPIDController intakeMotorController = m_intakeMotor.getPIDController();
+    m_intakeMotor.setIdleMode(IdleMode.kBrake);
+    m_intakeMotor.enableVoltageCompensation(12);
+    m_intakeMotor.setSmartCurrentLimit(20);
+
+    intakeMotorController.setP(RobotConfig.Arm.kPIntake);
+    intakeMotorController.setI(RobotConfig.Arm.kIIntake);
+    intakeMotorController.setD(RobotConfig.Arm.kDIntake);
+    intakeMotorController.setFeedbackDevice(m_intakeMotor.getAlternateEncoder(1024));
+    intakeMotorController.setPositionPIDWrappingEnabled(false);
 
     // Extension
     final SparkMaxPIDController extensionController = m_extensionMotor.getPIDController();
@@ -153,23 +171,7 @@ public class ArmSubsystem extends CougarSubsystem {
     extensionController.setPositionPIDWrappingEnabled(false);
   }
 
-  public double getWristAngleSetpoint() {
-    return m_wristAngleSetpoint;
-  }
-
-  public double getPivotAngleSetpoint() {
-    return m_pivotAngleSetpoint;
-  }
-
-  public double getIntakeSpeedSetpoint() {
-    return m_intakeSpeedSetpoint;
-  }
-
-  public double getExtensionLengthSetpoint() {
-    return m_extensionLengthSetpoint;
-  }
-
-  // Wrist Methods
+  // --------------------------- Wrist Methods ---------------------------
 
   /**
    * Gets the absolute wrist encoder value.
@@ -188,16 +190,23 @@ public class ArmSubsystem extends CougarSubsystem {
     return value;
   }
 
+  /**
+   * Moves the wrist to the given angle.
+   * 
+   * @param absoluteWristAngle the angle to move the wrist to.
+   */
   private void setAbsoluteWristAngle(double absoluteWristAngle) {
     m_wristMotor.getPIDController().setReference(absoluteWristAngle,
         CANSparkMax.ControlType.kPosition);
   }
 
-  public double absoluteWristAngle(double desiredWristAngle, double desiredArmAngle,
-      double currentWristAngle) {
-    return currentWristAngle - (desiredArmAngle - 180) - 180 + desiredWristAngle;
-  }
-
+  /**
+   * Limits the wrist angle between the min and max wrist angles as defined in
+   * RobotConfig.Arm.
+   * 
+   * @param angle the given angle to limit.
+   * @return the limited angle.
+   */
   public double limitWristAngle(double angle) {
     return MathUtil.clamp(angle, Arm.kMinWristAngle, Arm.kMaxWristAngle);
   }
@@ -212,12 +221,12 @@ public class ArmSubsystem extends CougarSubsystem {
     return (angle > Arm.kMinWristAngle && angle < Arm.kMaxWristAngle);
   }
 
-  // Pivot Methods
+  // --------------------------- Pivot Methods ---------------------------
 
   /**
-   * Getter for arm limit switch.
+   * Returns whether the arm limit switch has been triggered.
    *
-   * @return if arm limit switch is triggered
+   * @return true if the limit switch has been triggered.
    */
   public boolean isArmSwitchActive() {
     return m_maxArmLimitSwitch.isTriggered();
@@ -228,17 +237,16 @@ public class ArmSubsystem extends CougarSubsystem {
    * Accounts for any belt skipping.
    */
   private void rezeroPivot() {
-    double currentAngle = getAbsolutePivotAngle();
-    if(Math.abs(currentAngle - RobotConfig.Arm.kMaxPivotAngle) > 1) {
-      double offset = currentAngle - RobotConfig.Arm.kMaxPivotAngle;
-    RobotConfig.Arm.kMaxPivotAngle -= (offset);
-    }
+    RobotConfig.Arm.kAbsolutePivotOffset = 0;
+    double difference = RobotConfig.Arm.kMaxPivotAngle - getAbsolutePivotAngle();
+    RobotConfig.Arm.kAbsolutePivotOffset += difference;
   }
 
   /**
-   * The absolute pivot encoder value.
+   * Returns the position of pivot in degrees as specified by the absolute
+   * encoder.
    *
-   * @return The encoder value of the pivot encoder.
+   * @return The angle of the pivot in degrees.
    */
   public double getAbsolutePivotAngle() {
     double value = (m_armAbsoluteEncoder.getAbsolutePosition() * 360) + RobotConfig.Arm.kAbsolutePivotOffset;
@@ -252,6 +260,11 @@ public class ArmSubsystem extends CougarSubsystem {
     return value;
   }
 
+  /**
+   * Moves the pivot to the desired angle.
+   * 
+   * @param desiredAngle the angle to move the pivot to in degrees.
+   */
   private void setAbsolutePivotAngle(double desiredAngle) {
     // Feedforward
     double currentAngle = getAbsolutePivotAngle();
@@ -270,7 +283,7 @@ public class ArmSubsystem extends CougarSubsystem {
     // Feedback
     double feedback = -1 * m_pivotPid.calculate(currentAngle, desiredAngle);
 
-    if(isArmSwitchActive()) {
+    if (isArmSwitchActive()) {
       feedforward = 0;
     }
 
@@ -281,44 +294,92 @@ public class ArmSubsystem extends CougarSubsystem {
   }
 
   /**
-   * Checks if the given angle is in the bounds of the wrist.
+   * Checks if the given angle is in the bounds of the pivot.
    *
    * @param angle the given angle
-   * @return true if the given angle is in the bounds of the wrist.
+   * @return true if the given angle is in the bounds of the pivot.
    */
   private boolean isInPivotBounds(double angle) {
     return (angle >= Arm.kMinPivotAngle && angle <= Arm.kMaxPivotAngle);
   }
 
+  /**
+   * Limits the given angle in between the min and max pivot angles as defined in
+   * the RobotConfig.Arm.
+   * 
+   * @param angle the angle to limit.
+   * @return the limited angle.
+   */
   public double limitPivotAngle(double angle) {
     return MathUtil.clamp(angle, Arm.kMinPivotAngle, Arm.kMaxPivotAngle);
   }
 
-  // Intake
+  // --------------------------- Intake ---------------------------
 
+  /**
+   * Runs the intake at the given speed. If the intake is not running, it will
+   * hold its position.
+   * 
+   * @param intakeSpeed the speed to run the intake at (between -1 and 1,
+   *                    inclusive).
+   */
   public void runIntake(double intakeSpeed) {
-    m_intakeMotor.set(m_intakeSpeedSetpoint);
+    if (intakeSpeed == 0) {
+      m_intakePosition = m_intakeMotor.getAlternateEncoder(1024).getPosition();
+      m_intakeMotor.getPIDController().setReference(m_intakePosition, CANSparkMax.ControlType.kPosition);
+    } else {
+      m_intakeMotor.set(m_intakeSpeedSetpoint);
+    }
   }
 
-  // Extension
+  // --------------------------- Extension ---------------------------
 
+  /**
+   * Returns the amount the arm has extended by in inches.
+   * 
+   * @return the extension length of the arm in inches.
+   */
   public double getExtensionLength() {
     return m_extensionMotor.getEncoder().getPosition();
   }
 
+  /**
+   * Extends the arm to the given extension length.
+   * 
+   * @param extensionLength the length to extend the arm to in inches.
+   */
   private void setMotorExtensionLength(double extensionLength) {
     m_extensionMotor.getPIDController().setReference(
         extensionLength, CANSparkMax.ControlType.kPosition);
   }
 
+  /**
+   * Returns whether the minimum extension limit switch is active. If it is, the
+   * arm has extended 0 inches.
+   * 
+   * @return whether the extension limit switch is active.
+   */
   private boolean isExtensionMinSwitchActive() {
     return m_minMagneticSwitch.get();
   }
 
+  /**
+   * Returns whether the maximum extension limit switch is active. If it is, the
+   * arm has extended 0 inches.
+   * 
+   * @return whether the extension limit switch is active.
+   */
   private boolean isExtensionMaxSwitchActive() {
     return m_maxMagneticSwitch.get();
   }
 
+  /**
+   * Limits the given length within bounds of the min and max extension specified
+   * in RobotConfig.Arm.
+   * 
+   * @param length the given length to limit.
+   * @return the limited length.
+   */
   public double limitExtensionLength(double length) {
     return MathUtil.clamp(length, Arm.kMinArmExtension, Arm.kMaxArmExtension);
   }
@@ -351,6 +412,10 @@ public class ArmSubsystem extends CougarSubsystem {
    * @return the arm length.
    */
   public double dynamicExtensionLimit(double extensionLength) {
+    if (m_ignoreExtensionLimit) {
+      return extensionLength;
+    }
+
     if (getAbsolutePivotAngle() >= RobotConfig.Arm.kFrameClearanceAngle) {
       return 0;
     } else if (getAbsolutePivotAngle() > RobotConfig.Arm.kHorizonAngle
@@ -359,42 +424,49 @@ public class ArmSubsystem extends CougarSubsystem {
           getAbsolutePivotAngle(), RobotConfig.kHeightFromGround);
       return MathUtil.clamp(extensionLength, 0, maxLength);
     } else if (getAbsolutePivotAngle() > RobotConfig.Arm.kFrameClearanceAngle
-          && getAbsolutePivotAngle() <= RobotConfig.Arm.kFrameAngle) {
-      double maxLength = -(8.355/4) * (getAbsolutePivotAngle()-229)  ;
+        && getAbsolutePivotAngle() <= RobotConfig.Arm.kFrameAngle) {
+      double maxLength = -(8.355 / 4) * (getAbsolutePivotAngle() - 229);
       return MathUtil.clamp(extensionLength, 0, maxLength);
     }
     return extensionLength;
   }
 
+  public void ignoreExtensionLimit(boolean ignore) {
+    m_ignoreExtensionLimit = ignore;
+  }
+
+  // --------------------------- General methods ---------------------------
+
   /**
-   * Sets values that the arm uses.
+   * Sets the setpoints for the pivot, extension, wrist, and intake to go to.
    *
-   * @param wristAngle   the wrist absolute angle.
+   * @param wristAngle      the wrist angle relative to the pivot.
    * @param intakeSpeed     intake speed.
    * @param pivotAngle      the pivot angle.
    * @param extensionLength the extension length.
    */
   public void moveArm(double wristAngle, double intakeSpeed,
       double pivotAngle, double extensionLength) {
-    this.m_wristAngleSetpoint = wristAngle;
+    this.m_wristAngleSetpoint = limitWristAngle(wristAngle);
     this.m_intakeSpeedSetpoint = intakeSpeed;
-    this.m_pivotAngleSetpoint = pivotAngle;
-    this.m_extensionLengthSetpoint = extensionLength;
+    this.m_pivotAngleSetpoint = limitPivotAngle(pivotAngle);
+    this.m_extensionLengthSetpoint = limitExtensionLength(extensionLength);
   }
 
   /**
-   * Sets arm values based off of the ArmState class.
+   * Sets the setpoints for the pivot, extension, wrist, and intake to go to.
    *
-   * @param state ArmState class.
+   * @param state the setpoints for the arm to move to.
    */
   public void moveArm(ArmState state) {
-    this.m_wristAngleSetpoint = state.wristAngle;
+    this.m_wristAngleSetpoint = limitWristAngle(state.wristAngle);
     this.m_intakeSpeedSetpoint = state.intakeSpeed;
-    this.m_pivotAngleSetpoint = state.armPivot;
-    this.m_extensionLengthSetpoint = state.armLength;
+    this.m_pivotAngleSetpoint = limitPivotAngle(state.armPivot);
+    this.m_extensionLengthSetpoint = limitExtensionLength(state.armLength);
   }
 
-  /** Returns whether the arm is at the current setpoint.
+  /**
+   * Returns whether the arm is at the current setpoint.
    *
    * @return true if the arm is at the current setpoint.
    */
@@ -403,15 +475,15 @@ public class ArmSubsystem extends CougarSubsystem {
     double currentWristAngle = getAbsoluteWristAngle();
     double currentExtensionLength = getExtensionLength();
 
-    if(Math.abs(currentPivotAngle - this.m_pivotAngleSetpoint) > 2) {
+    if (Math.abs(currentPivotAngle - this.m_pivotAngleSetpoint) > 5) {
       return false;
     }
 
-    if(Math.abs(currentWristAngle - this.m_wristAngleSetpoint) > 2) {
+    if (Math.abs(currentWristAngle - this.m_wristAngleSetpoint) > 5) {
       return false;
-    } 
+    }
 
-    if(Math.abs(currentExtensionLength - this.m_extensionLengthSetpoint) > 0.5) {
+    if (Math.abs(currentExtensionLength - this.m_extensionLengthSetpoint) > 2) {
       return false;
     }
 
@@ -421,25 +493,25 @@ public class ArmSubsystem extends CougarSubsystem {
   @Override
   public void periodic() {
     // Wrist
-    if(getAbsolutePivotAngle() < RobotConfig.Arm.kFrameAngle ) {
+    if (getAbsolutePivotAngle() < RobotConfig.Arm.kFrameAngle) {
       if (isInWristBounds(m_wristMotor.getEncoder().getPosition())
-        || isInWristBounds(this.m_wristAngleSetpoint)) {
-      setAbsoluteWristAngle(this.m_wristAngleSetpoint);
+          || isInWristBounds(this.m_wristAngleSetpoint)) {
+        setAbsoluteWristAngle(this.m_wristAngleSetpoint);
       } else if (m_wristMotor.getOutputCurrent() > 25) {
         setAbsoluteWristAngle(m_wristMotor.getEncoder().getPosition());
       } else {
         setAbsoluteWristAngle(m_wristMotor.getEncoder().getPosition());
-      } 
+      }
     }
-    
+
     // Intake
     runIntake(m_intakeSpeedSetpoint);
 
     // Pivot
-    // if(isArmSwitchActive()) {
-    //   rezeroPivot();
-    // }
-    
+    if(isArmSwitchActive()) {
+    rezeroPivot();
+    }
+
     if ((isInPivotBounds(getAbsolutePivotAngle()) && !isArmSwitchActive())
         || isInPivotBounds(this.m_pivotAngleSetpoint)) {
       setAbsolutePivotAngle(this.m_pivotAngleSetpoint);
@@ -451,25 +523,17 @@ public class ArmSubsystem extends CougarSubsystem {
 
     // Extension
     double limitedExtension = dynamicExtensionLimit(m_extensionLengthSetpoint);
+
     SmartDashboard.putNumber("Limited length", limitedExtension);
 
-    // m_extensionLengthSetpoint = limitedExtension;
-
-    if (isExtensionMinSwitchActive() && m_extensionLimitSwitchOffset == 0) {
+    if (isExtensionMinSwitchActive() && !m_extensionLimitSwitchReset) {
       // Rezero extension
-      m_extensionLimitSwitchOffset = getExtensionLength();
-      m_extensionMotor.getEncoder().setPosition(m_extensionLimitSwitchOffset);
-
-      // Let it still move while resetting to leave the magnet zone
-      if (isInExtensionBounds(limitedExtension)) {
-        setMotorExtensionLength(dynamicExtensionLimit(limitedExtension));
-      } else {
-        setMotorExtensionLength(getExtensionLength());
-      }
+      m_extensionLimitSwitchReset = true;
+      m_extensionMotor.getEncoder().setPosition(0);
     } else {
       if ((!isExtensionMinSwitchActive() && !isExtensionMaxSwitchActive())
           || isInExtensionBounds(limitedExtension)) {
-        setMotorExtensionLength(dynamicExtensionLimit(limitedExtension));
+        setMotorExtensionLength(limitedExtension);
       } else {
         setMotorExtensionLength(getExtensionLength());
       }
@@ -484,24 +548,81 @@ public class ArmSubsystem extends CougarSubsystem {
     SmartDashboard.putNumber("Pivot Setpoint", getPivotAngleSetpoint());
     SmartDashboard.putNumber("Extension Setpoint", getExtensionLengthSetpoint());
     SmartDashboard.putBoolean("minExtension", isExtensionMinSwitchActive());
+    SmartDashboard.putBoolean("Max Extension", isExtensionMaxSwitchActive());
+
     SmartDashboard.putNumber("RAW VALUE", m_wristAbsoluteEncoder.getAbsolutePosition());
     SmartDashboard.putBoolean("Arm Switch??", isArmSwitchActive());
   }
 
+  /**
+   * Returns the object for the wrist motor.
+   * 
+   * @return the wrist motor.
+   */
   public CougarSparkMax getWristMotor() {
     return m_wristMotor;
   }
 
+  /**
+   * Returns the object for the pivot motor.
+   * 
+   * @return the pivot motor.
+   */
   public CANSparkMax getLeftPivotMotor() {
     return m_leftPivotMotor;
   }
 
-
+  /**
+   * Returns the object for the intake motor.
+   * 
+   * @return The intake motor.
+   */
   public CANSparkMax getIntakeMotor() {
     return m_intakeMotor;
   }
 
+  /**
+   * Returns the object for the extension motor.
+   * 
+   * @return the extension motor.
+   */
   public CANSparkMax getExtensionMotor() {
     return m_extensionMotor;
+  }
+
+  /**
+   * Returns the setpoint for the wrist.
+   * 
+   * @return the setpoint in degrees.
+   */
+  public double getWristAngleSetpoint() {
+    return m_wristAngleSetpoint;
+  }
+
+  /**
+   * Returns the setpoint for the pivot.
+   * 
+   * @return the setpoint in degrees.
+   */
+  public double getPivotAngleSetpoint() {
+    return m_pivotAngleSetpoint;
+  }
+
+  /**
+   * Returns the setpoint for the intake speed.
+   * 
+   * @return the speed of the intake between -1 and 1, inclusive.
+   */
+  public double getIntakeSpeedSetpoint() {
+    return m_intakeSpeedSetpoint;
+  }
+
+  /**
+   * Returns the setpoint for the extension of the arm.
+   * 
+   * @return the setpoint in inches.
+   */
+  public double getExtensionLengthSetpoint() {
+    return m_extensionLengthSetpoint;
   }
 }

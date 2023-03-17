@@ -1,11 +1,13 @@
 package team1403.robot.chargedup.arm;
 
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /**
  * Moves the arm to a given position while avoiding any obstancles.
  */
-public class SequentialMoveArmCommand extends CommandBase{
+public class SequentialMoveArmCommand extends CommandBase {
   private final ArmSubsystem m_arm;
 
   private double m_intialPivotAngle;
@@ -14,11 +16,21 @@ public class SequentialMoveArmCommand extends CommandBase{
   private double m_initialIntakeSpeed;
 
   private final ArmState m_endState;
+  private ArmState m_firstState;
+
+  private TrapezoidProfile m_pivotProfile;
+
+  private double m_startTime;
+
+  private boolean m_isFinished = false;
+
+  private boolean m_ignoreLimit;
 
 
-  public SequentialMoveArmCommand(ArmSubsystem arm, ArmState endState) {
+  public SequentialMoveArmCommand(ArmSubsystem arm, ArmState endState, boolean ignoreLimit) {
     this.m_endState = endState;
-    m_arm = arm;
+    this.m_arm = arm;
+    this.m_ignoreLimit = ignoreLimit;
   }
 
   @Override
@@ -27,26 +39,42 @@ public class SequentialMoveArmCommand extends CommandBase{
     this.m_intialExtensionLength = m_arm.getExtensionLengthSetpoint();
     this.m_initialWristAngle = m_arm.getAbsoluteWristAngle();
     this.m_initialIntakeSpeed = m_arm.getIntakeSpeedSetpoint();
-    super.initialize();
+    
+    this.m_pivotProfile = new TrapezoidProfile(
+      new TrapezoidProfile.Constraints(360, 165), //high --> 360, 165 //slow --> 20, 10
+      new TrapezoidProfile.State(m_endState.armPivot, 1),
+      new TrapezoidProfile.State(m_intialPivotAngle, 0));
+
+    this.m_startTime = Timer.getFPGATimestamp();
+
+    this.m_firstState = new ArmState(m_intialExtensionLength , m_initialWristAngle, m_endState.armPivot, m_initialIntakeSpeed);
+
+    // super.initialize();
   }
 
 
   @Override
   public void execute() {
-    if(Math.abs(m_endState.armPivot - m_intialPivotAngle) > 1) {
-      m_arm.moveArm(m_initialWristAngle, m_initialIntakeSpeed, m_endState.armPivot, m_intialExtensionLength);
+    double deltaT = Timer.getFPGATimestamp() - m_startTime;
+    if(!m_pivotProfile.isFinished(deltaT)) {
+      double pivotPosition = m_pivotProfile.calculate(deltaT).position;
+      m_arm.ignoreExtensionLimit(m_ignoreLimit);
+      m_arm.moveArm(this.m_firstState.wristAngle, this.m_firstState.intakeSpeed, pivotPosition, this.m_firstState.armLength);
     } else {
-      m_arm.moveArm(m_endState);
+      m_arm.ignoreExtensionLimit(m_ignoreLimit);
+      m_arm.moveArm(this.m_endState);
+      m_isFinished = true;
     }
-    super.execute();
+    // super.execute();
   }
 
   @Override
   public boolean isFinished() {
-    if(Math.abs(m_endState.armPivot - m_intialPivotAngle) < 1) {
-      return m_arm.isAtSetpoint();
-    }
-    return false;
+    return m_isFinished && m_arm.isAtSetpoint();
   }
-  
+
+  @Override
+  public void end(boolean interrupted) {
+    System.out.println("asdfasdfasdf");
+  }
 }

@@ -2,6 +2,7 @@ package team1403.robot.chargedup.swerve;
 
 import com.revrobotics.CANSparkMax.IdleMode;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -20,8 +21,9 @@ import team1403.lib.device.wpi.NavxAhrs;
 import team1403.lib.util.CougarLogger;
 import team1403.lib.util.SwerveDriveOdometry;
 import team1403.lib.util.SwerveDrivePoseEstimator;
+import team1403.robot.chargedup.RobotConfig;
 import team1403.robot.chargedup.RobotConfig.CanBus;
-import team1403.robot.chargedup.RobotConfig.SwerveConfig;
+import team1403.robot.chargedup.RobotConfig.Swerve;
 
 /**
  * The drivetrain of the robot. Consists of for swerve modules and the
@@ -35,13 +37,31 @@ public class SwerveSubsystem extends CougarSubsystem {
   private SwerveModuleState[] m_states = new SwerveModuleState[4];
   private final SwerveDrivePoseEstimator m_odometer;
 
-  private final PIDController m_driftCorrectionPid = new PIDController(0.35, 0, 0);
+  private Translation2d frontRight = new Translation2d(
+      RobotConfig.Swerve.kTrackWidth / 2.0,
+      -RobotConfig.Swerve.kWheelBase / 2.0);
+
+  private Translation2d frontLeft = new Translation2d(
+      RobotConfig.Swerve.kTrackWidth / 2.0,
+      RobotConfig.Swerve.kWheelBase / 2.0);
+
+  private Translation2d backRight = new Translation2d(
+      -RobotConfig.Swerve.kTrackWidth / 2.0,
+      -RobotConfig.Swerve.kWheelBase / 2.0);
+
+  private Translation2d backLeft = new Translation2d(
+      -RobotConfig.Swerve.kTrackWidth / 2.0,
+      RobotConfig.Swerve.kWheelBase / 2.0);
+
+  private final PIDController m_driftCorrectionPid = new PIDController(0.37, 0, 0);
   private double m_desiredHeading = 0;
   private double m_speedLimiter = 0.6;
 
   private Translation2d m_offset;
 
   private double m_calc = 0;
+
+  private boolean m_isXModeEnabled = false;
 
   /**
    * Creates a new {@link SwerveSubsystem}.
@@ -60,19 +80,19 @@ public class SwerveSubsystem extends CougarSubsystem {
     m_modules = new SwerveModule[] {
         new SwerveModule("Front Left Module",
             CanBus.frontLeftDriveId, CanBus.frontLeftSteerId,
-            CanBus.frontLeftEncoderId, SwerveConfig.frontLeftEncoderOffset, logger),
+            CanBus.frontLeftEncoderId, Swerve.frontLeftEncoderOffset, logger),
         new SwerveModule("Front Right Module",
             CanBus.frontRightDriveId, CanBus.frontRightSteerId,
-            CanBus.frontRightEncoderId, SwerveConfig.frontRightEncoderOffset, logger),
+            CanBus.frontRightEncoderId, Swerve.frontRightEncoderOffset, logger),
         new SwerveModule("Back Left Module",
             CanBus.backLeftDriveId, CanBus.backLeftSteerId,
-            CanBus.backLeftEncoderId, SwerveConfig.backLeftEncoderOffset, logger),
+            CanBus.backLeftEncoderId, Swerve.backLeftEncoderOffset, logger),
         new SwerveModule("Back Right Module",
             CanBus.backRightDriveId, CanBus.backRightSteerId,
-            CanBus.backRightEncoderId, SwerveConfig.backRightEncoderOffset, logger),
+            CanBus.backRightEncoderId, Swerve.backRightEncoderOffset, logger),
     };
 
-    m_odometer = new SwerveDrivePoseEstimator(SwerveConfig.kDriveKinematics, getGyroscopeRotation(),
+    m_odometer = new SwerveDrivePoseEstimator(Swerve.kDriveKinematics, getGyroscopeRotation(),
         getModulePositions(), new Pose2d(0, 0, new Rotation2d(0)));
 
     addDevice(m_navx2.getName(), m_navx2);
@@ -90,10 +110,10 @@ public class SwerveSubsystem extends CougarSubsystem {
     m_desiredHeading = getGyroscopeRotation().getDegrees();
 
     setRobotRampRate(0.0);
-    setRobotIdleMode(IdleMode.kCoast);
+    setRobotIdleMode(IdleMode.kBrake);
 
     m_offset = new Translation2d();
-    
+
   }
 
   /**
@@ -114,6 +134,10 @@ public class SwerveSubsystem extends CougarSubsystem {
   public void decreaseSpeed(double amt) {
     tracef("decreasedSpeed %f", amt);
     m_speedLimiter = Math.max(0, m_speedLimiter - amt);
+  }
+
+  public void setSpeedLimiter(double amt) {
+    m_speedLimiter = MathUtil.clamp(amt, 0, 1);
   }
 
   /**
@@ -162,7 +186,17 @@ public class SwerveSubsystem extends CougarSubsystem {
   public void zeroGyroscope() {
     // tracef("zeroGyroscope %f", getGyroscopeRotation());
     m_navx2.reset();
+    m_navx2.setAngleOffset(0);
     m_desiredHeading = 0;
+  }
+
+  /**
+   * Set the offset of the gyroscope.
+   *
+   * @param offset offset to set on the gyroscope
+   */
+  public void setGyroscopeOffset(double offset) {
+    m_navx2.setAngleOffset(offset);
   }
 
   /**
@@ -232,7 +266,7 @@ public class SwerveSubsystem extends CougarSubsystem {
    * Moves the drivetrain at the given chassis speeds.
    *
    * @param chassisSpeeds the speed to move at
-   * @param offset the swerve module to pivot around
+   * @param offset        the swerve module to pivot around
    */
   public void drive(ChassisSpeeds chassisSpeeds, Translation2d offset) {
     m_chassisSpeeds = chassisSpeeds;
@@ -259,13 +293,138 @@ public class SwerveSubsystem extends CougarSubsystem {
    */
   public void setModuleStates(SwerveModuleState[] states) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        states, SwerveConfig.kMaxSpeed);
+        states, Swerve.kMaxSpeed);
 
     for (int i = 0; i < m_modules.length; i++) {
       m_modules[i].set((states[i].speedMetersPerSecond
-          / SwerveConfig.kMaxSpeed) * m_speedLimiter,
+          / Swerve.kMaxSpeed) * m_speedLimiter,
           states[i].angle.getRadians());
     }
+  }
+
+  public ChassisSpeeds getChassisSpeed() {
+    return m_chassisSpeeds;
+  }
+
+  /**
+   * Sets which wheel to pivot for the robot.
+   * 
+   * @param isRight whether right or left wheels should be pivoted
+   */
+  public void setPivotAroundOneWheel(boolean isRight) {
+    // Right wheels are to be pivoted
+    if (isRight) {
+      if ((45.0 <= getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() < -45.0)
+          || (315.0 <= getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() < -315.0)) {
+        if (m_chassisSpeeds.vxMetersPerSecond >= 0.0) {
+          // Pivots around front right wheel
+          m_offset = frontRight;
+        } else {
+          // Pivot around back right wheel
+          m_offset = backRight;
+        }
+      } else if ((-135.0 < getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() <= -45.0)
+          || (225.0 < getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() <= 315.0)) {
+        if (m_chassisSpeeds.vxMetersPerSecond >= 0.0) {
+          // Pivot around back right wheel
+          m_offset = backRight;
+        } else {
+          // Pivot around back left wheel
+          m_offset = backLeft;
+        }
+      } else if ((-225.0 <= getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() < -135.0)
+          || (135.0 <= getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() < 225.0)) {
+        if (m_chassisSpeeds.vxMetersPerSecond >= 0.0) {
+          // Pivot around back left wheel
+          m_offset = backLeft;
+        } else {
+          // Pivot around front left wheel
+          m_offset = frontLeft;
+        }
+      } else if ((-315.0 <= getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() < -225.0)
+          || (45.0 <= getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() < 135.0)) {
+        if (m_chassisSpeeds.vxMetersPerSecond >= 0.0) {
+          // Pivot around front left wheel
+          m_offset = frontLeft;
+        } else {
+          // Pivot around front right wheel
+          m_offset = frontRight;
+        }
+      }
+      // Left wheels are to be pivoted
+    } else {
+      if ((45.0 <= getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() < -45.0)
+          || (315.0 <= getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() < -315.0)) {
+        if (m_chassisSpeeds.vxMetersPerSecond >= 0.0) {
+          // Pivots around front left wheel
+          m_offset = frontLeft;
+        } else {
+          // Pivot around back left wheel
+          m_offset = backLeft;
+        }
+      } else if ((-135.0 < getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() <= -45.0)
+          || (225.0 < getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() <= 315.0)) {
+        if (m_chassisSpeeds.vxMetersPerSecond >= 0.0) {
+          // Pivot around back left wheel
+          m_offset = backLeft;
+        } else {
+          // Pivot around back right wheel
+          m_offset = backRight;
+        }
+      } else if ((-225.0 <= getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() < -135.0)
+          || (135.0 <= getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() < 225.0)) {
+        if (m_chassisSpeeds.vxMetersPerSecond >= 0.0) {
+          // Pivot around back right wheel
+          m_offset = backRight;
+        } else {
+          // Pivot around front right wheel
+          m_offset = frontRight;
+        }
+      } else if ((-315.0 <= getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() < -225.0)
+          || (45.0 <= getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() < 135.0)) {
+        if (m_chassisSpeeds.vxMetersPerSecond >= 0.0) {
+          // Pivot around front right wheel
+          m_offset = frontRight;
+        } else {
+          // Pivot around front left wheel
+          m_offset = frontLeft;
+        }
+      }
+    }
+  }
+
+  /**
+   * Resets the robot to no longer pivot around one wheel.
+   */
+  public void setMiddlePivot() {
+    m_offset = new Translation2d();
+  }
+
+  /**
+   * Puts the drivetrain into xMode where all the wheel put towards the center of the robot,
+   * making it harder for the robot to be pushed around. 
+   */
+  private void xMode() {
+    SwerveModuleState[] states = {
+        // Front Left
+        new SwerveModuleState(0, Rotation2d.fromDegrees(225)),
+        // Front Right
+        new SwerveModuleState(0, Rotation2d.fromDegrees(315)),
+        // Back left
+        new SwerveModuleState(0, Rotation2d.fromDegrees(135)),
+        // Back Right
+        new SwerveModuleState(0, Rotation2d.fromDegrees(45))
+    };
+    setModuleStates(states);
+  }
+
+  /**
+   * Sets the drivetain in xMode.
+   * 
+   * @param enabled whether the drivetrain is in xMode.
+   */
+  public void setXModeEnabled(boolean enabled) {
+    this.m_isXModeEnabled = enabled;
   }
 
   /**
@@ -324,19 +483,21 @@ public class SwerveSubsystem extends CougarSubsystem {
     m_odometer.updateWithTime(Timer.getFPGATimestamp(), getGyroscopeRotation(), getModulePositions());
     SmartDashboard.putString("Odometry", m_odometer.getEstimatedPosition().toString());
     SmartDashboard.putNumber("Speed", m_speedLimiter);
-        
-    m_chassisSpeeds = translationalDriftCorrection(m_chassisSpeeds);
-    m_chassisSpeeds = rotationalDriftCorrection(m_chassisSpeeds);
 
+    if (this.m_isXModeEnabled) {
+      xMode();
+    } else {
+      m_chassisSpeeds = translationalDriftCorrection(m_chassisSpeeds);
+      m_chassisSpeeds = rotationalDriftCorrection(m_chassisSpeeds);
 
-    SmartDashboard.putNumber("Front Left Absolute Encoder",  m_modules[0].getAbsoluteAngle());
-    SmartDashboard.putNumber("Front Right Absolute Encoder",  m_modules[1].getAbsoluteAngle());
-    SmartDashboard.putNumber("Back Left Absolute Encoder",  m_modules[2].getAbsoluteAngle());
-    SmartDashboard.putNumber("Back Right Absolute Encoder",  m_modules[3].getAbsoluteAngle());
+      m_states = Swerve.kDriveKinematics.toSwerveModuleStates(m_chassisSpeeds, m_offset);
+      setModuleStates(m_states);
+    }
 
+    SmartDashboard.putNumber("Front Left Absolute Encoder", m_modules[0].getAbsoluteAngle());
+    SmartDashboard.putNumber("Front Right Absolute Encoder", m_modules[1].getAbsoluteAngle());
+    SmartDashboard.putNumber("Back Left Absolute Encoder", m_modules[2].getAbsoluteAngle());
+    SmartDashboard.putNumber("Back Right Absolute Encoder", m_modules[3].getAbsoluteAngle());
 
-    m_states = SwerveConfig.kDriveKinematics.toSwerveModuleStates(m_chassisSpeeds, m_offset);
-
-    setModuleStates(m_states);
   }
 }

@@ -44,7 +44,7 @@ public class RobotConfig {
    * Swerve Constants.
    * 
    */
-  public static class SwerveConfig {
+  public static class Swerve {
     public static final int kEncoderResetIterations = 500;
     public static final double kEncoderResetMaxAngularVelocity = Math.toRadians(0.5);
     public static final int kStatusFrameGeneralPeriodMs = 250;
@@ -85,10 +85,10 @@ public class RobotConfig {
     public static final double kSteerReduction = (15.0 / 32.0) * (10.0 / 60.0);
 
     public static final double kSteerRelativeEncoderPositionConversionFactor = 2.0 * Math.PI
-        * SwerveConfig.kSteerReduction;
+        * Swerve.kSteerReduction;
 
     public static final double kSteerRelativeEncoderVelocityConversionFactor = 2.0 * Math.PI
-        * SwerveConfig.kSteerReduction / 60.0;
+        * Swerve.kSteerReduction / 60.0;
 
     public static final double kWheelDiameterMeters = Units.inchesToMeters(4);
 
@@ -109,7 +109,7 @@ public class RobotConfig {
         kMaxAngularAccelerationRadiansPerSecondSquared);
   }
 
-  public static class VisionConfig {
+  public static class Vision {
     public static AprilTagFieldLayout fieldLayout = new AprilTagFieldLayout(Arrays.asList(
       new AprilTag(1,   (new Pose3d(
         Units.inchesToMeters(610.77),
@@ -188,7 +188,7 @@ public class RobotConfig {
   /**
    * Ports on the RoboRIO.
    */
-  public class RioPorts {
+  public static class RioPorts {
 
     
     public static final int kWristAbsoluteEncoder = 1; //DIO
@@ -204,7 +204,7 @@ public class RobotConfig {
   /**
    * Config parameters for tuning the operator interface.
    */
-  public class OperatorConfig {
+  public static class Operator {
 
     public static final int dPadUp = 0;
     public static final int dPadRight = 1;
@@ -225,7 +225,7 @@ public class RobotConfig {
   /**
    * Config parameters for tuning the operator interface.
    */
-  public class DriverConfig {
+  public static class Driver {
 
     /**
      * The joystick port for the operator's controller.
@@ -247,7 +247,7 @@ public class RobotConfig {
     public static final int kPArmPivot = 1;
     public static final int kIArmPivot = 0;
     public static final int kDArmPivot = 0;
-    public static final double kAbsolutePivotOffset = 180-85.2492019663337;
+    public static double kAbsolutePivotOffset = 180-27.2492019663337;
     public static double kMaxPivotAngle = 249.84208720995503;
     public static final double kFrameAngle = 242.71777151085703;
     public static final double kFrameClearanceAngle = 234.5; //cone angle
@@ -262,7 +262,7 @@ public class RobotConfig {
     public static final double kMaxWristAngle = 265;
     public static final double kMinWristAngle = 29.196293229907326; 
     public static final double kWristConversionFactor = 90.0 / 100;
-    public static final double kAbsoluteWristOffset = 180-74.7792558694814;
+    public static final double kAbsoluteWristOffset = 180-136.28614255715357;
 
     //Extension
     public static final double kPArmExtension = 0.3;
@@ -275,7 +275,12 @@ public class RobotConfig {
     public static final double maxVerticalAngle = Math.acos(Math.toRadians(44.3 / 60.218)); //TODO
     public static final double angleHittingRobot = 66; //TODO
     public static final double angleHittingGround = 80; //TODO
-    public static final double kExtensionOffset = 8;
+    public static final double kExtensionOffset = 1;
+
+    //Intake
+    public static final double kPIntake = 0;
+    public static final double kIIntake = 0;
+    public static final double kDIntake = 0;
 
     //Dimensions
     public static final double kBaseArmLength = 31; //37 //28 inches
@@ -284,17 +289,17 @@ public class RobotConfig {
     public static final double kArmWeight = 16; //Pounds
   }
 
-  public static class ArmStateConfig {
-    public static final ArmState coneTowardsFloorIntake = new ArmState(0.039682067930698, 140.0363630009091, 240.55448872511047, 0);
+  public static class ArmStates {
+    public static final ArmState coneTowardsFloorIntake = new ArmState(2.00726276672, 141.346825025, 241.74272039269, 0); //0.039682067930698, 140.0363630009091, 240.55448872511047
     public static final ArmState coneTowardsHighConeNode = new ArmState(22.987735748, 246.78781366, 150.28003026, 0);
     public static final ArmState coneTowardsMiddleNode = new ArmState(8.345230102539062, 264, 149.45086251051157, 0);
     public static final ArmState singleSubstationIntake = new ArmState(0, 51.3175107829, 241.777313195, 0);
     public static final ArmState coneTowardsLowNode = new ArmState(0, 80.18787350469682, 245.42271036546947, 0);
-
-    public static final ArmState cubeFloorIntake = new ArmState(4.055530548095703, 124.90037862250946, 230.28624941341906, 0);
+    
+    public static final ArmState cubeFloorIntake = new ArmState(3.6968396620, 115.37985604, 237.75822122060124, 0);
     public static final ArmState cubeHighNode = new ArmState(16.6710987091, 177.965261949, 169.356773014, 0);
     public static final ArmState cubeMiddleNode = new ArmState(0.05158682167, 177.61028394, 181.482400676, 0);
 
-    public static final ArmState coneUprightIntake = new ArmState(0, 207.099432677, 205.208496037, 0);
+    public static final ArmState coneUprightIntake = new ArmState(0, 222.432458051, 205.82528059, 0);
   }
 }

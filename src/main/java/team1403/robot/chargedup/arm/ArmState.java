@@ -24,8 +24,7 @@ public class ArmState {
 
   @Override
   public String toString() {
-    return "ArmState [armLength=" + armLength + ", wristAngle=" + wristAngle 
-        + ", armPivot=" + armPivot + ", intakeSpeed=" + intakeSpeed + "]";
+    return "ArmState [armLength=" + armLength;
   }
 
   @Override
