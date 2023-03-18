@@ -11,55 +11,40 @@ import team1403.lib.device.GyroscopeDevice;
  */
 public class NavxAhrs extends AHRS implements GyroscopeDevice {
   private final String m_name;
-  private final AHRS m_navx;
 
   public NavxAhrs(String name) {
+    super(edu.wpi.first.wpilibj.SerialPort.Port.kUSB);
     this.m_name = name;
-    this.m_navx = new AHRS(edu.wpi.first.wpilibj.SerialPort.Port.kUSB);
-  }
+  } 
 
   @Override
   public String getName() { 
     return m_name;
   }
-  
-  @Override
-  public void reset() {
-    m_navx.reset();
-  }
-
-  public float getYaw() {
-    return m_navx.getYaw();
-  }
 
   @Override
   public double getRawAngle() {
-    return m_navx.getAngle() - m_navx.getAngleAdjustment();
-  }
-
-  @Override
-  public double getAngle() {
-    return m_navx.getAngle();
+    return getAngle() - getAngleAdjustment();
   }
 
   @Override
   public double getAngularVelocity() {
-    return m_navx.getRate();
+    return getRate();
   }
 
   @Override
   public void setAngleOffset(double angleOffset) {
-    m_navx.setAngleAdjustment(angleOffset);
+    setAngleAdjustment(angleOffset);
   }
 
   @Override
   public double getAngleOffset() {
-    return m_navx.getAngleAdjustment();
+    return getAngleAdjustment();
   }
 
   @Override
   public Rotation2d getRotation2d() {
-    return super.getRotation2d();
+      // TODO Auto-generated method stub
+      return super.getRotation2d();
   }
-
 }

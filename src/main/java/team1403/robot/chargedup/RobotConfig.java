@@ -247,8 +247,8 @@ public class RobotConfig {
     public static final int kPArmPivot = 1;
     public static final int kIArmPivot = 0;
     public static final int kDArmPivot = 0;
-    public static double kAbsolutePivotOffset = 180-27.2492019663337;
-    public static double kMaxPivotAngle = 249.84208720995503;
+    public static double kAbsolutePivotOffset = 180-27.2492019663337 + 17.66 + 7.5 + 10;
+    public static double kMaxPivotAngle = 256.84208720995503;
     public static final double kFrameAngle = 242.71777151085703;
     public static final double kFrameClearanceAngle = 234.5; //cone angle
     public static final double kMinPivotAngle = 132.211;
@@ -296,7 +296,7 @@ public class RobotConfig {
     public static final ArmState singleSubstationIntake = new ArmState(0, 51.3175107829, 241.777313195, 0);
     public static final ArmState coneTowardsLowNode = new ArmState(0, 80.18787350469682, 245.42271036546947, 0);
     
-    public static final ArmState cubeFloorIntake = new ArmState(3.6968396620, 115.37985604, 237.75822122060124, 0);
+    public static final ArmState cubeFloorIntake = new ArmState(3.6968396620, 117.37985604, 237.75822122060124, 0);
     public static final ArmState cubeHighNode = new ArmState(16.6710987091, 177.965261949, 169.356773014, 0);
     public static final ArmState cubeMiddleNode = new ArmState(0.05158682167, 177.61028394, 181.482400676, 0);
 

@@ -508,9 +508,9 @@ public class ArmSubsystem extends CougarSubsystem {
     runIntake(m_intakeSpeedSetpoint);
 
     // Pivot
-    if(isArmSwitchActive()) {
-    rezeroPivot();
-    }
+    // if(isArmSwitchActive()) {
+    // rezeroPivot();
+    // }
 
     if ((isInPivotBounds(getAbsolutePivotAngle()) && !isArmSwitchActive())
         || isInPivotBounds(this.m_pivotAngleSetpoint)) {
