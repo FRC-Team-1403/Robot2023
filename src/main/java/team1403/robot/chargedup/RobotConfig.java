@@ -247,7 +247,7 @@ public class RobotConfig {
     public static final int kPArmPivot = 1;
     public static final int kIArmPivot = 0;
     public static final int kDArmPivot = 0;
-    public static double kAbsolutePivotOffset = 180-27.2492019663337 + 17.66 + 7.5 + 10;
+    public static double kAbsolutePivotOffset = 180-27.2492019663337 + 17.66 + 7.5 + 10 - 25;
     public static double kMaxPivotAngle = 256.84208720995503;
     public static final double kFrameAngle = 242.71777151085703;
     public static final double kFrameClearanceAngle = 234.5; //cone angle
@@ -291,13 +291,13 @@ public class RobotConfig {
 
   public static class ArmStates {
     public static final ArmState coneTowardsFloorIntake = new ArmState(2.00726276672, 141.346825025, 241.74272039269, 0); //0.039682067930698, 140.0363630009091, 240.55448872511047
-    public static final ArmState coneTowardsHighConeNode = new ArmState(22.987735748, 246.78781366, 150.28003026, 0);
+    public static final ArmState coneTowardsHighConeNode = new ArmState(22.987735748, 249.49720658743016, 141.88693815473684, 0);
     public static final ArmState coneTowardsMiddleNode = new ArmState(8.345230102539062, 264, 149.45086251051157, 0);
     public static final ArmState singleSubstationIntake = new ArmState(0, 51.3175107829, 241.777313195, 0);
     public static final ArmState coneTowardsLowNode = new ArmState(0, 80.18787350469682, 245.42271036546947, 0);
     
-    public static final ArmState cubeFloorIntake = new ArmState(3.6968396620, 117.37985604, 237.75822122060124, 0);
-    public static final ArmState cubeHighNode = new ArmState(16.6710987091, 177.965261949, 169.356773014, 0);
+    public static final ArmState cubeFloorIntake = new ArmState(0.11, 109.01336428783411, 237.26611599405615, 0);
+    public static final ArmState cubeHighNode = new ArmState(19.6710987091, 182.465261949, 161.356773014, 0);
     public static final ArmState cubeMiddleNode = new ArmState(0.05158682167, 177.61028394, 181.482400676, 0);
 
     public static final ArmState coneUprightIntake = new ArmState(0, 222.432458051, 205.82528059, 0);
