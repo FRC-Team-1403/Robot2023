@@ -67,6 +67,7 @@ public class CougarRobotImpl extends CougarRobot {
     // m_builtins = new BuiltinSubsystem(parameters, logger);
     m_arm = new ArmSubsystem(parameters);
     m_swerveSubsystem = new SwerveSubsystem(parameters);
+    CameraServer.startAutomaticCapture();
     // m_visionSubsystem = new PhotonVisionSubsystem(parameters);
     // m_lightSubsystem = new LightSubsystem(parameters);
     registerAutoCommands();
@@ -159,7 +160,7 @@ public class CougarRobotImpl extends CougarRobot {
             .andThen(
             new SetpointArmCommand(m_arm, 
             () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
-            true)));
+            false)));
 
     // Intake upright cone
     new Trigger(() -> xboxOperator.getXButton()).onFalse(
