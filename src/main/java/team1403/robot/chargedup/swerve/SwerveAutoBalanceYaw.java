@@ -31,7 +31,6 @@ public class SwerveAutoBalanceYaw extends CommandBase {
         previousRollValue = 0;
         rollValue = 0;
         rollSetpoint = 0;
-
     }
 
     @Override

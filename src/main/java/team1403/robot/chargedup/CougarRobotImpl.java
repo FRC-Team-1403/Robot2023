@@ -114,20 +114,8 @@ public class CougarRobotImpl extends CougarRobot {
     new Trigger(() -> driveController.getL2Button()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.6)));
 
-<<<<<<< Updated upstream
-    new Trigger(() -> xboxDriver.getRightBumper()).onTrue(
-        new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.8)));
-  
-    new Trigger(() -> xboxDriver.getRightBumper()).onFalse(
-        new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.6)));
-
-    new Trigger(() -> xboxDriver.getLeftTriggerAxis() >= 0.08).onTrue(
-        new InstantCommand(() -> m_swerveSubsystem.setPivotAroundOneWheel(false)))
-        .onFalse(new InstantCommand(() -> m_swerveSubsystem.setMiddlePivot()));
-=======
     new Trigger(() -> driveController.getR2Button()).onTrue(
         new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.8)));
->>>>>>> Stashed changes
 
     new Trigger(() -> driveController.getR2Button()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.6)));
@@ -135,11 +123,7 @@ public class CougarRobotImpl extends CougarRobot {
     new Trigger(() -> driveController.getCircleButton()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.zeroGyroscope()));
 
-<<<<<<< Updated upstream
-    // new Trigger(() -> xboxDriver.getAButton()).whileTrue(autoBalanceYaw);
-=======
     new Trigger(() -> driveController.getCrossButton()).whileTrue(autoBalanceYaw);
->>>>>>> Stashed changes
 
     new Trigger(() -> driveController.getSquareButton()).onTrue (new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(true)));
     new Trigger(() -> driveController.getSquareButton()).onFalse(new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(false)));
@@ -185,7 +169,7 @@ public class CougarRobotImpl extends CougarRobot {
     new Trigger(() -> xboxOperator.getYButton()).onFalse(
       new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE))
             .andThen(
-            new SetpointArmCommand(m_arm, 
+            new SetpointArmCommand(m_arm,
             () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
             true)));
 
