@@ -198,8 +198,6 @@ public class SwerveControllerCommand extends CommandBase {
     var targetChassisSpeeds =
         m_controller.calculate(m_pose.get(), desiredState, m_desiredRotation.get());
     
-    SmartDashboard.putString("ChassiS Speeds", targetChassisSpeeds.toString());
-    
     m_subsystem.drive(targetChassisSpeeds, new Translation2d());
   }
 
