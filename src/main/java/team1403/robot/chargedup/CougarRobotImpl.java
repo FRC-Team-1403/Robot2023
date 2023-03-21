@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -92,7 +93,7 @@ public class CougarRobotImpl extends CougarRobot {
    * Configures the driver commands and their bindings.
    */
   public void configureDriverInterface() {
-    XboxController xboxDriver = getJoystick("Driver", RobotConfig.Driver.pilotPort);
+    PS4Controller driveController = getPS4Controller("Driver", RobotConfig.Driver.pilotPort);
     SwerveAutoBalanceYaw autoBalanceYaw = new SwerveAutoBalanceYaw(m_swerveSubsystem);
 
     // The controls are for field-oriented driving:
@@ -102,17 +103,18 @@ public class CougarRobotImpl extends CougarRobot {
     // Setting default command of swerve subsystem
     m_swerveSubsystem.setDefaultCommand(new SwerveCommand(
         m_swerveSubsystem,
-        () -> -deadband(xboxDriver.getLeftX(), 0.05),
-        () -> -deadband(xboxDriver.getLeftY(), 0.05),
-        () -> -deadband(xboxDriver.getRightX(), 0.05),
-        () -> xboxDriver.getYButtonReleased()));
+        () -> -deadband(driveController.getLeftX(), 0.05),
+        () -> -deadband(driveController.getLeftY(), 0.05),
+        () -> -deadband(driveController.getRightX(), 0.05),
+        () -> driveController.getTriangleButtonReleased()));
 
-    new Trigger(() -> xboxDriver.getLeftBumper()).onTrue(
+    new Trigger(() -> driveController.getL2Button()).onTrue(
         new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.2)));
 
-    new Trigger(() -> xboxDriver.getLeftBumper()).onFalse(
+    new Trigger(() -> driveController.getL2Button()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.6)));
 
+<<<<<<< Updated upstream
     new Trigger(() -> xboxDriver.getRightBumper()).onTrue(
         new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.8)));
   
@@ -122,25 +124,32 @@ public class CougarRobotImpl extends CougarRobot {
     new Trigger(() -> xboxDriver.getLeftTriggerAxis() >= 0.08).onTrue(
         new InstantCommand(() -> m_swerveSubsystem.setPivotAroundOneWheel(false)))
         .onFalse(new InstantCommand(() -> m_swerveSubsystem.setMiddlePivot()));
+=======
+    new Trigger(() -> driveController.getR2Button()).onTrue(
+        new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.8)));
+>>>>>>> Stashed changes
 
-    new Trigger(() -> xboxDriver.getRightTriggerAxis() >= 0.08).onTrue(
-        new InstantCommand(() -> m_swerveSubsystem.setPivotAroundOneWheel(true)))
-        .onFalse(new InstantCommand(() -> m_swerveSubsystem.setMiddlePivot()));
+    new Trigger(() -> driveController.getR2Button()).onFalse(
+        new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.6)));
 
-    new Trigger(() -> xboxDriver.getBButton()).onFalse(
+    new Trigger(() -> driveController.getCircleButton()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.zeroGyroscope()));
 
+<<<<<<< Updated upstream
     // new Trigger(() -> xboxDriver.getAButton()).whileTrue(autoBalanceYaw);
+=======
+    new Trigger(() -> driveController.getCrossButton()).whileTrue(autoBalanceYaw);
+>>>>>>> Stashed changes
 
-    new Trigger(() -> xboxDriver.getXButton()).onTrue (new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(true)));
-    new Trigger(() -> xboxDriver.getXButton()).onFalse(new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(false)));
+    new Trigger(() -> driveController.getSquareButton()).onTrue (new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(true)));
+    new Trigger(() -> driveController.getSquareButton()).onFalse(new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(false)));
   }
 
   /**
    * Configures the operator commands and their bindings.
    */
   public void configureOperatorInterface() {
-    XboxController xboxOperator = getJoystick("Operator", Operator.pilotPort);
+    XboxController xboxOperator = getXboxJoystick("Operator", Operator.pilotPort);
 
     m_arm.setDefaultCommand(new ManualArmCommand(m_arm,
         () -> -deadband(xboxOperator.getLeftY(), 0.05),
@@ -292,13 +301,30 @@ public class CougarRobotImpl extends CougarRobot {
    *
    * @return controller for port, though might not be temporarily disconnected.
    */
-  private XboxController getJoystick(String role, int port) {
+  private XboxController getXboxJoystick(String role, int port) {
     if (!DriverStation.isJoystickConnected(port)) {
       DriverStation.silenceJoystickConnectionWarning(true);
       CougarLogger.getAlwaysOn().warningf("No controller found on port %d for '%s'",
           port, role);
     }
     return new XboxController(port);
+  }
+
+  /**
+   * Get controller and silence warnings if not found.
+   *
+   * @param role The role for the port for logging purposes.
+   * @param port The expected port for the controller.
+   *
+   * @return controller for port, though might not be temporarily disconnected.
+   */
+  private PS4Controller getPS4Controller(String role, int port) {
+    if (!DriverStation.isJoystickConnected(port)) {
+      DriverStation.silenceJoystickConnectionWarning(true);
+      CougarLogger.getAlwaysOn().warningf("No controller found on port %d for '%s'",
+          port, role);
+    }
+    return new PS4Controller(port);
   }
 
   // private final BuiltinSubsystem m_builtins;
