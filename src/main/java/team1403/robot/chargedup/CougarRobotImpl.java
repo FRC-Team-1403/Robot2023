@@ -73,6 +73,7 @@ public class CougarRobotImpl extends CougarRobot {
     registerAutoCommands();
   }
 
+
   @Override
   public Command getAutonomousCommand() {
     CommandScheduler.getInstance().removeDefaultCommand(m_swerveSubsystem);
@@ -82,6 +83,7 @@ public class CougarRobotImpl extends CougarRobot {
 
   @Override
   public void teleopInit() {
+    // m_swerveSubsystem.setGyroRollOffset(m_swerveSubsystem.getGyroRoll());
     configureOperatorInterface();
     configureDriverInterface();
   }
@@ -128,7 +130,7 @@ public class CougarRobotImpl extends CougarRobot {
     new Trigger(() -> xboxDriver.getBButton()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.zeroGyroscope()));
 
-    new Trigger(() -> xboxDriver.getAButton()).whileTrue(autoBalanceYaw);
+    // new Trigger(() -> xboxDriver.getAButton()).whileTrue(autoBalanceYaw);
 
     new Trigger(() -> xboxDriver.getXButton()).onTrue (new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(true)));
     new Trigger(() -> xboxDriver.getXButton()).onFalse(new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(false)));
