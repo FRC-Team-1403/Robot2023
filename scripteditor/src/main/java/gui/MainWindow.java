@@ -164,8 +164,8 @@ public class MainWindow extends Window implements MouseListener, MouseMotionList
     try {
       logoImage = ImageIO.read(new File("scripteditor/src/resources/logo.png"));
       frame.setIconImage(new ImageIcon("scripteditor/src/resources/Icon.png").getImage());
-      setFieldImage(ImageIO.read(new File("scripteditor/src/resources/47.350364343 FieldImage.png")),
-          "47.350364343 FieldImage");
+      setFieldImage(ImageIO.read(new File("scripteditor/src/resources/21.1215992958 FieldImage.png")),
+          "21.1215992958 FieldImage.png");
     } catch (IOException e) {
       e.printStackTrace();
     }

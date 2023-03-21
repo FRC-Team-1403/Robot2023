@@ -56,6 +56,8 @@ public class ArmSubsystem extends CougarSubsystem {
   private double m_extensionLengthSetpoint;
   private double m_intakePosition;
 
+  private boolean previousLimitSwitchTrigger = true;
+
   /**
    * Initializing the arn subsystem.
    *
@@ -492,6 +494,7 @@ public class ArmSubsystem extends CougarSubsystem {
 
   @Override
   public void periodic() {
+
     // Wrist
     if (getAbsolutePivotAngle() < RobotConfig.Arm.kFrameAngle) {
       if (isInWristBounds(m_wristMotor.getEncoder().getPosition())
@@ -508,9 +511,12 @@ public class ArmSubsystem extends CougarSubsystem {
     runIntake(m_intakeSpeedSetpoint);
 
     // Pivot
-    // if(isArmSwitchActive()) {
-    // rezeroPivot();
-    // }
+    if(!isArmSwitchActive() && previousLimitSwitchTrigger) {
+      double difference = RobotConfig.Arm.kMaxPivotAngle - getAbsolutePivotAngle() + RobotConfig.Arm.kPivotLimitSwitchOffset;
+      RobotConfig.Arm.kAbsolutePivotOffset += difference;
+    }
+
+    previousLimitSwitchTrigger = isArmSwitchActive();
 
     if ((isInPivotBounds(getAbsolutePivotAngle()) && !isArmSwitchActive())
         || isInPivotBounds(this.m_pivotAngleSetpoint)) {

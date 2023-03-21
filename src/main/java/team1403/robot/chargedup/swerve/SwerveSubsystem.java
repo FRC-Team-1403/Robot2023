@@ -13,6 +13,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import team1403.lib.core.CougarLibInjectedParameters;
@@ -62,6 +63,8 @@ public class SwerveSubsystem extends CougarSubsystem {
   private double m_calc = 0;
 
   private boolean m_isXModeEnabled = false;
+
+  private Field2d m_field2d;
 
   /**
    * Creates a new {@link SwerveSubsystem}.
@@ -114,6 +117,8 @@ public class SwerveSubsystem extends CougarSubsystem {
 
     m_offset = new Translation2d();
 
+    m_field2d = new Field2d();
+    SmartDashboard.putData("Field", m_field2d);
   }
 
   /**
@@ -493,6 +498,8 @@ public class SwerveSubsystem extends CougarSubsystem {
       m_states = Swerve.kDriveKinematics.toSwerveModuleStates(m_chassisSpeeds, m_offset);
       setModuleStates(m_states);
     }
+
+    m_field2d.setRobotPose(m_odometer.getEstimatedPosition());
 
     SmartDashboard.putNumber("Front Left Absolute Encoder", m_modules[0].getAbsoluteAngle());
     SmartDashboard.putNumber("Front Right Absolute Encoder", m_modules[1].getAbsoluteAngle());
