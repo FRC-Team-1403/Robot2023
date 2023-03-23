@@ -26,7 +26,7 @@ public class LightSubsystem extends CougarSubsystem {
   public LightSubsystem(CougarLibInjectedParameters injectedParameters) {
     super("lights", injectedParameters);
     m_lightsLeft = new AddressableLED(0);
-    m_lightsRight = new AddressableLED(1);
+    m_lightsRight = new AddressableLED(2);
     m_ledBufferLeft = new AddressableLEDBuffer(60);
     m_ledBufferRight = new AddressableLEDBuffer(60);
     m_lightsRight.setLength(m_ledBufferRight.getLength());
@@ -109,18 +109,22 @@ public class LightSubsystem extends CougarSubsystem {
   }
 
   private void monty() {
-    for (var i = 0; i < m_ledBufferLeft.getLength(); i++) {
-      for (var j = 0; j < 2; j++) {
-        final int hue[] = { 15, 30 };
-        m_ledBufferLeft.setHSV(i, hue[j], 255, 128);
-        m_ledBufferRight.setHSV(i, hue[j], 255, 128);
-      }
+    for (var i = 0; i < m_ledBufferLeft.getLength(); i = i + 2) {
+      m_ledBufferLeft.setRGB(i, 255, 255, 0);
     }
-    m_lightsLeft.setData(m_ledBufferLeft);
-    m_lightsLeft.start();
+    for (var i = 0; i < m_ledBufferRight.getLength(); i = i + 2) {
+      m_ledBufferRight.setRGB(i, 255, 255, 0);
+    }   
+   m_lightsLeft.setData(m_ledBufferLeft);
     m_lightsRight.setData(m_ledBufferRight);
+    m_lightsLeft.start();
     m_lightsRight.start();
-    // right yellow left not
+    for (var i = 1; i < m_ledBufferLeft.getLength(); i = i + 2) {
+      m_ledBufferLeft.setRGB(i, 0, 255, 0);
+    } 
+    for (var i = 1; i < m_ledBufferRight.getLength(); i = i + 2) {
+      m_ledBufferRight.setRGB(i, 0, 255, 0);
+    } 
   }
 
   private void setLEDColor(LED led) {
@@ -141,7 +145,7 @@ public class LightSubsystem extends CougarSubsystem {
         monty();
         break;
       }
-      case NONE: {
+      default: {
         ledBufferClear();
         break;
       }
