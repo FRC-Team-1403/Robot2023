@@ -26,7 +26,7 @@ public class LightSubsystem extends CougarSubsystem {
   public LightSubsystem(CougarLibInjectedParameters injectedParameters) {
     super("lights", injectedParameters);
     m_lightsLeft = new AddressableLED(0);
-    m_lightsRight = new AddressableLED(2);
+    m_lightsRight = new AddressableLED(1);
     m_ledBufferLeft = new AddressableLEDBuffer(60);
     m_ledBufferRight = new AddressableLEDBuffer(60);
     m_lightsRight.setLength(m_ledBufferRight.getLength());

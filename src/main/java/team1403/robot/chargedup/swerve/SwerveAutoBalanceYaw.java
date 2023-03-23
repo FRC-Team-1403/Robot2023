@@ -41,6 +41,7 @@ public class SwerveAutoBalanceYaw extends CommandBase {
       rollSetpoint = rollVelocity + rollValue;
 
       SmartDashboard.putNumber("roll velocity", rollValue);
+      
       System.out.println(rollValue);
 
       velocity = m_xPIDController.calculate(rollValue, 0);
