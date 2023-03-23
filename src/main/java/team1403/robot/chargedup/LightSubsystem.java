@@ -2,8 +2,6 @@ package team1403.robot.chargedup;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarSubsystem;
@@ -13,25 +11,31 @@ import team1403.robot.chargedup.StateManager.LED;
  * The class creating the LED subsystem.
  * 
  */
-
 public class LightSubsystem extends CougarSubsystem {
-  private AddressableLED m_lights;
-  private AddressableLEDBuffer m_ledBuffer;
+  private AddressableLED m_lightsLeft;
+  private AddressableLED m_lightsRight;
+  private AddressableLEDBuffer m_ledBufferLeft;
+  private AddressableLEDBuffer m_ledBufferRight;
   private double m_rainbowFirstPixelHue;
+
+  private LED previousLED;
 
   /**
    * Initializing the subsystem.
    */
   public LightSubsystem(CougarLibInjectedParameters injectedParameters) {
     super("lights", injectedParameters);
-        
-    m_lights = new AddressableLED(0);
-    m_ledBuffer = new AddressableLEDBuffer(60);
-    m_lights.setLength(m_ledBuffer.getLength());
-    m_lights.setData(m_ledBuffer);
-    ledBufferClear();
+    m_lightsLeft = new AddressableLED(0);
+    m_lightsRight = new AddressableLED(2);
+    m_ledBufferLeft = new AddressableLEDBuffer(60);
+    m_ledBufferRight = new AddressableLEDBuffer(60);
+    m_lightsRight.setLength(m_ledBufferRight.getLength());
+    m_lightsRight.setData(m_ledBufferRight);
+    m_lightsLeft.setLength(m_ledBufferLeft.getLength());
+    m_lightsLeft.setData(m_ledBufferLeft);
 
-    
+    previousLED = LED.NONE;
+    ledBufferClear();
   }
 
   /**
@@ -39,11 +43,14 @@ public class LightSubsystem extends CougarSubsystem {
    * 
    */
   private void ledBufferClear() {
-    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
-      m_ledBuffer.setRGB(i, 0, 0, 0);
+    for (var i = 0; i < m_ledBufferLeft.getLength(); i++) {
+      m_ledBufferLeft.setRGB(i, 0, 0, 0);
+      m_ledBufferRight.setRGB(i, 0, 0, 0);
     }
-    m_lights.setData(m_ledBuffer);
-    m_lights.start();
+    m_lightsLeft.setData(m_ledBufferLeft);
+    m_lightsLeft.start();
+    m_lightsRight.setData(m_ledBufferRight);
+    m_lightsRight.start();
   }
 
   /**
@@ -51,14 +58,16 @@ public class LightSubsystem extends CougarSubsystem {
    * For cubes.
    * 
    */
-
   private void setPurple() {
-    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
-      m_ledBuffer.setRGB(i, 107, 3, 252);
+    for (var i = 0; i < m_ledBufferLeft.getLength(); i++) {
+      m_ledBufferLeft.setRGB(i, 107, 3, 252);
+      m_ledBufferRight.setRGB(i, 107, 3, 252);
     }
-       
-    m_lights.setData(m_ledBuffer);
-    m_lights.start();
+
+    m_lightsLeft.setData(m_ledBufferLeft);
+    m_lightsLeft.start();
+    m_lightsRight.setData(m_ledBufferRight);
+    m_lightsRight.start();
   }
 
   /**
@@ -66,76 +75,84 @@ public class LightSubsystem extends CougarSubsystem {
    * For cones.
    * 
    */
-
   private void setYellow() {
-    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
-      m_ledBuffer.setRGB(i, 255, 230, 0);
+    for (var i = 0; i < m_ledBufferLeft.getLength(); i++) {
+      m_ledBufferLeft.setRGB(i, 255, 230, 0);
+      m_ledBufferRight.setRGB(i, 255, 230, 0);
     }
-         
-    m_lights.setData(m_ledBuffer);
-    m_lights.start();
+    m_lightsLeft.setData(m_ledBufferLeft);
+    m_lightsLeft.start();
+    m_lightsRight.setData(m_ledBufferRight);
+    m_lightsRight.start();
   }
-
-
 
   private void rainbow() {
     // For every pixel
-    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+    for (var i = 0; i < m_ledBufferLeft.getLength(); i++) {
       // Calculate the hue - hue is easier for rainbows because the color
       // shape is a circle so only one value needs to precess
-      final int hue = (int) ((m_rainbowFirstPixelHue + (i * 180 / m_ledBuffer.getLength())) % 180);
+      final int hue = (int) ((m_rainbowFirstPixelHue + (i * 180 / m_ledBufferLeft.getLength())) % 180);
+  
       // Set the value
-      m_ledBuffer.setHSV(i, hue, 255, 128);
+      m_ledBufferLeft.setHSV(i, hue, 255, 128);
+      m_ledBufferRight.setHSV(i, hue, 255, 128);
     }
     // Increase by to make the rainbow "move"
     m_rainbowFirstPixelHue += 3;
     // Check bounds
     m_rainbowFirstPixelHue %= 180;
 
-    m_lights.setData(m_ledBuffer);
-    m_lights.start();
+    m_lightsLeft.setData(m_ledBufferLeft);
+    m_lightsLeft.start();
+    m_lightsRight.setData(m_ledBufferRight);
+    m_lightsRight.start();
   }
 
   private void monty() {
-    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
-      for (var j = 0; j < 3; j++) {
-      final int hue[] = {0,0};
-      m_ledBuffer.setHSV(i, hue[j], 255, 128);
+    for (var i = 0; i < m_ledBufferLeft.getLength(); i++) {
+      for (var j = 0; j < 2; j++) {
+        final int hue[] = { 15, 30 };
+        m_ledBufferLeft.setHSV(i, hue[j], 255, 128);
+        m_ledBufferRight.setHSV(i, hue[j], 255, 128);
       }
     }
-    m_lights.setData(m_ledBuffer);
-    m_lights.start();
-
-    //right yellow left not
+    m_lightsLeft.setData(m_ledBufferLeft);
+    m_lightsLeft.start();
+    m_lightsRight.setData(m_ledBufferRight);
+    m_lightsRight.start();
+    // right yellow left not
   }
 
   private void setLEDColor(LED led) {
     switch (led) {
-        case YELLOW: {
-            setYellow();
-            break;
-        }
-        case PURPLE: {
-            setPurple();
-            break;
-        }
-        case RAINBOW: {
-            rainbow();
-            break;
-        }
-        case MONTY: {
-            monty();
-            break;
-        }
-        case NONE: {
-            ledBufferClear();
-            break;
-        }
+      case YELLOW: {
+        setYellow();
+        break;
+      }
+      case PURPLE: {
+        setPurple();
+        break;
+      }
+      case RAINBOW: {
+        rainbow();
+        break;
+      }
+      case MONTY: {
+        monty();
+        break;
+      }
+      case NONE: {
+        ledBufferClear();
+        break;
+      }
     }
+    previousLED = led;
   }
 
   @Override
   public void periodic() {
-    setLEDColor(StateManager.getInstance().getLEDState());
+    if (previousLED != StateManager.getInstance().getLEDState()) {
+      setLEDColor(StateManager.getInstance().getLEDState());
+    }
   }
 }

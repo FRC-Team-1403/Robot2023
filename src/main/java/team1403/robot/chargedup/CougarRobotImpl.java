@@ -68,9 +68,9 @@ public class CougarRobotImpl extends CougarRobot {
     // m_builtins = new BuiltinSubsystem(parameters, logger);
     m_arm = new ArmSubsystem(parameters);
     m_swerveSubsystem = new SwerveSubsystem(parameters);
+    m_lightSubsystem = new LightSubsystem(parameters);
     CameraServer.startAutomaticCapture();
     // m_visionSubsystem = new PhotonVisionSubsystem(parameters);
-    // m_lightSubsystem = new LightSubsystem(parameters);
     registerAutoCommands();
   }
 
@@ -144,12 +144,6 @@ public class CougarRobotImpl extends CougarRobot {
         () -> xboxOperator.getLeftBumper()));
     
     // Intake tipped towards cone
-    // new Trigger(() -> xboxOperator.getAButton()).onFalse(
-    //     new SequentialCommandGroup(
-    //         new UpdateArmState(GamePiece.CONE_TOWARDS),
-    //         new InstantCommand(() -> System.out.println(StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState())),
-    //         new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
-    //             true)));
     new Trigger(() -> xboxOperator.getAButton()).onFalse(
             new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_TOWARDS))
             .andThen(
@@ -191,10 +185,18 @@ public class CougarRobotImpl extends CougarRobot {
     
 
     // lights
-    // new Trigger(() -> xboxOperator.getStartButton()).onTrue(
-    //     new InstantCommand(() -> StateManager.getInstance().updateLEDState(LED.YELLOW)));
-    // new Trigger(() -> xboxOperator.getBackButton()).onTrue(
-    //     new InstantCommand(() -> StateManager.getInstance().updateLEDState(LED.PURPLE)));
+    new Trigger(() -> xboxOperator.getStartButton())
+        .onTrue(
+          new InstantCommand(() -> StateManager.getInstance().updateLEDState(LED.YELLOW)))
+        .onFalse(
+          new InstantCommand(() -> StateManager.getInstance().updateLEDState(LED.MONTY))
+        );
+    new Trigger(() -> xboxOperator.getBackButton())
+      .onTrue(
+        new InstantCommand(() -> StateManager.getInstance().updateLEDState(LED.PURPLE)))
+      .onFalse(
+        new InstantCommand(() -> StateManager.getInstance().updateLEDState(LED.MONTY))
+    );
   }
 
   /**
@@ -316,5 +318,5 @@ public class CougarRobotImpl extends CougarRobot {
   private CougarScriptReader m_reader;
   private final ArmSubsystem m_arm;
   private final SwerveSubsystem m_swerveSubsystem;
-  // private final LightSubsystem m_lightSubsystem;
+  private final LightSubsystem m_lightSubsystem;
 }
