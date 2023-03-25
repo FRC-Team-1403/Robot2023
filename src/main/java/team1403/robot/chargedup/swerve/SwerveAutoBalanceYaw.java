@@ -23,7 +23,7 @@ public class SwerveAutoBalanceYaw extends CommandBase {
     public SwerveAutoBalanceYaw(SwerveSubsystem drivetrainSubsystem) {
         m_drivetrainSubsystem = drivetrainSubsystem;
         m_xPIDController = new ProfiledPIDController(
-            0.225, 
+            0.1, 
             RobotConfig.Swerve.kITranslation, 
             0,
             new TrapezoidProfile.Constraints(200, 200));
@@ -35,15 +35,13 @@ public class SwerveAutoBalanceYaw extends CommandBase {
 
     @Override
     public void execute() {
-      rollVelocity = (previousRollValue - m_drivetrainSubsystem.getGyroRoll()) * 20;
       rollValue = m_drivetrainSubsystem.getGyroRoll();
 
-      rollSetpoint = rollVelocity + rollValue;
-
-      SmartDashboard.putNumber("roll velocity", rollValue);
-      System.out.println(rollValue);
+      rollVelocity = (rollValue - previousRollValue) / 0.2;
 
       velocity = m_xPIDController.calculate(rollValue, 0);
+
+      SmartDashboard.putNumber("roll velocity", velocity);
 
       m_drivetrainSubsystem.drive(new ChassisSpeeds(velocity, 0, 0),
           new Translation2d());
@@ -53,11 +51,11 @@ public class SwerveAutoBalanceYaw extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return Math.abs(rollValue) < 2;
+        return rollValue == 0 && Math.abs(rollVelocity) > 3;
     }
 
     @Override
-    public void end(boolean interuptted) {
+    public void end(boolean interupted) {
         m_drivetrainSubsystem.setXModeEnabled(true);
     }
 }

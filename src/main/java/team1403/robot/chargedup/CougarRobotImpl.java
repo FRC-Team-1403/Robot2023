@@ -79,12 +79,11 @@ public class CougarRobotImpl extends CougarRobot {
   public Command getAutonomousCommand() {
     CommandScheduler.getInstance().removeDefaultCommand(m_swerveSubsystem);
     CommandScheduler.getInstance().removeDefaultCommand(m_arm);
-    return AutoManager.getInstance().getAlternateSideGridCommand(m_swerveSubsystem, m_arm);
+    return AutoManager.getInstance().getRightGridCommand(m_swerveSubsystem, m_arm);
   }
 
   @Override
   public void teleopInit() {
-    // m_swerveSubsystem.setGyroRollOffset(m_swerveSubsystem.getGyroRoll());
     configureOperatorInterface();
     configureDriverInterface();
   }
@@ -103,9 +102,9 @@ public class CougarRobotImpl extends CougarRobot {
     // Setting default command of swerve subsystem
     m_swerveSubsystem.setDefaultCommand(new SwerveCommand(
         m_swerveSubsystem,
-        () -> -deadband(driveController.getLeftX(), 0.05),
-        () -> -deadband(driveController.getLeftY(), 0.05),
-        () -> -deadband(driveController.getRightX(), 0.05),
+        () -> -deadband(driveController.getLeftX(), 0),
+        () -> -deadband(driveController.getLeftY(), 0),
+        () -> -deadband(driveController.getRightX(), 0),
         () -> driveController.getTriangleButtonReleased()));
 
     new Trigger(() -> driveController.getL2Button()).onTrue(

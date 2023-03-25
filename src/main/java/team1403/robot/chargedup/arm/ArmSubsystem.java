@@ -39,6 +39,8 @@ public class ArmSubsystem extends CougarSubsystem {
   private final PIDController m_pivotPid;
   private final WpiLimitSwitch m_maxArmLimitSwitch;
 
+  private boolean previousLimitSwitchTrigger = true;
+
   // Intake
   private final CANSparkMax m_intakeMotor;
 
@@ -55,8 +57,6 @@ public class ArmSubsystem extends CougarSubsystem {
   private double m_intakeSpeedSetpoint;
   private double m_extensionLengthSetpoint;
   private double m_intakePosition;
-
-  private boolean previousLimitSwitchTrigger = true;
 
   /**
    * Initializing the arn subsystem.
@@ -89,10 +89,15 @@ public class ArmSubsystem extends CougarSubsystem {
     m_minMagneticSwitch = new DigitalInput(RobotConfig.RioPorts.kExtensionMinMagneticSwitch);
     m_maxMagneticSwitch = new DigitalInput(RobotConfig.RioPorts.kExtensionMaxMagneticSwitch);
 
+    RobotConfig.Arm.kAbsolutePivotOffset = 0;
+    double difference = RobotConfig.Arm.kMaxPivotAngle - getAbsolutePivotAngle();
+    RobotConfig.Arm.kAbsolutePivotOffset = difference;
+
     this.m_pivotAngleSetpoint = getAbsolutePivotAngle();
     this.m_wristAngleSetpoint = getAbsoluteWristAngle();
     this.m_extensionLengthSetpoint = getExtensionLength();
 
+    
   }
 
   // --------------------------- Setup methods ---------------------------
@@ -512,8 +517,10 @@ public class ArmSubsystem extends CougarSubsystem {
 
     // Pivot
     if(!isArmSwitchActive() && previousLimitSwitchTrigger) {
-      double difference = RobotConfig.Arm.kMaxPivotAngle - getAbsolutePivotAngle() + RobotConfig.Arm.kPivotLimitSwitchOffset;
-      RobotConfig.Arm.kAbsolutePivotOffset += difference;
+      System.out.println("sdjklfane;voiajfasdlvnabuegoasd;jvansdinasdj;lcvnaweovnaewufa;sogha");
+      RobotConfig.Arm.kAbsolutePivotOffset = 0;
+      double difference = RobotConfig.Arm.kMaxPivotAngle - getAbsolutePivotAngle() - 10;
+      RobotConfig.Arm.kAbsolutePivotOffset = difference;
     }
 
     previousLimitSwitchTrigger = isArmSwitchActive();

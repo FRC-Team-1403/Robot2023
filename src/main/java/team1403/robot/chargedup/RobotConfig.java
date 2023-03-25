@@ -292,12 +292,12 @@ public class RobotConfig {
 
   public static class ArmStates {
     public static final ArmState coneTowardsFloorIntake = new ArmState(0, 144.5086341127158, 247.40214774876398, 0); //0.039682067930698, 140.0363630009091, 240.55448872511047
-    public static final ArmState coneTowardsHighConeNode = new ArmState(22.987735748, 249.49720658743016, 149.88693815473684, 0);
+    public static final ArmState coneTowardsHighConeNode = new ArmState(22.987735748, 258.505120962628, 152.96542524635782, 0);
     public static final ArmState coneTowardsMiddleNode = new ArmState(8.345230102539062, 264, 156.45086251051157, 0);
     public static final ArmState singleSubstationIntake = new ArmState(0, 51.3175107829, 241.777313195, 0);
     public static final ArmState coneTowardsLowNode = new ArmState(0, 80.18787350469682, 245.42271036546947, 0);
     
-    public static final ArmState cubeFloorIntake = new ArmState(0.099, 113.15336428783411, 244.565611599405615, 0);
+    public static final ArmState cubeFloorIntake = new ArmState(0.099, 113.57611033940275, 244.565611599405615, 0);
     public static final ArmState cubeHighNode = new ArmState(19.6710987091, 182.465261949, 161.356773014, 0);
     public static final ArmState cubeMiddleNode = new ArmState(0.05158682167, 177.61028394, 181.482400676, 0);
 
