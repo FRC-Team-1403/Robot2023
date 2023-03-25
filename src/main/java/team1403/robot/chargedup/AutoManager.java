@@ -80,10 +80,10 @@ public class AutoManager {
       final Trajectory trajectory2 = TrajectoryGenerator.generateTrajectory(
         new Pose2d(-4.1, 0, Rotation2d.fromDegrees(179)),
         List.of(
-            new Translation2d(-2.5, 0.5),
+            new Translation2d(-2.5, 0),
             new Translation2d(-1, 0)
             ),
-        new Pose2d(0, 0.6, Rotation2d.fromDegrees(0)),
+        new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
         m_trajectoryConfig);
 
     // 3. Define PID controllers for tracking trajectory
@@ -130,13 +130,16 @@ public class AutoManager {
         swerve);
 
     return new SequentialCommandGroup(
+      new SequentialMoveArmCommand(arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
       new RunIntake(arm, 1),
       new ParallelCommandGroup(
         new SequentialCommandGroup(
-          new WaitCommand(2),
+          new WaitCommand(0.1),
+          new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false),
+          new WaitCommand(1),
           new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)),
           new SetpointArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(), true),
-          new RunIntake(arm, 1.3),
+          new RunIntake(arm, -1),
           new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), true)
         ),
         new SequentialCommandGroup(
