@@ -34,6 +34,11 @@ public class SequentialCommandGroup extends CommandBase {
     this.m_onStart = onStart;
   }
 
+  public SequentialCommandGroup(ArrayList<Command> commandList)
+  {
+    this(null, null, (Command[])commandList.toArray());
+  }
+
   public SequentialCommandGroup(Command... commandIter) {
     this(null, null, commandIter);
   }

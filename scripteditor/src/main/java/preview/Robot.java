@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import exceptions.SubsystemNotFound;
+import util.Conversion;
 import util.Point;
 
 /**
@@ -38,7 +39,7 @@ public class Robot {
 	public Robot(Point position, double angle, Subsystem... subsystems) {
 		this.position = position.getCopy();
 		this.angle = angle;
-		this.robotSize = new Point(2, 3); //<-- width, height
+		this.robotSize = new Point(Conversion.inchesToMeters(24), Conversion.inchesToMeters(25)); //<-- width, height
 		this.subsystems = new HashSet<Subsystem>();
 		for (Subsystem s : subsystems) {
 			addSubsystem(s.getCopy());

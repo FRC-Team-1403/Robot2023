@@ -56,6 +56,7 @@ public class CougarScriptReader {
 
     // register parallelcommand automatically
     m_commandMap = new HashMap<String, Function<CougarScriptObject, Command>>();
+
     registerCommand("ParallelCommand", (CougarScriptObject p) -> {
       ArrayList<Command> commandsToRun = new ArrayList<>();
       ArrayList<Command> endCommands = new ArrayList<Command>();
@@ -72,6 +73,18 @@ public class CougarScriptReader {
         }
       }
       return new ParallelCommand(commandsToRun, endCommands);
+    });
+    registerCommand("SequentialCommand", (CougarScriptObject p) -> {
+      ArrayList<Command> commandsToRun = new ArrayList<>();
+      JSONArray commandListJson = p.getJsonArray("Commands");
+      for (int i = 0; i < commandListJson.length(); i++) {
+        JSONObject seqFieldJson = commandListJson.getJSONObject(i);
+        Command currentCommand = parseCommandFromJson(seqFieldJson.getJSONObject("Command"));
+        if (currentCommand != null) {
+          commandsToRun.add(currentCommand);
+        }
+      }
+      return new SequentialCommandGroup(commandsToRun);
     });
   }
 

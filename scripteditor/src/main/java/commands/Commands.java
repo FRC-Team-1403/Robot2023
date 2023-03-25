@@ -66,6 +66,24 @@ public class Commands {
 				return output;
 			}
 		});
+		commandMap.put("SequentialCommand", ()->new RobotCommand("SequentialCommand", Commands.MISC_COLOR, 
+			new InteractableList<SequentialCommandField, RobotCommand>("Commands", "Command", true, SequentialCommandField::new)) {
+				@Override
+				@SuppressWarnings("unchecked")
+				public Robot applyCommand(Robot initial) {
+					Robot output = initial;
+					List<SequentialCommandField> list = ((InteractableList<SequentialCommandField, RobotCommand>)getInteractable("Commands")).getValue();
+					for (SequentialCommandField field : list)
+					{
+						if(field.hasCommand())
+						{
+							output = field.getValue().applyCommand(output);
+						}
+					}
+					return output;
+				}
+			
+		});
 
 		commandMap.put("SwerveDrivePath", ()->new RobotCommand("SwerveDrivePath", DRIVE_COLOR, 
             new NumberField("StartAngle"),
