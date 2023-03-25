@@ -164,8 +164,8 @@ public class MainWindow extends Window implements MouseListener, MouseMotionList
     try {
       logoImage = ImageIO.read(new File("scripteditor/src/resources/logo.png"));
       frame.setIconImage(new ImageIcon("scripteditor/src/resources/Icon.png").getImage());
-      setFieldImage(ImageIO.read(new File("scripteditor/src/resources/47.350364343 FieldImage.png")),
-          "47.350364343 FieldImage");
+      setFieldImage(ImageIO.read(new File("scripteditor/src/resources/69.2921640513 Field Image.png")),
+          "69.2921640513 Field Image.png");
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -302,18 +302,12 @@ public class MainWindow extends Window implements MouseListener, MouseMotionList
       g.drawLine(m.x, imageRect.y, m.x, imageRect.y + imageRect.h);
       g.drawLine(imageRect.x, m.y, imageRect.x + imageRect.w, m.y);
       Point mfeet = new Point(m).toFeet().getRounded();
-      Pos ft = new Pos((int) mfeet.x, (int) mfeet.y);
-      Point inches = new Point(12 * (mfeet.x - ft.x), 12 * (mfeet.y - ft.y)).getRounded();
-      g.drawString("x: " + mfeet.x, imageRect.x + imageRect.w - 110,
+      g.drawString("x: " + mfeet.x + " m", imageRect.x + imageRect.w - 110,
           imageRect.y - g.getFontMetrics().getHeight() - margin - 2);
-      g.drawString(((inches.x < 0) ? "-" : " ") + Math.abs(ft.x) + "\' ", imageRect.x + imageRect.w - 60,
-          imageRect.y - g.getFontMetrics().getHeight() - margin - 2);
-      g.drawString(+Math.abs(inches.x) + "\'\'", imageRect.x + imageRect.w - 35,
-          imageRect.y - g.getFontMetrics().getHeight() - margin - 2);
-      g.drawString("y: " + mfeet.y, imageRect.x + imageRect.w - 110, imageRect.y - margin - 2);
-      g.drawString(((inches.y < 0) ? "-" : " ") + Math.abs(ft.y) + "\' ", imageRect.x + imageRect.w - 60,
-          imageRect.y - margin - 2);
-      g.drawString(+Math.abs(inches.y) + "\'\'", imageRect.x + imageRect.w - 35, imageRect.y - margin - 2);
+      //g.drawString(+Math.abs(inches.x) + " m", imageRect.x + imageRect.w - 35,
+        //  imageRect.y - g.getFontMetrics().getHeight() - margin - 2);
+      g.drawString("y: " + mfeet.y + " m", imageRect.x + imageRect.w - 110, imageRect.y - margin - 2);
+      //g.drawString(+Math.abs(inches.y) + " m", imageRect.x + imageRect.w - 35, imageRect.y - margin - 2);
     }
     // update robot path
     updateRobotPath();
