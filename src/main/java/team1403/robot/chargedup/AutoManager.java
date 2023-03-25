@@ -72,18 +72,19 @@ public class AutoManager {
         new Pose2d(-0.5, 0, Rotation2d.fromDegrees(0)),
         List.of(
             new Translation2d(-1, 0),
-            new Translation2d(-2.5, 0.1)
+            new Translation2d(-2.5, 0),
+            new Translation2d(-4, -0.3)
             ),
-        new Pose2d(-5, 0, Rotation2d.fromDegrees(179)),
+        new Pose2d(-5.1, -0.315, Rotation2d.fromDegrees(181)),
         m_trajectoryConfig);
 
       final Trajectory trajectory2 = TrajectoryGenerator.generateTrajectory(
-        new Pose2d(-5, 0, Rotation2d.fromDegrees(179)),
+        new Pose2d(-5.1, -0.315, Rotation2d.fromDegrees(181)),
         List.of(
-            new Translation2d(-2.5, 0.1),
-            new Translation2d(-1, 0)
+            new Translation2d(-2.5, 0),
+            new Translation2d(-1, -0.2)
             ),
-        new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
+        new Pose2d(0, -0.1, Rotation2d.fromDegrees(0)),
         m_trajectoryConfig);
 
     // 3. Define PID controllers for tracking trajectory
@@ -130,16 +131,16 @@ public class AutoManager {
         swerve);
 
     return new SequentialCommandGroup(
-      new SequentialMoveArmCommand(arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
+      // new SequentialMoveArmCommand(arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
       new RunIntake(arm, 1),
       new ParallelCommandGroup(
         new SequentialCommandGroup(
-          new WaitCommand(0.1),
-          new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false),
-          new WaitCommand(0.8),
+          // new WaitCommand(0.1),
+          // new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false),
+          new WaitCommand(2),
           new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)),
           new SetpointArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(), true),
-          new RunIntake(arm, -1),
+          new RunIntake(arm, 1),
           new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), true)
         ),
         new SequentialCommandGroup(

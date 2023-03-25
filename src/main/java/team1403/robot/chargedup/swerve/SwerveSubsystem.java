@@ -491,8 +491,8 @@ public class SwerveSubsystem extends CougarSubsystem {
     if (this.m_isXModeEnabled) {
       xMode();
     } else {
-      // m_chassisSpeeds = translationalDriftCorrection(m_chassisSpeeds);
-      // m_chassisSpeeds = rotationalDriftCorrection(m_chassisSpeeds);
+      m_chassisSpeeds = translationalDriftCorrection(m_chassisSpeeds);
+      m_chassisSpeeds = rotationalDriftCorrection(m_chassisSpeeds);
 
       m_states = Swerve.kDriveKinematics.toSwerveModuleStates(m_chassisSpeeds, m_offset);
       setModuleStates(m_states);

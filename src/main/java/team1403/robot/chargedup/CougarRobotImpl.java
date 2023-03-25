@@ -74,7 +74,6 @@ public class CougarRobotImpl extends CougarRobot {
     registerAutoCommands();
   }
 
-
   @Override
   public Command getAutonomousCommand() {
     CommandScheduler.getInstance().removeDefaultCommand(m_swerveSubsystem);
@@ -107,16 +106,16 @@ public class CougarRobotImpl extends CougarRobot {
         () -> -deadband(driveController.getRightX(), 0),
         () -> driveController.getTriangleButtonReleased()));
 
-    new Trigger(() -> driveController.getL2Button()).onTrue(
-        new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.2)));
-
-    new Trigger(() -> driveController.getL2Button()).onFalse(
-        new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.6)));
-
     new Trigger(() -> driveController.getR2Button()).onTrue(
         new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.8)));
 
     new Trigger(() -> driveController.getR2Button()).onFalse(
+        new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.6)));
+
+    new Trigger(() -> driveController.getL2Button()).onTrue(
+        new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.2)));
+
+    new Trigger(() -> driveController.getL2Button()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.6)));
 
     new Trigger(() -> driveController.getCircleButton()).onFalse(
@@ -124,8 +123,10 @@ public class CougarRobotImpl extends CougarRobot {
 
     new Trigger(() -> driveController.getCrossButton()).whileTrue(autoBalanceYaw);
 
-    new Trigger(() -> driveController.getSquareButton()).onTrue (new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(true)));
-    new Trigger(() -> driveController.getSquareButton()).onFalse(new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(false)));
+    new Trigger(() -> driveController.getSquareButton())
+        .onTrue(new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(true)));
+    new Trigger(() -> driveController.getSquareButton())
+        .onFalse(new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(false)));
   }
 
   /**
@@ -141,59 +142,63 @@ public class CougarRobotImpl extends CougarRobot {
         () -> deadband(xboxOperator.getRightTriggerAxis(), 0.2),
         () -> xboxOperator.getRightBumper(),
         () -> xboxOperator.getLeftBumper()));
-    
+
     // Intake tipped towards cone
     // new Trigger(() -> xboxOperator.getAButton()).onFalse(
-    //     new SequentialCommandGroup(
-    //         new UpdateArmState(GamePiece.CONE_TOWARDS),
-    //         new InstantCommand(() -> System.out.println(StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState())),
-    //         new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
-    //             true)));
+    // new SequentialCommandGroup(
+    // new UpdateArmState(GamePiece.CONE_TOWARDS),
+    // new InstantCommand(() ->
+    // System.out.println(StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState())),
+    // new SetpointArmCommand(m_arm,
+    // StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
+    // true)));
     new Trigger(() -> xboxOperator.getAButton()).onFalse(
-            new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_TOWARDS))
+        new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_TOWARDS))
             .andThen(
-            new SetpointArmCommand(m_arm, 
-            () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
-            false)));
+                new SetpointArmCommand(m_arm,
+                    () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
+                    false)));
 
     // Intake upright cone
     new Trigger(() -> xboxOperator.getXButton()).onFalse(
-      new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_UPRIGHT))
+        new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_UPRIGHT))
             .andThen(
-            new SetpointArmCommand(m_arm, 
-            () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
-            true)));
+                new SetpointArmCommand(m_arm,
+                    () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
+                    true)));
 
     // Intake cube
     new Trigger(() -> xboxOperator.getYButton()).onFalse(
-      new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE))
+        new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE))
             .andThen(
-            new SetpointArmCommand(m_arm,
-            () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
-            true)));
+                new SetpointArmCommand(m_arm,
+                    () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
+                    true)));
 
-    //Shelf Intake
+    // Shelf Intake
     new Trigger(() -> xboxOperator.getBButton()).onFalse(
         new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_TOWARDS)).andThen(
-          new SetpointArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getSingleShelfIntakeState(),
-            false)
-        ));
+            new SetpointArmCommand(m_arm,
+                () -> StateManager.getInstance().getCurrentArmGroup().getSingleShelfIntakeState(),
+                false)));
 
     new Trigger(() -> xboxOperator.getPOV() == 180).onFalse(
         new SetpointArmCommand(m_arm, () -> ArmStateGroup.getTuck(), false));
     new Trigger(() -> xboxOperator.getPOV() == 0).onFalse(
         new SetpointArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false));
     new Trigger(() -> xboxOperator.getPOV() == 90).onFalse(
-        new SetpointArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState(), false));
+        new SetpointArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState(),
+            false));
     new Trigger(() -> xboxOperator.getPOV() == 270).onFalse(
         new SetpointArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getLowNodeState(), false));
-    
 
     // lights
     // new Trigger(() -> xboxOperator.getStartButton()).onTrue(
-    //     new InstantCommand(() -> StateManager.getInstance().updateLEDState(LED.YELLOW)));
+    // new InstantCommand(() ->
+    // StateManager.getInstance().updateLEDState(LED.YELLOW)));
     // new Trigger(() -> xboxOperator.getBackButton()).onTrue(
-    //     new InstantCommand(() -> StateManager.getInstance().updateLEDState(LED.PURPLE)));
+    // new InstantCommand(() ->
+    // StateManager.getInstance().updateLEDState(LED.PURPLE)));
   }
 
   /**
