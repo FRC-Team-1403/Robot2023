@@ -7,7 +7,7 @@ public class ArmStateGroup {
     private ArmState highNodeState;
     private ArmState middleNodeState;
     private ArmState lowNodeState;
-    public static ArmState tuck = new ArmState(0, 0, 0, 0, null); //random values for now
+    public static ArmState tuck = new ArmState(0, 22.5, 256.273, 0); //random values for now
 
     public ArmStateGroup(ArmState floor, ArmState doubleShelf, ArmState singleShelf, ArmState highNode, ArmState middleNode, ArmState lowNode) {
         this.floorIntakeState = floor;
@@ -44,6 +44,11 @@ public class ArmStateGroup {
 
     public static ArmState getTuck() {
         return tuck;
+    }
+
+    @Override
+    public String toString() {
+        return "ArmStateGroup [floorIntakeState = " + floorIntakeState;
     }
 
 

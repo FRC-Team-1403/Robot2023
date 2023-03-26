@@ -12,7 +12,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-import team1403.robot.chargedup.RobotConfig.SwerveConfig;
+import team1403.robot.chargedup.RobotConfig.Swerve;
 
 /**
  * Autonomous command to be used with the CSE.
@@ -63,18 +63,18 @@ public class SwerveDrivePath extends CommandBase {
     wayPoints.remove(wayPoints.size() - 1);
 
     m_trajectoryConfig = new TrajectoryConfig(
-        SwerveConfig.kMaxSpeed / 4,
-        SwerveConfig.kMaxAccelerationMetersPerSecondSquared)
-        .setKinematics(SwerveConfig.kDriveKinematics);
+        Swerve.kMaxSpeed / 10,
+        0.5)
+        .setKinematics(Swerve.kDriveKinematics);
 
-    m_verticalTranslationController = new PIDController(SwerveConfig.kPTranslation, 
-        SwerveConfig.kITranslation, SwerveConfig.kDTranslation);
-    m_horizontalTranslationController = new PIDController(SwerveConfig.kPTranslation, 
-        SwerveConfig.kITranslation, SwerveConfig.kDTranslation);
+    m_verticalTranslationController = new PIDController(Swerve.kPTranslation, 
+        Swerve.kITranslation, Swerve.kDTranslation);
+    m_horizontalTranslationController = new PIDController(Swerve.kPTranslation, 
+        Swerve.kITranslation, Swerve.kDTranslation);
 
     m_angleController = new ProfiledPIDController(
-        SwerveConfig.kPAutoTurning, SwerveConfig.kIAutoTurning, 
-        SwerveConfig.kDAutoTurning, SwerveConfig.kThetaControllerConstraints);
+        Swerve.kPAutoTurning, Swerve.kIAutoTurning, 
+        Swerve.kDAutoTurning, Swerve.kThetaControllerConstraints);
   }
 
   @Override
@@ -112,7 +112,7 @@ public class SwerveDrivePath extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    m_drivetrain.decreaseSpeed(0.4);
+    m_drivetrain.setSpeedLimiter(0.6);
     m_drivetrain.stop();
   }
 }

@@ -19,7 +19,7 @@ public class ManualArmCommand extends CommandBase {
   private final BooleanSupplier m_wheelOuttakeSupplier;
 
 
-  private final Arm_Subsystem m_arm;
+  private final ArmSubsystem m_arm;
   /**
    * Defines the constructor for ArmCommands,
    * sets the instant class level vaiables,
@@ -32,7 +32,7 @@ public class ManualArmCommand extends CommandBase {
     the increase of arm extension, 0 to 1
     the decrease of arm extension, 0 to 1
    */
-  public ManualArmCommand(Arm_Subsystem arm, DoubleSupplier armAngle, DoubleSupplier wristAngle,
+  public ManualArmCommand(ArmSubsystem arm, DoubleSupplier armAngle, DoubleSupplier wristAngle,
       DoubleSupplier armExtensionDecrease, DoubleSupplier armExtensionIncrease,
         BooleanSupplier wheelIntake, BooleanSupplier wheelOuttake) {
     this.m_wheelIntakeSupplier = wheelIntake;
@@ -48,6 +48,7 @@ public class ManualArmCommand extends CommandBase {
 
   @Override
   public void execute() {
+    m_arm.ignoreExtensionLimit(true);
     double pivotAngle = m_arm.getPivotAngleSetpoint();
     double wristAngle = m_arm.getWristAngleSetpoint();
     double armExtension = m_arm.getExtensionLengthSetpoint();

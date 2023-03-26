@@ -23,8 +23,8 @@ public class SwerveAutoBalanceYaw extends CommandBase {
     public SwerveAutoBalanceYaw(SwerveSubsystem drivetrainSubsystem) {
         m_drivetrainSubsystem = drivetrainSubsystem;
         m_xPIDController = new ProfiledPIDController(
-            0.5, 
-            RobotConfig.SwerveConfig.kITranslation, 
+            0.1, 
+            RobotConfig.Swerve.kITranslation, 
             0,
             new TrapezoidProfile.Constraints(200, 200));
         m_drivetrainSubsystem.resetOdometry();
@@ -35,15 +35,13 @@ public class SwerveAutoBalanceYaw extends CommandBase {
 
     @Override
     public void execute() {
-      rollVelocity = ((previousRollValue - m_drivetrainSubsystem.getGyroRoll()) / 0.02) * 20;
-      rollValue = m_drivetrainSubsystem.getGyroRoll() * .5;
+      rollValue = m_drivetrainSubsystem.getGyroRoll();
 
-      rollSetpoint = rollVelocity + rollValue;
+      rollVelocity = (rollValue - previousRollValue) / 0.2;
 
-      SmartDashboard.putNumber("roll velocity", rollSetpoint);
-      System.out.println(rollSetpoint);
+      velocity = m_xPIDController.calculate(rollValue, 0);
 
-      velocity = m_xPIDController.calculate(rollSetpoint, 0);
+      SmartDashboard.putNumber("roll velocity", velocity);
 
       m_drivetrainSubsystem.drive(new ChassisSpeeds(velocity, 0, 0),
           new Translation2d());
@@ -53,21 +51,11 @@ public class SwerveAutoBalanceYaw extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        if ((rollVelocity > -0.0001) && (rollVelocity < 0.0001)) {
-            return true;
-        }
-        // if ((m_drivetrainSubsystem.getGyroRoll() < 3) && (m_drivetrainSubsystem.getGyroRoll() > 0)) {
-        //     return true;
-        // }
-        // if (rollVelocity != 0) {
-        //     return true;
-        // }
-        // return false;
-        return false;
+        return rollValue == 0 && Math.abs(rollVelocity) > 3;
     }
 
     @Override
-    public void end(boolean interuptted) {
-        m_drivetrainSubsystem.drive(new ChassisSpeeds(0, 0, 0.01), new Translation2d());
+    public void end(boolean interupted) {
+        m_drivetrainSubsystem.setXModeEnabled(true);
     }
 }

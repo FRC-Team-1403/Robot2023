@@ -2,7 +2,7 @@ package team1403.robot.chargedup.swerve;
 
 import com.revrobotics.CANSparkMax.IdleMode;
 
-import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import team1403.lib.core.CougarLibInjectedParameters;
@@ -22,8 +23,9 @@ import team1403.lib.device.wpi.NavxAhrs;
 import team1403.lib.util.CougarLogger;
 import team1403.lib.util.SwerveDriveOdometry;
 import team1403.lib.util.SwerveDrivePoseEstimator;
+import team1403.robot.chargedup.RobotConfig;
 import team1403.robot.chargedup.RobotConfig.CanBus;
-import team1403.robot.chargedup.RobotConfig.SwerveConfig;
+import team1403.robot.chargedup.RobotConfig.Swerve;
 
 /**
  * The drivetrain of the robot. Consists of for swerve modules and the
@@ -35,15 +37,38 @@ public class SwerveSubsystem extends CougarSubsystem {
 
   private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds();
   private SwerveModuleState[] m_states = new SwerveModuleState[4];
-  private final SwerveDrivePoseEstimator m_odometer;
+  private final SwerveDriveOdometry m_odometer;
 
-  private final PIDController m_driftCorrectionPid = new PIDController(0.35, 0, 0);
+  private Translation2d frontRight = new Translation2d(
+      RobotConfig.Swerve.kTrackWidth / 2.0,
+      -RobotConfig.Swerve.kWheelBase / 2.0);
+
+  private Translation2d frontLeft = new Translation2d(
+      RobotConfig.Swerve.kTrackWidth / 2.0,
+      RobotConfig.Swerve.kWheelBase / 2.0);
+
+  private Translation2d backRight = new Translation2d(
+      -RobotConfig.Swerve.kTrackWidth / 2.0,
+      -RobotConfig.Swerve.kWheelBase / 2.0);
+
+  private Translation2d backLeft = new Translation2d(
+      -RobotConfig.Swerve.kTrackWidth / 2.0,
+      RobotConfig.Swerve.kWheelBase / 2.0);
+
+  private final PIDController m_driftCorrectionPid = new PIDController(0.75, 0, 0);
   private double m_desiredHeading = 0;
   private double m_speedLimiter = 0.6;
 
   private Translation2d m_offset;
 
+  private double m_yawOffset;
+  private double m_rollOffset;
+
   private double m_calc = 0;
+
+  private boolean m_isXModeEnabled = false;
+
+  private Field2d m_field2d;
 
   /**
    * Creates a new {@link SwerveSubsystem}.
@@ -62,17 +87,20 @@ public class SwerveSubsystem extends CougarSubsystem {
     m_modules = new SwerveModule[] {
         new SwerveModule("Front Left Module",
             CanBus.frontLeftDriveId, CanBus.frontLeftSteerId,
-            CanBus.frontLeftEncoderId, SwerveConfig.frontLeftEncoderOffset, logger),
+            CanBus.frontLeftEncoderId, Swerve.frontLeftEncoderOffset, logger),
         new SwerveModule("Front Right Module",
             CanBus.frontRightDriveId, CanBus.frontRightSteerId,
-            CanBus.frontRightEncoderId, SwerveConfig.frontRightEncoderOffset, logger),
+            CanBus.frontRightEncoderId, Swerve.frontRightEncoderOffset, logger),
         new SwerveModule("Back Left Module",
             CanBus.backLeftDriveId, CanBus.backLeftSteerId,
-            CanBus.backLeftEncoderId, SwerveConfig.backLeftEncoderOffset, logger),
+            CanBus.backLeftEncoderId, Swerve.backLeftEncoderOffset, logger),
         new SwerveModule("Back Right Module",
             CanBus.backRightDriveId, CanBus.backRightSteerId,
-            CanBus.backRightEncoderId, SwerveConfig.backRightEncoderOffset, logger),
+            CanBus.backRightEncoderId, Swerve.backRightEncoderOffset, logger),
     };
+
+    m_odometer = new SwerveDriveOdometry(Swerve.kDriveKinematics, new Rotation2d(),
+        getModulePositions(), new Pose2d(0, 0, new Rotation2d(0)));
 
     addDevice(m_navx2.getName(), m_navx2);
     new Thread(() -> {
@@ -92,13 +120,16 @@ public class SwerveSubsystem extends CougarSubsystem {
         VecBuilder.fill(0.9, 0.9, 0.9));
     m_odometer.setPose(new Pose2d(Units.inchesToMeters(29.5), 0, getGyroscopeRotation()));
     m_desiredHeading = getGyroscopeRotation().getDegrees();
-    SmartDashboard.putNumber("Desired Heading", m_desiredHeading);
 
     setRobotRampRate(0.0);
-    setRobotIdleMode(IdleMode.kCoast);
+    setRobotIdleMode(IdleMode.kBrake);
 
     m_offset = new Translation2d();
-    
+    m_rollOffset = -m_navx2.getRoll();
+    m_yawOffset = 0;
+
+    m_field2d = new Field2d();
+    SmartDashboard.putData("Field", m_field2d);
   }
 
   /**
@@ -119,6 +150,10 @@ public class SwerveSubsystem extends CougarSubsystem {
   public void decreaseSpeed(double amt) {
     tracef("decreasedSpeed %f", amt);
     m_speedLimiter = Math.max(0, m_speedLimiter - amt);
+  }
+
+  public void setSpeedLimiter(double amt) {
+    m_speedLimiter = MathUtil.clamp(amt, 0, 1);
   }
 
   /**
@@ -175,12 +210,21 @@ public class SwerveSubsystem extends CougarSubsystem {
   }
 
   /**
+   * Set the offset of the gyroscope.
+   *
+   * @param offset offset to set on the gyroscope
+   */
+  public void setYawGyroscopeOffset(double offset) {
+    m_yawOffset = offset;
+  }
+
+  /**
    * Return the position of the drivetrain.
    *
    * @return the position of the drivetrain in Pose2d
    */
   public Pose2d getPose() {
-    return m_odometer.getEstimatedPosition();
+    return m_odometer.getPoseMeters();
   }
 
   /**
@@ -189,22 +233,11 @@ public class SwerveSubsystem extends CougarSubsystem {
    * @param pose the new position of the odometry.
    */
   public void setPose(Pose2d pose) {
-    m_odometer.setPose(pose);
+    m_odometer.setPoseMeters(pose);
   }
 
-  public SwerveDrivePoseEstimator getOdometer() {
+  public SwerveDriveOdometry getOdometer() {
     return m_odometer;
-  }
-
-  /**
-   * Updating the Odometer with PhotonVision.
-   *
-   * @param pose The Pose2d object needed to update.
-   */
-  public void updateOdometerWithVision(Pose2d pose) {
-    if (pose.getTranslation().getDistance(getPose().getTranslation()) < 1) {
-      m_odometer.addVisionMeasurement(pose, Timer.getFPGATimestamp());
-    }
   }
 
   /**
@@ -221,7 +254,7 @@ public class SwerveSubsystem extends CougarSubsystem {
    * @return a Rotation2d object that contains the gyroscope's heading
    */
   public Rotation2d getGyroscopeRotation() {
-    return m_navx2.getRotation2d();
+    return m_navx2.getRotation2d().minus(Rotation2d.fromDegrees(m_yawOffset));
   }
 
   /**
@@ -230,7 +263,7 @@ public class SwerveSubsystem extends CougarSubsystem {
    * @return a double representing the roll of robot in degrees
    */
   public double getGyroRoll() {
-    return m_navx2.getRoll();
+    return m_navx2.getRoll() + m_rollOffset;
   }
 
   /**
@@ -246,7 +279,7 @@ public class SwerveSubsystem extends CougarSubsystem {
    * Moves the drivetrain at the given chassis speeds.
    *
    * @param chassisSpeeds the speed to move at
-   * @param offset the swerve module to pivot around
+   * @param offset        the swerve module to pivot around
    */
   public void drive(ChassisSpeeds chassisSpeeds, Translation2d offset) {
     m_chassisSpeeds = chassisSpeeds;
@@ -264,10 +297,6 @@ public class SwerveSubsystem extends CougarSubsystem {
     m_chassisSpeeds = new ChassisSpeeds();
   }
 
-  public Pose2d getOdometryValue() {
-    return m_odometer.getEstimatedPosition();
-  }
-
   /**
    * Sets the module speed and heading for all 4 modules.
    *
@@ -276,13 +305,138 @@ public class SwerveSubsystem extends CougarSubsystem {
 
   public void setModuleStates(SwerveModuleState[] states) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        states, SwerveConfig.kMaxSpeed);
+        states, Swerve.kMaxSpeed);
 
     for (int i = 0; i < m_modules.length; i++) {
       m_modules[i].set((states[i].speedMetersPerSecond
-          / SwerveConfig.kMaxSpeed) * m_speedLimiter,
+          / Swerve.kMaxSpeed) * m_speedLimiter,
           states[i].angle.getRadians());
     }
+  }
+
+  public ChassisSpeeds getChassisSpeed() {
+    return m_chassisSpeeds;
+  }
+
+  /**
+   * Sets which wheel to pivot for the robot.
+   * 
+   * @param isRight whether right or left wheels should be pivoted
+   */
+  public void setPivotAroundOneWheel(boolean isRight) {
+    // Right wheels are to be pivoted
+    if (isRight) {
+      if ((45.0 <= getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() < -45.0)
+          || (315.0 <= getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() < -315.0)) {
+        if (m_chassisSpeeds.vxMetersPerSecond >= 0.0) {
+          // Pivots around front right wheel
+          m_offset = frontRight;
+        } else {
+          // Pivot around back right wheel
+          m_offset = backRight;
+        }
+      } else if ((-135.0 < getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() <= -45.0)
+          || (225.0 < getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() <= 315.0)) {
+        if (m_chassisSpeeds.vxMetersPerSecond >= 0.0) {
+          // Pivot around back right wheel
+          m_offset = backRight;
+        } else {
+          // Pivot around back left wheel
+          m_offset = backLeft;
+        }
+      } else if ((-225.0 <= getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() < -135.0)
+          || (135.0 <= getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() < 225.0)) {
+        if (m_chassisSpeeds.vxMetersPerSecond >= 0.0) {
+          // Pivot around back left wheel
+          m_offset = backLeft;
+        } else {
+          // Pivot around front left wheel
+          m_offset = frontLeft;
+        }
+      } else if ((-315.0 <= getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() < -225.0)
+          || (45.0 <= getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() < 135.0)) {
+        if (m_chassisSpeeds.vxMetersPerSecond >= 0.0) {
+          // Pivot around front left wheel
+          m_offset = frontLeft;
+        } else {
+          // Pivot around front right wheel
+          m_offset = frontRight;
+        }
+      }
+      // Left wheels are to be pivoted
+    } else {
+      if ((45.0 <= getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() < -45.0)
+          || (315.0 <= getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() < -315.0)) {
+        if (m_chassisSpeeds.vxMetersPerSecond >= 0.0) {
+          // Pivots around front left wheel
+          m_offset = frontLeft;
+        } else {
+          // Pivot around back left wheel
+          m_offset = backLeft;
+        }
+      } else if ((-135.0 < getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() <= -45.0)
+          || (225.0 < getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() <= 315.0)) {
+        if (m_chassisSpeeds.vxMetersPerSecond >= 0.0) {
+          // Pivot around back left wheel
+          m_offset = backLeft;
+        } else {
+          // Pivot around back right wheel
+          m_offset = backRight;
+        }
+      } else if ((-225.0 <= getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() < -135.0)
+          || (135.0 <= getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() < 225.0)) {
+        if (m_chassisSpeeds.vxMetersPerSecond >= 0.0) {
+          // Pivot around back right wheel
+          m_offset = backRight;
+        } else {
+          // Pivot around front right wheel
+          m_offset = frontRight;
+        }
+      } else if ((-315.0 <= getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() < -225.0)
+          || (45.0 <= getGyroscopeRotation().getDegrees()) && (getGyroscopeRotation().getDegrees() < 135.0)) {
+        if (m_chassisSpeeds.vxMetersPerSecond >= 0.0) {
+          // Pivot around front right wheel
+          m_offset = frontRight;
+        } else {
+          // Pivot around front left wheel
+          m_offset = frontLeft;
+        }
+      }
+    }
+  }
+
+  /**
+   * Resets the robot to no longer pivot around one wheel.
+   */
+  public void setMiddlePivot() {
+    m_offset = new Translation2d();
+  }
+
+  /**
+   * Puts the drivetrain into xMode where all the wheel put towards the center of the robot,
+   * making it harder for the robot to be pushed around. 
+   */
+  private void xMode() {
+    SwerveModuleState[] states = {
+        // Front Left
+        new SwerveModuleState(0, Rotation2d.fromDegrees(225)),
+        // Front Right
+        new SwerveModuleState(0, Rotation2d.fromDegrees(315)),
+        // Back left
+        new SwerveModuleState(0, Rotation2d.fromDegrees(135)),
+        // Back Right
+        new SwerveModuleState(0, Rotation2d.fromDegrees(45))
+    };
+    setModuleStates(states);
+  }
+
+  /**
+   * Sets the drivetain in xMode.
+   * 
+   * @param enabled whether the drivetrain is in xMode.
+   */
+  public void setXModeEnabled(boolean enabled) {
+    this.m_isXModeEnabled = enabled;
   }
 
   /**
@@ -300,10 +454,8 @@ public class SwerveSubsystem extends CougarSubsystem {
     } else if (translationalVelocity > 1) {
       m_calc = m_driftCorrectionPid.calculate(getGyroscopeRotation().getDegrees(),
           m_desiredHeading);
-      SmartDashboard.putNumber("Calc Drift Correction", m_calc);
       if (Math.abs(m_calc) >= 0.55) {
         m_chassisSpeeds.omegaRadiansPerSecond += m_calc;
-        SmartDashboard.putNumber("Omega Radians Correction", m_chassisSpeeds.omegaRadiansPerSecond);
       }
       tracef("driftCorrection %f, corrected omegaRadiansPerSecond %f",
           m_calc, m_chassisSpeeds.omegaRadiansPerSecond);
@@ -339,14 +491,29 @@ public class SwerveSubsystem extends CougarSubsystem {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("Gyro Reading", getGyroscopeRotation().getDegrees());
+
     m_odometer.update(getGyroscopeRotation(), getModulePositions());
-    SmartDashboard.putString("Swerve Odometry", m_odometer.getEstimatedPosition().toString());
+    SmartDashboard.putNumber("Debug X", m_odometer.getPoseMeters().getX());
+    SmartDashboard.putNumber("Debug Y", m_odometer.getPoseMeters().getY());
 
-    m_chassisSpeeds = translationalDriftCorrection(m_chassisSpeeds);
-    m_chassisSpeeds = rotationalDriftCorrection(m_chassisSpeeds);
+    SmartDashboard.putString("Odometry", m_odometer.getPoseMeters().toString());
+    SmartDashboard.putNumber("Speed", m_speedLimiter);
+    SmartDashboard.putNumber("Roll Value", getGyroRoll());
 
-    m_states = SwerveConfig.kDriveKinematics.toSwerveModuleStates(m_chassisSpeeds, m_offset);
+    if (this.m_isXModeEnabled) {
+      xMode();
+    } else {
+      m_chassisSpeeds = translationalDriftCorrection(m_chassisSpeeds);
+      m_chassisSpeeds = rotationalDriftCorrection(m_chassisSpeeds);
 
-    setModuleStates(m_states);
+      m_states = Swerve.kDriveKinematics.toSwerveModuleStates(m_chassisSpeeds, m_offset);
+      setModuleStates(m_states);
+    }
+
+    SmartDashboard.putNumber("Front Left Absolute Encoder", m_modules[0].getAbsoluteAngle());
+    SmartDashboard.putNumber("Front Right Absolute Encoder", m_modules[1].getAbsoluteAngle());
+    SmartDashboard.putNumber("Back Left Absolute Encoder", m_modules[2].getAbsoluteAngle());
+    SmartDashboard.putNumber("Back Right Absolute Encoder", m_modules[3].getAbsoluteAngle());
   }
 }

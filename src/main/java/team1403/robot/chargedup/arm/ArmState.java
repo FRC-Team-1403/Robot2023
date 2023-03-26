@@ -1,7 +1,5 @@
 package team1403.robot.chargedup.arm;
 
-import team1403.lib.core.CougarLibInjectedParameters;
-
 /**
  * Creates the ArmState class.
  * 
@@ -16,7 +14,7 @@ public class ArmState {
    * Initializes the ArmState class.
    */
   public ArmState(double armLength, double wristAngle, double armPivot,
-      double intakeSpeed, CougarLibInjectedParameters injectedParameters) {
+      double intakeSpeed) {
     this.armLength = armLength;
     this.wristAngle = wristAngle;
     this.armPivot = armPivot;
@@ -26,8 +24,7 @@ public class ArmState {
 
   @Override
   public String toString() {
-    return "ArmState [armLength=" + armLength + ", wristAngle=" + wristAngle 
-        + ", armPivot=" + armPivot + ", intakeSpeed=" + intakeSpeed + "]";
+    return "ArmState [armLength=" + armLength;
   }
 
   @Override
