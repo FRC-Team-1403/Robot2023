@@ -17,9 +17,18 @@ public class RunIntake extends CommandBase{
 
   private ArmSubsystem m_arm;
 
+  private double length;
+
+  public RunIntake(ArmSubsystem arm, double intakeSpeed, double length) {
+    this.m_arm = arm;
+    this.m_intakeSpeed = intakeSpeed;
+    this.length = length;
+  }
+
   public RunIntake(ArmSubsystem arm, double intakeSpeed) {
     this.m_arm = arm;
     this.m_intakeSpeed = intakeSpeed;
+    this.length = 0.5;
   }
 
   @Override
@@ -35,7 +44,7 @@ public class RunIntake extends CommandBase{
 
   @Override
   public boolean isFinished() {
-    return (Timer.getFPGATimestamp() - startTime) >= 0.5;
+    return (Timer.getFPGATimestamp() - startTime) >= length;
   }
 
   @Override

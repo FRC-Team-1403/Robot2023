@@ -28,8 +28,8 @@ import team1403.robot.chargedup.swerve.TimedDrive;
 public class AutoManager {
   static private AutoManager m_instance;
 
-  private final TrajectoryConfig m_trajectoryConfig = new TrajectoryConfig(6,
-      RobotConfig.Swerve.kMaxAccelerationMetersPerSecondSquared).setKinematics(RobotConfig.Swerve.kDriveKinematics);
+  private final TrajectoryConfig m_trajectoryConfig = new TrajectoryConfig(4,
+      2).setKinematics(RobotConfig.Swerve.kDriveKinematics);
 
   private final PIDController xController = new PIDController(
       RobotConfig.Swerve.kPTranslation,
@@ -42,7 +42,7 @@ public class AutoManager {
       RobotConfig.Swerve.kDTranslation);
 
   private final ProfiledPIDController thetaController = new ProfiledPIDController(
-      5.3,
+      4,
       RobotConfig.Swerve.kIAutoTurning,
       RobotConfig.Swerve.kDAutoTurning,
       RobotConfig.Swerve.kThetaControllerConstraints);
@@ -67,9 +67,9 @@ public class AutoManager {
         TrajectoryGenerator.generateTrajectory(
             new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
             List.of(
-                new Translation2d(-0.2, 0),
-                new Translation2d(-0.5, 0)),
-            new Pose2d(-0.5, 0, Rotation2d.fromDegrees(0)),
+                new Translation2d(-1, -0.3),
+                new Translation2d(-2, -0.3)),
+            new Pose2d(-3, 0, Rotation2d.fromDegrees(180)),
             m_trajectoryConfig),
         swerve::getPose,
         xController,
@@ -78,13 +78,13 @@ public class AutoManager {
         swerve);
 
     grid3Trajectory2 = new SwerveControllerCommand(
-        TrajectoryGenerator.generateTrajectory(
-            new Pose2d(-0.5, 0, Rotation2d.fromDegrees(0)),
+        TrajectoryGenerator.generateTrajectory( 
+            new Pose2d(-3, 0, Rotation2d.fromDegrees(180)),
             List.of(
-                new Translation2d(-1, 0),
-                new Translation2d(-2.5, 0),
-                new Translation2d(-4, -0.3)),
-            new Pose2d(-5.1, -0.315, Rotation2d.fromDegrees(181)),
+                new Translation2d(-4.8, 0.7),
+                new Translation2d(-4.9, -0.7),
+                new Translation2d(-4.7, -0.2)),
+            new Pose2d(-4, 0.05, Rotation2d.fromDegrees(225)),
             m_trajectoryConfig),
         swerve::getPose,
         xController,
@@ -94,11 +94,11 @@ public class AutoManager {
 
     grid3Trajectory3 = new SwerveControllerCommand(
         TrajectoryGenerator.generateTrajectory(
-            new Pose2d(-5.1, -0.315, Rotation2d.fromDegrees(181)),
+            new Pose2d(-4, -0.3, Rotation2d.fromDegrees(225)),
             List.of(
-                new Translation2d(-2.5, 0),
-                new Translation2d(-1, -0.2)),
-            new Pose2d(0, -0.1, Rotation2d.fromDegrees(0)),
+                new Translation2d(-2.5, -0.5),
+                new Translation2d(-0.5, -0.5)),
+            new Pose2d(0.1, -1.05, Rotation2d.fromDegrees(4)),
             m_trajectoryConfig),
         swerve::getPose,
         xController,
@@ -118,23 +118,27 @@ public class AutoManager {
     swerve.setSpeedLimiter(1);
 
     return new SequentialCommandGroup(
-        // new SequentialMoveArmCommand(arm,
-        // StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
-        new RunIntake(arm, -1),
+        new SequentialMoveArmCommand(arm,
+        StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
+        new RunIntake(arm, 1),
         new ParallelCommandGroup(
             new SequentialCommandGroup(
-                // new WaitCommand(0.1),
-                // new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false),
-                new WaitCommand(2),
+                new WaitCommand(0.1),
+                new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false),
+                new WaitCommand(1.8),
                 new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)),
                 new SetpointArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
                     true),
-                new RunIntake(arm, 1),
-                new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), true)),
+                new RunIntake(arm, 3, 1.5),
+                new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), true),
+                new WaitCommand(1.2),
+                new SetpointArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false)
+                ),
             new SequentialCommandGroup(
                 grid3Trajectory1,
-                grid3Trajectory2)),
-        grid3Trajectory3);
+                grid3Trajectory2,
+                grid3Trajectory3)),
+                new RunIntake(arm, -1));
   }
 
   public Command getTimedSideGridCommand(SwerveSubsystem swerve, ArmSubsystem arm) {
