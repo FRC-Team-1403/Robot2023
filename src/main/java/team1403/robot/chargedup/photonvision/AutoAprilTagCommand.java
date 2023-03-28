@@ -59,7 +59,7 @@ public class AutoAprilTagCommand extends CommandBase {
         m_drivetrainSubsystem.getGyroscopeRotation().getDegrees(),
         m_lockedOnTarget.getRotation().getDegrees(), 
         List.of(
-          m_drivetrainSubsystem.getOdometryValue().getTranslation(),
+          m_drivetrainSubsystem.getPose().getTranslation(),
           m_lockedOnTarget.getTranslation()));
 
     m_drivePathCommand.schedule();

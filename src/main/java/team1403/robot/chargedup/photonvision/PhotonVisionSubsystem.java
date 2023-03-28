@@ -44,7 +44,7 @@ public class PhotonVisionSubsystem extends CougarSubsystem {
     // 1: Reflective Tape
 
     //Might need to switch this to init method of subsystem or autonomous init through StateManager
-    if (StateManager.getInstance().getAlliance().equals(Alliance.Red)) {
+    if (StateManager.getInstance().getalliance().equals(Alliance.Red)) {
       VisionConfig.fieldLayout.setOrigin(OriginPosition.kRedAllianceWallRightSide);
     } else {
       VisionConfig.fieldLayout.setOrigin(OriginPosition.kBlueAllianceWallRightSide);

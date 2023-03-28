@@ -51,7 +51,7 @@ public class PhotonVisionDefault extends CommandBase {
 
   @Override
   public void initialize() {
-    m_photonPoseEstimator.setReferencePose(m_drivetrainSubsystem.getOdometryValue());
+    m_photonPoseEstimator.setReferencePose(m_drivetrainSubsystem.getPose());
     addVisionMeasurment();
   }
 
@@ -70,13 +70,13 @@ public class PhotonVisionDefault extends CommandBase {
     if (result.isPresent()) {
       EstimatedRobotPose photonPose = result.get();
       double distanceFromCurrentMeasurment = photonPose.estimatedPose.toPose2d().getTranslation()
-          .getDistance(m_drivetrainSubsystem.getOdometryValue().getTranslation());
+          .getDistance(m_drivetrainSubsystem.getPose().getTranslation());
       if (Math.abs(distanceFromCurrentMeasurment) <= 1) {
         m_swervePoseEstimator.addVisionMeasurement(
             photonPose.estimatedPose.toPose2d(),
             photonPose.timestampSeconds,
             m_stdMatrix);
-        m_photonPoseEstimator.setReferencePose(m_drivetrainSubsystem.getOdometryValue());
+        m_photonPoseEstimator.setReferencePose(m_drivetrainSubsystem.getPose());
 
         SmartDashboard.putString("Vision Odometry", photonPose.estimatedPose.toPose2d().toString());
         SmartDashboard.putString("Vision X", photonPose.targetsUsed.toString());

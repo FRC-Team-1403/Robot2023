@@ -61,7 +61,7 @@ public class AutoReflectiveTapeCommand extends CommandBase {
         m_drivetrain.getGyroscopeRotation().getDegrees(),
         thetaOfTarget,
         List.of(
-            m_drivetrain.getOdometryValue().getTranslation(),
+            m_drivetrain.getPose().getTranslation(),
             m_target));
 
     m_drivePathCommand.schedule();

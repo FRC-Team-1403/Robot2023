@@ -112,9 +112,9 @@ public class SwerveModule implements Device {
   }
 
   private void initSteerMotor() {
-    m_steerMotor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, RobotConfig.SwerveConfig.kStatusFrameGeneralPeriodMs);
-    m_steerMotor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus1, RobotConfig.SwerveConfig.kStatusFrameGeneralPeriodMs);
-    m_steerMotor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, RobotConfig.SwerveConfig.kStatusFrameGeneralPeriodMs);
+    m_steerMotor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, RobotConfig.Swerve.kStatusFrameGeneralPeriodMs);
+    m_steerMotor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus1, RobotConfig.Swerve.kStatusFrameGeneralPeriodMs);
+    m_steerMotor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, RobotConfig.Swerve.kStatusFrameGeneralPeriodMs);
     m_steerMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
     m_steerMotor.setInverted(false);
     m_steerMotor.enableVoltageCompensation(12);
@@ -134,11 +134,11 @@ public class SwerveModule implements Device {
     m_driveMotor.setVoltageCompensation(RobotConfig.Swerve.kVoltageSaturation);
     m_driveMotor.setAmpLimit(RobotConfig.Swerve.kCurrentLimit);
     m_driveMotor.getCanSparkMaxApi().setPeriodicFramePeriod(
-        CANSparkMaxLowLevel.PeriodicFrame.kStatus0, RobotConfig.SwerveConfig.kStatusFrameGeneralPeriodMs);
+        CANSparkMaxLowLevel.PeriodicFrame.kStatus0, RobotConfig.Swerve.kStatusFrameGeneralPeriodMs);
     m_driveMotor.getCanSparkMaxApi().setPeriodicFramePeriod(
-        CANSparkMaxLowLevel.PeriodicFrame.kStatus1, RobotConfig.SwerveConfig.kStatusFrameGeneralPeriodMs);
+        CANSparkMaxLowLevel.PeriodicFrame.kStatus1, RobotConfig.Swerve.kStatusFrameGeneralPeriodMs);
     m_driveMotor.getCanSparkMaxApi().setPeriodicFramePeriod(
-        CANSparkMaxLowLevel.PeriodicFrame.kStatus2, RobotConfig.SwerveConfig.kStatusFrameGeneralPeriodMs);
+        CANSparkMaxLowLevel.PeriodicFrame.kStatus2, RobotConfig.Swerve.kStatusFrameGeneralPeriodMs);
   }
 
   /**
