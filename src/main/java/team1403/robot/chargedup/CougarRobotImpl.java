@@ -75,6 +75,12 @@ public class CougarRobotImpl extends CougarRobot {
   }
 
   @Override
+  public void robotInit() {
+    AutoManager.getInstance().init(m_swerveSubsystem);
+    super.robotInit();
+  }
+
+  @Override
   public Command getAutonomousCommand() {
     CommandScheduler.getInstance().removeDefaultCommand(m_swerveSubsystem);
     CommandScheduler.getInstance().removeDefaultCommand(m_arm);
@@ -83,6 +89,7 @@ public class CougarRobotImpl extends CougarRobot {
 
   @Override
   public void teleopInit() {
+    m_swerveSubsystem.setSpeedLimiter(0.6);
     configureOperatorInterface();
     configureDriverInterface();
   }
