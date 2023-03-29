@@ -2,10 +2,8 @@ package team1403.robot.chargedup.photonvision;
 
 import java.util.Optional;
 
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -24,7 +22,6 @@ public class PhotonVisionDefault extends CommandBase {
 
   private PhotonPoseEstimator m_photonPoseEstimator;
   private SwerveDrivePoseEstimator m_swervePoseEstimator;
-  private Matrix<N3, N1> m_stdMatrix;
 
   /**
    * Constructor for the default PhotonVision.
@@ -42,9 +39,6 @@ public class PhotonVisionDefault extends CommandBase {
     m_swervePoseEstimator = m_drivetrainSubsystem.getOdometer();
 
     m_photonPoseEstimator = m_photonVisionSubsystem.getPhotonPoseEstimator();
-    m_stdMatrix = new Matrix<N3, N1>(Nat.N3(), Nat.N1());
-    m_stdMatrix.fill(8.2);
-    m_drivetrainSubsystem.getOdometer().setVisionMeasurementStdDevs(m_stdMatrix);
 
     addRequirements(m_photonVisionSubsystem);
   }
@@ -52,38 +46,22 @@ public class PhotonVisionDefault extends CommandBase {
   @Override
   public void initialize() {
     m_photonPoseEstimator.setReferencePose(m_drivetrainSubsystem.getPose());
-    addVisionMeasurment();
   }
 
   @Override
   public void execute() {
-    addVisionMeasurment();
-  }
-
-  /**
-   * Adds a vision measurment to the drivetrain odometry.
-   *
-   * @return true if the vision measurment was added.
-   */
-  private boolean addVisionMeasurment() {
     Optional<EstimatedRobotPose> result = m_photonVisionSubsystem.getPhotonPose();
     if (result.isPresent()) {
-      EstimatedRobotPose photonPose = result.get();
-      double distanceFromCurrentMeasurment = photonPose.estimatedPose.toPose2d().getTranslation()
+      Pose2d photonPose = m_photonVisionSubsystem.getFieldLimelightBasedPose();
+      double distanceFromCurrentMeasurment = photonPose.getTranslation()
           .getDistance(m_drivetrainSubsystem.getPose().getTranslation());
       if (Math.abs(distanceFromCurrentMeasurment) <= 1) {
         m_swervePoseEstimator.addVisionMeasurement(
-            photonPose.estimatedPose.toPose2d(),
-            photonPose.timestampSeconds,
-            m_stdMatrix);
+            photonPose, Timer.getFPGATimestamp());
         m_photonPoseEstimator.setReferencePose(m_drivetrainSubsystem.getPose());
 
-        SmartDashboard.putString("Vision Odometry", photonPose.estimatedPose.toPose2d().toString());
-        SmartDashboard.putString("Vision X", photonPose.targetsUsed.toString());
-
-        return true;
+        SmartDashboard.putString("Vision Odometry", photonPose.toString());
       }
     }
-    return false;
   }
 }
