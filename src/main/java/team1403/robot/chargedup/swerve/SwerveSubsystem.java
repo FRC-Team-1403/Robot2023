@@ -13,7 +13,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
+
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -100,6 +100,7 @@ public class SwerveSubsystem extends CougarSubsystem {
     };
 
     addDevice(m_navx2.getName(), m_navx2);
+
     new Thread(() -> {
       while (m_navx2.isCalibrating()) {
         try {
@@ -112,7 +113,7 @@ public class SwerveSubsystem extends CougarSubsystem {
     }).start(); 
 
     m_odometer = new SwerveDrivePoseEstimator(RobotConfig.Swerve.kDriveKinematics, 
-        getGyroscopeRotation(), getModulePositions(), new Pose2d(0, 0, new Rotation2d(0)),
+        new Rotation2D(), getModulePositions(), new Pose2d(0, 0, new Rotation2d(0)),
         VecBuilder.fill(0.1, 0.1, 0.1),
         VecBuilder.fill(0.9, 0.9, 0.9));
     m_odometer.setPose(new Pose2d(Units.inchesToMeters(29.5), 0, getGyroscopeRotation()));
@@ -491,10 +492,9 @@ public class SwerveSubsystem extends CougarSubsystem {
     SmartDashboard.putNumber("Gyro Reading", getGyroscopeRotation().getDegrees());
 
     m_odometer.update(getGyroscopeRotation(), getModulePositions());
-    SmartDashboard.putNumber("Debug X", m_odometer.getEstimatedPosition().getX());
-    SmartDashboard.putNumber("Debug Y", m_odometer.getEstimatedPosition().getY());
 
     SmartDashboard.putString("Odometry", m_odometer.getEstimatedPosition().toString());
+
     SmartDashboard.putNumber("Speed", m_speedLimiter);
     SmartDashboard.putNumber("Roll Value", getGyroRoll());
 

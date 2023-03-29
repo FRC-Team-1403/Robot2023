@@ -75,10 +75,14 @@ public class CougarRobotImpl extends CougarRobot {
     m_arm = new ArmSubsystem(parameters);
     m_swerveSubsystem = new SwerveSubsystem(parameters);
     m_visionSubsystem = new PhotonVisionSubsystem(parameters);
+  }
 
-    configureOperatorInterface();
-    configureDriverInterface();
-    // registerAutoCommands();
+
+  @Override
+  public void robotInit() {
+    AutoManager.getInstance().init(m_swerveSubsystem);
+    super.robotInit();
+
   }
 
   @Override
@@ -90,6 +94,7 @@ public class CougarRobotImpl extends CougarRobot {
 
   @Override
   public void teleopInit() {
+    m_swerveSubsystem.setSpeedLimiter(0.6);
     configureOperatorInterface();
     configureDriverInterface();
   }
@@ -98,7 +103,7 @@ public class CougarRobotImpl extends CougarRobot {
    * Configures the driver commands and their bindings.
    */
   public void configureDriverInterface() {
-    PS4Controller driveController = getPS4Controller("Driver", RobotConfig.Driver.pilotPort);
+    XboxController driveController = getXboxJoystick("Driver", RobotConfig.Driver.pilotPort);
     SwerveAutoBalanceYaw autoBalanceYaw = new SwerveAutoBalanceYaw(m_swerveSubsystem);
 
     // The controls are for field-oriented driving:
@@ -111,28 +116,28 @@ public class CougarRobotImpl extends CougarRobot {
         () -> -deadband(driveController.getLeftX(), 0),
         () -> -deadband(driveController.getLeftY(), 0),
         () -> -deadband(driveController.getRightX(), 0),
-        () -> driveController.getTriangleButtonReleased()));
+        () -> driveController.getYButton()));
 
-    new Trigger(() -> driveController.getR2Button()).onTrue(
+    new Trigger(() -> driveController.getRightBumper()).onTrue(
         new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.8)));
 
-    new Trigger(() -> driveController.getR2Button()).onFalse(
+    new Trigger(() -> driveController.getRightBumper()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.6)));
 
-    new Trigger(() -> driveController.getL2Button()).onTrue(
+    new Trigger(() -> driveController.getLeftBumper()).onTrue(
         new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.2)));
 
-    new Trigger(() -> driveController.getL2Button()).onFalse(
+    new Trigger(() -> driveController.getLeftBumper()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.6)));
 
-    new Trigger(() -> driveController.getCircleButton()).onFalse(
+    new Trigger(() -> driveController.getBButton()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.zeroGyroscope()));
 
-    new Trigger(() -> driveController.getCrossButton()).whileTrue(autoBalanceYaw);
+    new Trigger(() -> driveController.getAButton()).whileTrue(autoBalanceYaw);
 
-    new Trigger(() -> driveController.getSquareButton())
+    new Trigger(() -> driveController.getXButton())
         .onTrue(new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(true)));
-    new Trigger(() -> driveController.getSquareButton())
+    new Trigger(() -> driveController.getXButton())
         .onFalse(new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(false)));
   }
 
