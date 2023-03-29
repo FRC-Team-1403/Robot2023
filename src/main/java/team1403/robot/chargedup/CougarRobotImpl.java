@@ -2,9 +2,6 @@ package team1403.robot.chargedup;
 
 import java.util.List;
 
-import com.revrobotics.CANSparkMax.IdleMode;
-
-import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -14,46 +11,37 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarRobot;
 import team1403.lib.util.CougarLogger;
-import team1403.robot.chargedup.arm.ManualArmCommand;
-import team1403.robot.chargedup.cse.CougarScriptReader;
-import team1403.robot.chargedup.photonvision.PhotonVisionDefault;
-import team1403.robot.chargedup.photonvision.PhotonVisionSubsystem;
-import team1403.robot.chargedup.swerve.SwerveAutoBalanceYaw;
-import team1403.robot.chargedup.swerve.SwerveCommand;
-import team1403.robot.chargedup.swerve.SwerveSubsystem;
-import team1403.robot.chargedup.cse.CougarScriptObject;
-import team1403.robot.chargedup.cse.CougarScriptReader;
-import team1403.robot.chargedup.swerve.SwerveAutoBalanceYaw;
-import team1403.robot.chargedup.swerve.SwerveCommand;
-import team1403.robot.chargedup.swerve.SwerveDrivePath;
-import team1403.robot.chargedup.swerve.SwerveSubsystem;
 import team1403.robot.chargedup.RobotConfig.Operator;
 import team1403.robot.chargedup.StateManager.GamePiece;
-import team1403.robot.chargedup.StateManager.LED;
-import team1403.robot.chargedup.arm.ArmState;
 import team1403.robot.chargedup.arm.ArmStateGroup;
 import team1403.robot.chargedup.arm.ArmSubsystem;
 import team1403.robot.chargedup.arm.ManualArmCommand;
 import team1403.robot.chargedup.arm.RunIntake;
 import team1403.robot.chargedup.arm.SequentialMoveArmCommand;
 import team1403.robot.chargedup.arm.SetpointArmCommand;
-import team1403.robot.chargedup.arm.UpdateArmState;
+import team1403.robot.chargedup.cse.CougarScriptObject;
+import team1403.robot.chargedup.cse.CougarScriptReader;
+import team1403.robot.chargedup.photonvision.PhotonVisionSubsystem;
+import team1403.robot.chargedup.swerve.SwerveAutoBalanceYaw;
+import team1403.robot.chargedup.swerve.SwerveCommand;
+import team1403.robot.chargedup.swerve.SwerveDrivePath;
+import team1403.robot.chargedup.swerve.SwerveSubsystem;
 
 /**
  * The heart of the robot.
  *
- * <p>The bulk of the robot will be implemented through various subsystems.
+ * <p>
+ * The bulk of the robot will be implemented through various subsystems.
  * This class creates those subsystems and configures their behaviors.
  *
- * <p>This class has little to do with the runtime operation. It acts more as
+ * <p>
+ * This class has little to do with the runtime operation. It acts more as
  * a factory to create the subsystems and write them together and to external
  * controls (both human and software). Once that has happened, the controls
  * take over and issue commands that interact with the subsystem to actually
@@ -64,7 +52,6 @@ public class CougarRobotImpl extends CougarRobot {
    * Constructor.
    *
    * @param parameters Standard framework injected parameters.
-   * @param config     Our robot's custom configuration values.
    */
   public CougarRobotImpl(CougarLibInjectedParameters parameters) {
     super(parameters);
@@ -74,9 +61,8 @@ public class CougarRobotImpl extends CougarRobot {
     // m_builtins = new BuiltinSubsystem(parameters, logger);
     m_arm = new ArmSubsystem(parameters);
     m_swerveSubsystem = new SwerveSubsystem(parameters);
-    m_visionSubsystem = new PhotonVisionSubsystem(parameters);
+    m_visionSubsystem = new PhotonVisionSubsystem();
   }
-
 
   @Override
   public void robotInit() {
@@ -189,20 +175,23 @@ public class CougarRobotImpl extends CougarRobot {
 
     // Shelf Intake
     new Trigger(() -> xboxOperator.getBButton()).onFalse(
-        new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_TOWARDS)).andThen(
-            new SetpointArmCommand(m_arm,
+        new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_TOWARDS))
+        .andThen(new SetpointArmCommand(m_arm,
                 () -> StateManager.getInstance().getCurrentArmGroup().getSingleShelfIntakeState(),
                 false)));
 
     new Trigger(() -> xboxOperator.getPOV() == 180).onFalse(
         new SetpointArmCommand(m_arm, () -> ArmStateGroup.getTuck(), false));
     new Trigger(() -> xboxOperator.getPOV() == 0).onFalse(
-        new SetpointArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false));
+        new SetpointArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup()
+        .getHighNodeState(), false));
     new Trigger(() -> xboxOperator.getPOV() == 90).onFalse(
-        new SetpointArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState(),
+        new SetpointArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup()
+        .getMiddleNodeState(),
             false));
     new Trigger(() -> xboxOperator.getPOV() == 270).onFalse(
-        new SetpointArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getLowNodeState(), false));
+        new SetpointArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup()
+        .getLowNodeState(), false));
 
     // lights
     // new Trigger(() -> xboxOperator.getStartButton()).onTrue(
@@ -327,10 +316,8 @@ public class CougarRobotImpl extends CougarRobot {
     return new PS4Controller(port);
   }
 
-  // private final BuiltinSubsystem m_builtins;
   private final PhotonVisionSubsystem m_visionSubsystem;
   private CougarScriptReader m_reader;
   private final ArmSubsystem m_arm;
   private final SwerveSubsystem m_swerveSubsystem;
-  // private final LightSubsystem m_lightSubsystem;
 }

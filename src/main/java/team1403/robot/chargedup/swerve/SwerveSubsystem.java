@@ -13,7 +13,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -113,10 +113,10 @@ public class SwerveSubsystem extends CougarSubsystem {
     }).start(); 
 
     m_odometer = new SwerveDrivePoseEstimator(RobotConfig.Swerve.kDriveKinematics, 
-        new Rotation2D(), getModulePositions(), new Pose2d(0, 0, new Rotation2d(0)),
+        new Rotation2d(), getModulePositions(), new Pose2d(0, 0, new Rotation2d(0)),
         VecBuilder.fill(0.1, 0.1, 0.1),
         VecBuilder.fill(0.9, 0.9, 0.9));
-    m_odometer.setPose(new Pose2d(Units.inchesToMeters(29.5), 0, getGyroscopeRotation()));
+        
     m_desiredHeading = getGyroscopeRotation().getDegrees();
 
     setRobotRampRate(0.0);
