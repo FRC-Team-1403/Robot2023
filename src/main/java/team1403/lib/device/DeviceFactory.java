@@ -8,6 +8,7 @@ import team1403.lib.util.CougarLogger;
  *
  * <p>Subsystems create their devices through this factory.
  */
+
 public interface DeviceFactory {
   /**
    * Creates a PowerDistributor for monitoring the power panel.
@@ -76,12 +77,13 @@ public interface DeviceFactory {
    *
    * @param name    The name of the new device instance.
    * @param deviceNumber  The CAN bus channel the motor controller is on.
-   * @param mode  The control mode for the TalonFX
    * @param logger  The logger to use with the new instance.
    *
    * @return a new MotorController for a TalonFX.
    */
-  public AdvancedMotorController makeCougarTalonFx(String name, int deviceNumber, CougarLogger logger);
+
+  public AdvancedMotorController makeCougarTalonFx(String name, int deviceNumber, 
+                                                CougarLogger logger);
 
   /**
    * Creates a VictorSpPwm MotorController.

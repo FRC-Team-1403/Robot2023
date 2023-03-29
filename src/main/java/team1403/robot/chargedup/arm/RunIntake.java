@@ -35,7 +35,6 @@ public class RunIntake extends CommandBase{
 
   @Override
   public boolean isFinished() {
-    System.out.println(Timer.getFPGATimestamp() - startTime);
     return (Timer.getFPGATimestamp() - startTime) >= 0.5;
   }
 

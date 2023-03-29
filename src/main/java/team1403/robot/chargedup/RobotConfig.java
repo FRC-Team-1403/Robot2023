@@ -4,7 +4,9 @@ import java.util.Arrays;
 
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -14,26 +16,22 @@ import edu.wpi.first.math.util.Units;
 import team1403.lib.util.Dimension;
 import team1403.robot.chargedup.arm.ArmState;
 
-
 /**
  * This class holds attributes for the robot configuration.
  *
- * <p>
- * The RobotConfig is broken out into different areas,
+ * <p>The RobotConfig is broken out into different areas,
  * each of which is captured in a class for that area. Each
  * subsystem has its own independent config.
  *
- * <p>
- * The "electrical" configs are treated separate and independent
+ * <p>The "electrical" configs are treated separate and independent
  * to make it easier to see how the robot should be wired and see
  * any conflicts since these ports specify their config together.
  */
 public class RobotConfig {
 
-  //Variables to used by all subsystems.
+  // Variables to used by all subsystems.
   public static final Dimension robotDimensions = new Dimension(0, 0, 0);
-  public static final Dimension wristDimensions = new Dimension(0, 0, 0); //TODO
-
+  public static final Dimension wristDimensions = new Dimension(0, 0, 0); // TODO
 
   public static double kRobotHeight = 32;
   public static double kHeightFromGround = 33.465;
@@ -65,16 +63,15 @@ public class RobotConfig {
     public static final double kTrackWidth = Units.inchesToMeters(17.5);
     public static final double kWheelBase = Units.inchesToMeters(17.5);
 
-    public static final SwerveDriveKinematics kDriveKinematics = 
-        new SwerveDriveKinematics(
-            // Front left
-            new Translation2d(kTrackWidth / 2.0, kWheelBase / 2.0),
-            // Front right
-            new Translation2d(kTrackWidth / 2.0, -kWheelBase / 2.0),
-            // Back left
-            new Translation2d(-kTrackWidth / 2.0, kWheelBase / 2.0),
-            // Back right
-            new Translation2d(-kTrackWidth / 2.0, -kWheelBase / 2.0));
+    public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
+        // Front left
+        new Translation2d(kTrackWidth / 2.0, kWheelBase / 2.0),
+        // Front right
+        new Translation2d(kTrackWidth / 2.0, -kWheelBase / 2.0),
+        // Back left
+        new Translation2d(-kTrackWidth / 2.0, kWheelBase / 2.0),
+        // Back right
+        new Translation2d(-kTrackWidth / 2.0, -kWheelBase / 2.0));
 
     public static final double frontLeftEncoderOffset = -(4.669437518323892 - Math.PI);
     public static final double frontRightEncoderOffset = -(0.009203884727314 + Math.PI);
@@ -95,7 +92,8 @@ public class RobotConfig {
     public static final double kMaxSpeed = 14.5;
 
     public static final double kMaxAngularSpeed = 50;
-    // (kMaxSpeed / Math.hypot(kTrackWidth / 2.0, kWheelBase / 2.0)); // 39.795095397
+    // (kMaxSpeed / Math.hypot(kTrackWidth / 2.0, kWheelBase / 2.0)); //
+    // 39.795095397
 
     public static final double kVoltageSaturation = 12.0;
     public static final double kCurrentLimit = 40.0;
@@ -103,54 +101,85 @@ public class RobotConfig {
     public static final double kMaxAccelerationMetersPerSecondSquared = 3;
     public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI / 2;
 
-    public static final TrapezoidProfile.Constraints kThetaControllerConstraints
-        = new TrapezoidProfile.Constraints(
+    public static final TrapezoidProfile.Constraints kThetaControllerConstraints = 
+        new TrapezoidProfile.Constraints(
         kMaxAngularSpeed,
         kMaxAngularAccelerationRadiansPerSecondSquared);
   }
 
-  public static class Vision {
+  /**
+   * Constants that deal with vision.
+   */
+  public static class VisionConfig {
+    public static final Pose2d[] reflectiveTapeLayout = new Pose2d[] {
+        new Pose2d(new Translation2d(Units.inchesToMeters(20), 
+        Units.inchesToMeters(30)), new Rotation2d()),
+        new Pose2d(new Translation2d(Units.inchesToMeters(64), 
+        Units.inchesToMeters(30)), new Rotation2d()),
+        new Pose2d(new Translation2d(Units.inchesToMeters(84), 
+        Units.inchesToMeters(30)), new Rotation2d()),
+        new Pose2d(new Translation2d(Units.inchesToMeters(124), 
+        Units.inchesToMeters(30)), new Rotation2d()),
+        new Pose2d(new Translation2d(Units.inchesToMeters(144), 
+        Units.inchesToMeters(30)), new Rotation2d()),
+        new Pose2d(new Translation2d(Units.inchesToMeters(204), 
+        Units.inchesToMeters(30)), new Rotation2d()),
+        new Pose2d(new Translation2d(Units.inchesToMeters(20), 
+        Units.inchesToMeters(621)), new Rotation2d()),
+        new Pose2d(new Translation2d(Units.inchesToMeters(64), 
+        Units.inchesToMeters(621)), new Rotation2d()),
+        new Pose2d(new Translation2d(Units.inchesToMeters(84), 
+        Units.inchesToMeters(621)), new Rotation2d()),
+        new Pose2d(new Translation2d(Units.inchesToMeters(124), 
+        Units.inchesToMeters(621)), new Rotation2d()),
+        new Pose2d(new Translation2d(Units.inchesToMeters(144), 
+        Units.inchesToMeters(621)), new Rotation2d()),
+        new Pose2d(new Translation2d(Units.inchesToMeters(204), 
+        Units.inchesToMeters(621)), new Rotation2d())
+    };
+
     public static AprilTagFieldLayout fieldLayout = new AprilTagFieldLayout(Arrays.asList(
-      new AprilTag(1,   (new Pose3d(
-        Units.inchesToMeters(610.77),
-        Units.inchesToMeters(42.19),
-        Units.inchesToMeters(18.22),
-        new Rotation3d(0.0, 0.0, Math.PI)))),
-      new AprilTag(2, new Pose3d(
-        Units.inchesToMeters(610.77),
-        Units.inchesToMeters(108.19),
-        Units.inchesToMeters(18.22),
-        new Rotation3d(0.0, 0.0, Math.PI))),
-      new AprilTag(3,new Pose3d(
-        Units.inchesToMeters(610.77),
-        Units.inchesToMeters(174.19), // FIRST's diagram has a typo (it says 147.19)
-        Units.inchesToMeters(18.22),
-        new Rotation3d(0.0, 0.0, Math.PI))),
-      new AprilTag(4, new Pose3d(
-        Units.inchesToMeters(636.96),
-        Units.inchesToMeters(265.74),
-        Units.inchesToMeters(27.38),
-        new Rotation3d(0.0, 0.0, Math.PI))), 
-      new AprilTag(5, new Pose3d(
-        Units.inchesToMeters(14.25),
-        Units.inchesToMeters(265.74),
-        Units.inchesToMeters(27.38),
-        new Rotation3d())), 
-      new AprilTag(6, new Pose3d(
-        Units.inchesToMeters(610.77),
-        Units.inchesToMeters(174.19), // FIRST's diagram has a typo (it says 147.19)
-        Units.inchesToMeters(18.22),
-        new Rotation3d(0.0, 0.0, Math.PI))),
-      new AprilTag(7, new Pose3d(
-        Units.inchesToMeters(610.77),
-        Units.inchesToMeters(108.19),
-        Units.inchesToMeters(18.22),
-        new Rotation3d(0.0, 0.0, Math.PI))),  
-      new AprilTag(8, new Pose3d(
-        Units.inchesToMeters(40.45),
-        Units.inchesToMeters(42.19),
-        Units.inchesToMeters(18.22),
-        new Rotation3d()))), Units.inchesToMeters(651.25), Units.inchesToMeters(315.5));
+        new AprilTag(1, (new Pose3d(
+            Units.inchesToMeters(610.77),
+            Units.inchesToMeters(42.19),
+            Units.inchesToMeters(18.22),
+            new Rotation3d(0.0, 0.0, Math.PI)))),
+        new AprilTag(2, new Pose3d(
+            Units.inchesToMeters(610.77),
+            Units.inchesToMeters(108.19),
+            Units.inchesToMeters(18.22),
+            new Rotation3d(0.0, 0.0, Math.PI))),
+        new AprilTag(3, new Pose3d(
+            Units.inchesToMeters(0),
+            Units.inchesToMeters(0), // FIRST's diagram has a typo (it says 147.19)
+            Units.inchesToMeters(18.22),
+            new Rotation3d(0.0, 0.0, Math.PI))),
+        new AprilTag(4, new Pose3d(
+            Units.inchesToMeters(636.96),
+            Units.inchesToMeters(265.74),
+            Units.inchesToMeters(27.38),
+            new Rotation3d(0.0, 0.0, Math.PI))),
+        new AprilTag(5, new Pose3d(
+            Units.inchesToMeters(14.25),
+            Units.inchesToMeters(265.74),
+            Units.inchesToMeters(27.38),
+            new Rotation3d())),
+        new AprilTag(6, new Pose3d(
+            Units.inchesToMeters(8),
+            Units.inchesToMeters(0), // FIRST's diagram has a typo (it says 147.19)
+            Units.inchesToMeters(18.22),
+            new Rotation3d(0.0, 0.0, Math.PI))),
+        new AprilTag(7, new Pose3d(
+            Units.inchesToMeters(610.77),
+            Units.inchesToMeters(108.19),
+            Units.inchesToMeters(18.22),
+            new Rotation3d(0.0, 0.0, Math.PI))),
+        new AprilTag(8, new Pose3d(
+            Units.inchesToMeters(40.45),
+            Units.inchesToMeters(42.19),
+            Units.inchesToMeters(18.22),
+            new Rotation3d()))),
+        Units.inchesToMeters(651.25), Units.inchesToMeters(315.5));
   }
 
   /**
@@ -160,7 +189,7 @@ public class RobotConfig {
    */
   public static class CanBus {
 
-    //Arm Ports
+    // Arm Ports
     public static final int wheelIntakeMotor = 5;
     public static final int telescopicArmMotor = 4;
     public static final int leftPivotMotor = 2;
@@ -190,15 +219,14 @@ public class RobotConfig {
    */
   public static class RioPorts {
 
-    
-    public static final int kWristAbsoluteEncoder = 1; //DIO
+    public static final int kWristAbsoluteEncoder = 1; // DIO
 
-    public static final int kArmAbsoluteEncoder = 3; ///Analog
+    public static final int kArmAbsoluteEncoder = 3; /// Analog
 
-    public static final int kArmLimitSwitch = 0; //DIO
+    public static final int kArmLimitSwitch = 0; // DIO
 
-    public static final int kExtensionMinMagneticSwitch = 2; //DIO
-    public static final int kExtensionMaxMagneticSwitch = 3; //DIO
+    public static final int kExtensionMinMagneticSwitch = 2; // DIO
+    public static final int kExtensionMaxMagneticSwitch = 3; // DIO
   }
 
   /**
@@ -243,28 +271,29 @@ public class RobotConfig {
    */
   public static class Arm {
 
-    //Pivot
+    // Pivot
     public static final int kPArmPivot = 1;
     public static final int kIArmPivot = 0;
     public static final int kDArmPivot = 0;
-    public static double kAbsolutePivotOffset = 180-27.2492019663337 + 17.66 + 7.5 + 10 - 25 +10;
+    public static double kAbsolutePivotOffset = 355.5375784610152-180+10;
     public static double kMaxPivotAngle = 256.84208720995503;
-    public static final double kFrameAngle = 242.71777151085703;
+    public static final double kFrameAngle = 250.24629;
     public static final double kFrameClearanceAngle = 234.5; //cone angle
     public static final double kMinPivotAngle = 132.211;
     public static final double kPivotAngleMaxAmperage = 40;
     public static final double kHorizonAngle = 210;
+    public static final double kPivotLimitSwitchOffset = -6;
 
-    //Wrist
+    // Wrist
     public static final double kPWristMotor = 0.95;
     public static final double kIWristMotor = 0;
     public static final double kDWristMotor = 90;
     public static final double kMaxWristAngle = 265;
     public static final double kMinWristAngle = 29.196293229907326; 
     public static final double kWristConversionFactor = 90.0 / 100;
-    public static final double kAbsoluteWristOffset = 180-136.28614255715357;
+    public static final double kAbsoluteWristOffset = 180-138.81934247048358;
 
-    //Extension
+    // Extension
     public static final double kPArmExtension = 0.3;
     public static final double kIArmExtension = 0;
     public static final double kDArmExtension = 0; 
@@ -282,21 +311,22 @@ public class RobotConfig {
     public static final double kIIntake = 0;
     public static final double kDIntake = 0;
 
-    //Dimensions
-    public static final double kBaseArmLength = 31; //37 //28 inches
-    public static final double kPhysicalArmMaxExtension = kBaseArmLength + kMaxArmExtension; //inches
+    // Dimensions
+    public static final double kBaseArmLength = 31; // 37 //28 inches
+    public static final double kPhysicalArmMaxExtension = 
+        kBaseArmLength + kMaxArmExtension; // inches
 
-    public static final double kArmWeight = 16; //Pounds
+    public static final double kArmWeight = 16; // Pounds
   }
 
   public static class ArmStates {
-    public static final ArmState coneTowardsFloorIntake = new ArmState(0, 141.346825025, 241.74272039269, 0); //0.039682067930698, 140.0363630009091, 240.55448872511047
-    public static final ArmState coneTowardsHighConeNode = new ArmState(22.987735748, 249.49720658743016, 149.88693815473684, 0);
-    public static final ArmState coneTowardsMiddleNode = new ArmState(8.345230102539062, 264, 149.45086251051157, 0);
+    public static final ArmState coneTowardsFloorIntake = new ArmState(0, 144.5086341127158, 247.40214774876398, 0); //0.039682067930698, 140.0363630009091, 240.55448872511047
+    public static final ArmState coneTowardsHighConeNode = new ArmState(22.987735748, 252.595120962628, 154.96542524635782, 0);
+    public static final ArmState coneTowardsMiddleNode = new ArmState(8.345230102539062, 264, 156.45086251051157, 0);
     public static final ArmState singleSubstationIntake = new ArmState(0, 51.3175107829, 241.777313195, 0);
     public static final ArmState coneTowardsLowNode = new ArmState(0, 80.18787350469682, 245.42271036546947, 0);
     
-    public static final ArmState cubeFloorIntake = new ArmState(0.11, 109.01336428783411, 237.26611599405615, 0);
+    public static final ArmState cubeFloorIntake = new ArmState(0.099, 113.57611033940275, 244.565611599405615, 0);
     public static final ArmState cubeHighNode = new ArmState(19.6710987091, 182.465261949, 161.356773014, 0);
     public static final ArmState cubeMiddleNode = new ArmState(0.05158682167, 177.61028394, 181.482400676, 0);
 

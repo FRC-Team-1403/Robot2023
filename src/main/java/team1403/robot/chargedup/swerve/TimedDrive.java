@@ -23,7 +23,6 @@ public class TimedDrive extends CommandBase{
   @Override
   public void initialize() {
     this.m_startTime = Timer.getFPGATimestamp();
-    System.out.println("Starting: ********************************************");
   }
 
   
@@ -34,7 +33,6 @@ public class TimedDrive extends CommandBase{
 
   @Override
   public void end(boolean interrupted) {    
-    System.out.println("HVBfiuasfbhoun--------------------------------------------------------------------");
     m_swerve.stop();
     super.end(interrupted);
   }
@@ -42,7 +40,6 @@ public class TimedDrive extends CommandBase{
 
   @Override
   public boolean isFinished() {
-    System.out.println(Timer.getFPGATimestamp() - m_startTime);
     return Timer.getFPGATimestamp() - m_startTime >= m_duration;
   }
 

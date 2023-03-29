@@ -98,15 +98,19 @@ public class StateManager {
     if (newGamePiece == GamePiece.CONE_UPRIGHT) {
       m_currentArmGroup = m_coneUprightGroup;
       m_armGroupUsed = 0;
+      
       coneAwayCounter++;
+      updateLEDState(LED.YELLOW);
     } else if (newGamePiece == GamePiece.CUBE) {
       m_currentArmGroup = m_cubeGroup;
       m_armGroupUsed = 1;
       cubeCounter++;
+      updateLEDState(LED.PURPLE);
     } else if (newGamePiece == GamePiece.CONE_TOWARDS) {
       m_currentArmGroup = m_coneTowardsGroup;
       m_armGroupUsed = 2;
       coneTowardsCounter++;
+      updateLEDState(LED.YELLOW);
     }
   }
 

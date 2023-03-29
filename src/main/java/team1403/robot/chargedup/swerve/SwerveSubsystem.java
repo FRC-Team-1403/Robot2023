@@ -3,6 +3,7 @@ package team1403.robot.chargedup.swerve;
 import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -12,7 +13,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import team1403.lib.core.CougarLibInjectedParameters;
@@ -53,15 +55,20 @@ public class SwerveSubsystem extends CougarSubsystem {
       -RobotConfig.Swerve.kTrackWidth / 2.0,
       RobotConfig.Swerve.kWheelBase / 2.0);
 
-  private final PIDController m_driftCorrectionPid = new PIDController(0.37, 0, 0);
+  private final PIDController m_driftCorrectionPid = new PIDController(0.75, 0, 0);
   private double m_desiredHeading = 0;
   private double m_speedLimiter = 0.6;
 
   private Translation2d m_offset;
 
+  private double m_yawOffset;
+  private double m_rollOffset;
+
   private double m_calc = 0;
 
   private boolean m_isXModeEnabled = false;
+
+  private Field2d m_field2d;
 
   /**
    * Creates a new {@link SwerveSubsystem}.
@@ -92,9 +99,6 @@ public class SwerveSubsystem extends CougarSubsystem {
             CanBus.backRightEncoderId, Swerve.backRightEncoderOffset, logger),
     };
 
-    m_odometer = new SwerveDrivePoseEstimator(Swerve.kDriveKinematics, getGyroscopeRotation(),
-        getModulePositions(), new Pose2d(0, 0, new Rotation2d(0)));
-
     addDevice(m_navx2.getName(), m_navx2);
     new Thread(() -> {
       while (m_navx2.isCalibrating()) {
@@ -105,15 +109,24 @@ public class SwerveSubsystem extends CougarSubsystem {
         }
       }
       zeroGyroscope();
-    }).start();
+    }).start(); 
 
+    m_odometer = new SwerveDrivePoseEstimator(RobotConfig.Swerve.kDriveKinematics, 
+        getGyroscopeRotation(), getModulePositions(), new Pose2d(0, 0, new Rotation2d(0)),
+        VecBuilder.fill(0.1, 0.1, 0.1),
+        VecBuilder.fill(0.9, 0.9, 0.9));
+    m_odometer.setPose(new Pose2d(Units.inchesToMeters(29.5), 0, getGyroscopeRotation()));
     m_desiredHeading = getGyroscopeRotation().getDegrees();
 
     setRobotRampRate(0.0);
     setRobotIdleMode(IdleMode.kBrake);
 
     m_offset = new Translation2d();
+    m_rollOffset = -m_navx2.getRoll();
+    m_yawOffset = 0;
 
+    m_field2d = new Field2d();
+    SmartDashboard.putData("Field", m_field2d);
   }
 
   /**
@@ -186,8 +199,11 @@ public class SwerveSubsystem extends CougarSubsystem {
   public void zeroGyroscope() {
     // tracef("zeroGyroscope %f", getGyroscopeRotation());
     m_navx2.reset();
-    m_navx2.setAngleOffset(0);
     m_desiredHeading = 0;
+  }
+
+  public SwerveDrivePoseEstimator getPoseEstimator() {
+    return m_odometer;
   }
 
   /**
@@ -195,8 +211,8 @@ public class SwerveSubsystem extends CougarSubsystem {
    *
    * @param offset offset to set on the gyroscope
    */
-  public void setGyroscopeOffset(double offset) {
-    m_navx2.setAngleOffset(offset);
+  public void setYawGyroscopeOffset(double offset) {
+    m_yawOffset = offset;
   }
 
   /**
@@ -221,12 +237,6 @@ public class SwerveSubsystem extends CougarSubsystem {
     return m_odometer;
   }
 
-  public void updateOdometerWithVision(Pose2d pose) {
-    if (pose.getTranslation().getDistance(getPose().getTranslation()) < 1) {
-      m_odometer.addVisionMeasurement(pose, Timer.getFPGATimestamp());
-    }
-  }
-
   /**
    * Reset the position of the drivetrain odometry.
    */
@@ -241,7 +251,7 @@ public class SwerveSubsystem extends CougarSubsystem {
    * @return a Rotation2d object that contains the gyroscope's heading
    */
   public Rotation2d getGyroscopeRotation() {
-    return m_navx2.getRotation2d();
+    return m_navx2.getRotation2d().minus(Rotation2d.fromDegrees(m_yawOffset));
   }
 
   /**
@@ -250,7 +260,7 @@ public class SwerveSubsystem extends CougarSubsystem {
    * @return a double representing the roll of robot in degrees
    */
   public double getGyroRoll() {
-    return m_navx2.getRoll();
+    return m_navx2.getRoll() + m_rollOffset;
   }
 
   /**
@@ -274,6 +284,8 @@ public class SwerveSubsystem extends CougarSubsystem {
     SmartDashboard.putString("Chassis Speeds", m_chassisSpeeds.toString());
   }
 
+  
+
   /**
    * Stops the drivetrain.
    */
@@ -282,15 +294,12 @@ public class SwerveSubsystem extends CougarSubsystem {
     m_chassisSpeeds = new ChassisSpeeds();
   }
 
-  public Pose2d getOdometryValue() {
-    return m_odometer.getEstimatedPosition();
-  }
-
   /**
    * Sets the module speed and heading for all 4 modules.
    *
    * @param states an array of states for each module.
    */
+
   public void setModuleStates(SwerveModuleState[] states) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
         states, Swerve.kMaxSpeed);
@@ -430,7 +439,7 @@ public class SwerveSubsystem extends CougarSubsystem {
   /**
    * Adds rotational velocity to the chassis speed to compensate for
    * unwanted changes in gyroscope heading.
-   * 
+   *
    * @param chassisSpeeds the given chassisspeeds
    * @return the corrected chassisspeeds
    */
@@ -458,7 +467,7 @@ public class SwerveSubsystem extends CougarSubsystem {
    * <p>
    * Looks forward one control loop to figure out where the robot
    * should be given the chassisspeed and backs out a twist command from that.
-   * 
+   *
    * @param chassisSpeeds the given chassisspeeds
    * @return the corrected chassisspeeds
    */
@@ -480,9 +489,14 @@ public class SwerveSubsystem extends CougarSubsystem {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Gyro Reading", getGyroscopeRotation().getDegrees());
-    m_odometer.updateWithTime(Timer.getFPGATimestamp(), getGyroscopeRotation(), getModulePositions());
+
+    m_odometer.update(getGyroscopeRotation(), getModulePositions());
+    SmartDashboard.putNumber("Debug X", m_odometer.getEstimatedPosition().getX());
+    SmartDashboard.putNumber("Debug Y", m_odometer.getEstimatedPosition().getY());
+
     SmartDashboard.putString("Odometry", m_odometer.getEstimatedPosition().toString());
     SmartDashboard.putNumber("Speed", m_speedLimiter);
+    SmartDashboard.putNumber("Roll Value", getGyroRoll());
 
     if (this.m_isXModeEnabled) {
       xMode();
@@ -498,6 +512,5 @@ public class SwerveSubsystem extends CougarSubsystem {
     SmartDashboard.putNumber("Front Right Absolute Encoder", m_modules[1].getAbsoluteAngle());
     SmartDashboard.putNumber("Back Left Absolute Encoder", m_modules[2].getAbsoluteAngle());
     SmartDashboard.putNumber("Back Right Absolute Encoder", m_modules[3].getAbsoluteAngle());
-
   }
 }

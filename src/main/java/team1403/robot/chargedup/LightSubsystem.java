@@ -15,8 +15,7 @@ import team1403.robot.chargedup.StateManager.LED;
  */
 
 public class LightSubsystem extends CougarSubsystem {
-  private AddressableLED m_lightsLeft;
-  private AddressableLED m_lightsRight;
+  private AddressableLED m_lights;
   private AddressableLEDBuffer m_ledBuffer;
   private double m_rainbowFirstPixelHue;
 
@@ -26,13 +25,10 @@ public class LightSubsystem extends CougarSubsystem {
   public LightSubsystem(CougarLibInjectedParameters injectedParameters) {
     super("lights", injectedParameters);
         
-    m_lightsLeft = new AddressableLED(0);
-    m_lightsRight = new AddressableLED(1);
+    m_lights = new AddressableLED(0);
     m_ledBuffer = new AddressableLEDBuffer(60);
-    m_lightsLeft.setLength(m_ledBuffer.getLength());
-    m_lightsRight.setLength(m_ledBuffer.getLength());
-    m_lightsLeft.setData(m_ledBuffer);
-    m_lightsRight.setData(m_ledBuffer);
+    m_lights.setLength(m_ledBuffer.getLength());
+    m_lights.setData(m_ledBuffer);
     ledBufferClear();
 
     
@@ -46,10 +42,8 @@ public class LightSubsystem extends CougarSubsystem {
     for (var i = 0; i < m_ledBuffer.getLength(); i++) {
       m_ledBuffer.setRGB(i, 0, 0, 0);
     }
-    m_lightsLeft.setData(m_ledBuffer);
-    m_lightsRight.setData(m_ledBuffer);
-    m_lightsLeft.start();
-    m_lightsRight.start();
+    m_lights.setData(m_ledBuffer);
+    m_lights.start();
   }
 
   /**
@@ -63,10 +57,8 @@ public class LightSubsystem extends CougarSubsystem {
       m_ledBuffer.setRGB(i, 107, 3, 252);
     }
        
-    m_lightsLeft.setData(m_ledBuffer);
-    m_lightsRight.setData(m_ledBuffer);
-    m_lightsLeft.start();
-    m_lightsRight.start();
+    m_lights.setData(m_ledBuffer);
+    m_lights.start();
   }
 
   /**
@@ -80,10 +72,8 @@ public class LightSubsystem extends CougarSubsystem {
       m_ledBuffer.setRGB(i, 255, 230, 0);
     }
          
-    m_lightsLeft.setData(m_ledBuffer);
-    m_lightsRight.setData(m_ledBuffer);
-    m_lightsLeft.start();
-    m_lightsRight.start();
+    m_lights.setData(m_ledBuffer);
+    m_lights.start();
   }
 
 
@@ -102,10 +92,8 @@ public class LightSubsystem extends CougarSubsystem {
     // Check bounds
     m_rainbowFirstPixelHue %= 180;
 
-    m_lightsLeft.setData(m_ledBuffer);
-    m_lightsRight.setData(m_ledBuffer);
-    m_lightsLeft.start();
-    m_lightsRight.start();
+    m_lights.setData(m_ledBuffer);
+    m_lights.start();
   }
 
   private void monty() {
@@ -115,10 +103,8 @@ public class LightSubsystem extends CougarSubsystem {
       m_ledBuffer.setHSV(i, hue[j], 255, 128);
       }
     }
-    m_lightsLeft.setData(m_ledBuffer);
-    m_lightsRight.setData(m_ledBuffer);
-    m_lightsLeft.start();
-    m_lightsRight.start();
+    m_lights.setData(m_ledBuffer);
+    m_lights.start();
 
     //right yellow left not
   }
@@ -150,6 +136,6 @@ public class LightSubsystem extends CougarSubsystem {
 
   @Override
   public void periodic() {
-    // setLEDColor(StateManager.getInstance().getLEDState());
+    setLEDColor(StateManager.getInstance().getLEDState());
   }
 }

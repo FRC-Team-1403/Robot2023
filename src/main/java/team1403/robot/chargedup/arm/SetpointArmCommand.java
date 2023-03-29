@@ -55,6 +55,6 @@ public class SetpointArmCommand extends CommandBase {
   @Override
   public boolean isFinished() {
     m_arm.ignoreExtensionLimit(false);
-    return m_pivotProfile.isFinished(Timer.getFPGATimestamp() - m_startTime);
+    return m_pivotProfile.isFinished(Timer.getFPGATimestamp() - m_startTime) && m_arm.isAtSetpoint();
   }
 }

@@ -67,4 +67,6 @@ public interface GyroscopeDevice extends Sensor {
   public default Rotation2d getRotation2d() {
     return Rotation2d.fromDegrees(getHeading());
   }
+
+
 }

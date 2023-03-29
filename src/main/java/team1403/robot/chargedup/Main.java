@@ -2,6 +2,7 @@ package team1403.robot.chargedup;
 
 import java.util.function.Function;
 
+import edu.wpi.first.math.spline.SplineParameterizer.MalformedSplineException;
 import edu.wpi.first.wpilibj.RobotBase;
 
 import team1403.lib.core.CougarLibInjectedParameters;
@@ -31,13 +32,17 @@ public final class Main {
     // This is going to create our CougarRobotImpl when called.
     Function<CougarLibInjectedParameters, CougarRobotImpl> cougarFactory =
         (CougarLibInjectedParameters params) -> {
-          RobotConfig config = new RobotConfig();
           return new CougarRobotImpl(params);
         };
 
+    try {
     RobotBase.startRobot(
         () -> {
           return new WpiLibRobotAdapter<CougarRobotImpl>(cougarFactory);
         });
+    } catch (MalformedSplineException e) {
+      System.err.println(e);
+      throw e;
+    }
   }
 }
