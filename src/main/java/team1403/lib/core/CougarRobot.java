@@ -98,6 +98,13 @@ public class CougarRobot {
   }
 
   /**
+   * Adds functationality to the robot init method found in WpiLibRobotAdapter.
+   */
+  public void robotInit() {
+
+  }
+
+  /**
    * Adds functionality to the teleop init method found in WpiLibRobotAdapter
    */
   public void teleopInit() {

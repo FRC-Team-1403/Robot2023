@@ -105,6 +105,8 @@ public class WpiLibRobotAdapter<T extends CougarRobot> extends TimedRobot {
     m_cougarRobot = m_cougarRobotFactory.apply(parameters);
     m_schedulerTimer = new BaseTimer("SchedulerTimer", clock);
     m_periodTimer = new BaseTimer("LoopPeriodTimer", clock);
+
+    m_cougarRobot.robotInit();
   }
 
 

@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -73,17 +74,22 @@ public class CougarRobotImpl extends CougarRobot {
     registerAutoCommands();
   }
 
+  @Override
+  public void robotInit() {
+    AutoManager.getInstance().init(m_swerveSubsystem);
+    super.robotInit();
+  }
 
   @Override
   public Command getAutonomousCommand() {
     CommandScheduler.getInstance().removeDefaultCommand(m_swerveSubsystem);
     CommandScheduler.getInstance().removeDefaultCommand(m_arm);
-    return AutoManager.getInstance().getAlternateSideGridCommand(m_swerveSubsystem, m_arm);
+    return AutoManager.getInstance().getRightGridCommand(m_swerveSubsystem, m_arm);
   }
 
   @Override
   public void teleopInit() {
-    // m_swerveSubsystem.setGyroRollOffset(m_swerveSubsystem.getGyroRoll());
+    m_swerveSubsystem.setSpeedLimiter(0.6);
     configureOperatorInterface();
     configureDriverInterface();
   }
@@ -92,7 +98,7 @@ public class CougarRobotImpl extends CougarRobot {
    * Configures the driver commands and their bindings.
    */
   public void configureDriverInterface() {
-    XboxController xboxDriver = getJoystick("Driver", RobotConfig.Driver.pilotPort);
+    XboxController driveController = getXboxJoystick("Driver", RobotConfig.Driver.pilotPort);
     SwerveAutoBalanceYaw autoBalanceYaw = new SwerveAutoBalanceYaw(m_swerveSubsystem);
 
     // The controls are for field-oriented driving:
@@ -102,45 +108,39 @@ public class CougarRobotImpl extends CougarRobot {
     // Setting default command of swerve subsystem
     m_swerveSubsystem.setDefaultCommand(new SwerveCommand(
         m_swerveSubsystem,
-        () -> -deadband(xboxDriver.getLeftX(), 0.05),
-        () -> -deadband(xboxDriver.getLeftY(), 0.05),
-        () -> -deadband(xboxDriver.getRightX(), 0.05),
-        () -> xboxDriver.getYButtonReleased()));
+        () -> -deadband(driveController.getLeftX(), 0),
+        () -> -deadband(driveController.getLeftY(), 0),
+        () -> -deadband(driveController.getRightX(), 0),
+        () -> driveController.getYButton()));
 
-    new Trigger(() -> xboxDriver.getLeftBumper()).onTrue(
+    new Trigger(() -> driveController.getRightBumper()).onTrue(
+        new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.8)));
+
+    new Trigger(() -> driveController.getRightBumper()).onFalse(
+        new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.6)));
+
+    new Trigger(() -> driveController.getLeftBumper()).onTrue(
         new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.2)));
 
-    new Trigger(() -> xboxDriver.getLeftBumper()).onFalse(
+    new Trigger(() -> driveController.getLeftBumper()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.6)));
 
-    new Trigger(() -> xboxDriver.getRightBumper()).onTrue(
-        new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.8)));
-  
-    new Trigger(() -> xboxDriver.getRightBumper()).onFalse(
-        new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.6)));
-
-    new Trigger(() -> xboxDriver.getLeftTriggerAxis() >= 0.08).onTrue(
-        new InstantCommand(() -> m_swerveSubsystem.setPivotAroundOneWheel(false)))
-        .onFalse(new InstantCommand(() -> m_swerveSubsystem.setMiddlePivot()));
-
-    new Trigger(() -> xboxDriver.getRightTriggerAxis() >= 0.08).onTrue(
-        new InstantCommand(() -> m_swerveSubsystem.setPivotAroundOneWheel(true)))
-        .onFalse(new InstantCommand(() -> m_swerveSubsystem.setMiddlePivot()));
-
-    new Trigger(() -> xboxDriver.getBButton()).onFalse(
+    new Trigger(() -> driveController.getBButton()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.zeroGyroscope()));
 
-    // new Trigger(() -> xboxDriver.getAButton()).whileTrue(autoBalanceYaw);
+    new Trigger(() -> driveController.getAButton()).whileTrue(autoBalanceYaw);
 
-    new Trigger(() -> xboxDriver.getXButton()).onTrue (new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(true)));
-    new Trigger(() -> xboxDriver.getXButton()).onFalse(new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(false)));
+    new Trigger(() -> driveController.getXButton())
+        .onTrue(new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(true)));
+    new Trigger(() -> driveController.getXButton())
+        .onFalse(new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(false)));
   }
 
   /**
    * Configures the operator commands and their bindings.
    */
   public void configureOperatorInterface() {
-    XboxController xboxOperator = getJoystick("Operator", Operator.pilotPort);
+    XboxController xboxOperator = getXboxJoystick("Operator", Operator.pilotPort);
 
     m_arm.setDefaultCommand(new ManualArmCommand(m_arm,
         () -> -deadband(xboxOperator.getLeftY(), 0.05),
@@ -149,59 +149,63 @@ public class CougarRobotImpl extends CougarRobot {
         () -> deadband(xboxOperator.getRightTriggerAxis(), 0.2),
         () -> xboxOperator.getRightBumper(),
         () -> xboxOperator.getLeftBumper()));
-    
+
     // Intake tipped towards cone
     // new Trigger(() -> xboxOperator.getAButton()).onFalse(
-    //     new SequentialCommandGroup(
-    //         new UpdateArmState(GamePiece.CONE_TOWARDS),
-    //         new InstantCommand(() -> System.out.println(StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState())),
-    //         new SetpointArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
-    //             true)));
+    // new SequentialCommandGroup(
+    // new UpdateArmState(GamePiece.CONE_TOWARDS),
+    // new InstantCommand(() ->
+    // System.out.println(StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState())),
+    // new SetpointArmCommand(m_arm,
+    // StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
+    // true)));
     new Trigger(() -> xboxOperator.getAButton()).onFalse(
-            new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_TOWARDS))
+        new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_TOWARDS))
             .andThen(
-            new SetpointArmCommand(m_arm, 
-            () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
-            false)));
+                new SetpointArmCommand(m_arm,
+                    () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
+                    false)));
 
     // Intake upright cone
     new Trigger(() -> xboxOperator.getXButton()).onFalse(
-      new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_UPRIGHT))
+        new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_UPRIGHT))
             .andThen(
-            new SetpointArmCommand(m_arm, 
-            () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
-            true)));
+                new SetpointArmCommand(m_arm,
+                    () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
+                    true)));
 
     // Intake cube
     new Trigger(() -> xboxOperator.getYButton()).onFalse(
-      new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE))
+        new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE))
             .andThen(
-            new SetpointArmCommand(m_arm, 
-            () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
-            true)));
+                new SetpointArmCommand(m_arm,
+                    () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
+                    true)));
 
-    //Shelf Intake
+    // Shelf Intake
     new Trigger(() -> xboxOperator.getBButton()).onFalse(
         new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_TOWARDS)).andThen(
-          new SetpointArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getSingleShelfIntakeState(),
-            false)
-        ));
+            new SetpointArmCommand(m_arm,
+                () -> StateManager.getInstance().getCurrentArmGroup().getSingleShelfIntakeState(),
+                false)));
 
     new Trigger(() -> xboxOperator.getPOV() == 180).onFalse(
         new SetpointArmCommand(m_arm, () -> ArmStateGroup.getTuck(), false));
     new Trigger(() -> xboxOperator.getPOV() == 0).onFalse(
         new SetpointArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false));
     new Trigger(() -> xboxOperator.getPOV() == 90).onFalse(
-        new SetpointArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState(), false));
+        new SetpointArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState(),
+            false));
     new Trigger(() -> xboxOperator.getPOV() == 270).onFalse(
         new SetpointArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getLowNodeState(), false));
-    
 
     // lights
     // new Trigger(() -> xboxOperator.getStartButton()).onTrue(
-    //     new InstantCommand(() -> StateManager.getInstance().updateLEDState(LED.YELLOW)));
+    // new InstantCommand(() ->
+    // StateManager.getInstance().updateLEDState(LED.YELLOW)));
     // new Trigger(() -> xboxOperator.getBackButton()).onTrue(
-    //     new InstantCommand(() -> StateManager.getInstance().updateLEDState(LED.PURPLE)));
+    // new InstantCommand(() ->
+    // StateManager.getInstance().updateLEDState(LED.PURPLE)));
   }
 
   /**
@@ -292,13 +296,30 @@ public class CougarRobotImpl extends CougarRobot {
    *
    * @return controller for port, though might not be temporarily disconnected.
    */
-  private XboxController getJoystick(String role, int port) {
+  private XboxController getXboxJoystick(String role, int port) {
     if (!DriverStation.isJoystickConnected(port)) {
       DriverStation.silenceJoystickConnectionWarning(true);
       CougarLogger.getAlwaysOn().warningf("No controller found on port %d for '%s'",
           port, role);
     }
     return new XboxController(port);
+  }
+
+  /**
+   * Get controller and silence warnings if not found.
+   *
+   * @param role The role for the port for logging purposes.
+   * @param port The expected port for the controller.
+   *
+   * @return controller for port, though might not be temporarily disconnected.
+   */
+  private PS4Controller getPS4Controller(String role, int port) {
+    if (!DriverStation.isJoystickConnected(port)) {
+      DriverStation.silenceJoystickConnectionWarning(true);
+      CougarLogger.getAlwaysOn().warningf("No controller found on port %d for '%s'",
+          port, role);
+    }
+    return new PS4Controller(port);
   }
 
   // private final BuiltinSubsystem m_builtins;

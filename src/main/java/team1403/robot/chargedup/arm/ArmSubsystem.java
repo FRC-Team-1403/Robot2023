@@ -39,6 +39,8 @@ public class ArmSubsystem extends CougarSubsystem {
   private final PIDController m_pivotPid;
   private final WpiLimitSwitch m_maxArmLimitSwitch;
 
+  private boolean previousLimitSwitchTrigger = true;
+
   // Intake
   private final CANSparkMax m_intakeMotor;
 
@@ -87,10 +89,15 @@ public class ArmSubsystem extends CougarSubsystem {
     m_minMagneticSwitch = new DigitalInput(RobotConfig.RioPorts.kExtensionMinMagneticSwitch);
     m_maxMagneticSwitch = new DigitalInput(RobotConfig.RioPorts.kExtensionMaxMagneticSwitch);
 
+    RobotConfig.Arm.kAbsolutePivotOffset = 0;
+    double difference = RobotConfig.Arm.kMaxPivotAngle - getAbsolutePivotAngle();
+    RobotConfig.Arm.kAbsolutePivotOffset = difference;
+
     this.m_pivotAngleSetpoint = getAbsolutePivotAngle();
     this.m_wristAngleSetpoint = getAbsoluteWristAngle();
     this.m_extensionLengthSetpoint = getExtensionLength();
 
+    
   }
 
   // --------------------------- Setup methods ---------------------------
@@ -492,6 +499,7 @@ public class ArmSubsystem extends CougarSubsystem {
 
   @Override
   public void periodic() {
+
     // Wrist
     if (getAbsolutePivotAngle() < RobotConfig.Arm.kFrameAngle) {
       if (isInWristBounds(m_wristMotor.getEncoder().getPosition())
@@ -508,9 +516,14 @@ public class ArmSubsystem extends CougarSubsystem {
     runIntake(m_intakeSpeedSetpoint);
 
     // Pivot
-    // if(isArmSwitchActive()) {
-    // rezeroPivot();
-    // }
+    if(!isArmSwitchActive() && previousLimitSwitchTrigger) {
+      System.out.println("sdjklfane;voiajfasdlvnabuegoasd;jvansdinasdj;lcvnaweovnaewufa;sogha");
+      RobotConfig.Arm.kAbsolutePivotOffset = 0;
+      double difference = RobotConfig.Arm.kMaxPivotAngle - getAbsolutePivotAngle() - 10;
+      RobotConfig.Arm.kAbsolutePivotOffset = difference;
+    }
+
+    previousLimitSwitchTrigger = isArmSwitchActive();
 
     if ((isInPivotBounds(getAbsolutePivotAngle()) && !isArmSwitchActive())
         || isInPivotBounds(this.m_pivotAngleSetpoint)) {
