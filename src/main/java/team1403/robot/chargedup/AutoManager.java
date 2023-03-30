@@ -192,6 +192,20 @@ public class AutoManager {
         swerve);
   }
 
+  public Command getStraightPathCommand(SwerveSubsystem swerve, ArmSubsystem arm) {
+    return new ParallelCommandGroup(
+      new SequentialCommandGroup(
+        new WaitCommand(0.6),
+        new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)),
+        new SetpointArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(), true),
+        new RunIntake(arm, 2, 1),
+        new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), true)),
+      new SequentialCommandGroup(
+        sideGridStraightTrajectory1,
+        sideGridStraightTrajectory2
+    ));
+  }
+
   /**
    * Command for grids 3. Right grid is in relation to red alliance
    * 
@@ -200,74 +214,54 @@ public class AutoManager {
    * @return the command
    */
   public Command getRightGridCommand(SwerveSubsystem swerve, ArmSubsystem arm) {
-    // swerve.setSpeedLimiter(1);
-    // if (DriverStation.getAlliance() == Alliance.Red) {
-    //     return new SequentialCommandGroup(
-    //         new SequentialMoveArmCommand(arm,
-    //         StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
-    //         new RunIntake(arm, 1),
-    //         new ParallelCommandGroup(
-    //             new SequentialCommandGroup(
-    //                 new WaitCommand(0.1),
-    //                 new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false),
-    //                 new WaitCommand(1.8),
-    //                 new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)),
-    //                 new SetpointArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
-    //                     true),
-    //                 new RunIntake(arm, 3, 1.6),
-    //                 new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), true),
-    //                 new WaitCommand(0.2),
-    //                 new SetpointArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false)
-    //                 ),
-    //             new SequentialCommandGroup(
-    //                 sideGridTrajectory1,
-    //                 sideGridTrajectory2,
-    //                 sideGridTrajectory3)),
-    //                 new RunIntake(arm, -1));
-
-    //     return new SequentialCommandGroup(
-    //         sideGridStraightTrajectory1,
-    //         sideGridStraightTrajectory2);
-    // }
-
-    return new WaitCommand(0.2);
-
-    //     return new SequentialCommandGroup(
-    //         new ParallelCommandGroup(
-    //             new SequentialCommandGroup(
-    //                 new WaitCommand(0.6),
-    //                 new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)),
-    //                 new SetpointArmCommand(arm, () -> StateManager.getInstance.getCurrentArmGroup().getFloorIntakeState()),
-    //                 new RunIntake(arm, 2, 1),
-    //                 new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), true)),
-    //             new SequentialCommandGroup(
-    //                 sideGridStraightTrajectory1,
-    //                 sideGridStraightTrajectory2));  
-    //         )      
-    //     );
-    // }
-    // return new SequentialCommandGroup(
-    //         new SequentialMoveArmCommand(arm,
-    //         StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
-    //         new RunIntake(arm, 1),
-    //         new ParallelCommandGroup(
-    //             new SequentialCommandGroup(
-    //                 new WaitCommand(0.1),
-    //                 new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false),
-    //                 new WaitCommand(1.8),
-    //                 new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)),
-    //                 new SetpointArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
-    //                     true),
-    //                 new RunIntake(arm, 3, 1.6),
-    //                 new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), true),
-    //                 new WaitCommand(1.2),
-    //                 new SetpointArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false)
-    //                 ),
-    //             new SequentialCommandGroup(
-    //                 sideGridTrajectory1Reverse,
-    //                 sideGridTrajectory2Reverse,
-    //                 sideGridTrajectory3Reverse)),
-    //                 new RunIntake(arm, -1));
+    swerve.setSpeedLimiter(1);
+    if (DriverStation.getAlliance() == Alliance.Red) {
+        return new SequentialCommandGroup(
+            new SequentialMoveArmCommand(arm,
+            StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
+            new RunIntake(arm, 1),
+            new ParallelCommandGroup(
+                new SequentialCommandGroup(
+                    new WaitCommand(0.1),
+                    new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false),
+                    new WaitCommand(1.8),
+                    new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)),
+                    new SetpointArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
+                        true),
+                    new RunIntake(arm, 3, 1.6),
+                    new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), true),
+                    new WaitCommand(0.2),
+                    new SetpointArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false)
+                    ),
+                new SequentialCommandGroup(
+                    sideGridTrajectory1,
+                    sideGridTrajectory2,
+                    sideGridTrajectory3)),
+                    new RunIntake(arm, -1));
+    }
+    
+    return new SequentialCommandGroup(
+            new SequentialMoveArmCommand(arm,
+            StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
+            new RunIntake(arm, 1),
+            new ParallelCommandGroup(
+                new SequentialCommandGroup(
+                    new WaitCommand(0.1),
+                    new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false),
+                    new WaitCommand(1.8),
+                    new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)),
+                    new SetpointArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
+                        true),
+                    new RunIntake(arm, 3, 1.6),
+                    new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), true),
+                    new WaitCommand(1.2),
+                    new SetpointArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false)
+                    ),
+                new SequentialCommandGroup(
+                    sideGridTrajectory1Reverse,
+                    sideGridTrajectory2Reverse,
+                    sideGridTrajectory3Reverse)),
+                    new RunIntake(arm, -1));
     }
 
 
