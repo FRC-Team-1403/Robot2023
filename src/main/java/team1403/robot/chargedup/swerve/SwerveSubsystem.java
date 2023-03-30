@@ -478,6 +478,7 @@ public class SwerveSubsystem extends CougarSubsystem {
 
     m_odometer.update(getGyroscopeRotation(), getModulePositions());
 
+    SmartDashboard.putString("Odometry", m_odometer.getEstimatedPosition().toString());
     SmartDashboard.putNumber("Speed", m_speedLimiter);
     SmartDashboard.putNumber("Roll Value", getGyroRoll());
 

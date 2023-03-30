@@ -229,26 +229,26 @@ public class CougarRobotImpl extends CougarRobot {
     });
 
     m_reader.registerCommand("Tuck", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, ArmStateGroup.getTuck(), false);
+      return new SequentialMoveArmCommand(m_arm, () -> ArmStateGroup.getTuck(), false);
     });
 
     m_reader.registerCommand("High Node", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState(),
+      return new SequentialMoveArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(),
           false);
     });
 
     m_reader.registerCommand("Middle Node", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState(),
+      return new SequentialMoveArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState(),
           false);
     });
 
     m_reader.registerCommand("Low Node", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getLowNodeState(),
+      return new SequentialMoveArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getLowNodeState(),
           false);
     });
 
     m_reader.registerCommand("Floor Pickup", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
+      return new SequentialMoveArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
           true);
     });
 

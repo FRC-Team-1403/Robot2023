@@ -517,7 +517,6 @@ public class ArmSubsystem extends CougarSubsystem {
 
     // Pivot
     if(!isArmSwitchActive() && previousLimitSwitchTrigger) {
-      System.out.println("sdjklfane;voiajfasdlvnabuegoasd;jvansdinasdj;lcvnaweovnaewufa;sogha");
       RobotConfig.Arm.kAbsolutePivotOffset = 0;
       double difference = RobotConfig.Arm.kMaxPivotAngle - getAbsolutePivotAngle() - 10;
       RobotConfig.Arm.kAbsolutePivotOffset = difference;

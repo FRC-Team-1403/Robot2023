@@ -33,8 +33,8 @@ public class AutoManager {
   private final TrajectoryConfig m_trajectoryConfig1 = new TrajectoryConfig(4,
       2).setKinematics(RobotConfig.Swerve.kDriveKinematics);
     
-  private final TrajectoryConfig m_trajectoryConfig2 = new TrajectoryConfig(8,
-2).setKinematics(RobotConfig.Swerve.kDriveKinematics);
+  private final TrajectoryConfig m_trajectoryConfig2 = new TrajectoryConfig(2,
+1).setKinematics(RobotConfig.Swerve.kDriveKinematics);
 
   private final TrajectoryConfig m_trajectoryConfig3 = new TrajectoryConfig(6,
 2).setKinematics(RobotConfig.Swerve.kDriveKinematics);
@@ -113,8 +113,8 @@ public class AutoManager {
             List.of(
                 new Translation2d(-1, -0.3),
                 new Translation2d(-2, -0.3)),
-            new Pose2d(-3, 0, Rotation2d.fromDegrees(180)),
-            m_trajectoryConfig1.setEndVelocity(2)),
+            new Pose2d(-3, 0, Rotation2d.fromDegrees(-90)),
+            m_trajectoryConfig1),
         swerve::getPose,
         xController,
         yController,
@@ -123,12 +123,12 @@ public class AutoManager {
 
     sideGridTrajectory2 = new SwerveControllerCommand(
         TrajectoryGenerator.generateTrajectory( 
-            new Pose2d(-3, 0, Rotation2d.fromDegrees(180)),
+            new Pose2d(-3, 0, Rotation2d.fromDegrees(-90)),
             List.of(
-                new Translation2d(-4.7, 0.7),
-                new Translation2d(-5.5, -0.4)),
-            new Pose2d(-5.7, -0.7, Rotation2d.fromDegrees(-90)),
-            m_trajectoryConfig2.setStartVelocity(2).setEndVelocity(2)),
+                new Translation2d(-5.0, 0.7),
+                new Translation2d(-5.5, -0.7)),
+            new Pose2d(-6.2, -0.6, Rotation2d.fromDegrees(-90)),
+            m_trajectoryConfig2),
         swerve::getPose,
         xController,
         yController,
@@ -137,12 +137,13 @@ public class AutoManager {
 
     sideGridTrajectory3 = new SwerveControllerCommand(
         TrajectoryGenerator.generateTrajectory(
-            new Pose2d(-5.7, -0.7, Rotation2d.fromDegrees(-90)),
+            new Pose2d(-6.2, -0.6, Rotation2d.fromDegrees(-90)),
             List.of(
-                new Translation2d(-2.5, -0.5),
-                new Translation2d(-0.5, -0.5)),
-            new Pose2d(0.17, -1.05, Rotation2d.fromDegrees(4)),
-            m_trajectoryConfig3.setStartVelocity(2)),
+                new Translation2d(-5.7, -0.2),
+                new Translation2d(-2.5, -0.2),
+                new Translation2d(-0.5, -0.2)),
+            new Pose2d(0.20, -1.2, Rotation2d.fromDegrees(0)),
+            m_trajectoryConfig3),
         swerve::getPose,
         xController,
         yController,
@@ -218,31 +219,37 @@ public class AutoManager {
     if (DriverStation.getAlliance() == Alliance.Red) {
         return new SequentialCommandGroup(
             new SequentialMoveArmCommand(arm,
-            StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
+            () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
             new RunIntake(arm, 1),
             new ParallelCommandGroup(
                 new SequentialCommandGroup(
                     new WaitCommand(0.1),
                     new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false),
-                    new WaitCommand(1.8),
+                    new WaitCommand(0.45),
                     new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)),
                     new SetpointArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
                         true),
-                    new RunIntake(arm, 3, 1.6),
+                    new RunIntake(arm, 3, 3.7),
                     new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), true),
-                    new WaitCommand(0.2),
-                    new SetpointArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false)
+                    new WaitCommand(2),
+                    new SequentialMoveArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false)
                     ),
                 new SequentialCommandGroup(
                     sideGridTrajectory1,
                     sideGridTrajectory2,
                     sideGridTrajectory3)),
                     new RunIntake(arm, -1));
+        // return new SequentialCommandGroup(
+        //     sideGridTrajectory1,
+        //     sideGridTrajectory2,
+        //     sideGridTrajectory3,
+        //     new RunIntake(arm, -1)
+        // );
     }
     
     return new SequentialCommandGroup(
             new SequentialMoveArmCommand(arm,
-            StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
+            () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
             new RunIntake(arm, 1),
             new ParallelCommandGroup(
                 new SequentialCommandGroup(
@@ -271,7 +278,7 @@ public class AutoManager {
     if (DriverStation.getAlliance() == Alliance.Red) {
         return new SequentialCommandGroup(
             new SequentialMoveArmCommand(arm,
-            StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
+            () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
             new RunIntake(arm, 1),
             new ParallelCommandGroup(
                 new SequentialCommandGroup(
@@ -294,7 +301,7 @@ public class AutoManager {
     }
     return new SequentialCommandGroup(
         new SequentialMoveArmCommand(arm,
-        StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
+        () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
         new RunIntake(arm, 1),
         new ParallelCommandGroup(
             new SequentialCommandGroup(
@@ -319,7 +326,7 @@ public class AutoManager {
   public Command getTimedSideGridCommand(SwerveSubsystem swerve, ArmSubsystem arm) {
     swerve.setSpeedLimiter(1);
     return new SequentialCommandGroup(
-        new SequentialMoveArmCommand(arm, StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
+        new SequentialMoveArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
         new RunIntake(arm, 1),
         new TimedDrive(swerve, 1, new ChassisSpeeds(-2, 0, 0)),
         new ParallelCommandGroup(
