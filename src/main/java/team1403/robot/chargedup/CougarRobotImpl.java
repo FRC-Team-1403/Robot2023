@@ -111,19 +111,8 @@ public class CougarRobotImpl extends CougarRobot {
         () -> -deadband(driveController.getLeftX(), 0),
         () -> -deadband(driveController.getLeftY(), 0),
         () -> -deadband(driveController.getRightX(), 0),
-        () -> driveController.getYButton()));
-
-    new Trigger(() -> driveController.getRightBumper()).onTrue(
-        new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.8)));
-
-    new Trigger(() -> driveController.getRightBumper()).onFalse(
-        new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.6)));
-
-    new Trigger(() -> driveController.getLeftBumper()).onTrue(
-        new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.2)));
-
-    new Trigger(() -> driveController.getLeftBumper()).onFalse(
-        new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.6)));
+        () -> driveController.getYButton(),
+        () -> driveController.getRightTriggerAxis()));
 
     new Trigger(() -> driveController.getBButton()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.zeroGyroscope()));
