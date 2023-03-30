@@ -114,7 +114,7 @@ public class AutoManager {
                 new Translation2d(-1, -0.3),
                 new Translation2d(-2, -0.3)),
             new Pose2d(-3, 0, Rotation2d.fromDegrees(180)),
-            m_trajectoryConfig1),
+            m_trajectoryConfig1.setEndVelocity(2)),
         swerve::getPose,
         xController,
         yController,
@@ -127,8 +127,8 @@ public class AutoManager {
             List.of(
                 new Translation2d(-4.7, 0.7),
                 new Translation2d(-5.5, -0.4)),
-            new Pose2d(-5.7, -0.7, Rotation2d.fromDegrees(270)),
-            m_trajectoryConfig2),
+            new Pose2d(-5.7, -0.7, Rotation2d.fromDegrees(-90)),
+            m_trajectoryConfig2.setStartVelocity(2).setEndVelocity(2)),
         swerve::getPose,
         xController,
         yController,
@@ -137,12 +137,12 @@ public class AutoManager {
 
     sideGridTrajectory3 = new SwerveControllerCommand(
         TrajectoryGenerator.generateTrajectory(
-            new Pose2d(-5.7, -0.7, Rotation2d.fromDegrees(270)),
+            new Pose2d(-5.7, -0.7, Rotation2d.fromDegrees(-90)),
             List.of(
                 new Translation2d(-2.5, -0.5),
                 new Translation2d(-0.5, -0.5)),
             new Pose2d(0.17, -1.05, Rotation2d.fromDegrees(4)),
-            m_trajectoryConfig3),
+            m_trajectoryConfig3.setStartVelocity(2)),
         swerve::getPose,
         xController,
         yController,
