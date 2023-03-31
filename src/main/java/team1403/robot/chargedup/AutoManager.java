@@ -33,12 +33,18 @@ public class AutoManager {
 
   private final TrajectoryConfig m_trajectoryConfig1 = new TrajectoryConfig(14.5,
       3.25).setKinematics(RobotConfig.Swerve.kDriveKinematics);
+
+  private final TrajectoryConfig m_reverseTrajectoryConfig1 = new TrajectoryConfig(14.5,
+    3).setKinematics(RobotConfig.Swerve.kDriveKinematics);
     
   private final TrajectoryConfig m_trajectoryConfig2 = new TrajectoryConfig(4,
 1).setKinematics(RobotConfig.Swerve.kDriveKinematics);
 
   private final TrajectoryConfig m_trajectoryConfig3 = new TrajectoryConfig(10,
 2.75).setKinematics(RobotConfig.Swerve.kDriveKinematics);
+
+  private final TrajectoryConfig m_reverseTrajectoryConfig3 = new TrajectoryConfig(10,
+2).setKinematics(RobotConfig.Swerve.kDriveKinematics);
 
   private final PIDController xController = new PIDController(
       RobotConfig.Swerve.kPTranslation,
@@ -159,7 +165,7 @@ public class AutoManager {
                 new Translation2d(-1, 0.3),
                 new Translation2d(-2, 0.3)),
             new Pose2d(-3, 0, Rotation2d.fromDegrees(90)),
-            m_trajectoryConfig1),
+            m_reverseTrajectoryConfig1),
         swerve::getPose,
         xController,
         yController,
@@ -188,8 +194,8 @@ public class AutoManager {
                 new Translation2d(-4.5, 0),
                 new Translation2d(-2.5, 0),
                 new Translation2d(-0.5, 0.4)),
-            new Pose2d(0.15, 1.02, Rotation2d.fromDegrees(0)),
-            m_trajectoryConfig3),
+            new Pose2d(0.10, 1.02, Rotation2d.fromDegrees(0)),
+            m_reverseTrajectoryConfig3),
         swerve::getPose,
         xController,
         yController,
