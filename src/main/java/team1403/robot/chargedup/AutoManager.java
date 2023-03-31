@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import team1403.robot.chargedup.RobotConfig.Arm;
 import team1403.robot.chargedup.StateManager.GamePiece;
 import team1403.robot.chargedup.arm.ArmStateGroup;
 import team1403.robot.chargedup.arm.ArmSubsystem;
@@ -56,16 +57,19 @@ public class AutoManager {
       RobotConfig.Swerve.kDAutoTurning,
       RobotConfig.Swerve.kThetaControllerConstraints);
 
-  private SwerveControllerCommand sideGridTrajectory1;
-  private SwerveControllerCommand sideGridTrajectory2;
-  private SwerveControllerCommand sideGridTrajectory3;
+  private SwerveControllerCommand redRightGridTrajectory1;
+  private SwerveControllerCommand redRightGridTrajectory2;
+  private SwerveControllerCommand redRightGridTrajectory3;
+  
+  private SwerveControllerCommand blueSideGridTrajectory1;
+  private SwerveControllerCommand blueSideGridTrajectory2;
+  private SwerveControllerCommand blueSideGridTrajectory3;
 
-  private SwerveControllerCommand sideGridStraightTrajectory1;
-  private SwerveControllerCommand sideGridStraightTrajectory2;
+  private SwerveControllerCommand redSideGridStraightTrajectory1;
+  private SwerveControllerCommand redSideGridStraightTrajectory2;
 
-  private SwerveControllerCommand sideGridTrajectory1Reverse;
-  private SwerveControllerCommand sideGridTrajectory2Reverse;
-  private SwerveControllerCommand sideGridTrajectory3Reverse;
+  private SwerveControllerCommand blueSideGridStraightTrajectory1;
+  private SwerveControllerCommand blueSideGridStraightTrajectory2;
 
   private AutoManager() {
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
@@ -80,13 +84,13 @@ public class AutoManager {
 
   public void init(SwerveSubsystem swerve) {
 
-    sideGridStraightTrajectory1 = new SwerveControllerCommand(
+    redSideGridStraightTrajectory1 = new SwerveControllerCommand(
         TrajectoryGenerator.generateTrajectory(
             new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
             List.of(
-                new Translation2d(-1, -0.3),
-                new Translation2d(-2, -0.3)),
-            new Pose2d(-5, -0.5, Rotation2d.fromDegrees(180)),
+                new Translation2d(-1, 0.3),
+                new Translation2d(-2, 0.3)),
+            new Pose2d(-5.5, 0.5, Rotation2d.fromDegrees(180)),
             m_trajectoryConfig1),
         swerve::getPose,
         xController,
@@ -94,13 +98,13 @@ public class AutoManager {
         thetaController,
         swerve);
     
-    sideGridStraightTrajectory2 = new SwerveControllerCommand(
+    redSideGridStraightTrajectory2 = new SwerveControllerCommand(
         TrajectoryGenerator.generateTrajectory(
-            new Pose2d(-5, -0.5, Rotation2d.fromDegrees(180)),
+            new Pose2d(-5.5, 0.5, Rotation2d.fromDegrees(180)),
             List.of(
-                new Translation2d(-4, -0.5),
+                new Translation2d(-4, 0.5),
                 new Translation2d(-3, 0)),
-            new Pose2d(-0.2, -1.05, Rotation2d.fromDegrees(4)),
+            new Pose2d(-0.1, 1.02, Rotation2d.fromDegrees(0)),
             m_trajectoryConfig2),
         swerve::getPose,
         xController,
@@ -108,7 +112,35 @@ public class AutoManager {
         thetaController,
         swerve);
 
-    sideGridTrajectory1 = new SwerveControllerCommand(
+    blueSideGridStraightTrajectory1 = new SwerveControllerCommand(
+      TrajectoryGenerator.generateTrajectory(
+          new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
+          List.of(
+              new Translation2d(-1, -0.3),
+              new Translation2d(-2, -0.3)),
+          new Pose2d(-5.5, -0.5, Rotation2d.fromDegrees(180)),
+          m_trajectoryConfig1),
+      swerve::getPose,
+      xController,
+      yController,
+      thetaController,
+      swerve);
+
+    blueSideGridStraightTrajectory2 = new SwerveControllerCommand(
+      TrajectoryGenerator.generateTrajectory(
+          new Pose2d(-5.5, -0.5, Rotation2d.fromDegrees(180)),
+          List.of(
+              new Translation2d(-4, -0.3),
+              new Translation2d(-3, 0)),
+          new Pose2d(-0.1, 1.02, Rotation2d.fromDegrees(0)),
+          m_trajectoryConfig1),
+      swerve::getPose,
+      xController,
+      yController,
+      thetaController,
+      swerve);
+
+    redRightGridTrajectory1 = new SwerveControllerCommand(
         TrajectoryGenerator.generateTrajectory(
             new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
             List.of(
@@ -122,7 +154,7 @@ public class AutoManager {
         thetaController,
         swerve);
 
-    sideGridTrajectory2 = new SwerveControllerCommand(
+    redRightGridTrajectory2 = new SwerveControllerCommand(
         TrajectoryGenerator.generateTrajectory( 
             new Pose2d(-3, 0, Rotation2d.fromDegrees(-90)),
             List.of(
@@ -136,7 +168,7 @@ public class AutoManager {
         thetaController,
         swerve);
 
-    sideGridTrajectory3 = new SwerveControllerCommand(
+    redRightGridTrajectory3 = new SwerveControllerCommand(
         TrajectoryGenerator.generateTrajectory(
             new Pose2d(-5.5, -0.7, Rotation2d.fromDegrees(-90)),
             List.of(
@@ -152,7 +184,7 @@ public class AutoManager {
         thetaController,
         swerve);
 
-    sideGridTrajectory1Reverse = new SwerveControllerCommand(
+    blueSideGridTrajectory2 = new SwerveControllerCommand(
         TrajectoryGenerator.generateTrajectory(
             new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
             List.of(
@@ -166,7 +198,7 @@ public class AutoManager {
         thetaController,
         swerve);
 
-    sideGridTrajectory2Reverse = new SwerveControllerCommand(
+    blueSideGridTrajectory2 = new SwerveControllerCommand(
         TrajectoryGenerator.generateTrajectory( 
             new Pose2d(-3, 0, Rotation2d.fromDegrees(90)),
             List.of(
@@ -180,7 +212,7 @@ public class AutoManager {
         thetaController,
         swerve);
 
-    sideGridTrajectory3Reverse = new SwerveControllerCommand(
+    blueSideGridTrajectory3 = new SwerveControllerCommand(
         TrajectoryGenerator.generateTrajectory(
             new Pose2d(-5.05, 0.7, Rotation2d.fromDegrees(90)),
             List.of(
@@ -197,7 +229,25 @@ public class AutoManager {
         swerve);
   }
 
-  public Command getStraightPathCommand(SwerveSubsystem swerve, ArmSubsystem arm) {
+  // Straight path on the red alliance
+  public Command getRedStraightPathCommand(SwerveSubsystem swerve, ArmSubsystem arm) {
+    return new ParallelCommandGroup(
+      new SequentialCommandGroup(
+        new WaitCommand(0.6),
+        new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)),
+        new SetpointArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(), true),
+        new RunIntake(arm, 2, 1),
+        new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), true),
+        new WaitCommand(0.3),
+        new SequentialMoveArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false)),
+      new SequentialCommandGroup(
+        redSideGridStraightTrajectory1,
+        redSideGridStraightTrajectory2
+                                ));
+  }
+
+  // Straight path on the blue alliance
+  public Command getBlueStraightPathCommand(SwerveSubsystem swerve, ArmSubsystem arm) {
     return new ParallelCommandGroup(
       new SequentialCommandGroup(
         new WaitCommand(0.6),
@@ -206,22 +256,15 @@ public class AutoManager {
         new RunIntake(arm, 2, 1),
         new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), true)),
       new SequentialCommandGroup(
-        sideGridStraightTrajectory1,
-        sideGridStraightTrajectory2
+        blueSideGridStraightTrajectory1,
+        blueSideGridStraightTrajectory2
     ));
   }
 
-  /**
-   * Command for grids 3. Right grid is in relation to red alliance
-   * 
-   * @param swerve
-   * @param arm
-   * @return the command
-   */
-  public Command getRightGridCommand(SwerveSubsystem swerve, ArmSubsystem arm) {
+  // Red alliance path involving a swing
+  public Command getRedRightGridCommand(SwerveSubsystem swerve, ArmSubsystem arm) {
     swerve.setSpeedLimiter(1);
-    if (DriverStation.getAlliance() == Alliance.Red) {
-        return new SequentialCommandGroup(
+    return new SequentialCommandGroup(
             new SequentialMoveArmCommand(arm,
             () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
             new RunIntake(arm, 1),
@@ -239,42 +282,16 @@ public class AutoManager {
                     new SequentialMoveArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false)
                     ),
                 new SequentialCommandGroup(
-                    sideGridTrajectory1,
-                    sideGridTrajectory2,
-                    sideGridTrajectory3)),
-                    new RunIntake(arm, -1));
-    }
-    
-    return new SequentialCommandGroup(
-            new SequentialMoveArmCommand(arm,
-            () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
-            new RunIntake(arm, 1),
-            new ParallelCommandGroup(
-                new SequentialCommandGroup(
-                    new WaitCommand(0.1),
-                    new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false),
-                    new WaitCommand(0.45),
-                    new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)),
-                    new SetpointArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
-                        true),
-                    new RunIntake(arm, 3, 3.85),
-                    new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), true),
-                    new WaitCommand(0.1),
-                    new SetpointArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false)
-                    ),
-                new SequentialCommandGroup(
-                    sideGridTrajectory1Reverse,
-                    sideGridTrajectory2Reverse,
-                    sideGridTrajectory3Reverse)),
+                    redRightGridTrajectory1,
+                    redRightGridTrajectory2,
+                    redRightGridTrajectory3)),
                     new RunIntake(arm, -1));
     }
 
-
-  // In relation to red side
-  public Command getLeftGridCommand(SwerveSubsystem swerve, ArmSubsystem arm) {
+  // Blue alliance path involving a swing
+  public Command getBlueRightCommand(SwerveSubsystem swerve, ArmSubsystem arm) {
     swerve.setSpeedLimiter(1);
-    if (DriverStation.getAlliance() == Alliance.Red) {
-        return new SequentialCommandGroup(
+    return new SequentialCommandGroup(
             new SequentialMoveArmCommand(arm,
             () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
             new RunIntake(arm, 1),
@@ -292,33 +309,10 @@ public class AutoManager {
                     new SetpointArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false)
                     ),
                 new SequentialCommandGroup(
-                    sideGridTrajectory1Reverse,
-                    sideGridTrajectory2Reverse,
-                    sideGridTrajectory3Reverse)),
+                    blueSideGridTrajectory2,
+                    blueSideGridTrajectory2,
+                    blueSideGridTrajectory3)),
                     new RunIntake(arm, -1));
-    }
-    return new SequentialCommandGroup(
-        new SequentialMoveArmCommand(arm,
-        () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
-        new RunIntake(arm, 1),
-        new ParallelCommandGroup(
-            new SequentialCommandGroup(
-                new WaitCommand(0.1),
-                new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false),
-                new WaitCommand(0.45),
-                new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)),
-                new SetpointArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
-                    true),
-                new RunIntake(arm, 3, 3.85),
-                new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), true),
-                new WaitCommand(0.1),
-                new SetpointArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false)
-                ),
-            new SequentialCommandGroup(
-                sideGridTrajectory1,
-                sideGridTrajectory2,
-                sideGridTrajectory3)),
-                new RunIntake(arm, -1));
   }
 
   public Command getTimedSideGridCommand(SwerveSubsystem swerve, ArmSubsystem arm) {

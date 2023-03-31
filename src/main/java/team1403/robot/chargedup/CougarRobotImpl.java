@@ -84,7 +84,7 @@ public class CougarRobotImpl extends CougarRobot {
   public Command getAutonomousCommand() {
     CommandScheduler.getInstance().removeDefaultCommand(m_swerveSubsystem);
     CommandScheduler.getInstance().removeDefaultCommand(m_arm);
-    return AutoManager.getInstance().getRightGridCommand(m_swerveSubsystem, m_arm);
+    return AutoManager.getInstance().getRedRightGridCommand(m_swerveSubsystem, m_arm);
   }
 
   @Override
