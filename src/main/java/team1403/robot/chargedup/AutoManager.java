@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -30,14 +31,14 @@ import team1403.robot.chargedup.swerve.TimedDrive;
 public class AutoManager {
   static private AutoManager m_instance;
 
-  private final TrajectoryConfig m_trajectoryConfig1 = new TrajectoryConfig(4,
-      2).setKinematics(RobotConfig.Swerve.kDriveKinematics);
+  private final TrajectoryConfig m_trajectoryConfig1 = new TrajectoryConfig(14.5,
+      3.25).setKinematics(RobotConfig.Swerve.kDriveKinematics);
     
-  private final TrajectoryConfig m_trajectoryConfig2 = new TrajectoryConfig(2,
+  private final TrajectoryConfig m_trajectoryConfig2 = new TrajectoryConfig(4,
 1).setKinematics(RobotConfig.Swerve.kDriveKinematics);
 
-  private final TrajectoryConfig m_trajectoryConfig3 = new TrajectoryConfig(6,
-2).setKinematics(RobotConfig.Swerve.kDriveKinematics);
+  private final TrajectoryConfig m_trajectoryConfig3 = new TrajectoryConfig(10,
+2.75).setKinematics(RobotConfig.Swerve.kDriveKinematics);
 
   private final PIDController xController = new PIDController(
       RobotConfig.Swerve.kPTranslation,
@@ -100,7 +101,7 @@ public class AutoManager {
                 new Translation2d(-4, -0.5),
                 new Translation2d(-3, 0)),
             new Pose2d(-0.2, -1.05, Rotation2d.fromDegrees(4)),
-            m_trajectoryConfig1),
+            m_trajectoryConfig2),
         swerve::getPose,
         xController,
         yController,
@@ -126,8 +127,8 @@ public class AutoManager {
             new Pose2d(-3, 0, Rotation2d.fromDegrees(-90)),
             List.of(
                 new Translation2d(-5.0, 0.7),
-                new Translation2d(-5.5, -0.7)),
-            new Pose2d(-6.2, -0.6, Rotation2d.fromDegrees(-90)),
+                new Translation2d(-5.5, -0.3)),
+            new Pose2d(-5.5, -0.7, Rotation2d.fromDegrees(-90)),
             m_trajectoryConfig2),
         swerve::getPose,
         xController,
@@ -137,13 +138,14 @@ public class AutoManager {
 
     sideGridTrajectory3 = new SwerveControllerCommand(
         TrajectoryGenerator.generateTrajectory(
-            new Pose2d(-6.2, -0.6, Rotation2d.fromDegrees(-90)),
+            new Pose2d(-5.5, -0.7, Rotation2d.fromDegrees(-90)),
             List.of(
-                new Translation2d(-5.7, -0.2),
-                new Translation2d(-2.5, -0.2),
-                new Translation2d(-0.5, -0.2)),
-            new Pose2d(0.20, -1.2, Rotation2d.fromDegrees(0)),
-            m_trajectoryConfig3),
+                new Translation2d(-5.7, -0.1),
+                new Translation2d(-4.5, 0),
+                new Translation2d(-2.5, 0),
+                new Translation2d(-0.5, -0.4)),
+            new Pose2d(0.15, -1.02, Rotation2d.fromDegrees(0)),
+            m_trajectoryConfig3.setStartVelocity(5)),
         swerve::getPose,
         xController,
         yController,
@@ -229,9 +231,9 @@ public class AutoManager {
                     new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)),
                     new SetpointArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
                         true),
-                    new RunIntake(arm, 3, 3.7),
+                    new RunIntake(arm, 3, 3.85),
                     new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), true),
-                    new WaitCommand(2),
+                    new WaitCommand(0.1),
                     new SequentialMoveArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false)
                     ),
                 new SequentialCommandGroup(
@@ -261,7 +263,7 @@ public class AutoManager {
                         true),
                     new RunIntake(arm, 3, 1.6),
                     new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), true),
-                    new WaitCommand(1.2),
+                    new WaitCommand(0.6),
                     new SetpointArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false)
                     ),
                 new SequentialCommandGroup(
