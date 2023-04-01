@@ -11,6 +11,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -67,16 +69,22 @@ public class CougarRobotImpl extends CougarRobot {
 
     // m_builtins = new BuiltinSubsystem(parameters, logger);
     m_arm = new ArmSubsystem(parameters);
-    m_swerveSubsystem = new SwerveSubsystem(parameters);
+    m_swerveSubsystem = new SwerveSubsystem( parameters);
     CameraServer.startAutomaticCapture();
     // m_visionSubsystem = new PhotonVisionSubsystem(parameters);
     // m_lightSubsystem = new LightSubsystem(parameters);
+    m_autonChooser = new SendableChooser<>();
     registerAutoCommands();
   }
 
   @Override
   public void robotInit() {
     AutoManager.getInstance().init(m_swerveSubsystem);
+    m_autonChooser.setDefaultOption("Red Right Grid", AutoManager.getInstance().getRedRightGridCommand(m_swerveSubsystem, m_arm));
+    m_autonChooser.addOption("Blue Right Grid", AutoManager.getInstance().getBlueRightGridCommand(m_swerveSubsystem, m_arm));
+    // m_autonChooser.addOption("Red Middle Grid", AutoManager.getInstance().getRedPathMiddleGridCommand(m_swerveSubsystem, m_arm));
+    SmartDashboard.putData(m_autonChooser);
+    
     super.robotInit();
   }
 
@@ -84,7 +92,9 @@ public class CougarRobotImpl extends CougarRobot {
   public Command getAutonomousCommand() {
     CommandScheduler.getInstance().removeDefaultCommand(m_swerveSubsystem);
     CommandScheduler.getInstance().removeDefaultCommand(m_arm);
-    return AutoManager.getInstance().getRedRightGridCommand(m_swerveSubsystem, m_arm);
+    
+    // return AutoManager.getInstance().getTimedMiddleGridCommand(m_swerveSubsystem, m_arm);
+    return m_autonChooser.getSelected();
   }
 
   @Override
@@ -132,8 +142,8 @@ public class CougarRobotImpl extends CougarRobot {
     XboxController xboxOperator = getXboxJoystick("Operator", Operator.pilotPort);
 
     m_arm.setDefaultCommand(new ManualArmCommand(m_arm,
-        () -> -deadband(xboxOperator.getLeftY(), 0.05),
-        () -> deadband(xboxOperator.getRightY(), 0.05),
+        () -> -deadband(xboxOperator.getLeftY(), 0.08),
+        () -> deadband(xboxOperator.getRightY(), 0.1),
         () -> xboxOperator.getLeftTriggerAxis(),
         () -> deadband(xboxOperator.getRightTriggerAxis(), 0.2),
         () -> xboxOperator.getRightBumper(),
@@ -316,5 +326,6 @@ public class CougarRobotImpl extends CougarRobot {
   private CougarScriptReader m_reader;
   private final ArmSubsystem m_arm;
   private final SwerveSubsystem m_swerveSubsystem;
+  private final SendableChooser<Command> m_autonChooser;
   // private final LightSubsystem m_lightSubsystem;
 }

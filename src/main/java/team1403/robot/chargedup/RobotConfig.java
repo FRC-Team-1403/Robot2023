@@ -244,9 +244,9 @@ public class RobotConfig {
   public static class Arm {
 
     //Pivot
-    public static final int kPArmPivot = 1;
-    public static final int kIArmPivot = 0;
-    public static final int kDArmPivot = 0;
+    public static final double kPArmPivot = 0.025;
+    public static final double kIArmPivot = 0;
+    public static final double kDArmPivot = 0;
     public static double kAbsolutePivotOffset = 355.5375784610152-180+10;
     public static double kMaxPivotAngle = 256.84208720995503;
     public static final double kFrameAngle = 250.24629;
@@ -258,7 +258,7 @@ public class RobotConfig {
 
     //Wrist
     public static final double kPWristMotor = 0.95;
-    public static final double kIWristMotor = 0;
+    public static final double kIWristMotor = 0.0;
     public static final double kDWristMotor = 90;
     public static final double kMaxWristAngle = 265;
     public static final double kMinWristAngle = 29.196293229907326; 
@@ -292,12 +292,12 @@ public class RobotConfig {
 
   public static class ArmStates {
     public static final ArmState coneTowardsFloorIntake = new ArmState(0, 144.5086341127158, 247.40214774876398, 0); //0.039682067930698, 140.0363630009091, 240.55448872511047
-    public static final ArmState coneTowardsHighConeNode = new ArmState(22.987735748, 252.595120962628, 154.96542524635782, 0);
+    public static final ArmState coneTowardsHighConeNode = new ArmState(22.987735748, 251.18045277951128, 150.03904620700123, 0);
     public static final ArmState coneTowardsMiddleNode = new ArmState(8.345230102539062, 264, 156.45086251051157, 0);
     public static final ArmState singleSubstationIntake = new ArmState(0, 51.3175107829, 241.777313195, 0);
     public static final ArmState coneTowardsLowNode = new ArmState(0, 80.18787350469682, 245.42271036546947, 0);
     
-    public static final ArmState cubeFloorIntake = new ArmState(0.099, 115.27611033940275, 244.565611599405615, 0);
+    public static final ArmState cubeFloorIntake = new ArmState(0.099, 104.27611033940275, 244.565611599405615, 0);
     public static final ArmState cubeHighNode = new ArmState(19.6710987091, 182.465261949, 161.356773014, 0);
     public static final ArmState cubeMiddleNode = new ArmState(0.05158682167, 177.61028394, 181.482400676, 0);
 

@@ -23,7 +23,7 @@ public class SwerveAutoBalanceYaw extends CommandBase {
     public SwerveAutoBalanceYaw(SwerveSubsystem drivetrainSubsystem) {
         m_drivetrainSubsystem = drivetrainSubsystem;
         m_xPIDController = new ProfiledPIDController(
-            0.1, 
+            0.5, 
             RobotConfig.Swerve.kITranslation, 
             0,
             new TrapezoidProfile.Constraints(200, 200));
@@ -51,7 +51,7 @@ public class SwerveAutoBalanceYaw extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return rollValue == 0 && Math.abs(rollVelocity) > 3;
+        return m_xPIDController.atGoal();
     }
 
     @Override

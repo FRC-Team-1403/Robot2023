@@ -85,10 +85,10 @@ public class ArmSubsystem extends CougarSubsystem {
     configWristMotor();
     configEncoders();
 
-    m_pivotPid = new PIDController(0.025, RobotConfig.Arm.kIArmPivot, RobotConfig.Arm.kDArmPivot);
+    m_pivotPid = new PIDController(RobotConfig.Arm.kPArmPivot, RobotConfig.Arm.kIArmPivot, RobotConfig.Arm.kDArmPivot);
     m_minMagneticSwitch = new DigitalInput(RobotConfig.RioPorts.kExtensionMinMagneticSwitch);
     m_maxMagneticSwitch = new DigitalInput(RobotConfig.RioPorts.kExtensionMaxMagneticSwitch);
-
+    
     RobotConfig.Arm.kAbsolutePivotOffset = 0;
     double difference = RobotConfig.Arm.kMaxPivotAngle - getAbsolutePivotAngle();
     RobotConfig.Arm.kAbsolutePivotOffset = difference;
