@@ -35,6 +35,7 @@ public class SwerveAutoBalanceYaw extends CommandBase {
 
     @Override
     public void execute() {
+        m_drivetrainSubsystem.setSpeedLimiter(0.2);
       rollValue = m_drivetrainSubsystem.getGyroRoll();
 
       rollVelocity = (rollValue - previousRollValue) / 0.2;
