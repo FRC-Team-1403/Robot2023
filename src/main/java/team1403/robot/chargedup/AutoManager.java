@@ -79,6 +79,8 @@ public class AutoManager {
 
   private SwerveControllerCommand straightTrajectory;
 
+  private SwerveControllerCommand balanceTrajectory;
+
   private AutoManager() {
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
   }
@@ -241,6 +243,22 @@ public class AutoManager {
       yController,
       thetaController,
       swerve);
+
+    balanceTrajectory = new SwerveControllerCommand(
+        TrajectoryGenerator.generateTrajectory(
+          List.of(
+            new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
+            new Pose2d(-1, 0, Rotation2d.fromDegrees(0)),
+            new Pose2d(-2, 0, Rotation2d.fromDegrees(0)),
+            new Pose2d(-3, 0, Rotation2d.fromDegrees(0))),
+        new TrajectoryConfig(14.5,
+        3.25)
+          .setKinematics(RobotConfig.Swerve.kDriveKinematics)),
+        swerve::getPose,
+        xController,
+        yController,
+        thetaController,
+        swerve);
   }
 
   // Red alliance path involving a swing
@@ -313,5 +331,15 @@ public class AutoManager {
         new ParallelCommandGroup(
             new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false),
             new TimedDrive(swerve, 6.5, new ChassisSpeeds(-2, 0, 0))));
+  }
+
+  public Command getImprovedRedSideGridCommand(SwerveSubsystem swerve, ArmSubsystem arm) {
+    swerve.setSpeedLimiter(1);
+    return redRightGridTrajectory;
+  }
+
+  public Command getImprovedStraightCommand(SwerveSubsystem swerve, ArmSubsystem arm) {
+    swerve.setSpeedLimiter(1);
+    return straightTrajectory;
   }
 }
