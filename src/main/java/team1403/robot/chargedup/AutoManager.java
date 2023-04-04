@@ -108,7 +108,7 @@ public class AutoManager {
         swerve);
 
     redRightGridTrajectory2 = new SwerveControllerCommand(
-        TrajectoryGenerator.generateTrajectory(
+        TrajectoryGenerator.generateTrajectory( 
             new Pose2d(-3, 0.1, Rotation2d.fromDegrees(-90)),
             List.of(
                 new Translation2d(-5.0, 0.7),
@@ -152,7 +152,7 @@ public class AutoManager {
         swerve);
 
     blueSideGridTrajectory2 = new SwerveControllerCommand(
-        TrajectoryGenerator.generateTrajectory(
+        TrajectoryGenerator.generateTrajectory( 
             new Pose2d(-3, 0, Rotation2d.fromDegrees(90)),
             List.of(
                 new Translation2d(-5.0, -0.7),
