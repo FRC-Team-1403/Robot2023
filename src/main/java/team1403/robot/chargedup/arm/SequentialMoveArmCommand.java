@@ -1,5 +1,7 @@
 package team1403.robot.chargedup.arm;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -15,7 +17,7 @@ public class SequentialMoveArmCommand extends CommandBase {
   private double m_initialWristAngle;
   private double m_initialIntakeSpeed;
 
-  private final ArmState m_endState;
+  private final Supplier<ArmState> m_endState;
   private ArmState m_firstState;
 
   private TrapezoidProfile m_pivotProfile;
@@ -27,7 +29,7 @@ public class SequentialMoveArmCommand extends CommandBase {
   private boolean m_ignoreLimit;
 
 
-  public SequentialMoveArmCommand(ArmSubsystem arm, ArmState endState, boolean ignoreLimit) {
+  public SequentialMoveArmCommand(ArmSubsystem arm, Supplier<ArmState> endState, boolean ignoreLimit) {
     this.m_endState = endState;
     this.m_arm = arm;
     this.m_ignoreLimit = ignoreLimit;
@@ -42,12 +44,12 @@ public class SequentialMoveArmCommand extends CommandBase {
     
     this.m_pivotProfile = new TrapezoidProfile(
       new TrapezoidProfile.Constraints(360, 165), //high --> 360, 165 //slow --> 20, 10
-      new TrapezoidProfile.State(m_endState.armPivot, 1),
+      new TrapezoidProfile.State(m_endState.get().armPivot, 1),
       new TrapezoidProfile.State(m_intialPivotAngle, 0));
 
     this.m_startTime = Timer.getFPGATimestamp();
 
-    this.m_firstState = new ArmState(m_intialExtensionLength , m_initialWristAngle, m_endState.armPivot, m_initialIntakeSpeed);
+    this.m_firstState = new ArmState(m_intialExtensionLength , m_initialWristAngle, m_endState.get().armPivot, m_initialIntakeSpeed);
 
     // super.initialize();
   }
@@ -62,7 +64,7 @@ public class SequentialMoveArmCommand extends CommandBase {
       m_arm.moveArm(this.m_firstState.wristAngle, this.m_firstState.intakeSpeed, pivotPosition, this.m_firstState.armLength);
     } else {
       m_arm.ignoreExtensionLimit(m_ignoreLimit);
-      m_arm.moveArm(this.m_endState);
+      m_arm.moveArm(this.m_endState.get());
       m_isFinished = true;
     }
     // super.execute();

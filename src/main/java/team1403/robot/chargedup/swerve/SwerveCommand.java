@@ -21,6 +21,7 @@ public class SwerveCommand extends CommandBase {
   private final DoubleSupplier m_horizontalTranslationSupplier;
   private final DoubleSupplier m_rotationSupplier;
   private final BooleanSupplier m_fieldRelativeSupplier;
+  private final DoubleSupplier m_speedSupplier;
   private boolean m_isFieldRelative;
 
   private Translation2d frontRight;
@@ -30,7 +31,6 @@ public class SwerveCommand extends CommandBase {
 
   private SlewRateLimiter m_verticalTranslationLimiter;
   private SlewRateLimiter m_horizontalTranslationLimiter;
-  private SlewRateLimiter m_rotationalLimiter;
 
   /**
    * Creates the swerve command.
@@ -54,12 +54,14 @@ public class SwerveCommand extends CommandBase {
       DoubleSupplier horizontalTranslationSupplier,
       DoubleSupplier verticalTranslationSupplier,
       DoubleSupplier rotationSupplier,
-      BooleanSupplier fieldRelativeSupplier) {
+      BooleanSupplier fieldRelativeSupplier,
+      DoubleSupplier speedSupplier) {
     this.m_drivetrainSubsystem = drivetrain;
     this.m_verticalTranslationSupplier = verticalTranslationSupplier;
     this.m_horizontalTranslationSupplier = horizontalTranslationSupplier;
     this.m_rotationSupplier = rotationSupplier;
     this.m_fieldRelativeSupplier = fieldRelativeSupplier;
+    this.m_speedSupplier = speedSupplier;
     m_isFieldRelative = true;
 
     frontRight = new Translation2d(
@@ -80,13 +82,13 @@ public class SwerveCommand extends CommandBase {
 
     m_verticalTranslationLimiter = new SlewRateLimiter(8, -8, 0);
     m_horizontalTranslationLimiter = new SlewRateLimiter(8, -8, 0);
-    m_rotationalLimiter = new SlewRateLimiter(5, -5, 0);
 
     addRequirements(m_drivetrainSubsystem);
   }
 
   @Override
   public void execute() {
+    m_drivetrainSubsystem.setSpeedLimiter(0.2 + (m_speedSupplier.getAsDouble() * 0.8));
     if (m_fieldRelativeSupplier.getAsBoolean()) {
       m_isFieldRelative = !m_isFieldRelative;
     }

@@ -85,7 +85,7 @@ public class ArmSubsystem extends CougarSubsystem {
     configWristMotor();
     configEncoders();
 
-    m_pivotPid = new PIDController(0.025, RobotConfig.Arm.kIArmPivot, RobotConfig.Arm.kDArmPivot);
+    m_pivotPid = new PIDController(RobotConfig.Arm.kPArmPivot, RobotConfig.Arm.kIArmPivot, RobotConfig.Arm.kDArmPivot);
     m_minMagneticSwitch = new DigitalInput(RobotConfig.RioPorts.kExtensionMinMagneticSwitch);
     m_maxMagneticSwitch = new DigitalInput(RobotConfig.RioPorts.kExtensionMaxMagneticSwitch);
 
@@ -482,11 +482,11 @@ public class ArmSubsystem extends CougarSubsystem {
     double currentWristAngle = getAbsoluteWristAngle();
     double currentExtensionLength = getExtensionLength();
 
-    if (Math.abs(currentPivotAngle - this.m_pivotAngleSetpoint) > 5) {
+    if (Math.abs(currentPivotAngle - this.m_pivotAngleSetpoint) > 7) {
       return false;
     }
 
-    if (Math.abs(currentWristAngle - this.m_wristAngleSetpoint) > 5) {
+    if (Math.abs(currentWristAngle - this.m_wristAngleSetpoint) > 6) {
       return false;
     }
 
@@ -517,7 +517,6 @@ public class ArmSubsystem extends CougarSubsystem {
 
     // Pivot
     if(!isArmSwitchActive() && previousLimitSwitchTrigger) {
-      System.out.println("sdjklfane;voiajfasdlvnabuegoasd;jvansdinasdj;lcvnaweovnaewufa;sogha");
       RobotConfig.Arm.kAbsolutePivotOffset = 0;
       double difference = RobotConfig.Arm.kMaxPivotAngle - getAbsolutePivotAngle() - 10;
       RobotConfig.Arm.kAbsolutePivotOffset = difference;

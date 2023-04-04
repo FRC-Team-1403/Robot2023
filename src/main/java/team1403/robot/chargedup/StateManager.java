@@ -93,12 +93,9 @@ public class StateManager {
   public void updateArmState(GamePiece newGamePiece) {
     gamePiece = newGamePiece;
     SmartDashboard.putString("Game Piece", newGamePiece.toString());
-    System.out.println(gamePieceCounter);
-    gamePieceCounter++;
     if (newGamePiece == GamePiece.CONE_UPRIGHT) {
       m_currentArmGroup = m_coneUprightGroup;
       m_armGroupUsed = 0;
-      
       coneAwayCounter++;
       updateLEDState(LED.YELLOW);
     } else if (newGamePiece == GamePiece.CUBE) {
