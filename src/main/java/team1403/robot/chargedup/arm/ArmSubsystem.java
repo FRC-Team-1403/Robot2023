@@ -279,10 +279,10 @@ public class ArmSubsystem extends CougarSubsystem {
     while (normalizedCurrentAngle > 90) {
       normalizedCurrentAngle -= 90;
     }
-    double armLength = RobotConfig.Arm.kBaseArmLength + getExtensionLength();
-    double gravityCompensationFactor = 0.0015 * armLength;
-    double feedforward = gravityCompensationFactor
-        * Math.cos(Math.toRadians(normalizedCurrentAngle));
+    double gravityCompensationFactor = ((.0004/23.128) * getExtensionLength() + .0009)
+     * RobotConfig.Arm.kBaseArmLength; //0.0009
+    double feedforward = gravityCompensationFactor;
+        // * Math.cos(Math.toRadians(normalizedCurrentAngle));
     if ((currentAngle < 90 && currentAngle > 0) || (currentAngle > 270 && currentAngle < 360)) {
       feedforward *= -1;
     }
