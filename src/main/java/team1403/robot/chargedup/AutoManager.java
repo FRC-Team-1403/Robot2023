@@ -81,6 +81,7 @@ public class AutoManager {
   private SwerveControllerCommand redRightGridTrajectory2;
 
   private SwerveControllerCommand redRightGridCombinedTrajectory;
+  private SwerveControllerCommand blueRightGridCombinedTrajectory;
 
   private SwerveControllerCommand redRightGridTrajectory3;
   private SwerveControllerCommand redRightGridTrajectory4;  
@@ -122,6 +123,23 @@ public class AutoManager {
         yController,
         thetaController,
         swerve);
+
+    blueRightGridCombinedTrajectory = new SwerveControllerCommand(
+      TrajectoryGenerator.generateTrajectory(
+          new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
+          List.of(
+              new Translation2d(-1, 0.3),
+              new Translation2d(-2, 0.3),
+              new Translation2d(-3, -0.1),
+              new Translation2d(-4.92, -0.7)),
+          new Pose2d(-5.5, 0.7, Rotation2d.fromDegrees(-90)),
+          m_combinedTrajectoryConfig),
+      swerve::getPose,
+      xController,
+      yController,
+      thetaController,
+      swerve);
+  
 
     redRightGridTrajectory2 = new SwerveControllerCommand(
         TrajectoryGenerator.generateTrajectory( 
