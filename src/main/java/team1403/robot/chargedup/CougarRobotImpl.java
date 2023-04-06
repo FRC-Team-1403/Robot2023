@@ -79,7 +79,7 @@ public class CougarRobotImpl extends CougarRobot {
 
   @Override
   public void robotInit() {
-    AutoManager.getInstance().init(m_swerveSubsystem);
+    AutoManager.getInstance().init(m_swerveSubsystem, m_arm);
     m_autonChooser.setDefaultOption("Red Right Grid", AutoManager.getInstance().getRedRightGridCommand(m_swerveSubsystem, m_arm));
     m_autonChooser.addOption("Blue Right Grid", AutoManager.getInstance().getBlueRightGridCommand(m_swerveSubsystem, m_arm));
     SmartDashboard.putData(m_autonChooser);
@@ -90,7 +90,8 @@ public class CougarRobotImpl extends CougarRobot {
   public Command getAutonomousCommand() {
     CommandScheduler.getInstance().removeDefaultCommand(m_swerveSubsystem);
     CommandScheduler.getInstance().removeDefaultCommand(m_arm);
-    return m_autonChooser.getSelected();
+    // return m_autonChooser.getSelected();
+    return AutoManager.getInstance().getPathPlannerBlueGridCommand(m_swerveSubsystem);
     
     // return AutoManager.getInstance().getImprovedStraightCommand(m_swerveSubsystem, m_arm);
     // return AutoManager.getInstance().getRedRightGridCommand(m_swerveSubsystem, m_arm);

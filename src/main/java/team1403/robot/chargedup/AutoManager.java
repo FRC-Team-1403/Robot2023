@@ -1,6 +1,14 @@
 package team1403.robot.chargedup;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.auto.PIDConstants;
+import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -96,6 +104,9 @@ public class AutoManager {
 
   private SwerveControllerCommand balanceTrajectory;
 
+  private HashMap<String, Command> eventMap = new HashMap<>();
+  private List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup("Simple Blue Side", new PathConstraints(14.5, 3));
+
   private AutoManager() {
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
   }
@@ -107,7 +118,20 @@ public class AutoManager {
     return m_instance;
   }
 
-  public void init(SwerveSubsystem swerve) {
+  public void init(SwerveSubsystem swerve, ArmSubsystem arm) {
+    eventMap.put("seq high cone", new SequentialMoveArmCommand(arm,
+    () -> RobotConfig.ArmStates.coneHighNodeAuton, false));
+    eventMap.put("run cone intake", new RunIntake(arm, 1, 0.7));
+    eventMap.put("cube intake", new SequentialCommandGroup(
+        new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)),
+        new SequentialMoveArmCommand(arm,
+        () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(), true)));
+    eventMap.put("run cube intake", new RunIntake(arm, -1, 2));
+    eventMap.put("tuck", new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), true));
+    eventMap.put("high cube", new SetpointArmCommand(arm,
+    () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(),
+    false));
+
     redRightGridCombinedTrajectory = new SwerveControllerCommand(
         TrajectoryGenerator.generateTrajectory(
             new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
@@ -397,4 +421,20 @@ public class AutoManager {
     swerve.setSpeedLimiter(1);
     return straightTrajectory;
   }
+
+  public Command getPathPlannerBlueGridCommand(SwerveSubsystem swerve) {
+    SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
+        swerve::getPose, // Pose2d supplier
+        swerve::setPose, // Pose2d consumer, used to reset odometry at the beginning of auto
+        RobotConfig.Swerve.kDriveKinematics, // SwerveDriveKinematics
+        new PIDConstants(RobotConfig.Swerve.kPTranslation, RobotConfig.Swerve.kITranslation, RobotConfig.Swerve.kDTranslation), // PID constants to correct for translation error (used to create the X and Y PID controllers)
+        new PIDConstants(4, 0, 0), // PID constants to correct for rotation error (used to create the rotation controller)
+        swerve::setModuleStates, // Module states consumer used to output to the drive subsystem
+        eventMap, // Maps event markers to commands
+        false, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
+        swerve);
+
+    return autoBuilder.fullAuto(pathGroup);
+  }
+  
 }

@@ -290,6 +290,9 @@ public class SwerveSubsystem extends CougarSubsystem {
     SwerveDriveKinematics.desaturateWheelSpeeds(
         states, Swerve.kMaxSpeed);
 
+    SmartDashboard.putNumber("Swerve Module State Angle", states[0].angle.getDegrees());
+    SmartDashboard.putNumber("Swerve Module State Velocity", states[0].speedMetersPerSecond);
+
     for (int i = 0; i < m_modules.length; i++) {
       m_modules[i].set((states[i].speedMetersPerSecond
           / Swerve.kMaxSpeed) * m_speedLimiter,

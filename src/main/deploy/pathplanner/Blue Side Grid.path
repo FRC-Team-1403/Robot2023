@@ -17,7 +17,8 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "score high cube 1"
+          "high cone",
+          "run cone intake"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -140,7 +141,10 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [],
+        "names": [
+          "high cone",
+          "run intake"
+        ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
@@ -148,25 +152,26 @@
     }
   ],
   "maxVelocity": 14.5,
-  "maxAcceleration": 10.0,
+  "maxAcceleration": 6.0,
   "isReversed": null,
   "markers": [
     {
       "position": 0.8484848484848518,
       "names": [
-        "cube intake 1"
+        "cube intake",
+        "run cube intake"
       ]
     },
     {
       "position": 1.2727272727272931,
       "names": [
-        "tuck 1"
+        "tuck"
       ]
     },
     {
       "position": 2.6363636363636367,
       "names": [
-        "high cube 2"
+        "high cube"
       ]
     },
     {
@@ -178,19 +183,26 @@
     {
       "position": 3.969696969697009,
       "names": [
-        "cube intake 3"
+        "cube intake",
+        "run cube intake"
       ]
     },
     {
       "position": 4.333333333333415,
       "names": [
-        "tuck 3"
+        "tuck"
       ]
     },
     {
       "position": 4.969696969696976,
       "names": [
         "high cube 3"
+      ]
+    },
+    {
+      "position": 0.09090909090909069,
+      "names": [
+        "tuck"
       ]
     }
   ]
