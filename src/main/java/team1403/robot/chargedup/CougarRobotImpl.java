@@ -25,6 +25,7 @@ import team1403.lib.core.CougarRobot;
 import team1403.lib.util.CougarLogger;
 import team1403.robot.chargedup.cse.CougarScriptObject;
 import team1403.robot.chargedup.cse.CougarScriptReader;
+import team1403.robot.chargedup.photonvision.PhotonVisionSubsystem;
 import team1403.robot.chargedup.swerve.SwerveAutoBalanceYaw;
 import team1403.robot.chargedup.swerve.SwerveCommand;
 import team1403.robot.chargedup.swerve.SwerveDrivePath;
@@ -82,6 +83,10 @@ public class CougarRobotImpl extends CougarRobot {
     AutoManager.getInstance().init(m_swerveSubsystem);
     m_autonChooser.setDefaultOption("Red Right Grid", AutoManager.getInstance().getRedRightGridCommand(m_swerveSubsystem, m_arm));
     m_autonChooser.addOption("Blue Right Grid", AutoManager.getInstance().getBlueRightGridCommand(m_swerveSubsystem, m_arm));
+    m_autonChooser.addOption("Middle Grid Auto", AutoManager.getInstance().getMiddleGridCommand(m_swerveSubsystem, m_arm));
+    m_autonChooser.addOption("1 Piece Bump Auto", AutoManager.getInstance().getStraightTrajectory(m_swerveSubsystem, m_arm));
+    m_autonChooser.addOption("Old Red Right Grid", AutoManager.getInstance().getOldRedRightGridCommand(m_swerveSubsystem, m_arm));
+    m_autonChooser.addOption("Old Blue Right Grid", AutoManager.getInstance().getOldBlueRightGridCommand(m_swerveSubsystem, m_arm));
     SmartDashboard.putData(m_autonChooser);
     super.robotInit();
   }
@@ -196,6 +201,10 @@ public class CougarRobotImpl extends CougarRobot {
             true));
     new Trigger(() -> xboxOperator.getPOV() == 270).onFalse(
         new SetpointArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getLowNodeState(), false));
+
+    // Auto High Cone Node
+    // new Trigger(() -> xboxOperator.getStartButton()).onFalse(
+    //   new SequentialMoveArmCommand(m_arm, () -> RobotConfig.ArmStates.coneHighNodeAuton, false));
 
     // lights
     // new Trigger(() -> xboxOperator.getStartButton()).onTrue(
