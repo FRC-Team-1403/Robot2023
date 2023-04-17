@@ -80,12 +80,12 @@ public class CougarRobotImpl extends CougarRobot {
   @Override
   public void robotInit() {
     AutoManager.getInstance().init(m_swerveSubsystem);
-    m_autonChooser.setDefaultOption("Red Right Grid", AutoManager.getInstance().getRedRightGridCommand(m_swerveSubsystem, m_arm));
-    m_autonChooser.addOption("Blue Right Grid", AutoManager.getInstance().getBlueRightGridCommand(m_swerveSubsystem, m_arm));
+    m_autonChooser.setDefaultOption("1 Piece", AutoManager.getInstance().get1PieceCommand(m_swerveSubsystem, m_arm));
+    m_autonChooser.setDefaultOption("2 Piece Red Right Grid", AutoManager.getInstance().getRedRightGrid2PieceCommand(m_swerveSubsystem, m_arm));
+    m_autonChooser.addOption("2 Piece Blue Right Grid", AutoManager.getInstance().getBlueRightGrid2PieceCommand(m_swerveSubsystem, m_arm));
     m_autonChooser.addOption("Middle Grid Auto", AutoManager.getInstance().getMiddleGridCommand(m_swerveSubsystem, m_arm));
-    m_autonChooser.addOption("1 Piece Bump Auto", AutoManager.getInstance().getStraightTrajectory(m_swerveSubsystem, m_arm));
-    m_autonChooser.addOption("Old Red Right Grid", AutoManager.getInstance().getOldRedRightGridCommand(m_swerveSubsystem, m_arm));
-    m_autonChooser.addOption("Old Blue Right Grid", AutoManager.getInstance().getOldBlueRightGridCommand(m_swerveSubsystem, m_arm));
+    m_autonChooser.addOption("1.5 Piece Red Right Grid", AutoManager.getInstance().getRedRightGrid1_5PieceCommand(m_swerveSubsystem, m_arm));
+    m_autonChooser.addOption("1.5 Piece Blue Right Grid", AutoManager.getInstance().getBlueRightGrid1_5PieceCommand(m_swerveSubsystem, m_arm));
     SmartDashboard.putData(m_autonChooser);
     super.robotInit();
   }

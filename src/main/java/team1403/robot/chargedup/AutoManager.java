@@ -299,7 +299,7 @@ public class AutoManager {
   }
 
   // Red alliance path involving a swing
-  public Command getRedRightGridCommand(SwerveSubsystem swerve, ArmSubsystem arm) {
+  public Command getRedRightGrid2PieceCommand(SwerveSubsystem swerve, ArmSubsystem arm) {
     swerve.setSpeedLimiter(1);
     return new SequentialCommandGroup(
         new SequentialMoveArmCommand(arm,
@@ -330,7 +330,7 @@ public class AutoManager {
                 redRightGridTrajectory3)));
   }
 
-  public Command getOldRedRightGridCommand(SwerveSubsystem swerve, ArmSubsystem arm) {
+  public Command getRedRightGrid1_5PieceCommand(SwerveSubsystem swerve, ArmSubsystem arm) {
     swerve.setSpeedLimiter(1);
     return new SequentialCommandGroup(
         new SequentialMoveArmCommand(arm,
@@ -356,7 +356,7 @@ public class AutoManager {
                 redRightGridTrajectory2Copy)));
   }
 
-  public Command getOldBlueRightGridCommand(SwerveSubsystem swerve, ArmSubsystem arm) {
+  public Command getBlueRightGrid1_5PieceCommand(SwerveSubsystem swerve, ArmSubsystem arm) {
     swerve.setSpeedLimiter(1);
     return new SequentialCommandGroup(
         new SequentialMoveArmCommand(arm,
@@ -385,7 +385,7 @@ public class AutoManager {
 
 
   // Blue alliance path involving a swing
-  public Command getBlueRightGridCommand(SwerveSubsystem swerve, ArmSubsystem arm) {
+  public Command getBlueRightGrid2PieceCommand(SwerveSubsystem swerve, ArmSubsystem arm) {
     swerve.setSpeedLimiter(1);
     return new SequentialCommandGroup(
         new SequentialMoveArmCommand(arm,
@@ -427,7 +427,7 @@ public class AutoManager {
         new TimedDrive(swerve, 6.5, new ChassisSpeeds(-4, 0, 0)));
   }
 
-  public Command getStraightTrajectory(SwerveSubsystem swerve, ArmSubsystem arm) {
+  public Command get1PieceCommand(SwerveSubsystem swerve, ArmSubsystem arm) {
     swerve.setSpeedLimiter(1);
     return new SequentialCommandGroup(
         new SequentialMoveArmCommand(arm,
