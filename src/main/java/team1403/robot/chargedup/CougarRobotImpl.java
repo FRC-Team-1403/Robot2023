@@ -75,7 +75,6 @@ public class CougarRobotImpl extends CougarRobot {
     // m_visionSubsystem = new PhotonVisionSubsystem(parameters);
     // m_lightSubsystem = new LightSubsystem(parameters);
     m_autonChooser = new SendableChooser<Command>();
-    registerAutoCommands();
   }
 
   @Override
@@ -96,14 +95,11 @@ public class CougarRobotImpl extends CougarRobot {
     CommandScheduler.getInstance().removeDefaultCommand(m_swerveSubsystem);
     CommandScheduler.getInstance().removeDefaultCommand(m_arm);
     return m_autonChooser.getSelected();
-    
-    // return AutoManager.getInstance().getImprovedStraightCommand(m_swerveSubsystem, m_arm);
-    // return AutoManager.getInstance().getRedRightGridCommand(m_swerveSubsystem, m_arm);
   }
 
   @Override
   public void teleopInit() {
-    m_swerveSubsystem.setSpeedLimiter(0.6);
+    m_swerveSubsystem.setYawGyroscopeOffset(180 - m_swerveSubsystem.getGyroscopeRotation().getDegrees());
     configureOperatorInterface();
     configureDriverInterface();
   }
@@ -202,10 +198,6 @@ public class CougarRobotImpl extends CougarRobot {
     new Trigger(() -> xboxOperator.getPOV() == 270).onFalse(
         new SetpointArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getLowNodeState(), false));
 
-    // Auto High Cone Node
-    // new Trigger(() -> xboxOperator.getStartButton()).onFalse(
-    //   new SequentialMoveArmCommand(m_arm, () -> RobotConfig.ArmStates.coneHighNodeAuton, false));
-
     // lights
     // new Trigger(() -> xboxOperator.getStartButton()).onTrue(
     // new InstantCommand(() ->
@@ -213,66 +205,6 @@ public class CougarRobotImpl extends CougarRobot {
     // new Trigger(() -> xboxOperator.getBackButton()).onTrue(
     // new InstantCommand(() ->
     // StateManager.getInstance().updateLEDState(LED.PURPLE)));
-  }
-
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  private void registerAutoCommands() {
-    m_reader = new CougarScriptReader((Pose2d startPose) -> {
-      double feetToMeters = 0.30478512648;
-
-      Translation2d flippedXandY = new Translation2d(
-          startPose.getY() * feetToMeters, startPose.getX() * feetToMeters);
-
-      Rotation2d theta = new Rotation2d(
-          startPose.getRotation().getDegrees());
-
-      Pose2d transformedStartPose = new Pose2d(flippedXandY, theta);
-      m_swerveSubsystem.setPose(transformedStartPose);
-    });
-
-    m_reader.registerCommand("SwerveDrivePath", (CougarScriptObject p) -> {
-      List<Translation2d> wayPoints = p.getPointList("Waypoints");
-      return new SwerveDrivePath(m_swerveSubsystem,
-          p.getDouble("StartAngle"),
-          p.getDouble("EndAngle"),
-          wayPoints);
-    });
-
-    m_reader.registerCommand("Delay", (CougarScriptObject p) -> {
-      return new WaitCommand(p.getDouble("seconds"));
-    });
-
-    m_reader.registerCommand("Tuck", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, () -> ArmStateGroup.getTuck(), false);
-    });
-
-    m_reader.registerCommand("High Node", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(),
-          false);
-    });
-
-    m_reader.registerCommand("Middle Node", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState(),
-          false);
-    });
-
-    m_reader.registerCommand("Low Node", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getLowNodeState(),
-          false);
-    });
-
-    m_reader.registerCommand("Floor Pickup", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
-          true);
-    });
-
-    m_reader.registerCommand("Run Intake", (CougarScriptObject p) -> {
-      return new RunIntake(m_arm, p.getDouble("Intake Speed"));
-    });
   }
 
   /**

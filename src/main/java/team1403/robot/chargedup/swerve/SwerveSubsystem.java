@@ -240,7 +240,7 @@ public class SwerveSubsystem extends CougarSubsystem {
    * @return a Rotation2d object that contains the gyroscope's heading
    */
   public Rotation2d getGyroscopeRotation() {
-    return m_navx2.getRotation2d().minus(Rotation2d.fromDegrees(m_yawOffset));
+    return m_navx2.getRotation2d().plus(Rotation2d.fromDegrees(m_yawOffset));
   }
 
   /**
