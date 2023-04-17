@@ -1,13 +1,7 @@
 package team1403.robot.chargedup;
 
-import java.util.List;
-
-import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
@@ -16,31 +10,20 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarRobot;
 import team1403.lib.util.CougarLogger;
-import team1403.robot.chargedup.cse.CougarScriptObject;
 import team1403.robot.chargedup.cse.CougarScriptReader;
-import team1403.robot.chargedup.photonvision.PhotonVisionSubsystem;
 import team1403.robot.chargedup.swerve.SwerveAutoBalanceYaw;
 import team1403.robot.chargedup.swerve.SwerveCommand;
-import team1403.robot.chargedup.swerve.SwerveDrivePath;
 import team1403.robot.chargedup.swerve.SwerveSubsystem;
 import team1403.robot.chargedup.RobotConfig.Operator;
 import team1403.robot.chargedup.StateManager.GamePiece;
-import team1403.robot.chargedup.StateManager.LED;
-import team1403.robot.chargedup.arm.ArmState;
 import team1403.robot.chargedup.arm.ArmStateGroup;
 import team1403.robot.chargedup.arm.ArmSubsystem;
 import team1403.robot.chargedup.arm.ManualArmCommand;
-import team1403.robot.chargedup.arm.RunIntake;
-import team1403.robot.chargedup.arm.SequentialMoveArmCommand;
 import team1403.robot.chargedup.arm.SetpointArmCommand;
-import team1403.robot.chargedup.arm.UpdateArmState;
 
 /**
  * The heart of the robot.
@@ -68,12 +51,9 @@ public class CougarRobotImpl extends CougarRobot {
     var logger = CougarLogger.getChildLogger(
         parameters.getRobotLogger(), "BuiltinDevices");
 
-    // m_builtins = new BuiltinSubsystem(parameters, logger);
     m_arm = new ArmSubsystem(parameters);
     m_swerveSubsystem = new SwerveSubsystem( parameters);
     CameraServer.startAutomaticCapture();
-    // m_visionSubsystem = new PhotonVisionSubsystem(parameters);
-    // m_lightSubsystem = new LightSubsystem(parameters);
     m_autonChooser = new SendableChooser<Command>();
   }
 
@@ -81,11 +61,11 @@ public class CougarRobotImpl extends CougarRobot {
   public void robotInit() {
     AutoManager.getInstance().init(m_swerveSubsystem);
     m_autonChooser.setDefaultOption("1 Piece", AutoManager.getInstance().get1PieceCommand(m_swerveSubsystem, m_arm));
-    m_autonChooser.setDefaultOption("2 Piece Red Right Grid", AutoManager.getInstance().getRedRightGrid2PieceCommand(m_swerveSubsystem, m_arm));
-    m_autonChooser.addOption("2 Piece Blue Right Grid", AutoManager.getInstance().getBlueRightGrid2PieceCommand(m_swerveSubsystem, m_arm));
+    m_autonChooser.addOption("3 Piece Red Right Grid", AutoManager.getInstance().getRedRightGrid3PieceCommand(m_swerveSubsystem, m_arm));
+    m_autonChooser.addOption("3 Piece Blue Right Grid", AutoManager.getInstance().getBlueRightGrid3PieceCommand(m_swerveSubsystem, m_arm));
     m_autonChooser.addOption("Middle Grid Auto", AutoManager.getInstance().getMiddleGridCommand(m_swerveSubsystem, m_arm));
-    m_autonChooser.addOption("1.5 Piece Red Right Grid", AutoManager.getInstance().getRedRightGrid1_5PieceCommand(m_swerveSubsystem, m_arm));
-    m_autonChooser.addOption("1.5 Piece Blue Right Grid", AutoManager.getInstance().getBlueRightGrid1_5PieceCommand(m_swerveSubsystem, m_arm));
+    m_autonChooser.addOption("2 Piece Red Right Grid", AutoManager.getInstance().getRedRightGrid2PieceCommand(m_swerveSubsystem, m_arm));
+    m_autonChooser.addOption("2 Piece Blue Right Grid", AutoManager.getInstance().getBlueRightGrid2PieceCommand(m_swerveSubsystem, m_arm));
     SmartDashboard.putData(m_autonChooser);
     super.robotInit();
   }
