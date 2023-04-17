@@ -35,11 +35,14 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
  */
 public class SwerveControllerCommand extends CommandBase {
   private final Timer m_timer = new Timer();
-  private final Trajectory m_trajectory;
+  private Trajectory m_trajectory;
   private final Supplier<Pose2d> m_pose;
   private final HolonomicDriveController m_controller;
   private final Supplier<Rotation2d> m_desiredRotation;
   private final SwerveSubsystem m_subsystem;
+  private PIDController m_xController;
+  private PIDController m_yController;
+  private ProfiledPIDController m_thetaController;
 
   /**
    * Constructs a new SwerveControllerCommand that when executed will follow the provided
@@ -116,6 +119,11 @@ public class SwerveControllerCommand extends CommandBase {
         () ->
             trajectory.getStates().get(trajectory.getStates().size() - 1).poseMeters.getRotation(),
         subsystem);
+    this.m_xController = xController;
+    this.m_yController = yController;
+    this.m_thetaController = thetaController;
+    this.m_trajectory = trajectory;
+
   }
 
   /**
@@ -210,5 +218,15 @@ public class SwerveControllerCommand extends CommandBase {
     @Override
     public boolean isFinished() {
       return m_timer.hasElapsed(m_trajectory.getTotalTimeSeconds());
+    }
+
+
+    public SwerveControllerCommand copyOf() {
+      return new SwerveControllerCommand(m_trajectory,
+      m_pose,
+      m_xController,
+      m_yController,
+      m_thetaController,
+      m_subsystem);
     }
 }

@@ -31,6 +31,7 @@ public class ArmSubsystem extends CougarSubsystem {
   // Wrist
   private final CougarSparkMax m_wristMotor;
   private final DutyCycleEncoder m_wristAbsoluteEncoder;
+  private final PIDController m_wristController;
 
   // Arm
   private final CANSparkMax m_leftPivotMotor;
@@ -84,6 +85,8 @@ public class ArmSubsystem extends CougarSubsystem {
 
     configWristMotor();
     configEncoders();
+
+    m_wristController = new PIDController(0.05, 0, 0);
 
     m_pivotPid = new PIDController(RobotConfig.Arm.kPArmPivot, RobotConfig.Arm.kIArmPivot, RobotConfig.Arm.kDArmPivot);
     m_minMagneticSwitch = new DigitalInput(RobotConfig.RioPorts.kExtensionMinMagneticSwitch);
@@ -187,7 +190,6 @@ public class ArmSubsystem extends CougarSubsystem {
    */
   public double getAbsoluteWristAngle() {
     double value = (m_wristAbsoluteEncoder.getAbsolutePosition() * 360) + RobotConfig.Arm.kAbsoluteWristOffset;
-
     if (value < 0) {
       value += 360;
     }
@@ -205,6 +207,7 @@ public class ArmSubsystem extends CougarSubsystem {
   private void setAbsoluteWristAngle(double absoluteWristAngle) {
     m_wristMotor.getPIDController().setReference(absoluteWristAngle,
         CANSparkMax.ControlType.kPosition);
+    // m_wristMotor.setSpeed(m_wristController.calculate(getAbsoluteWristAngle(), absoluteWristAngle));
   }
 
   /**
@@ -279,10 +282,10 @@ public class ArmSubsystem extends CougarSubsystem {
     while (normalizedCurrentAngle > 90) {
       normalizedCurrentAngle -= 90;
     }
-    double armLength = RobotConfig.Arm.kBaseArmLength + getExtensionLength();
-    double gravityCompensationFactor = 0.0015 * armLength;
-    double feedforward = gravityCompensationFactor
-        * Math.cos(Math.toRadians(normalizedCurrentAngle));
+    double gravityCompensationFactor = ((.0004/23.128) * getExtensionLength() + .0009)
+     * RobotConfig.Arm.kBaseArmLength; //0.0009
+    double feedforward = gravityCompensationFactor;
+        // * Math.cos(Math.toRadians(normalizedCurrentAngle));
     if ((currentAngle < 90 && currentAngle > 0) || (currentAngle > 270 && currentAngle < 360)) {
       feedforward *= -1;
     }
@@ -553,6 +556,7 @@ public class ArmSubsystem extends CougarSubsystem {
 
     // Track Values
     SmartDashboard.putNumber("Wrist Angle", getAbsoluteWristAngle());
+    SmartDashboard.putNumber("Wrist Relative Angle", m_wristMotor.getEncoder().getPosition());
     SmartDashboard.putNumber("Pivot Angle", getAbsolutePivotAngle());
     SmartDashboard.putNumber("Extension Length", getExtensionLength());
 

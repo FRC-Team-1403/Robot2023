@@ -25,6 +25,7 @@ import team1403.lib.core.CougarRobot;
 import team1403.lib.util.CougarLogger;
 import team1403.robot.chargedup.cse.CougarScriptObject;
 import team1403.robot.chargedup.cse.CougarScriptReader;
+import team1403.robot.chargedup.photonvision.PhotonVisionSubsystem;
 import team1403.robot.chargedup.swerve.SwerveAutoBalanceYaw;
 import team1403.robot.chargedup.swerve.SwerveCommand;
 import team1403.robot.chargedup.swerve.SwerveDrivePath;
@@ -73,16 +74,20 @@ public class CougarRobotImpl extends CougarRobot {
     CameraServer.startAutomaticCapture();
     // m_visionSubsystem = new PhotonVisionSubsystem(parameters);
     // m_lightSubsystem = new LightSubsystem(parameters);
-    // m_autonChooser = new SendableChooser<>();
+    m_autonChooser = new SendableChooser<Command>();
     registerAutoCommands();
   }
 
   @Override
   public void robotInit() {
     AutoManager.getInstance().init(m_swerveSubsystem);
-    // m_autonChooser.setDefaultOption("Red Right Grid", AutoManager.getInstance().getRedRightGridCommand(m_swerveSubsystem, m_arm));
-    // m_autonChooser.addOption("Blue Right Grid", AutoManager.getInstance().getBlueRightGridCommand(m_swerveSubsystem, m_arm));
-    // SmartDashboard.putData(m_autonChooser);
+    m_autonChooser.setDefaultOption("Red Right Grid", AutoManager.getInstance().getRedRightGridCommand(m_swerveSubsystem, m_arm));
+    m_autonChooser.addOption("Blue Right Grid", AutoManager.getInstance().getBlueRightGridCommand(m_swerveSubsystem, m_arm));
+    m_autonChooser.addOption("Middle Grid Auto", AutoManager.getInstance().getMiddleGridCommand(m_swerveSubsystem, m_arm));
+    m_autonChooser.addOption("1 Piece Bump Auto", AutoManager.getInstance().getStraightTrajectory(m_swerveSubsystem, m_arm));
+    m_autonChooser.addOption("Old Red Right Grid", AutoManager.getInstance().getOldRedRightGridCommand(m_swerveSubsystem, m_arm));
+    m_autonChooser.addOption("Old Blue Right Grid", AutoManager.getInstance().getOldBlueRightGridCommand(m_swerveSubsystem, m_arm));
+    SmartDashboard.putData(m_autonChooser);
     super.robotInit();
   }
 
@@ -90,9 +95,10 @@ public class CougarRobotImpl extends CougarRobot {
   public Command getAutonomousCommand() {
     CommandScheduler.getInstance().removeDefaultCommand(m_swerveSubsystem);
     CommandScheduler.getInstance().removeDefaultCommand(m_arm);
+    return m_autonChooser.getSelected();
     
-    // return m_autonChooser.getSelected();
-    return AutoManager.getInstance().getRedRightGridCommand(m_swerveSubsystem, m_arm);
+    // return AutoManager.getInstance().getImprovedStraightCommand(m_swerveSubsystem, m_arm);
+    // return AutoManager.getInstance().getRedRightGridCommand(m_swerveSubsystem, m_arm);
   }
 
   @Override
@@ -189,12 +195,16 @@ public class CougarRobotImpl extends CougarRobot {
     new Trigger(() -> xboxOperator.getPOV() == 180).onFalse(
         new SetpointArmCommand(m_arm, () -> ArmStateGroup.getTuck(), false));
     new Trigger(() -> xboxOperator.getPOV() == 0).onFalse(
-        new SetpointArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false));
+        new SetpointArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), true));
     new Trigger(() -> xboxOperator.getPOV() == 90).onFalse(
         new SetpointArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState(),
-            false));
+            true));
     new Trigger(() -> xboxOperator.getPOV() == 270).onFalse(
         new SetpointArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getLowNodeState(), false));
+
+    // Auto High Cone Node
+    // new Trigger(() -> xboxOperator.getStartButton()).onFalse(
+    //   new SequentialMoveArmCommand(m_arm, () -> RobotConfig.ArmStates.coneHighNodeAuton, false));
 
     // lights
     // new Trigger(() -> xboxOperator.getStartButton()).onTrue(
@@ -324,6 +334,6 @@ public class CougarRobotImpl extends CougarRobot {
   private CougarScriptReader m_reader;
   private final ArmSubsystem m_arm;
   private final SwerveSubsystem m_swerveSubsystem;
-  // private final SendableChooser<Command> m_autonChooser;
+  private final SendableChooser<Command> m_autonChooser;
   // private final LightSubsystem m_lightSubsystem;
 }
