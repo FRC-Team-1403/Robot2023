@@ -191,6 +191,7 @@ public class SwerveSubsystem extends CougarSubsystem {
    */
   public void zeroGyroscope() {
     // tracef("zeroGyroscope %f", getGyroscopeRotation());
+    m_yawOffset = 0;
     m_navx2.reset();
     m_desiredHeading = 0;
   }

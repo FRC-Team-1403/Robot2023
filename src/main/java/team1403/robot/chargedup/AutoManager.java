@@ -84,6 +84,7 @@ public class AutoManager {
   private SwerveControllerCommand redRight3PieceTrajectory1;
   private SwerveControllerCommand redRight3PieceTrajectory2;
   private SwerveControllerCommand redRight3PieceTrajectory3;  
+  private SwerveControllerCommand redRight3PieceTrajectory4;
 
   private SwerveControllerCommand redRight3PieceTrajectory2Copy;
   private SwerveControllerCommand blueSide3PieceTrajectory2Copy;
@@ -94,7 +95,8 @@ public class AutoManager {
 
   private SwerveControllerCommand straightTrajectory1;
 
-  private SwerveControllerCommand balanceTrajectory;
+  private SwerveControllerCommand balanceTrajectory1;
+  private SwerveControllerCommand balanceTrajectory2;
 
   private AutoManager() {
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
@@ -183,10 +185,10 @@ public class AutoManager {
             new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
             List.of(
                 new Translation2d(-1, -0.3),
-                new Translation2d(-2, -0.3),
+                new Translation2d(-2, -0.4),
                 new Translation2d(-3, 0.1),
                 new Translation2d(-5.2, 0.7)),
-            new Pose2d(-5.50, -0.7, Rotation2d.fromDegrees(-90)),
+            new Pose2d(-5.51, -0.7, Rotation2d.fromDegrees(-90)),
             right3PieceTrajectoryConfig1),
         swerve::getPose,
         xController,
@@ -196,13 +198,13 @@ public class AutoManager {
 
     redRight3PieceTrajectory2 = new SwerveControllerCommand(
         TrajectoryGenerator.generateTrajectory(
-            new Pose2d(-5.65, -0.7, Rotation2d.fromDegrees(-90)),
+            new Pose2d(-5.51, -0.7, Rotation2d.fromDegrees(-90)),
             List.of(
-                new Translation2d(-5.7, -0.55),
-                new Translation2d(-4.5, -0.55),
-                new Translation2d(-2.5, -0.55),
-                new Translation2d(-0.5, -0.7)),
-            new Pose2d(0.05, -1.02, Rotation2d.fromDegrees(1)),
+                new Translation2d(-5.55, -0.8),
+                new Translation2d(-4.5, -0.8),
+                new Translation2d(-2.5, -0.8),
+                new Translation2d(-0.5, -0.9)),
+            new Pose2d(0.05, -1.1, Rotation2d.fromDegrees(1)),
             right3PieceTrajectoryConfig2.setStartVelocity(5)),
         swerve::getPose,
         xController,
@@ -212,13 +214,28 @@ public class AutoManager {
 
     redRight3PieceTrajectory3 = new SwerveControllerCommand(
         TrajectoryGenerator.generateTrajectory(
-            new Pose2d(0.05, -1.02, Rotation2d.fromDegrees(1)),
+            new Pose2d(0.05, -1.1, Rotation2d.fromDegrees(1)),
             List.of(
-                new Translation2d(-0.5, -0.55),
-                new Translation2d(-2.5, -0.55),
-                new Translation2d(-4.5, -0.55),
-                new Translation2d(-5.8, -0.55)),
-            new Pose2d(-5.8, -0.65, Rotation2d.fromDegrees(-180)),
+                new Translation2d(-0.5, -0.8),
+                new Translation2d(-2.5, -0.9),
+                new Translation2d(-4.5, -0.9),
+                new Translation2d(-5.0, -1)),
+            new Pose2d(-5.55, -2.22, Rotation2d.fromDegrees(-90)),
+            right3PieceTrajectoryConfig2.setStartVelocity(5)),
+        swerve::getPose,
+        xController,
+        yController,
+        thetaController,
+        swerve);
+
+    redRight3PieceTrajectory4 = new SwerveControllerCommand(
+        TrajectoryGenerator.generateTrajectory(
+            new Pose2d(-5.55, -2.22, Rotation2d.fromDegrees(-90)),
+            List.of(
+                new Translation2d(-4.5, -1.5),
+                new Translation2d(-2.5, -1.5),
+                new Translation2d(-0.5, -1.5)),
+            new Pose2d(-0.05, -2.04, Rotation2d.fromDegrees(1)),
             right3PieceTrajectoryConfig2.setStartVelocity(5)),
         swerve::getPose,
         xController,
@@ -275,14 +292,28 @@ public class AutoManager {
         thetaController,
         swerve);
 
-    balanceTrajectory = new SwerveControllerCommand(
+    balanceTrajectory1 = new SwerveControllerCommand(
         TrajectoryGenerator.generateTrajectory(
-          List.of(
             new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
-            new Pose2d(-2.5, 0, Rotation2d.fromDegrees(1))),
-        new TrajectoryConfig(6,
-        3.25)
+          List.of(
+            new Translation2d(-3, 0)),
+            new Pose2d(-5.1, 0, Rotation2d.fromDegrees(1)),
+        new TrajectoryConfig(2, 3.25)
           .setKinematics(RobotConfig.Swerve.kDriveKinematics)),
+        swerve::getPose,
+        xController,
+        yController,
+        thetaController,
+        swerve);
+
+    balanceTrajectory2 = new SwerveControllerCommand(
+        TrajectoryGenerator.generateTrajectory(
+            new Pose2d(-5.1, 0, Rotation2d.fromDegrees(1)),
+            List.of(
+            new Translation2d(-4.5, 0)),
+            new Pose2d(-2.1, 0, Rotation2d.fromDegrees(2)),
+        new TrajectoryConfig(2, 3.25)
+            .setKinematics(RobotConfig.Swerve.kDriveKinematics)),
         swerve::getPose,
         xController,
         yController,
@@ -360,32 +391,31 @@ public class AutoManager {
   public Command getRedRightGrid3PieceCommand(SwerveSubsystem swerve, ArmSubsystem arm) {
     swerve.setSpeedLimiter(1);
     return new SequentialCommandGroup(
-        new SequentialMoveArmCommand(arm,
-            () -> RobotConfig.ArmStates.coneHighNodeAuton, false),
-        new RunIntake(arm, 1),
+        new RunIntake(arm, -1),
         new ParallelCommandGroup(
             new SequentialCommandGroup(
-                new WaitCommand(0.1),
-                new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false),
-                new WaitCommand(0.65),
+                new WaitCommand(2.37),
                 new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)),
+                new SequentialMoveArmCommand(arm,
+                    () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
+                    true),
+                new RunIntake(arm, 1, 0.9),
+                new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), true),
+                new WaitCommand(1.3),
+                new RunIntake(arm, -1),
+                new WaitCommand(1.67),
                 new SequentialMoveArmCommand(arm,
                     () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
                     true),
                 new RunIntake(arm, 1, 1.2),
                 new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), true),
-                new SequentialMoveArmCommand(arm,
-                    () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(),
-                    false),
-                new RunIntake(arm, -1),
-                new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false),
-                new WaitCommand(0.05),
-                new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_TOWARDS))),
+                new WaitCommand(1.5),
+                new RunIntake(arm, -1)),
             new SequentialCommandGroup(
                 redRight3PieceTrajectory1,
                 redRight3PieceTrajectory2,
-                new WaitCommand(0.5),
-                redRight3PieceTrajectory3)));
+                redRight3PieceTrajectory3,
+                redRight3PieceTrajectory4)));
   }
 
   /**
@@ -395,31 +425,29 @@ public class AutoManager {
   public Command getBlueRightGrid3PieceCommand(SwerveSubsystem swerve, ArmSubsystem arm) {
     swerve.setSpeedLimiter(1);
     return new SequentialCommandGroup(
-        new SequentialMoveArmCommand(arm,
-            () -> RobotConfig.ArmStates.coneHighNodeAuton, false),
-        new RunIntake(arm, 1),
+        new RunIntake(arm, -1),
         new ParallelCommandGroup(
             new SequentialCommandGroup(
-                new WaitCommand(0.1),
-                new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false),
-                new WaitCommand(0.65),
+                new WaitCommand(0.75),
                 new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CUBE)),
                 new SequentialMoveArmCommand(arm,
                     () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
                     true),
-                new RunIntake(arm, 1, 1.3),
+                new RunIntake(arm, 1, 1.2),
                 new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), true),
-                new SequentialMoveArmCommand(arm,
-                    () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(),
-                    false),
+                new WaitCommand(0.5),
                 new RunIntake(arm, -1),
-                new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false),
-                new WaitCommand(0.04),
-                new InstantCommand(() -> StateManager.getInstance().updateArmState(GamePiece.CONE_TOWARDS))),
+                new WaitCommand(0.5),
+                new SequentialMoveArmCommand(arm,
+                    () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
+                    true),
+                new RunIntake(arm, 1, 1.2),
+                new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), true),
+                new WaitCommand(0.5),
+                new RunIntake(arm, -1)),
             new SequentialCommandGroup(
                 blueSide3PieceTrajectory1,
                 blueSide3PieceTrajectory2,
-                new WaitCommand(0.5),
                 blueSide3PieceTrajectory3)));
   }
 
@@ -437,15 +465,17 @@ public class AutoManager {
     swerve.setSpeedLimiter(1);
     return new SequentialCommandGroup(
         new SequentialMoveArmCommand(arm,
-            () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false),
+            () -> RobotConfig.ArmStates.coneHighNodeAuton, false),
         new RunIntake(arm, 1),
         new ParallelCommandGroup(
             new SequentialCommandGroup(
                 new WaitCommand(0.1),
                 new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false)
             ),
-            balanceTrajectory
+            balanceTrajectory1
         ),
+        new WaitCommand(0.1),
+        balanceTrajectory2,
         new SwerveAutoBalanceYaw(swerve));
   }
 }

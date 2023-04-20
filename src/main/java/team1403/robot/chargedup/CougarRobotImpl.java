@@ -80,6 +80,7 @@ public class CougarRobotImpl extends CougarRobot {
   @Override
   public void teleopInit() {
     m_swerveSubsystem.setYawGyroscopeOffset(180 - m_swerveSubsystem.getGyroscopeRotation().getDegrees());
+    m_swerveSubsystem.setXModeEnabled(false);
     configureOperatorInterface();
     configureDriverInterface();
   }

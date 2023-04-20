@@ -296,7 +296,7 @@ public class RobotConfig {
     public static final ArmState coneTowardsAngledMiddleNode = new ArmState(8.345230102539062, 264, 156.45086251051157, 0);
     public static final ArmState coneTowardsLowNode = new ArmState(0, 80.18787350469682, 245.42271036546947, 0);
 
-    public static final ArmState coneTowardsHighConeNode = new ArmState(14.337, 191.3, 167.368595, 0);
+    public static final ArmState coneTowardsHighConeNode = new ArmState(14.337, 191.3, 170.56, 0);
     public static final ArmState coneTowardsMiddleNode = new ArmState(0, 179.6, 183.235, 0);
 
     public static final ArmState coneUprightIntake = new ArmState(0, 216.432458051, 205.82528059, 0);
