@@ -234,6 +234,11 @@ public class SwerveSubsystem extends CougarSubsystem {
     m_odometer.resetPosition(getGyroscopeRotation(), getModulePositions(), getPose());
   }
 
+  public void resetOdometry(Pose2d pose) {
+    tracef("resetOdometry %s", pose.toString());
+    m_odometer.resetPosition(getGyroscopeRotation(), getModulePositions(), pose);
+  }
+
   /**
    * Gets the heading of the gyroscope.
    *

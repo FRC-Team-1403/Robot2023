@@ -1,5 +1,7 @@
 package team1403.robot.chargedup;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -33,73 +35,24 @@ import team1403.robot.chargedup.swerve.SwerveControllerCommand;
 import team1403.robot.chargedup.swerve.SwerveSubsystem;
 import team1403.robot.chargedup.swerve.TimedDrive;
 
+import com.pathplanner.lib.*;
+import com.pathplanner.lib.auto.PIDConstants;
+import com.pathplanner.lib.auto.SwerveAutoBuilder;
+
 public class AutoManager {
   static private AutoManager m_instance;
 
-  private final TrajectoryConfig m_straightTrajectory = new TrajectoryConfig(3,
-  3.0).setKinematics(RobotConfig.Swerve.kDriveKinematics);
+  private ArrayList<PathPlannerTrajectory> pathGroup = (ArrayList<PathPlannerTrajectory>) PathPlanner.loadPathGroup("TestingAuto", new PathConstraints(4, 3));
 
-  private final TrajectoryConfig m_trajectoryConfig1 = new TrajectoryConfig(14.5,
-      3.25).setKinematics(RobotConfig.Swerve.kDriveKinematics);
-
-  private final TrajectoryConfig m_reverseTrajectoryConfig1 = new TrajectoryConfig(14.5,
-      3).setKinematics(RobotConfig.Swerve.kDriveKinematics);
-
-  private final TrajectoryConfig m_trajectoryConfig2 = new TrajectoryConfig(4,
-      1).setKinematics(RobotConfig.Swerve.kDriveKinematics);
-
-  private final TrajectoryConfig m_trajectoryConfig3 = new TrajectoryConfig(10,
-      3).setKinematics(RobotConfig.Swerve.kDriveKinematics);
-
-  private final TrajectoryConfig m_reverseTrajectoryConfig3 = new TrajectoryConfig(10,
-      2).setKinematics(RobotConfig.Swerve.kDriveKinematics);
-
-  private final TrajectoryConfig m_combinedTrajectoryConfig = new TrajectoryConfig(3,
-       3.25).setKinematics(RobotConfig.Swerve.kDriveKinematics).addConstraint(
-        new RectangularRegionConstraint(new Translation2d(1, 1),
-            new Translation2d(-1, -5),
-            new SwerveDriveKinematicsConstraint(RobotConfig.Swerve.kDriveKinematics, 4)))
-    .addConstraint(
-        new RectangularRegionConstraint(new Translation2d(-4.5, 1),
-        new Translation2d(-6, -5),
-        new SwerveDriveKinematicsConstraint(RobotConfig.Swerve.kDriveKinematics, 4)));
-
-  private final PIDController xController = new PIDController(
-      RobotConfig.Swerve.kPTranslation,
-      RobotConfig.Swerve.kITranslation,
-      RobotConfig.Swerve.kDTranslation);
-
-  private final PIDController yController = new PIDController(
-      RobotConfig.Swerve.kPTranslation,
-      RobotConfig.Swerve.kITranslation,
-      RobotConfig.Swerve.kDTranslation);
+  private HashMap<String, Command> eventMap = new HashMap<>();
 
   private final ProfiledPIDController thetaController = new ProfiledPIDController(
-      4,
-      RobotConfig.Swerve.kIAutoTurning,
-      RobotConfig.Swerve.kDAutoTurning,
-      RobotConfig.Swerve.kThetaControllerConstraints);
+    4,
+    RobotConfig.Swerve.kIAutoTurning,
+    RobotConfig.Swerve.kDAutoTurning,
+    RobotConfig.Swerve.kThetaControllerConstraints);
 
-  private SwerveControllerCommand oldRedRightGridTrajectory1;
-  private SwerveControllerCommand oldRedRightGridTrajectory2;
-
-  private SwerveControllerCommand oldBlueRightGridTrajectory1;
-  private SwerveControllerCommand oldBlueRightGridTrajectory2;
-
-  private SwerveControllerCommand redRightGridTrajectory1;
-  private SwerveControllerCommand redRightGridTrajectory2;
-  private SwerveControllerCommand redRightGridTrajectory3;  
-
-  private SwerveControllerCommand redRightGridTrajectory2Copy;
-  private SwerveControllerCommand blueSideGridTrajectory2Copy;
-
-  private SwerveControllerCommand blueSideGridTrajectory1;
-  private SwerveControllerCommand blueSideGridTrajectory2;
-  private SwerveControllerCommand blueSideGridTrajectory3;
-
-  private SwerveControllerCommand straightTrajectory1;
-
-  private SwerveControllerCommand balanceTrajectory;
+    private Command pathplannerAuto;
 
   private AutoManager() {
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
@@ -113,189 +66,18 @@ public class AutoManager {
   }
 
   public void init(SwerveSubsystem swerve) {
-
-    straightTrajectory1 = new SwerveControllerCommand(
-        TrajectoryGenerator.generateTrajectory(
-            new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
-            List.of(
-                new Translation2d(-1.5, 0)),
-            new Pose2d(-4.3, 0, Rotation2d.fromDegrees(1)),
-            m_straightTrajectory),
-        swerve::getPose,
-        xController,
-        yController,
-        thetaController,
-        swerve);
-
-    oldRedRightGridTrajectory1 = new SwerveControllerCommand(
-        TrajectoryGenerator.generateTrajectory(
-            new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
-            List.of(
-                new Translation2d(-1, -0.3),
-                new Translation2d(-2, -0.3)),
-            new Pose2d(-3, 0.1, Rotation2d.fromDegrees(-90)),
-            m_trajectoryConfig1),
-        swerve::getPose,
-        xController,
-        yController,
-        thetaController,
-        swerve);
-
-    oldRedRightGridTrajectory2 = new SwerveControllerCommand(
-        TrajectoryGenerator.generateTrajectory( 
-            new Pose2d(-3, 0.1, Rotation2d.fromDegrees(-90)),
-            List.of(
-                new Translation2d(-5.0, 0.7),
-                new Translation2d(-5.4, -0.3)),
-            new Pose2d(-5.75, -0.7, Rotation2d.fromDegrees(-90)),
-            m_trajectoryConfig2),
-        swerve::getPose,
-        xController,
-        yController,
-        thetaController,
-        swerve);
-
-    oldBlueRightGridTrajectory1 = new SwerveControllerCommand(
-        TrajectoryGenerator.generateTrajectory( 
-            new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
-            List.of(
-                new Translation2d(-1, 0.3),
-                new Translation2d(-2, 0.3)),
-            new Pose2d(-3, 0, Rotation2d.fromDegrees(90)),
-            m_reverseTrajectoryConfig1),
-        swerve::getPose,
-        xController,
-        yController,
-        thetaController,
-        swerve);
-
-    oldBlueRightGridTrajectory2 = new SwerveControllerCommand(
-        TrajectoryGenerator.generateTrajectory( 
-            new Pose2d(-3, 0, Rotation2d.fromDegrees(90)),
-            List.of(
-                new Translation2d(-5, -0.7),
-                new Translation2d(-5.5, 0.3)),
-            new Pose2d(-5.5, 0.7, Rotation2d.fromDegrees(90)),
-            m_trajectoryConfig2),
-        swerve::getPose,
-        xController,
-        yController,
-        thetaController,
-        swerve);
-
-    redRightGridTrajectory1 = new SwerveControllerCommand(
-        TrajectoryGenerator.generateTrajectory(
-            new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
-            List.of(
-                new Translation2d(-1, -0.3),
-                new Translation2d(-2, -0.3),
-                new Translation2d(-3, 0.1),
-                new Translation2d(-5.2, 0.7)),
-            new Pose2d(-5.50, -0.7, Rotation2d.fromDegrees(-90)),
-            m_combinedTrajectoryConfig),
-        swerve::getPose,
-        xController,
-        yController,
-        thetaController,
-        swerve);
-
-    redRightGridTrajectory2 = new SwerveControllerCommand(
-        TrajectoryGenerator.generateTrajectory(
-            new Pose2d(-5.65, -0.7, Rotation2d.fromDegrees(-90)),
-            List.of(
-                new Translation2d(-5.7, -0.55),
-                new Translation2d(-4.5, -0.55),
-                new Translation2d(-2.5, -0.55),
-                new Translation2d(-0.5, -0.7)),
-            new Pose2d(0.05, -1.02, Rotation2d.fromDegrees(1)),
-            m_trajectoryConfig3.setStartVelocity(5)),
-        swerve::getPose,
-        xController,
-        yController,
-        thetaController,
-        swerve);
-
-    redRightGridTrajectory3 = new SwerveControllerCommand(
-        TrajectoryGenerator.generateTrajectory(
-            new Pose2d(0.05, -1.02, Rotation2d.fromDegrees(1)),
-            List.of(
-                new Translation2d(-0.5, -0.55),
-                new Translation2d(-2.5, -0.55),
-                new Translation2d(-4.5, -0.55),
-                new Translation2d(-5.8, -0.55)),
-            new Pose2d(-5.8, -0.65, Rotation2d.fromDegrees(-180)),
-            m_trajectoryConfig3.setStartVelocity(5)),
-        swerve::getPose,
-        xController,
-        yController,
-        thetaController,
-        swerve);
-
-    blueSideGridTrajectory1 = new SwerveControllerCommand(
-        TrajectoryGenerator.generateTrajectory(
-            new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
-            List.of(
-                new Translation2d(-1, 0.3),
-                new Translation2d(-2, 0.3),
-                new Translation2d(-3, 0.1),
-                new Translation2d(-5.2, -0.7)),
-            new Pose2d(-5.65, 0.7, Rotation2d.fromDegrees(90)),
-            m_combinedTrajectoryConfig),
-        swerve::getPose,
-        xController,
-        yController,
-        thetaController,
-        swerve);
-
-    blueSideGridTrajectory2 = new SwerveControllerCommand(
-        TrajectoryGenerator.generateTrajectory(
-            new Pose2d(-5.65, 0.7, Rotation2d.fromDegrees(90)),
-            List.of(
-                new Translation2d(-5.7, 0.65),
-                new Translation2d(-4.5, 0.65),
-                new Translation2d(-2.5, 0.65),
-                new Translation2d(-0.5, 0.8)),
-            new Pose2d(0.04, 1.02, Rotation2d.fromDegrees(0)),
-            m_trajectoryConfig3.setStartVelocity(5)),
-        swerve::getPose,
-        xController,
-        yController,
-        thetaController,
-        swerve);
-
-    blueSideGridTrajectory3 = new SwerveControllerCommand(
-        TrajectoryGenerator.generateTrajectory(
-            new Pose2d(0.04, 1.02, Rotation2d.fromDegrees(0)),
-            List.of(
-                new Translation2d(-0.5, 0.5),
-                new Translation2d(-2.5, 0.55),
-                new Translation2d(-4.5, 0.55),
-                new Translation2d(-5.7, 0.55),
-                new Translation2d(-5.96, 0.55)),
-            new Pose2d(-5.96, 0.65, Rotation2d.fromDegrees(180)),
-            m_trajectoryConfig3.setStartVelocity(5)),
-        swerve::getPose,
-        xController,
-        yController,
-        thetaController,
-        swerve);
-
-    balanceTrajectory = new SwerveControllerCommand(
-        TrajectoryGenerator.generateTrajectory(
-          List.of(
-            new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
-            new Pose2d(-2.5, 0, Rotation2d.fromDegrees(1))),
-        new TrajectoryConfig(6,
-        3.25)
-          .setKinematics(RobotConfig.Swerve.kDriveKinematics)),
-        swerve::getPose,
-        xController,
-        yController,
-        thetaController,
-        swerve);
-
-    redRightGridTrajectory2Copy = redRightGridTrajectory2.copyOf();
-    blueSideGridTrajectory2Copy = blueSideGridTrajectory2.copyOf();
+    SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
+        () -> swerve.getPose(), // Pose2d supplier
+        pose -> swerve.resetOdometry(pose), // Pose2d consumer, used to reset odometry at the beginning of auto
+        RobotConfig.Swerve.kDriveKinematics, // SwerveDriveKinematics
+        new PIDConstants( RobotConfig.Swerve.kPTranslation, RobotConfig.Swerve.kITranslation, RobotConfig.Swerve.kDTranslation ), // PID constants to correct for translation error (used to create the X and Y PID controllers)
+        new PIDConstants( RobotConfig.Swerve.kPAutoTurning, RobotConfig.Swerve.kIAutoTurning, RobotConfig.Swerve.kDAutoTurning ), // PID constants to correct for rotation error (used to create the rotation controller)
+        moduleStates -> swerve.setModuleStates(moduleStates), // Module states consumer used to output to the drive subsystem
+        eventMap,
+        true, // Should th>e path be automatically mirrored depending on alliance color. Optional, defaults to true
+        swerve // The drive subsystem. Used to properly set the requirements of path following commands
+    );
+    pathplannerAuto = autoBuilder.fullAuto(pathGroup);
   }
 
   // Red alliance path involving a swing
