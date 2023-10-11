@@ -84,7 +84,7 @@ public class AutoManager {
 
   public Command getPathPlannerAuto(SwerveSubsystem swerve)
   {
-    swerve.setSpeedLimiter(0.2);
+    swerve.setSpeedLimiter(1.0);
     return pathplannerAuto;
   }
 }
