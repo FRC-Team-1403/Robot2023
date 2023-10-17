@@ -83,6 +83,7 @@
       },
       "nextControl": null,
       "holonomicAngle": 0,
+      "holonomicAngle": -179.34893961977056,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,

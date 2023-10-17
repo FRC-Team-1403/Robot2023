@@ -88,7 +88,7 @@ public class SwerveCommand extends CommandBase {
 
   @Override
   public void execute() {
-    m_drivetrainSubsystem.setSpeedLimiter(0.2 + (m_speedSupplier.getAsDouble() * 0.8));
+    //m_drivetrainSubsystem.setSpeedLimiter(0.2 + (m_speedSupplier.getAsDouble() * 0.8));
     if (m_fieldRelativeSupplier.getAsBoolean()) {
       m_isFieldRelative = !m_isFieldRelative;
     }
