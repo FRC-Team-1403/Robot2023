@@ -87,7 +87,7 @@ public class CougarRobotImpl extends CougarRobot {
     // m_autonChooser.addOption("1 Piece Bump Auto", AutoManager.getInstance().getStraightTrajectory(m_swerveSubsystem, m_arm));
     // m_autonChooser.addOption("Old Red Right Grid", AutoManager.getInstance().getOldRedRightGridCommand(m_swerveSubsystem, m_arm));
     // m_autonChooser.addOption("Old Blue Right Grid", AutoManager.getInstance().getOldBlueRightGridCommand(m_swerveSubsystem, m_arm));
-    m_autonChooser.addOption("pathplanner autp", AutoManager.getInstance().getPathPlannerAuto(m_swerveSubsystem));
+    m_autonChooser.addOption("pathplanner auto", AutoManager.getInstance().getPathPlannerAuto(m_swerveSubsystem));
     SmartDashboard.putData(m_autonChooser);
     super.robotInit();
   }
