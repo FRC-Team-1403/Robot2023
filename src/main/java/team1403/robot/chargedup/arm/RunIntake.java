@@ -38,6 +38,8 @@ public class RunIntake extends CommandBase{
     this.m_initialWristAngle = m_arm.getAbsoluteWristAngle();
     this.startTime = Timer.getFPGATimestamp();
 
+    System.out.println("!!!!!!!!!!!!!!!!!!!!! initialized");
+
     m_arm.moveArm(new ArmState(m_intialExtensionLength, m_initialWristAngle, m_intialPivotAngle, m_intakeSpeed));
   }
 

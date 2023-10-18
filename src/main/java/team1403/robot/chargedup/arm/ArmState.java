@@ -8,7 +8,7 @@ public class ArmState {
   public final double armLength;
   public final double wristAngle;
   public final double armPivot;
-  public final double intakeSpeed;
+  public double intakeSpeed;
 
   /**
    * Initializes the ArmState class.
@@ -24,7 +24,7 @@ public class ArmState {
 
   @Override
   public String toString() {
-    return "ArmState [armLength=" + armLength;
+    return "ArmState [armLength=" + armLength + "]";
   }
 
   @Override

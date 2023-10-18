@@ -28,14 +28,14 @@
         "y": 3.814002157918846
       },
       "prevControl": {
-        "x": 3.079774063878666,
-        "y": 3.840541479251022
+        "x": 3.4305767721526204,
+        "y": 3.7345517421754106
       },
       "nextControl": {
-        "x": 5.3697878335927625,
-        "y": 3.7797446535064023
+        "x": 5.1985003115305375,
+        "y": 3.9510321755686246
       },
-      "holonomicAngle": 1.21887523513132,
+      "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -82,7 +82,7 @@
         "y": 2.6492470078957244
       },
       "nextControl": null,
-      "holonomicAngle": -179.34893961977056,
+      "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -95,5 +95,19 @@
       }
     }
   ],
-  "markers": []
+  "markers": [
+    {
+      "position": 1.2436363636363672,
+      "names": [
+        "lowNode",
+        "lowNodeIntake"
+      ]
+    },
+    {
+      "position": 2.399999999999988,
+      "names": [
+        "lowNodeToTuck"
+      ]
+    }
+  ]
 }

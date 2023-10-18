@@ -70,7 +70,7 @@ public class CougarRobotImpl extends CougarRobot {
 
     // m_builtins = new BuiltinSubsystem(parameters, logger);
     m_arm = new ArmSubsystem(parameters);
-    m_swerveSubsystem = new SwerveSubsystem( parameters);
+    m_swerveSubsystem = new SwerveSubsystem(parameters);
     CameraServer.startAutomaticCapture();
     // m_visionSubsystem = new PhotonVisionSubsystem(parameters);
     // m_lightSubsystem = new LightSubsystem(parameters);
@@ -80,13 +80,21 @@ public class CougarRobotImpl extends CougarRobot {
 
   @Override
   public void robotInit() {
-    AutoManager.getInstance().init(m_swerveSubsystem);
-    // m_autonChooser.setDefaultOption("Red Right Grid", AutoManager.getInstance().getRedRightGridCommand(m_swerveSubsystem, m_arm));
-    // m_autonChooser.addOption("Blue Right Grid", AutoManager.getInstance().getBlueRightGridCommand(m_swerveSubsystem, m_arm));
-    // m_autonChooser.addOption("Middle Grid Auto", AutoManager.getInstance().getMiddleGridCommand(m_swerveSubsystem, m_arm));
-    // m_autonChooser.addOption("1 Piece Bump Auto", AutoManager.getInstance().getStraightTrajectory(m_swerveSubsystem, m_arm));
-    // m_autonChooser.addOption("Old Red Right Grid", AutoManager.getInstance().getOldRedRightGridCommand(m_swerveSubsystem, m_arm));
-    // m_autonChooser.addOption("Old Blue Right Grid", AutoManager.getInstance().getOldBlueRightGridCommand(m_swerveSubsystem, m_arm));
+    AutoManager.getInstance().init(m_swerveSubsystem, m_arm);
+    // m_autonChooser.setDefaultOption("Red Right Grid",
+    // AutoManager.getInstance().getRedRightGridCommand(m_swerveSubsystem, m_arm));
+    // m_autonChooser.addOption("Blue Right Grid",
+    // AutoManager.getInstance().getBlueRightGridCommand(m_swerveSubsystem, m_arm));
+    // m_autonChooser.addOption("Middle Grid Auto",
+    // AutoManager.getInstance().getMiddleGridCommand(m_swerveSubsystem, m_arm));
+    // m_autonChooser.addOption("1 Piece Bump Auto",
+    // AutoManager.getInstance().getStraightTrajectory(m_swerveSubsystem, m_arm));
+    // m_autonChooser.addOption("Old Red Right Grid",
+    // AutoManager.getInstance().getOldRedRightGridCommand(m_swerveSubsystem,
+    // m_arm));
+    // m_autonChooser.addOption("Old Blue Right Grid",
+    // AutoManager.getInstance().getOldBlueRightGridCommand(m_swerveSubsystem,
+    // m_arm));
     m_autonChooser.addOption("pathplanner auto", AutoManager.getInstance().getPathPlannerAuto(m_swerveSubsystem));
     SmartDashboard.putData(m_autonChooser);
     super.robotInit();
@@ -97,9 +105,12 @@ public class CougarRobotImpl extends CougarRobot {
     CommandScheduler.getInstance().removeDefaultCommand(m_swerveSubsystem);
     CommandScheduler.getInstance().removeDefaultCommand(m_arm);
     return m_autonChooser.getSelected();
-    
-    // return AutoManager.getInstance().getImprovedStraightCommand(m_swerveSubsystem, m_arm);
-    // return AutoManager.getInstance().getRedRightGridCommand(m_swerveSubsystem, m_arm);
+
+    // return
+    // AutoManager.getInstance().getImprovedStraightCommand(m_swerveSubsystem,
+    // m_arm);
+    // return AutoManager.getInstance().getRedRightGridCommand(m_swerveSubsystem,
+    // m_arm);
   }
 
   @Override
@@ -138,6 +149,16 @@ public class CougarRobotImpl extends CougarRobot {
         .onTrue(new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(true)));
     new Trigger(() -> driveController.getXButton())
         .onFalse(new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(false)));
+    new Trigger(() -> driveController.getYButton())
+        .toggleOnTrue(new InstantCommand(() -> m_swerveSubsystem.resetOdometry()));
+    new Trigger(() -> driveController.getRightBumperPressed())
+        .toggleOnTrue(new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(1.0)));
+    new Trigger(() -> driveController.getLeftBumperPressed())
+        .toggleOnTrue(new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.5)));
+    new Trigger(() -> (driveController.getLeftTriggerAxis() > 0.5 ))
+        .toggleOnTrue(new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.5)));
+
+
   }
 
   /**
@@ -205,7 +226,8 @@ public class CougarRobotImpl extends CougarRobot {
 
     // Auto High Cone Node
     // new Trigger(() -> xboxOperator.getStartButton()).onFalse(
-    //   new SequentialMoveArmCommand(m_arm, () -> RobotConfig.ArmStates.coneHighNodeAuton, false));
+    // new SequentialMoveArmCommand(m_arm, () ->
+    // RobotConfig.ArmStates.coneHighNodeAuton, false));
 
     // lights
     // new Trigger(() -> xboxOperator.getStartButton()).onTrue(
@@ -252,22 +274,26 @@ public class CougarRobotImpl extends CougarRobot {
     });
 
     m_reader.registerCommand("High Node", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(),
+      return new SequentialMoveArmCommand(m_arm,
+          () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(),
           false);
     });
 
     m_reader.registerCommand("Middle Node", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState(),
+      return new SequentialMoveArmCommand(m_arm,
+          () -> StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState(),
           false);
     });
 
     m_reader.registerCommand("Low Node", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getLowNodeState(),
+      return new SequentialMoveArmCommand(m_arm,
+          () -> StateManager.getInstance().getCurrentArmGroup().getLowNodeState(),
           false);
     });
 
     m_reader.registerCommand("Floor Pickup", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
+      return new SequentialMoveArmCommand(m_arm,
+          () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
           true);
     });
 
