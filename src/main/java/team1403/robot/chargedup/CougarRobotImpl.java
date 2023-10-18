@@ -104,7 +104,7 @@ public class CougarRobotImpl extends CougarRobot {
 
   @Override
   public void teleopInit() {
-    m_swerveSubsystem.setSpeedLimiter(0.6);
+    m_swerveSubsystem.setSpeedLimiter(1.0);
     configureOperatorInterface();
     configureDriverInterface();
   }
