@@ -138,6 +138,11 @@ public class CougarRobotImpl extends CougarRobot {
         .onTrue(new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(true)));
     new Trigger(() -> driveController.getXButton())
         .onFalse(new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(false)));
+    // Speed limit changer 
+    new Trigger(() -> driveController.getYButton())
+    .onFalse(new InstantCommand(() ->     m_sswerveSubsystem.setSpeedLimiter(0.6)));
+    new Trigger(() -> driveController.getYButton())
+    .onFalse(new InstantCommand(() ->     m_swerveSubsystem.setSpeedLimiter(1.0)));
   }
 
   /**
