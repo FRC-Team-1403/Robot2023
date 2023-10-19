@@ -99,14 +99,13 @@
     {
       "position": 1.2436363636363672,
       "names": [
-        "lowNode",
-        "lowNodeIntake"
+        "lowNode"
       ]
     },
     {
       "position": 2.399999999999988,
       "names": [
-        "lowNodeToTuck"
+        "tuck"
       ]
     }
   ]

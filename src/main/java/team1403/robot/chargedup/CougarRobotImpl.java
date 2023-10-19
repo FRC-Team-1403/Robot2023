@@ -81,21 +81,10 @@ public class CougarRobotImpl extends CougarRobot {
   @Override
   public void robotInit() {
     AutoManager.getInstance().init(m_swerveSubsystem, m_arm);
-    // m_autonChooser.setDefaultOption("Red Right Grid",
-    // AutoManager.getInstance().getRedRightGridCommand(m_swerveSubsystem, m_arm));
-    // m_autonChooser.addOption("Blue Right Grid",
-    // AutoManager.getInstance().getBlueRightGridCommand(m_swerveSubsystem, m_arm));
-    // m_autonChooser.addOption("Middle Grid Auto",
-    // AutoManager.getInstance().getMiddleGridCommand(m_swerveSubsystem, m_arm));
-    // m_autonChooser.addOption("1 Piece Bump Auto",
-    // AutoManager.getInstance().getStraightTrajectory(m_swerveSubsystem, m_arm));
-    // m_autonChooser.addOption("Old Red Right Grid",
-    // AutoManager.getInstance().getOldRedRightGridCommand(m_swerveSubsystem,
-    // m_arm));
-    // m_autonChooser.addOption("Old Blue Right Grid",
-    // AutoManager.getInstance().getOldBlueRightGridCommand(m_swerveSubsystem,
-    // m_arm));
-    m_autonChooser.addOption("pathplanner auto", AutoManager.getInstance().getPathPlannerAuto(m_swerveSubsystem));
+
+    m_autonChooser.setDefaultOption("pathplanner auto", AutoManager.getInstance().getPathPlannerAuto(m_swerveSubsystem));
+    m_autonChooser.addOption("Two Piece Auto", AutoManager.getInstance().getTwoPieceAuto(m_swerveSubsystem));
+
     SmartDashboard.putData(m_autonChooser);
     super.robotInit();
   }
@@ -154,11 +143,7 @@ public class CougarRobotImpl extends CougarRobot {
     new Trigger(() -> driveController.getRightBumperPressed())
         .toggleOnTrue(new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(1.0)));
     new Trigger(() -> driveController.getLeftBumperPressed())
-        .toggleOnTrue(new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.5)));
-    new Trigger(() -> (driveController.getLeftTriggerAxis() > 0.5 ))
-        .toggleOnTrue(new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.5)));
-
-
+        .toggleOnTrue(new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.6)));
   }
 
   /**

@@ -19,7 +19,11 @@ public class ArmState {
     this.wristAngle = wristAngle;
     this.armPivot = armPivot;
     this.intakeSpeed = intakeSpeed;
+  }
 
+  public void setIntakeSpeed(double speed)
+  {
+    this.intakeSpeed = speed;
   }
 
   @Override

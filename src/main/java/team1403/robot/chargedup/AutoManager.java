@@ -24,7 +24,13 @@ public class AutoManager {
   static private AutoManager m_instance;
 
   private ArrayList<PathPlannerTrajectory> pathGroup = (ArrayList<PathPlannerTrajectory>) 
-  PathPlanner.loadPathGroup("New Path", new PathConstraints(1.333, 1));
+  PathPlanner.loadPathGroup("One Piece Auto", new PathConstraints(4, 3));;
+
+  private ArrayList<PathPlannerTrajectory> twoPiece = (ArrayList<PathPlannerTrajectory>) 
+  PathPlanner.loadPathGroup("Two Piece Auto", new PathConstraints(4, 3));
+
+  private ArrayList<PathPlannerTrajectory> threePiece = (ArrayList<PathPlannerTrajectory>) 
+  PathPlanner.loadPathGroup("Three Piece Auto", new PathConstraints(4, 3));;
 
   private HashMap<String, Command> eventMap = new HashMap<>();
   
@@ -35,6 +41,8 @@ public class AutoManager {
     RobotConfig.Swerve.kThetaControllerConstraints);
 
   private CommandBase pathplannerAuto;
+  private CommandBase twoPieceAuto;
+  private CommandBase threePieceAuto;
 
   private AutoManager() {
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
@@ -50,10 +58,10 @@ public class AutoManager {
   public void init(SwerveSubsystem swerve, ArmSubsystem arm) {
     StateManager.getInstance().updateArmState(GamePiece.CUBE);
     ArmState state = StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState();
-    state.intakeSpeed = 1.0;
+    state.setIntakeSpeed(1.0);
     eventMap.put("lowNode", new SetpointArmCommand(arm, () -> state, false));
     //max speed is 1.0
-    eventMap.put("lowNodeToTuck", new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false));
+    eventMap.put("tuck", new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false));
     SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
         () -> swerve.getPose(), // Pose2d supplier
         pose -> swerve.resetOdometry(pose), // Pose2d consumer, used to reset odometry at the beginning of auto
@@ -66,12 +74,24 @@ public class AutoManager {
         swerve // The drive subsystem. Used to properly set the requirements of path following commands
     );
     pathplannerAuto = autoBuilder.fullAuto(pathGroup).andThen(() -> swerve.stop(), swerve);
+    twoPieceAuto = autoBuilder.fullAuto(twoPiece).andThen(() -> swerve.stop(), swerve);
+    threePieceAuto = autoBuilder.fullAuto(threePiece).andThen(() -> swerve.stop(), swerve);
   } 
-
+  public CommandBase getThreePieceAuto(SwerveSubsystem swerve)
+  {
+    swerve.setSpeedLimiter(1.0);
+    return threePieceAuto;
+  }
 
   public CommandBase getPathPlannerAuto(SwerveSubsystem swerve)
   {
     swerve.setSpeedLimiter(1.0);
     return pathplannerAuto;
+  }
+
+  public CommandBase getTwoPieceAuto(SwerveSubsystem swerve)
+  {
+    swerve.setSpeedLimiter(1.0);
+    return twoPieceAuto;
   }
 }
