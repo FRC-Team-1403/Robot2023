@@ -21,7 +21,6 @@ public class SwerveCommand extends CommandBase {
   private final DoubleSupplier m_horizontalTranslationSupplier;
   private final DoubleSupplier m_rotationSupplier;
   private final BooleanSupplier m_fieldRelativeSupplier;
-  private final DoubleSupplier m_speedSupplier;
   private boolean m_isFieldRelative;
 
   private Translation2d frontRight;
@@ -54,14 +53,12 @@ public class SwerveCommand extends CommandBase {
       DoubleSupplier horizontalTranslationSupplier,
       DoubleSupplier verticalTranslationSupplier,
       DoubleSupplier rotationSupplier,
-      BooleanSupplier fieldRelativeSupplier,
-      DoubleSupplier speedSupplier) {
+      BooleanSupplier fieldRelativeSupplier) {
     this.m_drivetrainSubsystem = drivetrain;
     this.m_verticalTranslationSupplier = verticalTranslationSupplier;
     this.m_horizontalTranslationSupplier = horizontalTranslationSupplier;
     this.m_rotationSupplier = rotationSupplier;
     this.m_fieldRelativeSupplier = fieldRelativeSupplier;
-    this.m_speedSupplier = speedSupplier;
     m_isFieldRelative = true;
 
     frontRight = new Translation2d(
@@ -88,7 +85,6 @@ public class SwerveCommand extends CommandBase {
 
   @Override
   public void execute() {
-    //m_drivetrainSubsystem.setSpeedLimiter(0.2 + (m_speedSupplier.getAsDouble() * 0.8));
     if (m_fieldRelativeSupplier.getAsBoolean()) {
       m_isFieldRelative = !m_isFieldRelative;
     }

@@ -104,7 +104,7 @@ public class CougarRobotImpl extends CougarRobot {
 
   @Override
   public void teleopInit() {
-    m_swerveSubsystem.setSpeedLimiter(1.0);
+    m_swerveSubsystem.setSpeedLimiter(0.6);
     configureOperatorInterface();
     configureDriverInterface();
   }
@@ -126,8 +126,8 @@ public class CougarRobotImpl extends CougarRobot {
         () -> -deadband(driveController.getLeftX(), 0),
         () -> -deadband(driveController.getLeftY(), 0),
         () -> -deadband(driveController.getRightX(), 0),
-        () -> driveController.getYButton(),
-        () -> driveController.getRightTriggerAxis()));
+        () -> driveController.getYButton()
+        ));
 
     new Trigger(() -> driveController.getBButton()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.zeroGyroscope()));
@@ -138,12 +138,12 @@ public class CougarRobotImpl extends CougarRobot {
         .onTrue(new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(true)));
     new Trigger(() -> driveController.getXButton())
         .onFalse(new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(false)));
-    new Trigger(() -> driveController.getYButton())
+    new Trigger(() -> driveController.getPOV() == 180)
         .toggleOnTrue(new InstantCommand(() -> m_swerveSubsystem.resetOdometry()));
     new Trigger(() -> driveController.getRightBumperPressed())
-        .toggleOnTrue(new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(1.0)));
+        .toggleOnTrue(new InstantCommand(() -> m_swerveSubsystem.increaseSpeed(0.2)));
     new Trigger(() -> driveController.getLeftBumperPressed())
-        .toggleOnTrue(new InstantCommand(() -> m_swerveSubsystem.setSpeedLimiter(0.6)));
+        .toggleOnTrue(new InstantCommand(() -> m_swerveSubsystem.decreaseSpeed(0.2)));
   }
 
   /**
