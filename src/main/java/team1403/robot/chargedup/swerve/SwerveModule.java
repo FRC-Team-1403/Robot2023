@@ -117,10 +117,10 @@ public class SwerveModule implements Device {
     m_steerMotor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 20);
     m_steerMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
     m_steerMotor.setInverted(false);
-    m_steerMotor.enableVoltageCompensation(12);
-    m_steerMotor.setSmartCurrentLimit(40);
+    m_steerMotor.enableVoltageCompensation(RobotConfig.Swerve.kVoltageSaturation);
+    m_steerMotor.setSmartCurrentLimit(RobotConfig.Swerve.kCurrentLimit);
 
-    m_steerPidController.setP(0.3);
+    m_steerPidController.setP(Swerve.kPTurning);
     m_steerPidController.setI(Swerve.kITurning);
     m_steerPidController.setD(Swerve.kDTurning);
     m_steerPidController.setFeedbackDevice((MotorFeedbackSensor) m_steerRelativeEncoder);
@@ -132,7 +132,7 @@ public class SwerveModule implements Device {
   public void initDriveMotor() {
     m_driveMotor.setInverted(true);
     m_driveMotor.setVoltageCompensation(RobotConfig.Swerve.kVoltageSaturation);
-    m_driveMotor.setAmpLimit(RobotConfig.Swerve.kCurrentLimit);
+    m_driveMotor.setSmartCurrentLimit(RobotConfig.Swerve.kCurrentLimit);
     m_driveMotor.getCanSparkMaxApi().setPeriodicFramePeriod(
         CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 100);
     m_driveMotor.getCanSparkMaxApi().setPeriodicFramePeriod(
