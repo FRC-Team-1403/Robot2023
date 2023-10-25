@@ -46,11 +46,11 @@ public class SwerveModule implements Device {
   /**
    * Swerve Module represents a singular swerve module for a
    * swerve drive train.
-   * 
+   *
    * <p>Each swerve module consists of a drive motor,
    * changing the velocity of the wheel, and a steer motor, changing
    * the angle of the actual wheel inside of the module.
-   * 
+   *
    * <p>The swerve module also features
    * an absolute encoder to ensure the angle of
    * the module is always known, regardless if the bot is turned off
@@ -212,7 +212,7 @@ public class SwerveModule implements Device {
    */
   private double convertSteerAngle(double steerAngle) {
     steerAngle = normalizeAngle(steerAngle);
-    double difference = normalizeAngleError(steerAngle);        
+    double difference = normalizeAngleError(steerAngle);
 
     // If the difference is greater than 90 deg or less than -90 deg the drive can
     // be inverted so the total
@@ -236,13 +236,13 @@ public class SwerveModule implements Device {
     // fully set up, and we don't
     // end up getting a good reading. If we reset periodically this won't matter
     // anymore.
-    if (m_steerMotor.getEncoder().getVelocity() 
+    if (m_steerMotor.getEncoder().getVelocity()
             < Swerve.kEncoderResetMaxAngularVelocity) {
       if (++m_absoluteEncoderResetIterations >= Swerve.kEncoderResetIterations) {
-        m_logger.tracef("Resetting steer relative encoder. Reset iteration %f", 
+        m_logger.tracef("Resetting steer relative encoder. Reset iteration %f",
             m_absoluteEncoderResetIterations);
         m_absoluteEncoderResetIterations = 0;
-        double absoluteAngle = getAbsoluteAngle();    
+        double absoluteAngle = getAbsoluteAngle();
         m_steerMotor.getEncoder().setPosition(getAbsoluteAngle());
         currentAngleRadians = absoluteAngle;
       }
@@ -254,7 +254,7 @@ public class SwerveModule implements Device {
 
     // The reference angle has the range [0, 2pi)
     // but the Falcon's encoder can go above that
-    double adjustedReferenceAngleRadians = referenceAngleRadians 
+    double adjustedReferenceAngleRadians = referenceAngleRadians
         + currentAngleRadians - currentAngleRadiansMod;
     if (referenceAngleRadians - currentAngleRadiansMod > Math.PI) {
       adjustedReferenceAngleRadians -= 2.0 * Math.PI;

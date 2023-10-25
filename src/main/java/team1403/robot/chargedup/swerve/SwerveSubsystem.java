@@ -120,6 +120,11 @@ public class SwerveSubsystem extends CougarSubsystem {
     m_rollOffset = -m_navx2.getRoll();
     m_yawOffset = 0;
 
+    //reset each swerve module
+    for(int i = 0; i < m_modules.length; i++)
+    {
+      m_modules[i].set(0.0, 0.0);
+    }
   }
 
   /**
@@ -308,7 +313,7 @@ public class SwerveSubsystem extends CougarSubsystem {
 
   /**
    * Sets which wheel to pivot for the robot.
-   * 
+   *
    * @param isRight whether right or left wheels should be pivoted
    */
   public void setPivotAroundOneWheel(boolean isRight) {
