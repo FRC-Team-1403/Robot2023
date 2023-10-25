@@ -76,7 +76,8 @@ public class AutoManager {
     pathplannerAuto = autoBuilder.fullAuto(pathGroup).andThen(() -> swerve.stop(), swerve);
     twoPieceAuto = autoBuilder.fullAuto(twoPiece).andThen(() -> swerve.stop(), swerve);
     threePieceAuto = autoBuilder.fullAuto(threePiece).andThen(() -> swerve.stop(), swerve);
-  } 
+  }
+  
   public CommandBase getThreePieceAuto(SwerveSubsystem swerve)
   {
     swerve.setSpeedLimiter(1.0);

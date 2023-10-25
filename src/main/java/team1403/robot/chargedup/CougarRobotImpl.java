@@ -94,7 +94,7 @@ public class CougarRobotImpl extends CougarRobot {
     CommandScheduler.getInstance().removeDefaultCommand(m_swerveSubsystem);
     CommandScheduler.getInstance().removeDefaultCommand(m_arm);
     //force the swerve subsystem to stop running the default command, setting the speed limiter should now work
-    new InstantCommand(() -> m_swerveSubsystem.stop(), m_swerveSubsystem);
+    //new InstantCommand(() -> m_swerveSubsystem.stop(), m_swerveSubsystem);
     return m_autonChooser.getSelected();
 
     // return
@@ -129,7 +129,8 @@ public class CougarRobotImpl extends CougarRobot {
         () -> -deadband(driveController.getLeftY(), 0),
         () -> -deadband(driveController.getRightX(), 0),
         () -> driveController.getYButton(),
-        () -> driveController.getRightTriggerAxis()
+        () -> driveController.getRightTriggerAxis(),
+        () -> getMode()
         ));
 
     new Trigger(() -> driveController.getBButton()).onFalse(
@@ -143,10 +144,6 @@ public class CougarRobotImpl extends CougarRobot {
         .onFalse(new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(false)));
     new Trigger(() -> driveController.getPOV() == 180)
         .toggleOnTrue(new InstantCommand(() -> m_swerveSubsystem.resetOdometry()));
-    new Trigger(() -> driveController.getRightBumperPressed())
-        .toggleOnTrue(new InstantCommand(() -> m_swerveSubsystem.increaseSpeed(0.2)));
-    new Trigger(() -> driveController.getLeftBumperPressed())
-        .toggleOnTrue(new InstantCommand(() -> m_swerveSubsystem.decreaseSpeed(0.2)));
   }
 
   /**
