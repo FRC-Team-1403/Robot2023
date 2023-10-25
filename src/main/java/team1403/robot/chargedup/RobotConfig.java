@@ -146,7 +146,7 @@ public class RobotConfig {
         Units.inchesToMeters(610.77),
         Units.inchesToMeters(108.19),
         Units.inchesToMeters(18.22),
-        new Rotation3d(0.0, 0.0, Math.PI))),  
+        new Rotation3d(0.0, 0.0, Math.PI))),
       new AprilTag(8, new Pose3d(
         Units.inchesToMeters(40.45),
         Units.inchesToMeters(42.19),
@@ -191,7 +191,6 @@ public class RobotConfig {
    */
   public static class RioPorts {
 
-    
     public static final int kWristAbsoluteEncoder = 1; //DIO
 
     public static final int kArmAbsoluteEncoder = 3; ///Analog
