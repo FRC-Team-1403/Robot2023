@@ -8,6 +8,7 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
@@ -75,7 +76,6 @@ public class CougarRobotImpl extends CougarRobot {
     // m_visionSubsystem = new PhotonVisionSubsystem(parameters);
     // m_lightSubsystem = new LightSubsystem(parameters);
     m_autonChooser = new SendableChooser<Command>();
-    registerAutoCommands();
   }
 
   @Override
@@ -227,70 +227,6 @@ public class CougarRobotImpl extends CougarRobot {
   }
 
   /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  private void registerAutoCommands() {
-    m_reader = new CougarScriptReader((Pose2d startPose) -> {
-      double feetToMeters = 0.30478512648;
-
-      Translation2d flippedXandY = new Translation2d(
-          startPose.getY() * feetToMeters, startPose.getX() * feetToMeters);
-
-      Rotation2d theta = new Rotation2d(
-          startPose.getRotation().getDegrees());
-
-      Pose2d transformedStartPose = new Pose2d(flippedXandY, theta);
-      m_swerveSubsystem.setPose(transformedStartPose);
-    });
-
-    m_reader.registerCommand("SwerveDrivePath", (CougarScriptObject p) -> {
-      List<Translation2d> wayPoints = p.getPointList("Waypoints");
-      return new SwerveDrivePath(m_swerveSubsystem,
-          p.getDouble("StartAngle"),
-          p.getDouble("EndAngle"),
-          wayPoints);
-    });
-
-    m_reader.registerCommand("Delay", (CougarScriptObject p) -> {
-      return new WaitCommand(p.getDouble("seconds"));
-    });
-
-    m_reader.registerCommand("Tuck", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, () -> ArmStateGroup.getTuck(), false);
-    });
-
-    m_reader.registerCommand("High Node", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm,
-          () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(),
-          false);
-    });
-
-    m_reader.registerCommand("Middle Node", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm,
-          () -> StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState(),
-          false);
-    });
-
-    m_reader.registerCommand("Low Node", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm,
-          () -> StateManager.getInstance().getCurrentArmGroup().getLowNodeState(),
-          false);
-    });
-
-    m_reader.registerCommand("Floor Pickup", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm,
-          () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
-          true);
-    });
-
-    m_reader.registerCommand("Run Intake", (CougarScriptObject p) -> {
-      return new RunIntake(m_arm, p.getDouble("Intake Speed"));
-    });
-  }
-
-  /**
    * Applies a deadband to the given value.
    *
    * @param value    the value to apply a deadband to
@@ -346,7 +282,6 @@ public class CougarRobotImpl extends CougarRobot {
 
   // private final BuiltinSubsystem m_builtins;
   // private final PhotonVisionSubsystem m_visionSubsystem;
-  private CougarScriptReader m_reader;
   private final ArmSubsystem m_arm;
   private final SwerveSubsystem m_swerveSubsystem;
   private final SendableChooser<Command> m_autonChooser;
