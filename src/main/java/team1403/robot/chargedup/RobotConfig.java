@@ -99,7 +99,8 @@ public class RobotConfig {
 
     public static final double kVoltageSaturation = 12.0;
     //max neo amperage, 50 amps seems the safest based on https://www.revrobotics.com/neo-brushless-motor-locked-rotor-testing/
-    public static final int kCurrentLimit = 50;
+    //40 A fuses
+    public static final int kCurrentLimit = 40;
 
     public static final double kMaxAccelerationMetersPerSecondSquared = 3;
     public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI / 2;
