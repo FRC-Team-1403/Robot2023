@@ -65,9 +65,9 @@ public class AutoManager {
 
     StateManager.getInstance().updateArmState(GamePiece.CONE_UPRIGHT);
     ArmState state2 = StateManager.getInstance().getCurrentArmGroup().getHighNodeState();
-    state2.setIntakeSpeed(1.0);
 
     eventMap.put("highNodeCone", new SetpointArmCommand(arm, () -> state2, false));
+    eventMap.put("runIntake", new RunIntake(arm, 1.0));
 
     SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
         () -> swerve.getPose(), // Pose2d supplier
