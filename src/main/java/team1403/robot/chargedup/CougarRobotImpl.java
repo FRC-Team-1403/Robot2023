@@ -129,7 +129,8 @@ public class CougarRobotImpl extends CougarRobot {
         () -> -deadband(driveController.getLeftY(), 0),
         () -> -deadband(driveController.getRightX(), 0),
         () -> driveController.getYButton(),
-        () -> driveController.getRightTriggerAxis()
+        () -> driveController.getRightTriggerAxis(),
+        () -> getMode()
         ));
 
     new Trigger(() -> driveController.getBButton()).onFalse(

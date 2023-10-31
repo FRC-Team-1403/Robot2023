@@ -2,12 +2,14 @@ package team1403.robot.chargedup.swerve;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import team1403.lib.core.CougarRobot;
 import team1403.robot.chargedup.AutoManager;
 import team1403.robot.chargedup.RobotConfig;
 import team1403.robot.chargedup.RobotConfig.Swerve;
@@ -23,6 +25,7 @@ public class SwerveCommand extends CommandBase {
   private final DoubleSupplier m_rotationSupplier;
   private final BooleanSupplier m_fieldRelativeSupplier;
   private final DoubleSupplier m_speedDoubleSupplier;
+  private final Supplier<CougarRobot.Mode> m_modeSupplier;
   private boolean m_isFieldRelative;
 
   private Translation2d frontRight;
@@ -56,13 +59,15 @@ public class SwerveCommand extends CommandBase {
       DoubleSupplier verticalTranslationSupplier,
       DoubleSupplier rotationSupplier,
       BooleanSupplier fieldRelativeSupplier,
-      DoubleSupplier speedDoubleSupplier) {
+      DoubleSupplier speedDoubleSupplier,
+      Supplier<CougarRobot.Mode> modeSupplier) {
     this.m_drivetrainSubsystem = drivetrain;
     this.m_verticalTranslationSupplier = verticalTranslationSupplier;
     this.m_horizontalTranslationSupplier = horizontalTranslationSupplier;
     this.m_rotationSupplier = rotationSupplier;
     this.m_fieldRelativeSupplier = fieldRelativeSupplier;
     this.m_speedDoubleSupplier = speedDoubleSupplier;
+    this.m_modeSupplier = modeSupplier;
     m_isFieldRelative = true;
 
     frontRight = new Translation2d(
@@ -89,7 +94,14 @@ public class SwerveCommand extends CommandBase {
 
   @Override
   public void execute() {
-    m_drivetrainSubsystem.setSpeedLimiter(0.2 + (m_speedDoubleSupplier.getAsDouble() * 0.8));
+    if(m_modeSupplier.get() == CougarRobot.Mode.TELEOP)
+    {
+      m_drivetrainSubsystem.setSpeedLimiter(0.2 + (m_speedDoubleSupplier.getAsDouble() * 0.8));
+    }
+    else if(m_modeSupplier.get() == CougarRobot.Mode.AUTONOMOUS)
+    {
+      m_drivetrainSubsystem.setSpeedLimiter(1.0);
+    }
     if (m_fieldRelativeSupplier.getAsBoolean()) {
       m_isFieldRelative = !m_isFieldRelative;
     }
