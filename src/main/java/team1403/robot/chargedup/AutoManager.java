@@ -62,6 +62,13 @@ public class AutoManager {
     eventMap.put("lowNode", new SetpointArmCommand(arm, () -> state, false));
     //max speed is 1.0
     eventMap.put("tuck", new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false));
+
+    StateManager.getInstance().updateArmState(GamePiece.CONE_UPRIGHT);
+    ArmState state2 = StateManager.getInstance().getCurrentArmGroup().getHighNodeState();
+    state2.setIntakeSpeed(1.0);
+
+    eventMap.put("highNodeCone", new SetpointArmCommand(arm, () -> state2, false));
+
     SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
         () -> swerve.getPose(), // Pose2d supplier
         pose -> swerve.resetOdometry(pose), // Pose2d consumer, used to reset odometry at the beginning of auto
