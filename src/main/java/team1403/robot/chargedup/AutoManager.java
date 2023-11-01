@@ -12,6 +12,7 @@ import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import team1403.robot.chargedup.StateManager.GamePiece;
 import team1403.robot.chargedup.arm.ArmState;
 import team1403.robot.chargedup.arm.ArmStateGroup;
@@ -87,19 +88,16 @@ public class AutoManager {
   
   public CommandBase getThreePieceAuto(SwerveSubsystem swerve)
   {
-    swerve.setSpeedLimiter(1.0);
-    return threePieceAuto;
+    return new InstantCommand(() -> swerve.setSpeedLimiter(1.0), swerve).andThen(threePieceAuto);
   }
 
   public CommandBase getPathPlannerAuto(SwerveSubsystem swerve)
   {
-    swerve.setSpeedLimiter(1.0);
-    return pathplannerAuto;
+    return new InstantCommand(() -> swerve.setSpeedLimiter(1.0), swerve).andThen(pathplannerAuto);
   }
 
   public CommandBase getTwoPieceAuto(SwerveSubsystem swerve)
   {
-    swerve.setSpeedLimiter(1.0);
-    return twoPieceAuto;
+    return new InstantCommand(() -> swerve.setSpeedLimiter(1.0), swerve).andThen(twoPieceAuto);
   }
 }
