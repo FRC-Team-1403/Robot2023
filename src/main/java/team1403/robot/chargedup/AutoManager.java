@@ -29,7 +29,7 @@ public class AutoManager {
   PathPlanner.loadPathGroup("One Piece Auto", new PathConstraints(4, 3));;
 
   private ArrayList<PathPlannerTrajectory> twoPiece = (ArrayList<PathPlannerTrajectory>) 
-  PathPlanner.loadPathGroup("two piece auto 2.0", new PathConstraints(4, 3));
+  PathPlanner.loadPathGroup("Two Piece Auto", new PathConstraints(4, 3));
 
   private ArrayList<PathPlannerTrajectory> threePiece = (ArrayList<PathPlannerTrajectory>) 
   PathPlanner.loadPathGroup("Three Piece Auto", new PathConstraints(4, 3));;

@@ -61,7 +61,9 @@ public class SequentialMoveArmCommand extends CommandBase {
     if(!m_pivotProfile.isFinished(deltaT)) {
       double pivotPosition = m_pivotProfile.calculate(deltaT).position;
       m_arm.ignoreExtensionLimit(m_ignoreLimit);
-      m_arm.moveArm(this.m_firstState.wristAngle, this.m_firstState.intakeSpeed, pivotPosition, this.m_firstState.armLength);
+      m_arm.moveArm(this.m_firstState.intakeSpeed, pivotPosition, this.m_firstState.armLength);
+      m_arm.moveWrist(this.m_firstState.wristAngle);
+      
     } else {
       m_arm.ignoreExtensionLimit(m_ignoreLimit);
       m_arm.moveArm(this.m_endState.get());

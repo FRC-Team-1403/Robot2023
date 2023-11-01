@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarSubsystem;
 import team1403.lib.device.wpi.CougarSparkMax;
@@ -462,7 +463,15 @@ public class ArmSubsystem extends CougarSubsystem {
     this.m_pivotAngleSetpoint = limitPivotAngle(pivotAngle);
     this.m_extensionLengthSetpoint = limitExtensionLength(extensionLength);
   }
-
+  public void moveWrist(double wristAngle) {
+this.m_wristAngleSetpoint = limitWristAngle(wristAngle);
+}
+  public void moveArm(double intakeSpeed,
+  double pivotAngle, double extensionLength) {
+    this.m_intakeSpeedSetpoint = intakeSpeed;
+    this.m_pivotAngleSetpoint = limitPivotAngle(pivotAngle);
+    this.m_extensionLengthSetpoint = limitExtensionLength(extensionLength);
+  }
   /**
    * Sets the setpoints for the pivot, extension, wrist, and intake to go to.
    *
@@ -473,6 +482,13 @@ public class ArmSubsystem extends CougarSubsystem {
     this.m_intakeSpeedSetpoint = state.intakeSpeed;
     this.m_pivotAngleSetpoint = limitPivotAngle(state.armPivot);
     this.m_extensionLengthSetpoint = limitExtensionLength(state.armLength);
+  }
+  public void moveArmWithDelay(ArmState state) {
+    this.m_intakeSpeedSetpoint = state.intakeSpeed;
+    this.m_pivotAngleSetpoint = limitPivotAngle(state.armPivot);
+    this.m_extensionLengthSetpoint = limitExtensionLength(state.armLength);
+    new WaitCommand(0.4);
+    this.m_wristAngleSetpoint = limitWristAngle(state.wristAngle);
   }
 
   /**

@@ -65,7 +65,6 @@ public class CougarRobotImpl extends CougarRobot {
     m_autonChooser.setDefaultOption("pathplanner auto", AutoManager.getInstance().getPathPlannerAuto(m_swerveSubsystem));
     m_autonChooser.addOption("Two Piece Auto", AutoManager.getInstance().getTwoPieceAuto(m_swerveSubsystem));
     m_autonChooser.addOption("Three Piece Auto", AutoManager.getInstance().getThreePieceAuto(m_swerveSubsystem));
-
     SmartDashboard.putData(m_autonChooser);
     super.robotInit();
   }
