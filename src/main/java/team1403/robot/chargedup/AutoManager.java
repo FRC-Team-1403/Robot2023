@@ -13,6 +13,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import team1403.robot.chargedup.StateManager.GamePiece;
 import team1403.robot.chargedup.arm.ArmState;
 import team1403.robot.chargedup.arm.ArmStateGroup;
@@ -28,7 +29,7 @@ public class AutoManager {
   PathPlanner.loadPathGroup("One Piece Auto", new PathConstraints(4, 3));;
 
   private ArrayList<PathPlannerTrajectory> twoPiece = (ArrayList<PathPlannerTrajectory>) 
-  PathPlanner.loadPathGroup("Two Piece Auto", new PathConstraints(4, 3));
+  PathPlanner.loadPathGroup("two piece auto 2.0", new PathConstraints(4, 3));
 
   private ArrayList<PathPlannerTrajectory> threePiece = (ArrayList<PathPlannerTrajectory>) 
   PathPlanner.loadPathGroup("Three Piece Auto", new PathConstraints(4, 3));;
@@ -59,16 +60,20 @@ public class AutoManager {
   public void init(SwerveSubsystem swerve, ArmSubsystem arm) {
     StateManager.getInstance().updateArmState(GamePiece.CUBE);
     ArmState state = StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState();
-    state.setIntakeSpeed(1.0);
-    eventMap.put("lowNode", new SetpointArmCommand(arm, () -> state, false));
+    //state.setIntakeSpeed(1.0);
+    eventMap.put("lowCubeIntake", new SetpointArmCommand(arm, () -> state, false));
     //max speed is 1.0
     eventMap.put("tuck", new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false));
 
     StateManager.getInstance().updateArmState(GamePiece.CONE_UPRIGHT);
     ArmState state2 = StateManager.getInstance().getCurrentArmGroup().getHighNodeState();
 
-    eventMap.put("highNodeCone", new SetpointArmCommand(arm, () -> state2, false));
-    eventMap.put("runIntake", new RunIntake(arm, 1.0));
+    eventMap.put("highNodeCone", new SetpointArmCommand(arm, () -> state2, false).andThen(new WaitCommand(0.5)));
+    StateManager.getInstance().updateArmState(GamePiece.CUBE);
+    eventMap.put("highNodeCube", new SetpointArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().
+                                                          getHighNodeState(), false).andThen(new WaitCommand(0.5)));
+    eventMap.put("runOutake", new RunIntake(arm, 1.0, 1.0));
+    eventMap.put("runIntake", new RunIntake(arm, -1.0, 2.0));
 
     SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
         () -> swerve.getPose(), // Pose2d supplier

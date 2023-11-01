@@ -1,14 +1,6 @@
 package team1403.robot.chargedup;
 
-import java.util.List;
-
-import com.revrobotics.CANSparkMax.IdleMode;
-
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
@@ -17,31 +9,19 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarRobot;
 import team1403.lib.util.CougarLogger;
-import team1403.robot.chargedup.cse.CougarScriptObject;
-import team1403.robot.chargedup.cse.CougarScriptReader;
-import team1403.robot.chargedup.photonvision.PhotonVisionSubsystem;
 import team1403.robot.chargedup.swerve.SwerveAutoBalanceYaw;
 import team1403.robot.chargedup.swerve.SwerveCommand;
-import team1403.robot.chargedup.swerve.SwerveDrivePath;
 import team1403.robot.chargedup.swerve.SwerveSubsystem;
 import team1403.robot.chargedup.RobotConfig.Operator;
 import team1403.robot.chargedup.StateManager.GamePiece;
-import team1403.robot.chargedup.StateManager.LED;
-import team1403.robot.chargedup.arm.ArmState;
 import team1403.robot.chargedup.arm.ArmStateGroup;
 import team1403.robot.chargedup.arm.ArmSubsystem;
 import team1403.robot.chargedup.arm.ManualArmCommand;
-import team1403.robot.chargedup.arm.RunIntake;
-import team1403.robot.chargedup.arm.SequentialMoveArmCommand;
 import team1403.robot.chargedup.arm.SetpointArmCommand;
-import team1403.robot.chargedup.arm.UpdateArmState;
 
 /**
  * The heart of the robot.
@@ -84,6 +64,7 @@ public class CougarRobotImpl extends CougarRobot {
 
     m_autonChooser.setDefaultOption("pathplanner auto", AutoManager.getInstance().getPathPlannerAuto(m_swerveSubsystem));
     m_autonChooser.addOption("Two Piece Auto", AutoManager.getInstance().getTwoPieceAuto(m_swerveSubsystem));
+    m_autonChooser.addOption("Three Piece Auto", AutoManager.getInstance().getThreePieceAuto(m_swerveSubsystem));
 
     SmartDashboard.putData(m_autonChooser);
     super.robotInit();
@@ -129,8 +110,7 @@ public class CougarRobotImpl extends CougarRobot {
         () -> -deadband(driveController.getLeftY(), 0),
         () -> -deadband(driveController.getRightX(), 0),
         () -> driveController.getYButton(),
-        () -> driveController.getRightTriggerAxis(),
-        () -> getMode()
+        () -> driveController.getRightTriggerAxis()
         ));
 
     new Trigger(() -> driveController.getBButton()).onFalse(

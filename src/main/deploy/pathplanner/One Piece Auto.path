@@ -18,7 +18,7 @@
       "stopEvent": {
         "names": [
           "highNodeCone",
-          "runIntake",
+          "runOutake",
           "tuck"
         ],
         "executionBehavior": "sequential",
