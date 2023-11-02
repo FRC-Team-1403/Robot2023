@@ -3,6 +3,8 @@ package team1403.robot.chargedup;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.swing.GroupLayout.SequentialGroup;
+
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -19,6 +21,7 @@ import team1403.robot.chargedup.arm.ArmState;
 import team1403.robot.chargedup.arm.ArmStateGroup;
 import team1403.robot.chargedup.arm.ArmSubsystem;
 import team1403.robot.chargedup.arm.RunIntake;
+import team1403.robot.chargedup.arm.SequentialMoveArmCommand;
 import team1403.robot.chargedup.arm.SetpointArmCommand;
 import team1403.robot.chargedup.swerve.SwerveSubsystem;
 
@@ -59,13 +62,14 @@ public class AutoManager {
 
   public void init(SwerveSubsystem swerve, ArmSubsystem arm) {
     //state.setIntakeSpeed(1.0);
-    eventMap.put("lowCubeIntake", new SetpointArmCommand(arm, () ->  StateManager.getInstance().getCubeGroup().getFloorIntakeState(), false));
+    eventMap.put("lowCubeIntake", new SequentialMoveArmCommand(arm, () -> RobotConfig.ArmStates.cubeFloorIntake, false));
     //max speed is 1.0
     eventMap.put("tuck", new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false));
-    eventMap.put("highNodeCone", new SetpointArmCommand(arm, () -> StateManager.getInstance().getUprightConeGroup().getHighNodeState(), false)
-                                                          .andThen(new WaitCommand(0.7)));
-    eventMap.put("highNodeCube", new SetpointArmCommand(arm, () -> StateManager.getInstance().getCubeGroup().getHighNodeState(), false).
-                                                          andThen(new WaitCommand(0.7)));
+    final double armWait = 0.01;
+    eventMap.put("highNodeCone", new SequentialMoveArmCommand(arm, () -> RobotConfig.ArmStates.coneHighNodeAuton, false)
+                                                          .andThen(new WaitCommand(armWait)));
+    eventMap.put("highNodeCube", new SequentialMoveArmCommand(arm, () -> RobotConfig.ArmStates.cubeHighNode, false)
+                                                          .andThen(new WaitCommand(armWait)));
     eventMap.put("runOutake", new RunIntake(arm, 1.0, 1.0));
     eventMap.put("runIntake", new RunIntake(arm, -1.0, 2.0));
     eventMap.put("stop", new InstantCommand(() -> swerve.stop(), swerve));
