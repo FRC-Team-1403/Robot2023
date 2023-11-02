@@ -139,4 +139,14 @@ public class StateManager {
     return gamePiece;
   }
 
+  public ArmStateGroup getCubeGroup()
+  {
+    return m_cubeGroup;
+  }
+
+  public ArmStateGroup getUprightConeGroup()
+  {
+    return m_coneUprightGroup;
+  }
+
 }

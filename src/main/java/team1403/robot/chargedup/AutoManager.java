@@ -58,22 +58,17 @@ public class AutoManager {
   }
 
   public void init(SwerveSubsystem swerve, ArmSubsystem arm) {
-    StateManager.getInstance().updateArmState(GamePiece.CUBE);
-    ArmState state = StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState();
     //state.setIntakeSpeed(1.0);
-    eventMap.put("lowCubeIntake", new SetpointArmCommand(arm, () -> state, false));
+    eventMap.put("lowCubeIntake", new SetpointArmCommand(arm, () ->  StateManager.getInstance().getCubeGroup().getFloorIntakeState(), false));
     //max speed is 1.0
     eventMap.put("tuck", new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false));
-
-    StateManager.getInstance().updateArmState(GamePiece.CONE_UPRIGHT);
-    ArmState state2 = StateManager.getInstance().getCurrentArmGroup().getHighNodeState();
-
-    eventMap.put("highNodeCone", new SetpointArmCommand(arm, () -> state2, false).andThen(new WaitCommand(0.5)));
-    StateManager.getInstance().updateArmState(GamePiece.CUBE);
-    eventMap.put("highNodeCube", new SetpointArmCommand(arm, () -> StateManager.getInstance().getCurrentArmGroup().
-                                                          getHighNodeState(), false).andThen(new WaitCommand(0.5)));
+    eventMap.put("highNodeCone", new SetpointArmCommand(arm, () -> StateManager.getInstance().getUprightConeGroup().getHighNodeState(), false)
+                                                          .andThen(new WaitCommand(0.7)));
+    eventMap.put("highNodeCube", new SetpointArmCommand(arm, () -> StateManager.getInstance().getCubeGroup().getHighNodeState(), false).
+                                                          andThen(new WaitCommand(0.7)));
     eventMap.put("runOutake", new RunIntake(arm, 1.0, 1.0));
     eventMap.put("runIntake", new RunIntake(arm, -1.0, 2.0));
+    eventMap.put("stop", new InstantCommand(() -> swerve.stop(), swerve));
 
     SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
         () -> swerve.getPose(), // Pose2d supplier

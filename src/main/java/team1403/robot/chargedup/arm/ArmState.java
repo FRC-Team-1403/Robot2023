@@ -8,7 +8,7 @@ public class ArmState {
   public final double armLength;
   public final double wristAngle;
   public final double armPivot;
-  public double intakeSpeed;
+  public final double intakeSpeed;
 
   /**
    * Initializes the ArmState class.
@@ -19,11 +19,6 @@ public class ArmState {
     this.wristAngle = wristAngle;
     this.armPivot = armPivot;
     this.intakeSpeed = intakeSpeed;
-  }
-
-  public void setIntakeSpeed(double speed)
-  {
-    this.intakeSpeed = speed;
   }
 
   @Override

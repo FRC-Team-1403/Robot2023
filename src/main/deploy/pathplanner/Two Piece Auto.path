@@ -93,6 +93,7 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
+          "stop",
           "highNodeCube",
           "runOutake",
           "tuck"
