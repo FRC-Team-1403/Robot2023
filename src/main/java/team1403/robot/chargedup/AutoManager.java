@@ -61,11 +61,11 @@ public class AutoManager {
     eventMap.put("lowCubeIntake", new SequentialMoveArmCommand(arm, () -> RobotConfig.ArmStates.cubeFloorIntake, false));
     //max speed is 1.0
     eventMap.put("tuck", new SetpointArmCommand(arm, () -> ArmStateGroup.getTuck(), false));
-    final double armWait = 0.01;
+    final WaitCommand armWait = new WaitCommand(0.01);
     eventMap.put("highNodeCone", new SequentialMoveArmCommand(arm, () -> RobotConfig.ArmStates.coneHighNodeAuton, false)
-                                                          .andThen(new WaitCommand(armWait)));
+                                                          .andThen(armWait));
     eventMap.put("highNodeCube", new SequentialMoveArmCommand(arm, () -> RobotConfig.ArmStates.cubeHighNode, false)
-                                                          .andThen(new WaitCommand(armWait)));
+                                                          .andThen(armWait));
     eventMap.put("runOutake", new RunIntake(arm, 1.0, 1.0));
     eventMap.put("runIntake", new RunIntake(arm, -1.0, 2.0));
     eventMap.put("stop", new InstantCommand(() -> swerve.stop(), swerve));

@@ -20,6 +20,7 @@ import team1403.robot.chargedup.StateManager.GamePiece;
 import team1403.robot.chargedup.arm.ArmStateGroup;
 import team1403.robot.chargedup.arm.ArmSubsystem;
 import team1403.robot.chargedup.arm.ManualArmCommand;
+import team1403.robot.chargedup.arm.SequentialMoveArmCommand;
 import team1403.robot.chargedup.arm.SetpointArmCommand;
 
 /**
@@ -186,11 +187,9 @@ public class CougarRobotImpl extends CougarRobot {
             true));
     new Trigger(() -> xboxOperator.getPOV() == 270).onFalse(
         new SetpointArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getLowNodeState(), false));
-
     // Auto High Cone Node
-    // new Trigger(() -> xboxOperator.getStartButton()).onFalse(
-    // new SequentialMoveArmCommand(m_arm, () ->
-    // RobotConfig.ArmStates.coneHighNodeAuton, false));
+    new Trigger(() -> xboxOperator.getPOV() == 360).onFalse(
+      new SequentialMoveArmCommand(m_arm, () -> RobotConfig.ArmStates.coneHighNodeAuton, false));
 
     // lights
     // new Trigger(() -> xboxOperator.getStartButton()).onTrue(
