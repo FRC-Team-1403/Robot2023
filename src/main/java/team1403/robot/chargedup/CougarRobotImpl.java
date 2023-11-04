@@ -2,7 +2,6 @@ package team1403.robot.chargedup;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -46,7 +45,7 @@ public class CougarRobotImpl extends CougarRobot {
    */
   public CougarRobotImpl(CougarLibInjectedParameters parameters) {
     super(parameters);
-    var logger = CougarLogger.getChildLogger(
+    CougarLogger.getChildLogger(
         parameters.getRobotLogger(), "BuiltinDevices");
 
     // m_builtins = new BuiltinSubsystem(parameters, logger);
@@ -237,23 +236,6 @@ public class CougarRobotImpl extends CougarRobot {
           port, role);
     }
     return new XboxController(port);
-  }
-
-  /**
-   * Get controller and silence warnings if not found.
-   *
-   * @param role The role for the port for logging purposes.
-   * @param port The expected port for the controller.
-   *
-   * @return controller for port, though might not be temporarily disconnected.
-   */
-  private PS4Controller getPS4Controller(String role, int port) {
-    if (!DriverStation.isJoystickConnected(port)) {
-      DriverStation.silenceJoystickConnectionWarning(true);
-      CougarLogger.getAlwaysOn().warningf("No controller found on port %d for '%s'",
-          port, role);
-    }
-    return new PS4Controller(port);
   }
 
   // private final BuiltinSubsystem m_builtins;

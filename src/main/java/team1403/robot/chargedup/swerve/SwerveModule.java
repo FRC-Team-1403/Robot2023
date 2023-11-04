@@ -16,7 +16,6 @@ import com.revrobotics.SparkMaxRelativeEncoder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import team1403.lib.device.Device;
 import team1403.lib.device.Encoder;
 import team1403.lib.device.wpi.CougarSparkMax;

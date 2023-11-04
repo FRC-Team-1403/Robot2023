@@ -2,15 +2,11 @@ package team1403.robot.chargedup.swerve;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
-
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import team1403.lib.core.CougarRobot;
-import team1403.robot.chargedup.AutoManager;
 import team1403.robot.chargedup.RobotConfig;
 import team1403.robot.chargedup.RobotConfig.Swerve;
 
@@ -102,8 +98,6 @@ public class SwerveCommand extends CommandBase {
         * Swerve.kMaxSpeed;
     double angular = squareNum(m_rotationSupplier.getAsDouble()) * Swerve.kMaxAngularSpeed;
     Translation2d offset = new Translation2d();
-    double robotAngleinDegrees = m_drivetrainSubsystem.getGyroscopeRotation().getDegrees();
-
     if (m_isFieldRelative) {
       chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(vertical, horizontal,
           angular, m_drivetrainSubsystem.getGyroscopeRotation());
