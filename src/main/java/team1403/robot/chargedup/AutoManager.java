@@ -28,7 +28,7 @@ import team1403.robot.chargedup.swerve.SwerveSubsystem;
 public class AutoManager {
   static private AutoManager m_instance;
 
-  private ArrayList<PathPlannerTrajectory> pathGroup = (ArrayList<PathPlannerTrajectory>) 
+  private ArrayList<PathPlannerTrajectory> onePiece = (ArrayList<PathPlannerTrajectory>) 
   PathPlanner.loadPathGroup("One Piece Auto", new PathConstraints(4, 3));;
 
   private ArrayList<PathPlannerTrajectory> twoPiece = (ArrayList<PathPlannerTrajectory>) 
@@ -45,7 +45,7 @@ public class AutoManager {
     RobotConfig.Swerve.kDAutoTurning,
     RobotConfig.Swerve.kThetaControllerConstraints);
 
-  private CommandBase pathplannerAuto;
+  private CommandBase onePieceAuto;
   private CommandBase twoPieceAuto;
   private CommandBase threePieceAuto;
 
@@ -85,7 +85,7 @@ public class AutoManager {
         true, // Should th>e path be automatically mirrored depending on alliance color. Optional, defaults to true
         swerve // The drive subsystem. Used to properly set the requirements of path following commands
     );
-    pathplannerAuto = autoBuilder.fullAuto(pathGroup).andThen(() -> swerve.stop(), swerve);
+    onePieceAuto = autoBuilder.fullAuto(onePiece).andThen(() -> swerve.stop(), swerve);
     twoPieceAuto = autoBuilder.fullAuto(twoPiece).andThen(() -> swerve.stop(), swerve);
     threePieceAuto = autoBuilder.fullAuto(threePiece).andThen(() -> swerve.stop(), swerve);
   }
@@ -97,7 +97,7 @@ public class AutoManager {
 
   public CommandBase getPathPlannerAuto(SwerveSubsystem swerve)
   {
-    return new InstantCommand(() -> swerve.setSpeedLimiter(1.0), swerve).andThen(pathplannerAuto);
+    return new InstantCommand(() -> swerve.setSpeedLimiter(1.0), swerve).andThen(onePieceAuto);
   }
 
   public CommandBase getTwoPieceAuto(SwerveSubsystem swerve)
