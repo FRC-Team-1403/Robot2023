@@ -189,7 +189,7 @@ public class CougarRobotImpl extends CougarRobot {
         new SetpointArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getLowNodeState(), false));
     // Auto High Cone Node
     new Trigger(() -> xboxOperator.getPOV() == 360).onFalse(
-      new SequentialMoveArmCommand(m_arm, () -> RobotConfig.ArmStates.coneHighNodeAuton, false));
+      new SequentialMoveArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false));
 
     // lights
     // new Trigger(() -> xboxOperator.getStartButton()).onTrue(
