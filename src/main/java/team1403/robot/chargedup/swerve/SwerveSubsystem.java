@@ -13,7 +13,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import team1403.lib.core.CougarLibInjectedParameters;
@@ -35,7 +34,6 @@ public class SwerveSubsystem extends CougarSubsystem {
   private final SwerveModule[] m_modules;
 
   private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds();
-  private SwerveModuleState[] m_states = new SwerveModuleState[4];
   private final SwerveDrivePoseEstimator m_odometer;
 
   private Translation2d frontRight = new Translation2d(
@@ -62,8 +60,6 @@ public class SwerveSubsystem extends CougarSubsystem {
 
   private double m_yawOffset;
   private double m_rollOffset;
-
-  private double m_calc = 0;
 
   private boolean m_isXModeEnabled = false;
 
@@ -100,16 +96,16 @@ public class SwerveSubsystem extends CougarSubsystem {
         getModulePositions(), new Pose2d(0, 0, new Rotation2d(0)));
 
     addDevice(m_navx2.getName(), m_navx2);
-    new Thread(() -> {
-      while (m_navx2.isCalibrating()) {
-        try {
-          Thread.sleep(10);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
+
+    //navx2 only takes 1 second to calibrate, there's no point in using fancy threads
+    while(m_navx2.isCalibrating())
+    {
+      try {
+        Thread.sleep(500);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
       }
-      zeroGyroscope();
-    }).start();
+    }
 
     m_desiredHeading = getGyroscopeRotation().getDegrees();
 
@@ -119,7 +115,15 @@ public class SwerveSubsystem extends CougarSubsystem {
     m_offset = new Translation2d();
     m_rollOffset = -m_navx2.getRoll();
     m_yawOffset = 0;
+  }
 
+  public void autoInit()
+  {
+    m_speedLimiter = 1.0;
+    for(SwerveModule module : m_modules)
+    {
+      module.set(0.0, 0.0);
+    }
   }
 
   /**
@@ -230,8 +234,12 @@ public class SwerveSubsystem extends CougarSubsystem {
    * Reset the position of the drivetrain odometry.
    */
   public void resetOdometry() {
-    tracef("resetOdometry");
-    m_odometer.resetPosition(getGyroscopeRotation(), getModulePositions(), getPose());
+    resetOdometry(getPose());
+  }
+
+  public void resetOdometry(Pose2d pose) {
+    tracef("resetOdometry %s", pose.toString());
+    m_odometer.resetPosition(getGyroscopeRotation(), getModulePositions(), pose);
   }
 
   /**
@@ -303,7 +311,7 @@ public class SwerveSubsystem extends CougarSubsystem {
 
   /**
    * Sets which wheel to pivot for the robot.
-   * 
+   *
    * @param isRight whether right or left wheels should be pivoted
    */
   public void setPivotAroundOneWheel(boolean isRight) {
@@ -397,7 +405,7 @@ public class SwerveSubsystem extends CougarSubsystem {
 
   /**
    * Puts the drivetrain into xMode where all the wheel put towards the center of the robot,
-   * making it harder for the robot to be pushed around. 
+   * making it harder for the robot to be pushed around.
    */
   private void xMode() {
     SwerveModuleState[] states = {
@@ -415,7 +423,7 @@ public class SwerveSubsystem extends CougarSubsystem {
 
   /**
    * Sets the drivetain in xMode.
-   * 
+   *
    * @param enabled whether the drivetrain is in xMode.
    */
   public void setXModeEnabled(boolean enabled) {
@@ -425,7 +433,7 @@ public class SwerveSubsystem extends CougarSubsystem {
   /**
    * Adds rotational velocity to the chassis speed to compensate for
    * unwanted changes in gyroscope heading.
-   * 
+   *
    * @param chassisSpeeds the given chassisspeeds
    * @return the corrected chassisspeeds
    */
@@ -435,13 +443,13 @@ public class SwerveSubsystem extends CougarSubsystem {
     if (Math.abs(m_navx2.getAngularVelocity()) > 0.1) {
       m_desiredHeading = getGyroscopeRotation().getDegrees();
     } else if (translationalVelocity > 1) {
-      m_calc = m_driftCorrectionPid.calculate(getGyroscopeRotation().getDegrees(),
+      double calc = m_driftCorrectionPid.calculate(getGyroscopeRotation().getDegrees(),
           m_desiredHeading);
-      if (Math.abs(m_calc) >= 0.55) {
-        m_chassisSpeeds.omegaRadiansPerSecond += m_calc;
+      if (Math.abs(calc) >= 0.55) {
+        chassisSpeeds.omegaRadiansPerSecond += calc;
       }
       tracef("driftCorrection %f, corrected omegaRadiansPerSecond %f",
-          m_calc, m_chassisSpeeds.omegaRadiansPerSecond);
+          calc, chassisSpeeds.omegaRadiansPerSecond);
     }
     return chassisSpeeds;
   }
@@ -449,11 +457,11 @@ public class SwerveSubsystem extends CougarSubsystem {
   /**
    * Accounts for the drift caused by the first order kinematics
    * while doing both translational and rotational movement.
-   * 
+   *
    * <p>
    * Looks forward one control loop to figure out where the robot
    * should be given the chassisspeed and backs out a twist command from that.
-   * 
+   *
    * @param chassisSpeeds the given chassisspeeds
    * @return the corrected chassisspeeds
    */
@@ -488,8 +496,7 @@ public class SwerveSubsystem extends CougarSubsystem {
       m_chassisSpeeds = translationalDriftCorrection(m_chassisSpeeds);
       m_chassisSpeeds = rotationalDriftCorrection(m_chassisSpeeds);
 
-      m_states = Swerve.kDriveKinematics.toSwerveModuleStates(m_chassisSpeeds, m_offset);
-      setModuleStates(m_states);
+      setModuleStates(Swerve.kDriveKinematics.toSwerveModuleStates(m_chassisSpeeds, m_offset));
     }
 
     SmartDashboard.putNumber("Front Left Absolute Encoder", m_modules[0].getAbsoluteAngle());

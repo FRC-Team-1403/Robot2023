@@ -50,7 +50,7 @@ public class RobotConfig {
     public static final int kStatusFrameGeneralPeriodMs = 250;
     public static final int kCanTimeoutMs = 250;
 
-    public static final double kPTurning = 1.125;
+    public static final double kPTurning = 0.3;
     public static final double kITurning = 0.0;
     public static final double kDTurning = 0.0;
 
@@ -98,7 +98,9 @@ public class RobotConfig {
     // (kMaxSpeed / Math.hypot(kTrackWidth / 2.0, kWheelBase / 2.0)); // 39.795095397
 
     public static final double kVoltageSaturation = 12.0;
-    public static final double kCurrentLimit = 40.0;
+    //max neo amperage, 50 amps seems the safest based on https://www.revrobotics.com/neo-brushless-motor-locked-rotor-testing/
+    //40 A fuses
+    public static final int kCurrentLimit = 40;
 
     public static final double kMaxAccelerationMetersPerSecondSquared = 3;
     public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI / 2;
@@ -145,7 +147,7 @@ public class RobotConfig {
         Units.inchesToMeters(610.77),
         Units.inchesToMeters(108.19),
         Units.inchesToMeters(18.22),
-        new Rotation3d(0.0, 0.0, Math.PI))),  
+        new Rotation3d(0.0, 0.0, Math.PI))),
       new AprilTag(8, new Pose3d(
         Units.inchesToMeters(40.45),
         Units.inchesToMeters(42.19),
@@ -190,7 +192,6 @@ public class RobotConfig {
    */
   public static class RioPorts {
 
-    
     public static final int kWristAbsoluteEncoder = 1; //DIO
 
     public static final int kArmAbsoluteEncoder = 3; ///Analog

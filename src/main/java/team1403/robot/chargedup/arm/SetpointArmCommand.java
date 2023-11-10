@@ -4,7 +4,6 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 
@@ -48,7 +47,9 @@ public class SetpointArmCommand extends CommandBase {
     double deltaT = Timer.getFPGATimestamp() - m_startTime;
     double pivotPosition = m_pivotProfile.calculate(deltaT).position;
     m_arm.ignoreExtensionLimit(m_ignoreLimit);
-    m_arm.moveArm(m_state.wristAngle, m_state.intakeSpeed, pivotPosition, m_state.armLength);
+    m_arm.moveArm(m_state.intakeSpeed, pivotPosition, m_state.armLength);
+    m_arm.moveWrist(m_state.wristAngle);
+
     super.execute();
   }
 

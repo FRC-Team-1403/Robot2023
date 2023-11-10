@@ -2,7 +2,6 @@ package team1403.robot.chargedup.swerve;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -21,7 +20,7 @@ public class SwerveCommand extends CommandBase {
   private final DoubleSupplier m_horizontalTranslationSupplier;
   private final DoubleSupplier m_rotationSupplier;
   private final BooleanSupplier m_fieldRelativeSupplier;
-  private final DoubleSupplier m_speedSupplier;
+  private final DoubleSupplier m_speedDoubleSupplier;
   private boolean m_isFieldRelative;
 
   private Translation2d frontRight;
@@ -55,13 +54,13 @@ public class SwerveCommand extends CommandBase {
       DoubleSupplier verticalTranslationSupplier,
       DoubleSupplier rotationSupplier,
       BooleanSupplier fieldRelativeSupplier,
-      DoubleSupplier speedSupplier) {
+      DoubleSupplier speedDoubleSupplier) {
     this.m_drivetrainSubsystem = drivetrain;
     this.m_verticalTranslationSupplier = verticalTranslationSupplier;
     this.m_horizontalTranslationSupplier = horizontalTranslationSupplier;
     this.m_rotationSupplier = rotationSupplier;
     this.m_fieldRelativeSupplier = fieldRelativeSupplier;
-    this.m_speedSupplier = speedSupplier;
+    this.m_speedDoubleSupplier = speedDoubleSupplier;
     m_isFieldRelative = true;
 
     frontRight = new Translation2d(
@@ -88,7 +87,7 @@ public class SwerveCommand extends CommandBase {
 
   @Override
   public void execute() {
-    m_drivetrainSubsystem.setSpeedLimiter(0.2 + (m_speedSupplier.getAsDouble() * 0.8));
+    m_drivetrainSubsystem.setSpeedLimiter(0.2 + (m_speedDoubleSupplier.getAsDouble() * 0.8));
     if (m_fieldRelativeSupplier.getAsBoolean()) {
       m_isFieldRelative = !m_isFieldRelative;
     }
@@ -99,8 +98,6 @@ public class SwerveCommand extends CommandBase {
         * Swerve.kMaxSpeed;
     double angular = squareNum(m_rotationSupplier.getAsDouble()) * Swerve.kMaxAngularSpeed;
     Translation2d offset = new Translation2d();
-    double robotAngleinDegrees = m_drivetrainSubsystem.getGyroscopeRotation().getDegrees();
-
     if (m_isFieldRelative) {
       chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(vertical, horizontal,
           angular, m_drivetrainSubsystem.getGyroscopeRotation());

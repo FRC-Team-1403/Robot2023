@@ -16,7 +16,6 @@ import com.revrobotics.SparkMaxRelativeEncoder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import team1403.lib.device.Device;
 import team1403.lib.device.Encoder;
 import team1403.lib.device.wpi.CougarSparkMax;
@@ -46,11 +45,11 @@ public class SwerveModule implements Device {
   /**
    * Swerve Module represents a singular swerve module for a
    * swerve drive train.
-   * 
+   *
    * <p>Each swerve module consists of a drive motor,
    * changing the velocity of the wheel, and a steer motor, changing
    * the angle of the actual wheel inside of the module.
-   * 
+   *
    * <p>The swerve module also features
    * an absolute encoder to ensure the angle of
    * the module is always known, regardless if the bot is turned off
@@ -117,10 +116,10 @@ public class SwerveModule implements Device {
     m_steerMotor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 20);
     m_steerMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
     m_steerMotor.setInverted(false);
-    m_steerMotor.enableVoltageCompensation(12);
-    m_steerMotor.setSmartCurrentLimit(40);
+    m_steerMotor.enableVoltageCompensation(RobotConfig.Swerve.kVoltageSaturation);
+    m_steerMotor.setSmartCurrentLimit(RobotConfig.Swerve.kCurrentLimit);
 
-    m_steerPidController.setP(0.3);
+    m_steerPidController.setP(Swerve.kPTurning);
     m_steerPidController.setI(Swerve.kITurning);
     m_steerPidController.setD(Swerve.kDTurning);
     m_steerPidController.setFeedbackDevice((MotorFeedbackSensor) m_steerRelativeEncoder);
@@ -132,7 +131,7 @@ public class SwerveModule implements Device {
   public void initDriveMotor() {
     m_driveMotor.setInverted(true);
     m_driveMotor.setVoltageCompensation(RobotConfig.Swerve.kVoltageSaturation);
-    m_driveMotor.setAmpLimit(RobotConfig.Swerve.kCurrentLimit);
+    m_driveMotor.setSmartCurrentLimit(RobotConfig.Swerve.kCurrentLimit);
     m_driveMotor.getCanSparkMaxApi().setPeriodicFramePeriod(
         CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 100);
     m_driveMotor.getCanSparkMaxApi().setPeriodicFramePeriod(
@@ -212,7 +211,7 @@ public class SwerveModule implements Device {
    */
   private double convertSteerAngle(double steerAngle) {
     steerAngle = normalizeAngle(steerAngle);
-    double difference = normalizeAngleError(steerAngle);        
+    double difference = normalizeAngleError(steerAngle);
 
     // If the difference is greater than 90 deg or less than -90 deg the drive can
     // be inverted so the total
@@ -236,13 +235,13 @@ public class SwerveModule implements Device {
     // fully set up, and we don't
     // end up getting a good reading. If we reset periodically this won't matter
     // anymore.
-    if (m_steerMotor.getEncoder().getVelocity() 
+    if (m_steerMotor.getEncoder().getVelocity()
             < Swerve.kEncoderResetMaxAngularVelocity) {
       if (++m_absoluteEncoderResetIterations >= Swerve.kEncoderResetIterations) {
-        m_logger.tracef("Resetting steer relative encoder. Reset iteration %f", 
+        m_logger.tracef("Resetting steer relative encoder. Reset iteration %f",
             m_absoluteEncoderResetIterations);
         m_absoluteEncoderResetIterations = 0;
-        double absoluteAngle = getAbsoluteAngle();    
+        double absoluteAngle = getAbsoluteAngle();
         m_steerMotor.getEncoder().setPosition(getAbsoluteAngle());
         currentAngleRadians = absoluteAngle;
       }
@@ -254,7 +253,7 @@ public class SwerveModule implements Device {
 
     // The reference angle has the range [0, 2pi)
     // but the Falcon's encoder can go above that
-    double adjustedReferenceAngleRadians = referenceAngleRadians 
+    double adjustedReferenceAngleRadians = referenceAngleRadians
         + currentAngleRadians - currentAngleRadiansMod;
     if (referenceAngleRadians - currentAngleRadiansMod > Math.PI) {
       adjustedReferenceAngleRadians -= 2.0 * Math.PI;

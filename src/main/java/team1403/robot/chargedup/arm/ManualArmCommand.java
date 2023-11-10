@@ -45,6 +45,16 @@ public class ManualArmCommand extends CommandBase {
 
     addRequirements(arm);
   }
+  // for the driver to remove the cube, for testing purposes may be used if the driver wants it
+  public void driverOutManualOuttake() {
+    double wristAngle = m_arm.getWristAngleSetpoint();
+    wristAngle += m_wristAngleSupplier.getAsDouble() * 4;
+    wristAngle = m_arm.limitWristAngle(wristAngle);
+    double pivotAngle = m_arm.getPivotAngleSetpoint();
+    pivotAngle += (-1 * m_armAngleSupplier.getAsDouble());
+    pivotAngle = m_arm.limitPivotAngle(pivotAngle);
+    m_arm.moveArm(wristAngle, 1, pivotAngle, m_arm.getExtensionLengthSetpoint());
+  }
 
   @Override
   public void execute() {

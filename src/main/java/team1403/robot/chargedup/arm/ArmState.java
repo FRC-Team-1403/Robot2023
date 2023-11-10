@@ -19,12 +19,11 @@ public class ArmState {
     this.wristAngle = wristAngle;
     this.armPivot = armPivot;
     this.intakeSpeed = intakeSpeed;
-
   }
 
   @Override
   public String toString() {
-    return "ArmState [armLength=" + armLength;
+    return "ArmState [armLength=" + armLength + "]";
   }
 
   @Override

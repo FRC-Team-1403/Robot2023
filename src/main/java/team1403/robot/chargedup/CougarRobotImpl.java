@@ -1,46 +1,27 @@
 package team1403.robot.chargedup;
 
-import java.util.List;
-
-import com.revrobotics.CANSparkMax.IdleMode;
-
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarRobot;
 import team1403.lib.util.CougarLogger;
-import team1403.robot.chargedup.cse.CougarScriptObject;
-import team1403.robot.chargedup.cse.CougarScriptReader;
-import team1403.robot.chargedup.photonvision.PhotonVisionSubsystem;
 import team1403.robot.chargedup.swerve.SwerveAutoBalanceYaw;
 import team1403.robot.chargedup.swerve.SwerveCommand;
-import team1403.robot.chargedup.swerve.SwerveDrivePath;
 import team1403.robot.chargedup.swerve.SwerveSubsystem;
 import team1403.robot.chargedup.RobotConfig.Operator;
 import team1403.robot.chargedup.StateManager.GamePiece;
-import team1403.robot.chargedup.StateManager.LED;
-import team1403.robot.chargedup.arm.ArmState;
 import team1403.robot.chargedup.arm.ArmStateGroup;
 import team1403.robot.chargedup.arm.ArmSubsystem;
 import team1403.robot.chargedup.arm.ManualArmCommand;
-import team1403.robot.chargedup.arm.RunIntake;
 import team1403.robot.chargedup.arm.SequentialMoveArmCommand;
 import team1403.robot.chargedup.arm.SetpointArmCommand;
-import team1403.robot.chargedup.arm.UpdateArmState;
 
 /**
  * The heart of the robot.
@@ -65,28 +46,25 @@ public class CougarRobotImpl extends CougarRobot {
    */
   public CougarRobotImpl(CougarLibInjectedParameters parameters) {
     super(parameters);
-    var logger = CougarLogger.getChildLogger(
+    CougarLogger.getChildLogger(
         parameters.getRobotLogger(), "BuiltinDevices");
 
     // m_builtins = new BuiltinSubsystem(parameters, logger);
     m_arm = new ArmSubsystem(parameters);
-    m_swerveSubsystem = new SwerveSubsystem( parameters);
+    m_swerveSubsystem = new SwerveSubsystem(parameters);
     CameraServer.startAutomaticCapture();
     // m_visionSubsystem = new PhotonVisionSubsystem(parameters);
     // m_lightSubsystem = new LightSubsystem(parameters);
     m_autonChooser = new SendableChooser<Command>();
-    registerAutoCommands();
   }
 
   @Override
   public void robotInit() {
-    AutoManager.getInstance().init(m_swerveSubsystem);
-    m_autonChooser.setDefaultOption("Red Right Grid", AutoManager.getInstance().getRedRightGridCommand(m_swerveSubsystem, m_arm));
-    m_autonChooser.addOption("Blue Right Grid", AutoManager.getInstance().getBlueRightGridCommand(m_swerveSubsystem, m_arm));
-    m_autonChooser.addOption("Middle Grid Auto", AutoManager.getInstance().getMiddleGridCommand(m_swerveSubsystem, m_arm));
-    m_autonChooser.addOption("1 Piece Bump Auto", AutoManager.getInstance().getStraightTrajectory(m_swerveSubsystem, m_arm));
-    m_autonChooser.addOption("Old Red Right Grid", AutoManager.getInstance().getOldRedRightGridCommand(m_swerveSubsystem, m_arm));
-    m_autonChooser.addOption("Old Blue Right Grid", AutoManager.getInstance().getOldBlueRightGridCommand(m_swerveSubsystem, m_arm));
+    AutoManager.getInstance().init(m_swerveSubsystem, m_arm);
+
+    m_autonChooser.setDefaultOption("One Piece Auto", AutoManager.getInstance().getPathPlannerAuto(m_swerveSubsystem));
+    m_autonChooser.addOption("Two Piece Auto", AutoManager.getInstance().getTwoPieceAuto(m_swerveSubsystem));
+    m_autonChooser.addOption("Three Piece Auto", AutoManager.getInstance().getThreePieceAuto(m_swerveSubsystem));
     SmartDashboard.putData(m_autonChooser);
     super.robotInit();
   }
@@ -95,10 +73,15 @@ public class CougarRobotImpl extends CougarRobot {
   public Command getAutonomousCommand() {
     CommandScheduler.getInstance().removeDefaultCommand(m_swerveSubsystem);
     CommandScheduler.getInstance().removeDefaultCommand(m_arm);
+    //force the swerve subsystem to stop running the default command, setting the speed limiter should now work
+    //new InstantCommand(() -> m_swerveSubsystem.stop(), m_swerveSubsystem);
     return m_autonChooser.getSelected();
-    
-    // return AutoManager.getInstance().getImprovedStraightCommand(m_swerveSubsystem, m_arm);
-    // return AutoManager.getInstance().getRedRightGridCommand(m_swerveSubsystem, m_arm);
+
+    // return
+    // AutoManager.getInstance().getImprovedStraightCommand(m_swerveSubsystem,
+    // m_arm);
+    // return AutoManager.getInstance().getRedRightGridCommand(m_swerveSubsystem,
+    // m_arm);
   }
 
   @Override
@@ -126,7 +109,8 @@ public class CougarRobotImpl extends CougarRobot {
         () -> -deadband(driveController.getLeftY(), 0),
         () -> -deadband(driveController.getRightX(), 0),
         () -> driveController.getYButton(),
-        () -> driveController.getRightTriggerAxis()));
+        () -> driveController.getRightTriggerAxis()
+        ));
 
     new Trigger(() -> driveController.getBButton()).onFalse(
         new InstantCommand(() -> m_swerveSubsystem.zeroGyroscope()));
@@ -137,6 +121,8 @@ public class CougarRobotImpl extends CougarRobot {
         .onTrue(new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(true)));
     new Trigger(() -> driveController.getXButton())
         .onFalse(new InstantCommand(() -> m_swerveSubsystem.setXModeEnabled(false)));
+    new Trigger(() -> driveController.getPOV() == 180)
+        .toggleOnTrue(new InstantCommand(() -> m_swerveSubsystem.resetOdometry()));
   }
 
   /**
@@ -201,10 +187,9 @@ public class CougarRobotImpl extends CougarRobot {
             true));
     new Trigger(() -> xboxOperator.getPOV() == 270).onFalse(
         new SetpointArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getLowNodeState(), false));
-
     // Auto High Cone Node
-    // new Trigger(() -> xboxOperator.getStartButton()).onFalse(
-    //   new SequentialMoveArmCommand(m_arm, () -> RobotConfig.ArmStates.coneHighNodeAuton, false));
+    //new Trigger(() -> xboxOperator.getPOV() == 360).onFalse(
+      //new SequentialMoveArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(), false));
 
     // lights
     // new Trigger(() -> xboxOperator.getStartButton()).onTrue(
@@ -213,66 +198,6 @@ public class CougarRobotImpl extends CougarRobot {
     // new Trigger(() -> xboxOperator.getBackButton()).onTrue(
     // new InstantCommand(() ->
     // StateManager.getInstance().updateLEDState(LED.PURPLE)));
-  }
-
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  private void registerAutoCommands() {
-    m_reader = new CougarScriptReader((Pose2d startPose) -> {
-      double feetToMeters = 0.30478512648;
-
-      Translation2d flippedXandY = new Translation2d(
-          startPose.getY() * feetToMeters, startPose.getX() * feetToMeters);
-
-      Rotation2d theta = new Rotation2d(
-          startPose.getRotation().getDegrees());
-
-      Pose2d transformedStartPose = new Pose2d(flippedXandY, theta);
-      m_swerveSubsystem.setPose(transformedStartPose);
-    });
-
-    m_reader.registerCommand("SwerveDrivePath", (CougarScriptObject p) -> {
-      List<Translation2d> wayPoints = p.getPointList("Waypoints");
-      return new SwerveDrivePath(m_swerveSubsystem,
-          p.getDouble("StartAngle"),
-          p.getDouble("EndAngle"),
-          wayPoints);
-    });
-
-    m_reader.registerCommand("Delay", (CougarScriptObject p) -> {
-      return new WaitCommand(p.getDouble("seconds"));
-    });
-
-    m_reader.registerCommand("Tuck", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, () -> ArmStateGroup.getTuck(), false);
-    });
-
-    m_reader.registerCommand("High Node", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getHighNodeState(),
-          false);
-    });
-
-    m_reader.registerCommand("Middle Node", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getMiddleNodeState(),
-          false);
-    });
-
-    m_reader.registerCommand("Low Node", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getLowNodeState(),
-          false);
-    });
-
-    m_reader.registerCommand("Floor Pickup", (CougarScriptObject p) -> {
-      return new SequentialMoveArmCommand(m_arm, () -> StateManager.getInstance().getCurrentArmGroup().getFloorIntakeState(),
-          true);
-    });
-
-    m_reader.registerCommand("Run Intake", (CougarScriptObject p) -> {
-      return new RunIntake(m_arm, p.getDouble("Intake Speed"));
-    });
   }
 
   /**
@@ -312,26 +237,8 @@ public class CougarRobotImpl extends CougarRobot {
     return new XboxController(port);
   }
 
-  /**
-   * Get controller and silence warnings if not found.
-   *
-   * @param role The role for the port for logging purposes.
-   * @param port The expected port for the controller.
-   *
-   * @return controller for port, though might not be temporarily disconnected.
-   */
-  private PS4Controller getPS4Controller(String role, int port) {
-    if (!DriverStation.isJoystickConnected(port)) {
-      DriverStation.silenceJoystickConnectionWarning(true);
-      CougarLogger.getAlwaysOn().warningf("No controller found on port %d for '%s'",
-          port, role);
-    }
-    return new PS4Controller(port);
-  }
-
   // private final BuiltinSubsystem m_builtins;
   // private final PhotonVisionSubsystem m_visionSubsystem;
-  private CougarScriptReader m_reader;
   private final ArmSubsystem m_arm;
   private final SwerveSubsystem m_swerveSubsystem;
   private final SendableChooser<Command> m_autonChooser;

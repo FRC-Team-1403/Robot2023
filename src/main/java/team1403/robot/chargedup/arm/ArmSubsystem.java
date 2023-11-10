@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import team1403.lib.core.CougarLibInjectedParameters;
 import team1403.lib.core.CougarSubsystem;
 import team1403.lib.device.wpi.CougarSparkMax;
@@ -401,7 +402,7 @@ public class ArmSubsystem extends CougarSubsystem {
    * @return true if the given angle is in the bounds of the wrist.
    */
   private boolean isInExtensionBounds(double length) {
-    return (length > Arm.kMinArmExtension && length < Arm.kMaxArmExtension);
+    return (length >= Arm.kMinArmExtension && length <= Arm.kMaxArmExtension);
   }
 
   /**
@@ -463,6 +464,16 @@ public class ArmSubsystem extends CougarSubsystem {
     this.m_extensionLengthSetpoint = limitExtensionLength(extensionLength);
   }
 
+  public void moveWrist(double wristAngle) {
+    this.m_wristAngleSetpoint = limitWristAngle(wristAngle);
+  }
+
+  public void moveArm(double intakeSpeed,
+      double pivotAngle, double extensionLength) {
+    this.m_intakeSpeedSetpoint = intakeSpeed;
+    this.m_pivotAngleSetpoint = limitPivotAngle(pivotAngle);
+    this.m_extensionLengthSetpoint = limitExtensionLength(extensionLength);
+  }
   /**
    * Sets the setpoints for the pivot, extension, wrist, and intake to go to.
    *
@@ -482,7 +493,7 @@ public class ArmSubsystem extends CougarSubsystem {
    */
   public boolean isAtSetpoint() {
     double currentPivotAngle = getAbsolutePivotAngle();
-    double currentWristAngle = getAbsoluteWristAngle();
+    double currentWristAngle = m_wristMotor.getEncoder().getPosition();
     double currentExtensionLength = getExtensionLength();
 
     if (Math.abs(currentPivotAngle - this.m_pivotAngleSetpoint) > 7) {

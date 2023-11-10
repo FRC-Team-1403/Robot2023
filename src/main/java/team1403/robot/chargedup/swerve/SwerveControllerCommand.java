@@ -17,7 +17,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /**
@@ -205,7 +204,7 @@ public class SwerveControllerCommand extends CommandBase {
 
     var targetChassisSpeeds =
         m_controller.calculate(m_pose.get(), desiredState, m_desiredRotation.get());
-    
+
     m_subsystem.drive(targetChassisSpeeds, new Translation2d());
   }
 
