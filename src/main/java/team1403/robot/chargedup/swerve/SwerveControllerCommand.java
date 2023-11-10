@@ -204,7 +204,7 @@ public class SwerveControllerCommand extends CommandBase {
 
     var targetChassisSpeeds =
         m_controller.calculate(m_pose.get(), desiredState, m_desiredRotation.get());
-    
+
     m_subsystem.drive(targetChassisSpeeds, new Translation2d());
   }
 

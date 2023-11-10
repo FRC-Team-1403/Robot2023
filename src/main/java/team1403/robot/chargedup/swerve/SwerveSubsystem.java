@@ -449,10 +449,10 @@ public class SwerveSubsystem extends CougarSubsystem {
       m_calc = m_driftCorrectionPid.calculate(getGyroscopeRotation().getDegrees(),
           m_desiredHeading);
       if (Math.abs(m_calc) >= 0.55) {
-        m_chassisSpeeds.omegaRadiansPerSecond += m_calc;
+        chassisSpeeds.omegaRadiansPerSecond += m_calc;
       }
       tracef("driftCorrection %f, corrected omegaRadiansPerSecond %f",
-          m_calc, m_chassisSpeeds.omegaRadiansPerSecond);
+          m_calc, chassisSpeeds.omegaRadiansPerSecond);
     }
     return chassisSpeeds;
   }

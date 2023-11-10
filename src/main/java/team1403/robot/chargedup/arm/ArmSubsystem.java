@@ -483,13 +483,6 @@ this.m_wristAngleSetpoint = limitWristAngle(wristAngle);
     this.m_pivotAngleSetpoint = limitPivotAngle(state.armPivot);
     this.m_extensionLengthSetpoint = limitExtensionLength(state.armLength);
   }
-  public void moveArmWithDelay(ArmState state) {
-    this.m_intakeSpeedSetpoint = state.intakeSpeed;
-    this.m_pivotAngleSetpoint = limitPivotAngle(state.armPivot);
-    this.m_extensionLengthSetpoint = limitExtensionLength(state.armLength);
-    new WaitCommand(0.4);
-    this.m_wristAngleSetpoint = limitWristAngle(state.wristAngle);
-  }
 
   /**
    * Returns whether the arm is at the current setpoint.
