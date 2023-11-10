@@ -406,7 +406,7 @@ public class SwerveSubsystem extends CougarSubsystem {
 
   /**
    * Puts the drivetrain into xMode where all the wheel put towards the center of the robot,
-   * making it harder for the robot to be pushed around. 
+   * making it harder for the robot to be pushed around.
    */
   private void xMode() {
     SwerveModuleState[] states = {
@@ -424,7 +424,7 @@ public class SwerveSubsystem extends CougarSubsystem {
 
   /**
    * Sets the drivetain in xMode.
-   * 
+   *
    * @param enabled whether the drivetrain is in xMode.
    */
   public void setXModeEnabled(boolean enabled) {
@@ -434,7 +434,7 @@ public class SwerveSubsystem extends CougarSubsystem {
   /**
    * Adds rotational velocity to the chassis speed to compensate for
    * unwanted changes in gyroscope heading.
-   * 
+   *
    * @param chassisSpeeds the given chassisspeeds
    * @return the corrected chassisspeeds
    */
@@ -458,11 +458,11 @@ public class SwerveSubsystem extends CougarSubsystem {
   /**
    * Accounts for the drift caused by the first order kinematics
    * while doing both translational and rotational movement.
-   * 
+   *
    * <p>
    * Looks forward one control loop to figure out where the robot
    * should be given the chassisspeed and backs out a twist command from that.
-   * 
+   *
    * @param chassisSpeeds the given chassisspeeds
    * @return the corrected chassisspeeds
    */
