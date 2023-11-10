@@ -402,7 +402,7 @@ public class ArmSubsystem extends CougarSubsystem {
    * @return true if the given angle is in the bounds of the wrist.
    */
   private boolean isInExtensionBounds(double length) {
-    return (length > Arm.kMinArmExtension && length < Arm.kMaxArmExtension);
+    return (length >= Arm.kMinArmExtension && length <= Arm.kMaxArmExtension);
   }
 
   /**
