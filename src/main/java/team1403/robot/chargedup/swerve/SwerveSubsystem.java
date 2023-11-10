@@ -34,7 +34,6 @@ public class SwerveSubsystem extends CougarSubsystem {
   private final SwerveModule[] m_modules;
 
   private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds();
-  private SwerveModuleState[] m_states = new SwerveModuleState[4];
   private final SwerveDrivePoseEstimator m_odometer;
 
   private Translation2d frontRight = new Translation2d(
@@ -497,8 +496,7 @@ public class SwerveSubsystem extends CougarSubsystem {
       m_chassisSpeeds = translationalDriftCorrection(m_chassisSpeeds);
       m_chassisSpeeds = rotationalDriftCorrection(m_chassisSpeeds);
 
-      m_states = Swerve.kDriveKinematics.toSwerveModuleStates(m_chassisSpeeds, m_offset);
-      setModuleStates(m_states);
+      setModuleStates(Swerve.kDriveKinematics.toSwerveModuleStates(m_chassisSpeeds, m_offset));
     }
 
     SmartDashboard.putNumber("Front Left Absolute Encoder", m_modules[0].getAbsoluteAngle());
