@@ -99,16 +99,16 @@ public class SwerveSubsystem extends CougarSubsystem {
         getModulePositions(), new Pose2d(0, 0, new Rotation2d(0)));
 
     addDevice(m_navx2.getName(), m_navx2);
-    new Thread(() -> {
-      while (m_navx2.isCalibrating()) {
-        try {
-          Thread.sleep(10);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
+
+    //navx2 only takes 1 second to calibrate, there's no point in using fancy threads
+    while(m_navx2.isCalibrating())
+    {
+      try {
+        Thread.sleep(500);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
       }
-      zeroGyroscope();
-    }).start();
+    }
 
     m_desiredHeading = getGyroscopeRotation().getDegrees();
 
@@ -118,12 +118,15 @@ public class SwerveSubsystem extends CougarSubsystem {
     m_offset = new Translation2d();
     m_rollOffset = -m_navx2.getRoll();
     m_yawOffset = 0;
+  }
 
-    //not enabling until tested: reset each swerve module
-    // for(int i = 0; i < m_modules.length; i++)
-    // {
-    //   m_modules[i].set(0.0, 0.0);
-    // }
+  public void autoInit()
+  {
+    m_speedLimiter = 1.0;
+    for(SwerveModule module : m_modules)
+    {
+      module.set(0.0, 0.0);
+    }
   }
 
   /**
@@ -234,8 +237,7 @@ public class SwerveSubsystem extends CougarSubsystem {
    * Reset the position of the drivetrain odometry.
    */
   public void resetOdometry() {
-    tracef("resetOdometry");
-    m_odometer.resetPosition(getGyroscopeRotation(), getModulePositions(), getPose());
+    resetOdometry(getPose());
   }
 
   public void resetOdometry(Pose2d pose) {

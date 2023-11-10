@@ -498,7 +498,7 @@ this.m_wristAngleSetpoint = limitWristAngle(wristAngle);
    */
   public boolean isAtSetpoint() {
     double currentPivotAngle = getAbsolutePivotAngle();
-    double currentWristAngle = getAbsoluteWristAngle();
+    double currentWristAngle = m_wristMotor.getEncoder().getPosition();
     double currentExtensionLength = getExtensionLength();
 
     if (Math.abs(currentPivotAngle - this.m_pivotAngleSetpoint) > 7) {
