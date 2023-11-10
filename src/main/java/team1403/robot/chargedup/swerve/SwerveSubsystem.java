@@ -62,8 +62,6 @@ public class SwerveSubsystem extends CougarSubsystem {
   private double m_yawOffset;
   private double m_rollOffset;
 
-  private double m_calc = 0;
-
   private boolean m_isXModeEnabled = false;
 
   /**
@@ -446,13 +444,13 @@ public class SwerveSubsystem extends CougarSubsystem {
     if (Math.abs(m_navx2.getAngularVelocity()) > 0.1) {
       m_desiredHeading = getGyroscopeRotation().getDegrees();
     } else if (translationalVelocity > 1) {
-      m_calc = m_driftCorrectionPid.calculate(getGyroscopeRotation().getDegrees(),
+      double calc = m_driftCorrectionPid.calculate(getGyroscopeRotation().getDegrees(),
           m_desiredHeading);
-      if (Math.abs(m_calc) >= 0.55) {
-        chassisSpeeds.omegaRadiansPerSecond += m_calc;
+      if (Math.abs(calc) >= 0.55) {
+        chassisSpeeds.omegaRadiansPerSecond += calc;
       }
       tracef("driftCorrection %f, corrected omegaRadiansPerSecond %f",
-          m_calc, chassisSpeeds.omegaRadiansPerSecond);
+          calc, chassisSpeeds.omegaRadiansPerSecond);
     }
     return chassisSpeeds;
   }
