@@ -463,11 +463,13 @@ public class ArmSubsystem extends CougarSubsystem {
     this.m_pivotAngleSetpoint = limitPivotAngle(pivotAngle);
     this.m_extensionLengthSetpoint = limitExtensionLength(extensionLength);
   }
+
   public void moveWrist(double wristAngle) {
     this.m_wristAngleSetpoint = limitWristAngle(wristAngle);
   }
+
   public void moveArm(double intakeSpeed,
-  double pivotAngle, double extensionLength) {
+      double pivotAngle, double extensionLength) {
     this.m_intakeSpeedSetpoint = intakeSpeed;
     this.m_pivotAngleSetpoint = limitPivotAngle(pivotAngle);
     this.m_extensionLengthSetpoint = limitExtensionLength(extensionLength);
