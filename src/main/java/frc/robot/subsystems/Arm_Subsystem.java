@@ -10,11 +10,11 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import frc.robot.Constants;
                          
-public class ExampleSubsystem extends SubsystemBase {
+public class Arm_Subsystem extends SubsystemBase {
   final SparkMax m_arm;
   final SparkMax m_telescope;
   
-  public ExampleSubsystem() {
+  public Arm_Subsystem() {
     m_arm = new SparkMax(Constants.arm, MotorType.kBrushless);
     m_telescope = new SparkMax(Constants.telescope, MotorType.kBrushless);
   }

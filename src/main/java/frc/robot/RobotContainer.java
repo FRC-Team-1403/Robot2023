@@ -5,8 +5,8 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.ExampleCommand;
-import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.commands.ArmMovement;
+import frc.robot.subsystems.Arm_Subsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -19,10 +19,10 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+  private final Arm_Subsystem m_exampleSubsystem = new Arm_Subsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController = new CommandXboxController(OperatorConstants.kDriverControllerPort);
+  private final CommandXboxController m_XboxController = new CommandXboxController(OperatorConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -41,7 +41,7 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    m_exampleSubsystem.setDefaultCommand(new ExampleCommand(m_exampleSubsystem));
+    m_exampleSubsystem.setDefaultCommand(new ArmMovement(m_exampleSubsystem, m_XboxController.getLeftY(), m_XboxController.getRightY()));
   }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

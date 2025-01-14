@@ -17,5 +17,5 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
   }
   public static int arm = 3;
-  public static int telescope = 1;
+  public static int telescope = 4;
 }
